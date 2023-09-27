@@ -223,19 +223,28 @@ class Deployer {
             // Compose target
             const target = `${application.name.toLocaleLowerCase().replace(/\s/g, '-')}.sta.klave.network`;
 
-            // Fetch existing target
-            const targetRef = await prisma.deploymentAddress.findFirst({
+            // Fetch the latest non-errored deployment for this target
+            const previousDeployment = await prisma.deployment.findFirst({
                 where: {
-                    fqdn: target
+                    deploymentAddress: {
+                        fqdn: target
+                    },
+                    status: {
+                        not: 'errored'
+                    }
+                },
+                include: {
+                    deploymentAddress: true
                 }
             });
 
-            // Store previous deployment
-            const previousDeployment = targetRef?.deploymentId ? await prisma.deployment.findFirst({
-                where: {
-                    id: targetRef?.deploymentId
-                }
-            }) : null;
+            // // Fetch the corresponding deployment address
+            // const targetRef = previousDeployment?.deploymentAddress ? await prisma.deploymentAddress.findFirst({
+            //     where: {
+            //         id: previousDeployment.deploymentAddress.id
+            //     }
+            // }) : null;
+
 
             // Update the previous deployment to be updating
             if (previousDeployment)

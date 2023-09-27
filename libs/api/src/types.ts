@@ -15,12 +15,12 @@ export interface DeploymentBasePayload {
 
 export interface DeploymentPushPayload extends DeploymentBasePayload {
     class: 'push';
+    forceDeploy: boolean;
     commit: {
         url: string;
         ref: string;
         before?: string;
         after: string;
-        forced: boolean;
     }
 }
 

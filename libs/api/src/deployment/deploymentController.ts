@@ -45,7 +45,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
         }
     }
 
-    if (!files.length && !context.commit.forced)
+    if (!files.length && !context.forceDeploy)
         return;
 
     const repo = await prisma.repo.findUnique({
@@ -130,7 +130,6 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
 
     repo.applications.forEach(async application => {
 
-
         // Bail out if the application is not in the running configuration
         if (!availableApplicationsConfig[application.name])
             return;
@@ -138,11 +137,13 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
         // TODO There is typing error in this location
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        if (files.filter(({ filename }) => {
+        const fileChanged = files.filter(({ filename }) => {
             const commitFileDir = path.normalize(path.join('/', filename));
             const appPath = path.normalize(path.join('/', availableApplicationsConfig[application.name]?.rootDir ?? ''));
             return commitFileDir.startsWith(appPath) || filename === 'klave.json';
-        }).length === 0 && !context.commit.forced)
+        });
+
+        if (fileChanged.length === 0 && !context.forceDeploy)
             return;
 
         logger.info(`Deploying ${application.name} from ${context.commit.after}`);
@@ -183,15 +184,23 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                 let contextualDeploymentId: string | undefined;
 
                 try {
-                    const targetRef = await prisma.deploymentAddress.findFirst({
+                    const previousDeployment = await prisma.deployment.findFirst({
                         where: {
-                            fqdn: target
+                            deploymentAddress: {
+                                fqdn: target
+                            },
+                            status: {
+                                not: 'errored'
+                            }
+                        },
+                        include: {
+                            deploymentAddress: true
                         }
                     });
 
-                    const previousDeployment = targetRef?.deploymentId ? await prisma.deployment.findFirst({
+                    const targetRef = previousDeployment?.deploymentAddress ? await prisma.deploymentAddress.findFirst({
                         where: {
-                            id: targetRef?.deploymentId
+                            id: previousDeployment.deploymentAddress.id
                         }
                     }) : null;
 
@@ -265,6 +274,16 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                             logger.debug(`Deployment ${deployment.id} timed out`, {
                                 parent: 'dpl'
                             });
+                            if (previousDeployment) {
+                                await prisma.deployment.update({
+                                    where: {
+                                        id: previousDeployment.id
+                                    },
+                                    data: {
+                                        status: previousDeployment.status
+                                    }
+                                });
+                            }
                             await prisma.deployment.update({
                                 where: {
                                     id: deployment.id
@@ -456,7 +475,9 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 }
                                 logger.debug(`Error while ${!targetRef ? 'updating' : 'registering'} smart contract ${target}: ${error}`);
                                 // Timeout will eventually error this
-                            }).send();
+                            }).send().catch(() => {
+                                // Swallow this error
+                            });
                         } else {
                             if (previousDeployment) {
                                 await prisma.deployment.update({
@@ -470,10 +491,12 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                             }
                             // Timeout will eventually error this
                         }
-                    }).send();
+                    }).send().catch(() => {
+                        // Swallow this error
+                    });
 
                 } catch (error: any) {
-                    logger.debug(`General failure processing ${target}: ${error}`);
+                    logger.debug(`Deployment failure for ${target}: ${error}`);
                     try {
                         if (contextualDeploymentId)
                             await prisma.deployment.update({

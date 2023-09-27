@@ -121,6 +121,7 @@ export const applicationRouter = createTRPCRouter({
                     octokit: installationOctokit,
                     class: 'push',
                     type: 'push',
+                    forceDeploy: true,
                     repo: {
                         url: afterCommit.html_url,
                         owner: deployableRepo.owner,
@@ -129,9 +130,7 @@ export const applicationRouter = createTRPCRouter({
                     commit: {
                         url: afterCommit.html_url,
                         ref: afterCommit.sha, // TODO: check if this is the right ref
-                        // before: beforeCommit?.sha,
-                        after: afterCommit.sha,
-                        forced: true // TODO: check where to get this from
+                        after: afterCommit.sha
                     },
                     pusher: {
                         login: afterCommit.author?.login ?? afterCommit.committer?.login ?? afterCommit.commit.author?.name ?? 'unknown',

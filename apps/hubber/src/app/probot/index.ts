@@ -177,6 +177,7 @@ const probotApp = (app: Probot) => {
                 octokit: context.octokit,
                 class: context.name,
                 type: context.name,
+                forceDeploy: false,
                 repo: {
                     url: context.payload.repository.html_url,
                     owner: context.payload.repository.owner.login,
@@ -186,8 +187,7 @@ const probotApp = (app: Probot) => {
                     url: context.payload.repository.commits_url,
                     ref: context.payload.ref,
                     before: context.payload.before,
-                    after: context.payload.after,
-                    forced: context.payload.forced
+                    after: context.payload.after
                 },
                 pusher: {
                     login: context.payload.sender.login,
