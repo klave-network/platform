@@ -1,0 +1,62 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "rootDir": ".",
+        "sourceMap": true,
+        "declaration": false,
+        "moduleResolution": "node",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noUncheckedIndexedAccess": true,
+        "importHelpers": true,
+        "target": "es2017",
+        "module": "esnext",
+        "lib": [
+            "es2017",
+            "dom"
+        ],
+        "skipLibCheck": true,
+        "skipDefaultLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "baseUrl": ".",
+        "paths": {
+            "@klave/api": [
+                "libs/api/src/index.ts"
+            ],
+            "@klave/compiler": [
+                "libs/compiler/src/index.ts"
+            ],
+            "@klave/db": [
+                "libs/db/src/index.ts"
+            ],
+            "@klave/deployer": [
+                "libs/deployer/src/index.ts"
+            ],
+            "@klave/providers": [
+                "libs/providers/src/index.ts"
+            ],
+            "@klave/pruner": [
+                "libs/pruner/src/index.ts"
+            ],
+            "@klave/sdk": [
+                "libs/sdk/src/index.ts"
+            ]
+        }
+    },
+    "include": [
+        "package.json"
+    ],
+    "exclude": [
+        "node_modules",
+        "tmp"
+    ]
+}

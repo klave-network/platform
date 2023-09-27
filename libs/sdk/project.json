@@ -1,0 +1,83 @@
+{
+    "name": "sdk",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "libs/sdk/src",
+    "projectType": "library",
+    "targets": {
+        "build": {
+            "executor": "@nx/js:swc",
+            "outputs": [
+                "{options.outputPath}"
+            ],
+            "options": {
+                "outputPath": "dist/libs/sdk",
+                "tsConfig": "libs/sdk/tsconfig.lib.json",
+                "packageJson": "libs/sdk/package.json",
+                "main": "libs/sdk/src/index.ts",
+                "assets": [
+                    "libs/sdk/bin/*",
+                    "libs/sdk/assembly/**",
+                    "libs/sdk/index.ts",
+                    "libs/sdk/sdk.json",
+                    "libs/sdk/*.md"
+                ],
+                "generateExportsField": true,
+                "updateBuildableProjectDepsInPackageJson": true,
+                "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {
+                "development": {
+                    "watch": true
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nx/linter:eslint",
+            "outputs": [
+                "{options.outputFile}"
+            ],
+            "options": {
+                "lintFilePatterns": [
+                    "libs/sdk/**/*.ts",
+                    "libs/sdk/package.json"
+                ]
+            }
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+            ],
+            "options": {
+                "jestConfig": "libs/sdk/jest.config.ts",
+                "passWithNoTests": true
+            }
+        },
+        "version": {
+            "executor": "@jscutlery/semver:version",
+            "options": {
+                "preset": "conventional",
+                "trackDeps": true,
+                "changelogHeader": "# Changelog",
+                "tagPrefix": "{projectName}@",
+                "commitMessageFormat": "chore({projectName}): Release version ${version}",
+                "postTargets": [
+                    "sdk:build"
+                ]
+            }
+        },
+        "publish": {
+            "dependsOn": [
+                "build"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "dist/libs/sdk",
+                "commands": [
+                    "yarn publish --access public"
+                ]
+            }
+        }
+    },
+    "tags": []
+}

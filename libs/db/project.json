@@ -1,0 +1,87 @@
+{
+    "name": "db",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "libs/db/src",
+    "projectType": "library",
+    "targets": {
+        "build": {
+            "executor": "@nx/js:swc",
+            "dependsOn": [
+                {
+                    "target": "compile"
+                }
+            ],
+            "outputs": [
+                "{options.outputPath}"
+            ],
+            "options": {
+                "outputPath": "dist/libs/db",
+                "main": "libs/db/src/index.ts",
+                "tsConfig": "libs/db/tsconfig.lib.json",
+                "assets": [
+                    "libs/db/*.md"
+                ]
+            }
+        },
+        "lint": {
+            "executor": "@nx/linter:eslint",
+            "outputs": [
+                "{options.outputFile}"
+            ],
+            "options": {
+                "lintFilePatterns": [
+                    "libs/db/**/*.ts",
+                    "libs/db/package.json"
+                ]
+            }
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+            ],
+            "options": {
+                "jestConfig": "libs/db/jest.config.ts",
+                "passWithNoTests": true
+            }
+        },
+        "studio": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "prisma studio --port 5556 --schema src/prisma/schema.prisma",
+                "cwd": "libs/db"
+            }
+        },
+        "compile": {
+            "executor": "nx:run-commands",
+            "inputs": [
+                "{projectRoot}/src/prisma/schema.prisma"
+            ],
+            "options": {
+                "command": "prisma generate --schema src/prisma/schema.prisma",
+                "cwd": "libs/db"
+            }
+        },
+        "push": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "prisma db push --schema src/prisma/schema.prisma",
+                "cwd": "libs/db"
+            }
+        },
+        "version": {
+            "executor": "@jscutlery/semver:version",
+            "options": {
+                "preset": "conventional",
+                "trackDeps": true,
+                "changelogHeader": "# Changelog",
+                "tagPrefix": "{projectName}@",
+                "commitMessageFormat": "chore({projectName}): Release version ${version}",
+                "postTargets": [
+                    "db:build"
+                ]
+            }
+        }
+    },
+    "tags": []
+}

@@ -1,0 +1,100 @@
+{
+    "$schema": "./node_modules/nx/schemas/nx-schema.json",
+    "tasksRunnerOptions": {
+        "default": {
+            "runner": "nx-cloud",
+            "options": {
+                "cacheableOperations": [
+                    "build",
+                    "build-upstream",
+                    "lint",
+                    "test",
+                    "e2e"
+                ],
+                "accessToken": "OWY1ZGY3MjEtOWIzMi00NjM1LWE2YTItZGJhYTE2NGEwNWZlfHJlYWQtd3JpdGU="
+            }
+        }
+    },
+    "affected": {
+        "defaultBase": "main"
+    },
+    "workspaceLayout": {
+        "appsDir": "apps",
+        "libsDir": "libs"
+    },
+    "targetDefaults": {
+        "build": {
+            "dependsOn": [
+                "^build"
+            ],
+            "inputs": [
+                "production",
+                "^production"
+            ]
+        },
+        "test": {
+            "inputs": [
+                "default",
+                "^production",
+                "{workspaceRoot}/jest.preset.js"
+            ]
+        },
+        "e2e": {
+            "inputs": [
+                "default",
+                "^production"
+            ]
+        },
+        "lint": {
+            "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+            ]
+        },
+        "version": {
+            "dependsOn": [
+                "^version"
+            ]
+        }
+    },
+    "namedInputs": {
+        "default": [
+            "{projectRoot}/**/*",
+            "sharedGlobals"
+        ],
+        "production": [
+            "default",
+            "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+            "!{projectRoot}/tsconfig.spec.json",
+            "!{projectRoot}/jest.config.[jt]s",
+            "!{projectRoot}/.eslintrc.json",
+            "!{projectRoot}/src/test-setup.[jt]s"
+        ],
+        "sharedGlobals": [
+            "{workspaceRoot}/babel.config.json"
+        ]
+    },
+    "generators": {
+        "@nx/react": {
+            "application": {
+                "style": "css",
+                "linter": "eslint",
+                "bundler": "vite",
+                "babel": true
+            },
+            "component": {
+                "style": "css"
+            },
+            "library": {
+                "style": "css",
+                "linter": "eslint"
+            }
+        }
+    },
+    "pluginsConfig": {
+        "@nx/js": {
+            "analyzeSourceFiles": true
+        }
+    },
+    "defaultProject": "hubber"
+}

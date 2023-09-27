@@ -1,0 +1,6 @@
+{
+    "extends": "../sdk.json",
+    "include": [
+        "./**/*.ts"
+    ]
+}

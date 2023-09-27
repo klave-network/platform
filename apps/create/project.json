@@ -1,0 +1,79 @@
+{
+    "name": "create",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/create/src",
+    "projectType": "library",
+    "targets": {
+        "build": {
+            "executor": "@nx/js:swc",
+            "outputs": [
+                "{options.outputPath}"
+            ],
+            "options": {
+                "outputPath": "dist/apps/create",
+                "tsConfig": "apps/create/tsconfig.lib.json",
+                "packageJson": "apps/create/package.json",
+                "main": "apps/create/src/index.ts",
+                "assets": [
+                    {
+                        "glob": "**/(\\.*|*)",
+                        "input": "apps/create/template",
+                        "output": "template",
+                        "ignore": []
+                    },
+                    "apps/create/template/.gitignore",
+                    "apps/create/bin/*",
+                    "apps/create/*.md"
+                ]
+            }
+        },
+        "lint": {
+            "executor": "@nx/linter:eslint",
+            "outputs": [
+                "{options.outputFile}"
+            ],
+            "options": {
+                "lintFilePatterns": [
+                    "apps/create/**/*.ts",
+                    "apps/create/package.json"
+                ]
+            }
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+            ],
+            "options": {
+                "jestConfig": "apps/create/jest.config.ts",
+                "passWithNoTests": true
+            }
+        },
+        "version": {
+            "executor": "@jscutlery/semver:version",
+            "options": {
+                "preset": "conventional",
+                "trackDeps": true,
+                "changelogHeader": "# Changelog",
+                "tagPrefix": "{projectName}@",
+                "commitMessageFormat": "chore({projectName}): Release version ${version}",
+                "postTargets": [
+                    "create:build"
+                ]
+            }
+        },
+        "publish": {
+            "dependsOn": [
+                "build"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "dist/apps/create",
+                "commands": [
+                    "yarn publish --access public"
+                ]
+            }
+        }
+    },
+    "tags": []
+}

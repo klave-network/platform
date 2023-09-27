@@ -1,0 +1,7 @@
+###############################
+# Git Line Endings            #
+###############################
+
+# Force node binaries to always use LF line endings so that if a repo is accessed
+# in Linux the shebang will function.
+bin/* text eol=lf

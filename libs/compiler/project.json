@@ -1,0 +1,79 @@
+{
+    "name": "compiler",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "libs/compiler/src",
+    "projectType": "library",
+    "targets": {
+        "build": {
+            "executor": "@nx/js:tsc",
+            "outputs": [
+                "{options.outputPath}"
+            ],
+            "options": {
+                "outputPath": "dist/libs/compiler",
+                "main": "libs/compiler/src/index.ts",
+                "tsConfig": "libs/compiler/tsconfig.lib.json",
+                "assets": [
+                    "libs/compiler/*.md",
+                    "libs/compiler/src/*.mjs"
+                ],
+                "generateExportsField": true,
+                "updateBuildableProjectDepsInPackageJson": true,
+                "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {
+                "development": {
+                    "watch": true
+                }
+            }
+        },
+        "publish": {
+            "command": "node tools/scripts/publish.mjs compiler {args.ver} {args.tag}",
+            "dependsOn": [
+                "build"
+            ]
+        },
+        "lint": {
+            "executor": "@nx/linter:eslint",
+            "outputs": [
+                "{options.outputFile}"
+            ],
+            "options": {
+                "lintFilePatterns": [
+                    "libs/compiler/**/*.ts",
+                    "libs/compiler/package.json"
+                ]
+            }
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+            ],
+            "options": {
+                "jestConfig": "libs/compiler/jest.config.ts",
+                "passWithNoTests": true
+            },
+            "configurations": {
+                "ci": {
+                    "ci": true,
+                    "codeCoverage": true
+                }
+            }
+        },
+        "version": {
+            "executor": "@jscutlery/semver:version",
+            "options": {
+                "preset": "conventional",
+                "trackDeps": true,
+                "changelogHeader": "# Changelog",
+                "tagPrefix": "{projectName}@",
+                "commitMessageFormat": "chore({projectName}): Release version ${version}",
+                "postTargets": [
+                    "compiler:build"
+                ]
+            }
+        }
+    },
+    "tags": []
+}

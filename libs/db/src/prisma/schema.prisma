@@ -1,0 +1,331 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["tracing"]
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("NX_MONGODB_URL")
+}
+
+model Session {
+    id        String   @id @default(uuid()) @map("_id")
+    sid       String   @unique
+    data      String
+    expiresAt DateTime
+    web       Web?     @relation(fields: [webId], references: [id])
+    webId     String?
+}
+
+type GitHubToken {
+    accessToken           String
+    expiresIn             Int
+    refreshToken          String
+    refreshTokenExpiresIn Int
+    tokenType             String   @default("bearer")
+    scope                 String
+    createdAt             DateTime
+}
+
+model User {
+    id                        String              @id @default(uuid()) @map("_id")
+    loginCode                 String?
+    loginCodeCreatedAt        DateTime?
+    webauthChallenge          String?
+    webauthChallengeCreatedAt DateTime?
+    emails                    String[]            @default([])
+    createdAt                 DateTime            @default(now())
+    updatedAt                 DateTime            @updatedAt
+    webs                      Web[]
+    webauthCredentials        WebauthCredential[]
+}
+
+// enum CredentialDeviceType {
+//     singleDevice
+//     multiDevice
+// }
+
+// enum AuthenticatorTransport {
+//     usb
+//     ble
+//     nfc
+//     internal
+// }
+model WebauthCredential {
+    id                  String @id @default(uuid()) @map("_id")
+    user                User   @relation(fields: [userId], references: [id])
+    userId              String
+    credentialID        String
+    credentialPublicKey String
+    counter             Int
+    // credentialDeviceType CredentialDeviceType
+    // credentialBackedUp   Boolean
+    // transports           AuthenticatorTransport[] @default([])
+}
+
+enum CodeSource {
+    github
+}
+
+enum HookProcessingStatus {
+    idle
+    running
+    done
+}
+
+model Hook {
+    id        String               @id @default(uuid()) @map("_id")
+    source    CodeSource
+    event     String
+    remoteId  String
+    status    HookProcessingStatus @default(idle)
+    payload   Json
+    createdAt DateTime             @default(now())
+}
+
+model DeployableRepo {
+    id                   String   @id @default(uuid()) @map("_id")
+    creatorAuthToken     String
+    owner                String
+    name                 String
+    fullName             String
+    defaultBranch        String?
+    installationRemoteId String
+    config               String?
+    createdAt            DateTime @default(now())
+    web                  Web      @relation(fields: [webId], references: [id])
+    webId                String
+
+    @@unique([creatorAuthToken, owner, name])
+}
+
+model Repo {
+    id            String        @id @default(uuid()) @map("_id")
+    source        CodeSource
+    owner         String
+    name          String
+    defaultBranch String?
+    config        Json
+    createdAt     DateTime      @default(now())
+    updatedAt     DateTime      @updatedAt
+    applications  Application[]
+
+    @@unique([source, owner, name])
+}
+
+enum CompilationStageType {
+    checkout
+    linking
+    typecheck
+    export
+}
+
+model DeploymentStage {
+    id           String               @id @default(uuid()) @map("_id")
+    type         CompilationStageType
+    failed       Boolean              @default(false)
+    name         String?
+    stdout       String               @default("")
+    stderr       String               @default("")
+    createdAt    DateTime             @default(now())
+    updatedAt    DateTime             @updatedAt
+    deployment   Deployment?          @relation(fields: [deploymentId], references: [id])
+    deploymentId String?
+}
+
+enum DeploymentStatus {
+    created
+    compiled
+    deploying
+    deployed
+    updating
+    terminating
+    terminated
+    errored
+}
+
+enum DeploymentLifespan {
+    short
+    long
+}
+
+model Deployment {
+    id                   String             @id @default(uuid()) @map("_id")
+    deploymentAddress    DeploymentAddress?
+    set                  String
+    branch               String?
+    version              String?
+    build                String?
+    locations            String[]           @default([])
+    status               DeploymentStatus   @default(created)
+    life                 DeploymentLifespan @default(short)
+    sealed               Boolean            @default(false)
+    released             Boolean            @default(false)
+    tags                 String[]           @default([])
+    stages               DeploymentStage[]
+    expiresOn            DateTime
+    createdAt            DateTime           @default(now())
+    updatedAt            DateTime           @updatedAt
+    application          Application        @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+    applicationId        String
+    buildOutputDTS       String?
+    buildOutputWAT       String?
+    buildOutputWASM      String?
+    buildOutputStdOut    String?
+    buildOutputStdErr    String?
+    buildOutputErrorObj  Json?
+    dependenciesManifest Json?
+    contractFunctions    String[]           @default([])
+}
+
+model DeploymentAddress {
+    id           String     @id @default(uuid()) @map("_id")
+    fqdn         String
+    deployment   Deployment @relation(fields: [deploymentId], references: [id], onDelete: Cascade)
+    deploymentId String     @unique
+    createdAt    DateTime   @default(now())
+}
+
+model Domain {
+    id            String       @id @default(uuid()) @map("_id")
+    fqdn          String
+    token         String
+    verified      Boolean
+    createdAt     DateTime     @default(now())
+    updatedAt     DateTime     @updatedAt
+    application   Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+    applicationId String?
+    project       Project?     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    projectId     String?
+}
+
+model File {
+    id                String   @id @default(uuid()) @map("_id")
+    uploadToken       String
+    uploadTokenExpiry DateTime
+    size              Int
+    createdAt         DateTime @default(now())
+}
+
+enum ActivityLogClass {
+    pushHook
+    pullRequestHook
+    deployment
+    domain
+    environment
+    listing
+}
+
+type ActivityLogRecord {
+    type    String
+    payload Json
+}
+
+model ActivityLog {
+    id            String            @id @default(uuid()) @map("_id")
+    application   Application       @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+    applicationId String
+    class         ActivityLogClass
+    context       ActivityLogRecord
+    createdAt     DateTime          @default(now())
+}
+
+model Application {
+    id           String        @id @default(uuid()) @map("_id")
+    web          Web           @relation(fields: [webId], references: [id])
+    webId        String
+    name         String
+    domains      Domain[]
+    license      String?
+    description  String?
+    webhook      String?
+    author       String
+    homepage     String?
+    catogories   String[]      @default([])
+    tags         String[]      @default([])
+    logoFileId   String?
+    bannerFileId String?
+    color        String?
+    repo         Repo          @relation(fields: [repoId], references: [id])
+    repoId       String
+    deployments  Deployment[]
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt
+    activityLog  ActivityLog[]
+    project      Project?      @relation(fields: [projectId], references: [id])
+    projectId    String?
+}
+
+model Project {
+    id           String        @id @default(uuid()) @map("_id")
+    name         String
+    domains      Domain[]
+    description  String?
+    webhook      String?
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt
+    applications Application[]
+}
+
+enum InstallationAccountType {
+    unknown
+    user
+    bot
+    organization
+}
+
+model Installation {
+    id          String                  @id @default(uuid()) @map("_id")
+    source      CodeSource
+    hookPayload Json
+    remoteId    String
+    account     String
+    accountType InstallationAccountType
+    createdAt   DateTime                @default(now())
+    updatedAt   DateTime                @updatedAt
+
+    @@unique([source, remoteId, account])
+}
+
+model Repository {
+    id                   String     @id @default(uuid()) @map("_id")
+    source               CodeSource
+    installationPayload  Json
+    installationRemoteId String
+    remoteId             String
+    owner                String
+    name                 String
+    fullName             String
+    defaultBranch        String?
+    private              Boolean
+    createdAt            DateTime   @default(now())
+    updatedAt            DateTime   @updatedAt
+
+    @@unique([source, remoteId, installationRemoteId])
+}
+
+model Web {
+    id              String           @id @default(uuid()) @map("_id")
+    name            String
+    ancestors       String[]         @default([])
+    ephemerals      String[]         @default([])
+    user            User?            @relation(fields: [userId], references: [id])
+    userId          String?
+    githubToken     GitHubToken?
+    sessions        Session[]
+    devices         Device[]
+    deployableRepos DeployableRepo[]
+    applications    Application[]
+    deletedAt       DateTime?
+    createdAt       DateTime         @default(now())
+    updatedAt       DateTime         @updatedAt
+}
+
+model Device {
+    id        String   @id @default(uuid()) @map("_id")
+    localId   String
+    createdAt DateTime @default(now())
+    lastUsed  DateTime
+    web       Web?     @relation(fields: [webId], references: [id])
+    webId     String?
+}

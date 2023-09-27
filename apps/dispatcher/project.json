@@ -1,0 +1,92 @@
+{
+    "name": "dispatcher",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/dispatcher/src",
+    "projectType": "application",
+    "targets": {
+        "build": {
+            "executor": "@nx/esbuild:esbuild",
+            "outputs": [
+                "{options.outputPath}"
+            ],
+            "options": {
+                "outputPath": "dist/apps/dispatcher",
+                "format": [
+                    "cjs"
+                ],
+                "main": "apps/dispatcher/src/main.ts",
+                "tsConfig": "apps/dispatcher/tsconfig.app.json",
+                "assets": [
+                    "apps/dispatcher/src/assets"
+                ],
+                "esbuildOptions": {
+                    "sourcemap": true,
+                    "outExtension": {
+                        ".js": ".js"
+                    }
+                },
+                "generatePackageJson": true,
+                "thirdParty": true
+            },
+            "configurations": {
+                "production": {
+                    "generateLockfile": true,
+                    "esbuildOptions": {
+                        "sourcemap": false
+                    }
+                }
+            }
+        },
+        "serve": {
+            "executor": "@nx/js:node",
+            "options": {
+                "buildTarget": "dispatcher:build"
+            },
+            "configurations": {
+                "production": {
+                    "buildTarget": "dispatcher:build:production"
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nx/linter:eslint",
+            "outputs": [
+                "{options.outputFile}"
+            ],
+            "options": {
+                "lintFilePatterns": [
+                    "apps/dispatcher/**/*.ts",
+                    "apps/dispatcher/package.json"
+                ]
+            }
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+            ],
+            "options": {
+                "jestConfig": "apps/dispatcher/jest.config.ts",
+                "passWithNoTests": true
+            },
+            "configurations": {
+                "ci": {
+                    "ci": true,
+                    "codeCoverage": true
+                }
+            }
+        },
+        "docker-build": {
+            "dependsOn": [
+                "build"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "commands": [
+                    "docker build -f apps/dispatcher/Dockerfile . -t dispatcher:latest"
+                ]
+            }
+        }
+    },
+    "tags": []
+}

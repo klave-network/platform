@@ -1,0 +1,28 @@
+{
+    "name": "@klave/hubber",
+    "version": "0.1.5",
+    "type": "commonjs",
+    "license": "MIT",
+    "dependencies": {
+        "visitor-as": "^0.11.4",
+        "@klave/compiler": "*",
+        "typescript": "*"
+    },
+    "resolutions": {
+        "**/@octokit/auth-token": "^3",
+        "**/@octokit/endpoint": "^7",
+        "**/@octokit/request": "^6",
+        "**/@octokit/request-error": "^3",
+        "**/@octokit/rest": "^19",
+        "**/@octokit/types": "^9",
+        "**/@sentry/integrations": "7.52.1",
+        "**/@sentry/node": "7.52.1",
+        "**/@sentry/react": "7.52.1",
+        "**/@sentry/react-native": "5.5.0",
+        "**/@sentry/types": "7.52.1",
+        "**/react": "^18",
+        "**/react-dom": "^18",
+        "**/strip-ansi": "^6",
+        "**/typescript": "^5.1.3"
+    }
+}

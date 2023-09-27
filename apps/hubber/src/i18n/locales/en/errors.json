@@ -1,0 +1,4 @@
+{
+    "DB_CONNECT_ERROR": "There was a problem connecting to the database.",
+    "SCT_CONNECT_ERROR": "There was a problem connecting to Secretarium."
+}

@@ -1,0 +1,45 @@
+{
+    "bumpFiles": [
+        {
+            "filename": "package.json",
+            "type": "json"
+        }
+    ],
+    "types": [
+        {
+            "type": "feat",
+            "section": "Features"
+        },
+        {
+            "type": "fix",
+            "section": "Bug Fixes"
+        },
+        {
+            "type": "chore",
+            "hidden": true
+        },
+        {
+            "type": "docs",
+            "hidden": true
+        },
+        {
+            "type": "style",
+            "hidden": true
+        },
+        {
+            "type": "refactor",
+            "hidden": true
+        },
+        {
+            "type": "perf",
+            "hidden": true
+        },
+        {
+            "type": "test",
+            "hidden": true
+        }
+    ],
+    "commitUrlFormat": "https://github.com/klave-network/platform/commit/{{hash}}",
+    "compareUrlFormat": "https://github.com/klave-network/platform/compare?from={{currentTag}}&to={{previousTag}}",
+    "issueUrlFormat": "https://github.com/klave-network/platform/issues/{{id}}"
+}

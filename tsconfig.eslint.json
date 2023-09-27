@@ -1,0 +1,15 @@
+{
+    "extends": "./tsconfig.base.json",
+    "compilerOptions": {
+        "noEmit": true
+    },
+    "include": [
+        ".eslintrc.js",
+        ".commitlintrc.js",
+        "*.js*",
+        "*.ts*",
+        "apps/*/*.{js,mjs,ts,json}",
+        "libs/*/*.{js,mjs,ts,json}",
+        "tools/**/*.{js,mjs,ts,json}"
+    ]
+}

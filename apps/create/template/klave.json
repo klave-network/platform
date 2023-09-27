@@ -1,0 +1,14 @@
+{
+    "version": "1",
+    "branches": [
+        "*"
+    ],
+    "applications": [
+        {
+            "name": "{{SMART_CONTRACT_NAME}}",
+            "slug": "{{SMART_CONTRACT_SLUG}}",
+            "version": "0.0.1",
+            "rootDir": "/apps/{{SMART_CONTRACT_SLUG}}"
+        }
+    ]
+}

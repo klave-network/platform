@@ -1,0 +1,45 @@
+{
+    "name": "@klave/sdk",
+    "description": "Klave Honest Apps helpers and definitions",
+    "version": "0.8.1",
+    "license": "MIT",
+    "private": false,
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/klave-network/platform.git",
+        "directory": "libs/sdk"
+    },
+    "author": {
+        "email": "florian@secretarium.com",
+        "name": "Florian Guitton"
+    },
+    "bin": {
+        "stac": "./bin/stac"
+    },
+    "type": "commonjs",
+    "main": "assembly/index.ts",
+    "types": "assembly/index.ts",
+    "exports": {
+        ".": {
+            "default": "./src/index.js",
+            "require": "./src/index.js"
+        },
+        "./stac": {
+            "default": "./src/compile.js",
+            "require": "./src/compile.js"
+        },
+        "./assembly": {
+            "default": "./assembly/index.ts",
+            "require": "./assembly/index.ts"
+        }
+    },
+    "dependencies": {
+        "@klave/compiler": "*",
+        "assemblyscript": "^0.27.9",
+        "chalk": "4.1.2",
+        "fs-extra": "11.1.1"
+    },
+    "devDependencies": {
+        "@types/fs-extra": "11.0.1"
+    }
+}

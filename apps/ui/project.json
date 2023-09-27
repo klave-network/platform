@@ -1,0 +1,113 @@
+{
+    "name": "ui",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/ui/src",
+    "projectType": "application",
+    "targets": {
+        "build": {
+            "executor": "@nx/webpack:webpack",
+            "outputs": [
+                "{options.outputPath}"
+            ],
+            "defaultConfiguration": "production",
+            "options": {
+                "compiler": "swc",
+                "outputPath": "dist/apps/klave",
+                "index": "apps/ui/src/index.html",
+                "baseHref": "/",
+                "main": "apps/ui/src/main.tsx",
+                "polyfills": "apps/ui/src/polyfills.ts",
+                "tsConfig": "apps/ui/tsconfig.app.json",
+                "assets": [
+                    "apps/ui/src/favicon.svg",
+                    "apps/ui/src/assets"
+                ],
+                "styles": [
+                    "apps/ui/src/styles.css"
+                ],
+                "scripts": [],
+                "webpackConfig": "apps/ui/webpack.config",
+                "isolatedConfig": true
+            },
+            "configurations": {
+                "development": {
+                    "extractLicenses": false,
+                    "optimization": false,
+                    "sourceMap": true,
+                    "vendorChunk": true
+                },
+                "production": {
+                    "fileReplacements": [
+                        {
+                            "replace": "apps/ui/src/environments/environment.ts",
+                            "with": "apps/ui/src/environments/environment.prod.ts"
+                        }
+                    ],
+                    "subresourceIntegrity": true,
+                    "optimization": true,
+                    "outputHashing": "all",
+                    "sourceMap": false,
+                    "namedChunks": false,
+                    "extractLicenses": true,
+                    "vendorChunk": false
+                }
+            }
+        },
+        "serve": {
+            "executor": "@nx/webpack:dev-server",
+            "options": {
+                "proxyConfig": "apps/ui/proxy.config.js",
+                "buildTarget": "klave:build",
+                "hmr": true,
+                "port": 4220
+            },
+            "configurations": {
+                "development": {
+                    "buildTarget": "klave:build:development"
+                },
+                "production": {
+                    "buildTarget": "klave:build:production",
+                    "hmr": false,
+                    "port": 4220
+                }
+            },
+            "defaultConfiguration": "development"
+        },
+        "lint": {
+            "executor": "@nx/linter:eslint",
+            "outputs": [
+                "{options.outputFile}"
+            ],
+            "options": {
+                "lintFilePatterns": [
+                    "apps/ui/**/*.{ts,tsx,js,jsx}",
+                    "apps/ui/package.json"
+                ]
+            }
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+            ],
+            "options": {
+                "jestConfig": "apps/ui/jest.config.ts",
+                "passWithNoTests": true
+            }
+        },
+        "version": {
+            "executor": "@jscutlery/semver:version",
+            "options": {
+                "preset": "conventional",
+                "trackDeps": true,
+                "changelogHeader": "# Changelog",
+                "tagPrefix": "{projectName}@",
+                "commitMessageFormat": "chore({projectName}): Release version ${version}",
+                "postTargets": [
+                    "klave:build"
+                ]
+            }
+        }
+    },
+    "tags": []
+}

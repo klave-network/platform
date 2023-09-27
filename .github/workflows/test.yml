@@ -1,0 +1,64 @@
+name: Test
+
+on:
+  push:
+    branches: [main, develop, "fix/*"]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [18.x]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Derive appropriate SHAs for base and head for `nx affected` commands
+        uses: nrwl/nx-set-shas@v3
+
+      - run: |
+          echo "Nx base: ${{ env.NX_BASE }}"
+          echo "Git head: ${{ env.NX_HEAD }}"
+
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: yarn
+
+      - name: Disable TCP/UDP Offloading
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo ethtool -K eth0 tx off rx off
+            exit 0
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            sudo sysctl -w net.link.generic.system.hwcksum_tx=0
+            sudo sysctl -w net.link.generic.system.hwcksum_rx=0
+            exit 0
+          else
+            echo "$RUNNER_OS not supported"
+            exit 0
+          fi
+
+      - name: Install repo dependencies
+        run: yarn install --network-timeout 1000000 --forzen-lockfile
+
+      - name: Unit test the Dev Suite
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
+          CI: true
+        run: yarn nx affected --target=test --parallel=1 --base=${{ env.NX_BASE }} --head=${{ env.NX_HEAD }}
+
+      - name: Execute end-to-end tests
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
+          CI: true
+        run: yarn nx affected --target=e2e --parallel=1 --base=${{ env.NX_BASE }} --head=${{ env.NX_HEAD }}

@@ -1,0 +1,19 @@
+{
+    "name": "@klave/compiler",
+    "version": "0.2.5",
+    "license": "MIT",
+    "private": false,
+    "type": "commonjs",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/klave-network/platform.git",
+        "directory": "libs/compiler"
+    },
+    "author": {
+        "email": "florian@secretarium.com",
+        "name": "Florian Guitton"
+    },
+    "dependencies": {
+        "typescript": "*"
+    }
+}
