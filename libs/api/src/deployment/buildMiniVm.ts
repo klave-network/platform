@@ -1,6 +1,8 @@
 import * as nodePath from 'node:path';
+import * as fs from 'fs-extra';
 import * as sigstore from 'sigstore';
 import fetch from 'node-fetch';
+import { webcrypto } from 'node:crypto';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { ErrorObject, serializeError } from 'serialize-error';
 import type { Stats } from 'assemblyscript/dist/asc';
@@ -96,33 +98,58 @@ export class BuildMiniVM {
         try {
             const components = normalisedPath?.split('node_modules') ?? [];
             const lastComponent = components.pop();
-            logger.debug(`Getting unpkg content for '${lastComponent}'`, {
-                parent: 'bmv'
-            });
             if (lastComponent?.startsWith('/')) {
                 const comps = lastComponent.substring(1).split('/');
                 const packageName = comps[0]?.startsWith('@') ? `${comps.shift()}/${comps.shift()}` : comps.shift() ?? '';
                 const packageVersion = packageName ? this.options.dependencies?.[packageName] : undefined;
                 const filePath = comps.join('/');
+                let version = packageVersion ?? '';
+                let data = '';
 
-                const reponse = await fetch(`https://www.unpkg.com/${packageName}${packageVersion ? `@${packageVersion}` : ''}/${filePath}`, {
-                    agent: this.proxyAgent
-                });
+                const unpkgDomain = 'https://www.unpkg.com/';
+                const url = `${unpkgDomain}${packageName}${packageVersion ? `@${packageVersion}` : ''}/${filePath}`;
+                const urlHash = Utils.toHex(new Uint8Array(await webcrypto.subtle.digest('SHA-256', new TextEncoder().encode(url))));
+                const assetLocation = nodePath.resolve(`./.cache/klave/compiler/assets/${urlHash}`);
 
-                const effectiveComps = reponse.url.replace('https://www.unpkg.com/', '').split('/');
-                const effectiveName = effectiveComps[0]?.startsWith('@') ? `${effectiveComps.shift()}/${effectiveComps.shift()}` : effectiveComps.shift() ?? '';
-                const effectiveVersion = effectiveName ? effectiveName.split('@')[2] ?? effectiveName.split('@')[1] ?? '*' : '*';
+                if (fs.existsSync(assetLocation)) {
 
-                const data = await reponse.text();
-                if (reponse.ok) {
+                    logger.debug(`Getting disk cache content for '${lastComponent}'`, {
+                        parent: 'bmv'
+                    });
 
+                    if (fs.existsSync(`${assetLocation}/version`) && fs.existsSync(`${assetLocation}/data`)) {
+                        version = fs.readFileSync(`${assetLocation}/version`, 'utf-8');
+                        data = fs.readFileSync(`${assetLocation}/data`, 'utf-8');
+                    }
+
+                } else {
+                    logger.debug(`Getting unpkg content for '${lastComponent}'`, {
+                        parent: 'bmv'
+                    });
+                    const response = await fetch(url, {
+                        agent: this.proxyAgent
+                    });
+
+                    const effectiveComps = response.url.replace(unpkgDomain, '').split('/');
+                    const effectiveName = effectiveComps[0]?.startsWith('@') ? `${effectiveComps.shift()}/${effectiveComps.shift()}` : effectiveComps.shift() ?? '';
+                    const effectiveVersion = effectiveName ? effectiveName.split('@')[2] ?? effectiveName.split('@')[1] ?? '*' : '*';
+
+                    fs.mkdirpSync(assetLocation);
+                    if (response.ok) {
+                        version = effectiveVersion;
+                        data = await response.text();
+                        fs.writeFileSync(`${assetLocation}/version`, version);
+                        fs.writeFileSync(`${assetLocation}/data`, data);
+                    }
+                }
+
+                if (data !== '') {
                     if (!this.usedDependencies[packageName])
                         this.usedDependencies[packageName] = {
-                            version: effectiveVersion,
+                            version,
                             digests: {}
                         };
-                    else
-                        this.usedDependencies[packageName]!.digests[filePath] = Utils.toHex(await Utils.hash(new TextEncoder().encode(data)));
+                    this.usedDependencies[packageName]!.digests[filePath] = Utils.toHex(await Utils.hash(new TextEncoder().encode(data)));
 
                     // TODO - Store the response in a cahing layer
                     // response.getHeader('location');
@@ -136,6 +163,9 @@ export class BuildMiniVM {
         if (normalisedPath)
             return { data: this.getContentSync(normalisedPath) };
 
+        logger.debug(`Couldn't resolve content for '${normalisedPath}'`, {
+            parent: 'bmv'
+        });
         return { data: null };
     }
 
