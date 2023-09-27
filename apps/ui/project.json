@@ -57,16 +57,16 @@
             "executor": "@nx/webpack:dev-server",
             "options": {
                 "proxyConfig": "apps/ui/proxy.config.js",
-                "buildTarget": "klave:build",
+                "buildTarget": "ui:build",
                 "hmr": true,
                 "port": 4220
             },
             "configurations": {
                 "development": {
-                    "buildTarget": "klave:build:development"
+                    "buildTarget": "ui:build:development"
                 },
                 "production": {
-                    "buildTarget": "klave:build:production",
+                    "buildTarget": "ui:build:production",
                     "hmr": false,
                     "port": 4220
                 }
@@ -104,7 +104,7 @@
                 "tagPrefix": "{projectName}@",
                 "commitMessageFormat": "chore({projectName}): Release version ${version}",
                 "postTargets": [
-                    "klave:build"
+                    "ui:build"
                 ]
             }
         }
