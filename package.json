@@ -156,7 +156,7 @@
         "@types/jest": "29.5.5",
         "@types/morgan": "1.9.5",
         "@types/multer": "1.4.7",
-        "@types/node": "20.7.0",
+        "@types/node": "20.8.2",
         "@types/node-fetch": "2.6.6",
         "@types/nodemailer": "6.4.11",
         "@types/passport": "1.0.13",
