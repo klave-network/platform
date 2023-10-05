@@ -10,7 +10,22 @@
                 "*.js",
                 "*.jsx"
             ],
-            "rules": {}
+            "rules": {
+                "@nx/enforce-module-boundaries": [
+                    "error",
+                    {
+                        "allow": [],
+                        "depConstraints": [
+                            {
+                                "sourceTag": "*",
+                                "onlyDependOnLibsWithTags": [
+                                    "*"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         {
             "files": [
