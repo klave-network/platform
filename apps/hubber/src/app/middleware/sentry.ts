@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/node';
-import * as SecretariumInstruments from '@secretarium/intrumentation';
+import * as SecretariumInstruments from '@secretarium/instrumentation';
 import { client as prismaClient } from '../../utils/db';
 import { scp as scpClient } from '@klave/providers';
 
@@ -17,7 +17,8 @@ Sentry.init({
         }),
         new Sentry.Integrations.Mongo(),
         new SecretariumInstruments.Sentry.ConnectorTracing({
-            connector: scpClient
+            connector: scpClient,
+            domains: ['.sta.klave.network']
         })
     ],
     // Set tracesSampleRate to 1.0 to capture 100%

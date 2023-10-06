@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/browser';
-import * as SecretariumInstruments from '@secretarium/intrumentation';
+import * as SecretariumInstruments from '@secretarium/instrumentation';
 import {
     createBrowserRouter,
     useLocation,
@@ -26,7 +26,8 @@ Sentry.init({
             )
         }),
         new SecretariumInstruments.Sentry.ConnectorTracing({
-            connector: scpClient
+            connector: scpClient,
+            domains: ['.sta.klave.network']
         }),
         new Sentry.Replay()
     ],

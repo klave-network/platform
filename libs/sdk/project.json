@@ -21,9 +21,7 @@
                     "libs/sdk/sdk.json",
                     "libs/sdk/*.md"
                 ],
-                "generateExportsField": true,
-                "updateBuildableProjectDepsInPackageJson": true,
-                "buildableProjectDepsInPackageJsonType": "dependencies"
+                "generateExportsField": true
             },
             "configurations": {
                 "development": {

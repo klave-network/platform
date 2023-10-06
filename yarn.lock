@@ -3615,29 +3615,31 @@
   resolved "https://registry.yarnpkg.com/@rushstack/eslint-patch/-/eslint-patch-1.5.0.tgz#5143b0da9c536bfe8beddfeb68bb8b5d647cc7a3"
   integrity sha512-EF3948ckf3f5uPgYbQ6GhyA56Dmv8yg0+ir+BroRjwdxyZJsekhZzawOecC2rOTPCz173t7ZcR1HHZu0dZgOCw==
 
-"@secretarium/connector@0.13.3":
-  version "0.13.3"
-  resolved "https://registry.yarnpkg.com/@secretarium/connector/-/connector-0.13.3.tgz#3329e16346caafeaa63ea168e9beea8327ceeba6"
-  integrity sha512-PppmG2li529IL++L3G4vKGbo1eqG+y0dsK6JhNPGNT+CCphZ2PeQfcQ/Nu9G6TgH7IxpsYLT64SZli5e+6cwHg==
+"@secretarium/connector@0.13.5":
+  version "0.13.5"
+  resolved "https://registry.yarnpkg.com/@secretarium/connector/-/connector-0.13.5.tgz#de89859e622d42535f6793b18d9de6130b7b4d09"
+  integrity sha512-8rcuveKnmy7aG1MTAOirgloYXJBHVm9zPBz8H2W/pQ7CEJjAzSyAS4DMoMVAqTyo8TqfRuI/8KPkhz70PueTpg==
   dependencies:
-    "@secretarium/crypto" "0.1.4"
+    "@secretarium/crypto" "0.1.5"
     "@total-typescript/ts-reset" "0.5.1"
-    js-base64 "3.7.5"
-    tslib "2.6.2"
     ws "8.14.2"
 
-"@secretarium/crypto@0.1.4":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@secretarium/crypto/-/crypto-0.1.4.tgz#edb96708ff5d7f9b9a705eee8f4244342ad56acf"
-  integrity sha512-xLaVehKvhs9FyWcAbZrxe487PW2U4LYBruvF3m+mFmlfcGeng4yZoZ5Q8tuySRml9mrOGxbI2SGO41KIhItefw==
+"@secretarium/crypto@0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@secretarium/crypto/-/crypto-0.1.5.tgz#b5c7804eeb75aaed6ee53547f9a086434bd5fb60"
+  integrity sha512-kicRSVAmlAdA2z/TFG7QOgE2WxvsYqq4rq6a57igcPBGSiHqdjJzRnzEXgjdTQvPU1F50t7LaZCpCcHvQV/xOA==
   dependencies:
     js-base64 "3.7.5"
-    tslib "2.6.2"
 
-"@secretarium/intrumentation@0.1.3":
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/@secretarium/intrumentation/-/intrumentation-0.1.3.tgz#2c8d28ea7c5ff011d4572a2df9b4493fc56ff357"
-  integrity sha512-2rwVAS2rzLThNeSGUMq0e0vMP0weLBjwyl3tRxQoOahvCqNxvNcKLPMWBFMpeJ7TR5/zbuSsAbM92cKUpmab5A==
+"@secretarium/instrumentation@0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@secretarium/instrumentation/-/instrumentation-0.1.6.tgz#a3803e828aaacbbd06b9f87e3424ae5926f0e6f5"
+  integrity sha512-MDbENzKmkF7GEa2VlXJixGVXWU97ztRxvWxj2ZS9zqx9+czZnKBGx/OuVT0U+9b2LVH/vQJ6hs6RRexMGYIHQw==
+  dependencies:
+    "@secretarium/connector" "0.13.5"
+    "@sentry/core" "7.52.1"
+    "@sentry/types" "7.52.1"
+    "@sentry/utils" "7.52.1"
 
 "@sentry-internal/tracing@7.52.1":
   version "7.52.1"
@@ -15774,15 +15776,15 @@ tsconfig-paths@^4.0.0, tsconfig-paths@^4.1.2:
     minimist "^1.2.6"
     strip-bom "^3.0.0"
 
-tslib@2.6.2, tslib@^2.0.0, tslib@^2.0.3, tslib@^2.1.0, tslib@^2.3.0, tslib@^2.3.1, tslib@^2.4.0, tslib@^2.5.0, tslib@^2.6.1, tslib@^2.6.2:
-  version "2.6.2"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.6.2.tgz#703ac29425e7b37cd6fd456e92404d46d1f3e4ae"
-  integrity sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==
-
 tslib@^1.11.1, tslib@^1.9.3:
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
+
+tslib@^2.0.0, tslib@^2.0.3, tslib@^2.1.0, tslib@^2.3.0, tslib@^2.3.1, tslib@^2.4.0, tslib@^2.5.0, tslib@^2.6.1, tslib@^2.6.2:
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.6.2.tgz#703ac29425e7b37cd6fd456e92404d46d1f3e4ae"
+  integrity sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==
 
 tuf-js@^2.1.0:
   version "2.1.0"

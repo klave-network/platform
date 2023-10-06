@@ -17,9 +17,7 @@
                     "libs/compiler/*.md",
                     "libs/compiler/src/*.mjs"
                 ],
-                "generateExportsField": true,
-                "updateBuildableProjectDepsInPackageJson": true,
-                "buildableProjectDepsInPackageJsonType": "dependencies"
+                "generateExportsField": true
             },
             "configurations": {
                 "development": {
