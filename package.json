@@ -14,8 +14,8 @@
         "lint-fix": "nx affected --target=lint --parallel=1 --fix && yarn lint --fix",
         "lint-commit": "commitlint -c false --edit",
         "lint-staged": "lint-staged",
-        "format-check": "nx workspace-lint && nx format:check --all",
-        "format-fix": "nx workspace-lint && nx format --all",
+        "format-check": "nx format:check --all",
+        "format-fix": "nx format --all",
         "preinstall": "node ./tools/scripts/hintYarn.js",
         "postinstall": "is-ci || husky install",
         "prepare": "is-ci || husky install"
