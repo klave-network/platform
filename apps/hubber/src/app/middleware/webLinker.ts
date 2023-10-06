@@ -8,7 +8,6 @@ export const webLinkerMiddlware: RequestHandler = async (req, __unusedRes, next)
 
     const { headers, session } = req;
     const ephemeralTag = headers['x-trustless-klave-ephemeral-tag']?.toString();
-    const { localId } = session as any as Record<string, string>;
 
     try {
 
@@ -17,7 +16,6 @@ export const webLinkerMiddlware: RequestHandler = async (req, __unusedRes, next)
         const webs = await prisma.web.findMany({
             include: {
                 sessions: true,
-                devices: true,
                 deployableRepos: true,
                 applications: true
             },
@@ -37,12 +35,6 @@ export const webLinkerMiddlware: RequestHandler = async (req, __unusedRes, next)
                     ephemerals: ephemeralTag ? {
                         has: ephemeralTag
                     } : undefined
-                }, {
-                    devices: {
-                        some: {
-                            localId
-                        }
-                    }
                 }]
             }
         });
@@ -76,7 +68,6 @@ export const webLinkerMiddlware: RequestHandler = async (req, __unusedRes, next)
             const setOfWebId = new Set<string>();
             const setOfSessionId = new Set<string>([session.id]);
             const setOfEphemeralId = new Set<string>(ephemeralTag ? [ephemeralTag] : []);
-            const setOfDeviceId = new Set<string>();
             const setOfDeployableRepos = new Set<string>();
             const setOfApplications = new Set<string>();
             let githubToken: typeof webs[number]['githubToken'] = null;
@@ -86,7 +77,6 @@ export const webLinkerMiddlware: RequestHandler = async (req, __unusedRes, next)
                 setOfWebId.add(web.id);
                 web.sessions.map(s => s.sid).forEach(s => setOfSessionId.add(s));
                 web.ephemerals.forEach(e => setOfEphemeralId.add(e));
-                web.devices.map(d => d.id).forEach(d => setOfDeviceId.add(d));
                 web.deployableRepos.map(d => d.id).forEach(d => setOfDeployableRepos.add(d));
                 web.applications.map(a => a.id).forEach(a => setOfApplications.add(a));
                 if (web.githubToken && (!githubToken || githubToken.createdAt.getTime() < web.githubToken.createdAt.getTime()))
@@ -98,7 +88,6 @@ export const webLinkerMiddlware: RequestHandler = async (req, __unusedRes, next)
             currentWeb = await prisma.web.create({
                 include: {
                     sessions: true,
-                    devices: true,
                     deployableRepos: true,
                     applications: true
                 },
@@ -118,9 +107,6 @@ export const webLinkerMiddlware: RequestHandler = async (req, __unusedRes, next)
                         connect: Array.from(setOfSessionId).map(sid => ({ sid }))
                     },
                     ephemerals: Array.from(setOfEphemeralId),
-                    devices: {
-                        connect: Array.from(setOfDeviceId).map(did => ({ id: did }))
-                    },
                     deployableRepos: {
                         connect: Array.from(setOfDeployableRepos).map(did => ({ id: did }))
                     },

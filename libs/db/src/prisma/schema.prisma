@@ -40,17 +40,6 @@ model User {
     webauthCredentials        WebauthCredential[]
 }
 
-// enum CredentialDeviceType {
-//     singleDevice
-//     multiDevice
-// }
-
-// enum AuthenticatorTransport {
-//     usb
-//     ble
-//     nfc
-//     internal
-// }
 model WebauthCredential {
     id                  String @id @default(uuid()) @map("_id")
     user                User   @relation(fields: [userId], references: [id])
@@ -58,9 +47,6 @@ model WebauthCredential {
     credentialID        String
     credentialPublicKey String
     counter             Int
-    // credentialDeviceType CredentialDeviceType
-    // credentialBackedUp   Boolean
-    // transports           AuthenticatorTransport[] @default([])
 }
 
 enum CodeSource {
@@ -120,19 +106,6 @@ enum CompilationStageType {
     export
 }
 
-model DeploymentStage {
-    id           String               @id @default(uuid()) @map("_id")
-    type         CompilationStageType
-    failed       Boolean              @default(false)
-    name         String?
-    stdout       String               @default("")
-    stderr       String               @default("")
-    createdAt    DateTime             @default(now())
-    updatedAt    DateTime             @updatedAt
-    deployment   Deployment?          @relation(fields: [deploymentId], references: [id])
-    deploymentId String?
-}
-
 enum DeploymentStatus {
     created
     compiled
@@ -162,7 +135,6 @@ model Deployment {
     sealed               Boolean            @default(false)
     released             Boolean            @default(false)
     tags                 String[]           @default([])
-    stages               DeploymentStage[]
     expiresOn            DateTime
     createdAt            DateTime           @default(now())
     updatedAt            DateTime           @updatedAt
@@ -195,16 +167,6 @@ model Domain {
     updatedAt     DateTime     @updatedAt
     application   Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
     applicationId String?
-    project       Project?     @relation(fields: [projectId], references: [id], onDelete: Cascade)
-    projectId     String?
-}
-
-model File {
-    id                String   @id @default(uuid()) @map("_id")
-    uploadToken       String
-    uploadTokenExpiry DateTime
-    size              Int
-    createdAt         DateTime @default(now())
 }
 
 enum ActivityLogClass {
@@ -231,40 +193,24 @@ model ActivityLog {
 }
 
 model Application {
-    id           String        @id @default(uuid()) @map("_id")
-    web          Web           @relation(fields: [webId], references: [id])
-    webId        String
-    name         String
-    domains      Domain[]
-    license      String?
-    description  String?
-    webhook      String?
-    author       String
-    homepage     String?
-    catogories   String[]      @default([])
-    tags         String[]      @default([])
-    logoFileId   String?
-    bannerFileId String?
-    color        String?
-    repo         Repo          @relation(fields: [repoId], references: [id])
-    repoId       String
-    deployments  Deployment[]
-    createdAt    DateTime      @default(now())
-    updatedAt    DateTime      @updatedAt
-    activityLog  ActivityLog[]
-    project      Project?      @relation(fields: [projectId], references: [id])
-    projectId    String?
-}
-
-model Project {
-    id           String        @id @default(uuid()) @map("_id")
-    name         String
-    domains      Domain[]
-    description  String?
-    webhook      String?
-    createdAt    DateTime      @default(now())
-    updatedAt    DateTime      @updatedAt
-    applications Application[]
+    id          String        @id @default(uuid()) @map("_id")
+    web         Web           @relation(fields: [webId], references: [id])
+    webId       String
+    name        String
+    domains     Domain[]
+    license     String?
+    description String?
+    webhook     String?
+    author      String
+    homepage    String?
+    catogories  String[]      @default([])
+    tags        String[]      @default([])
+    repo        Repo          @relation(fields: [repoId], references: [id])
+    repoId      String
+    deployments Deployment[]
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
+    activityLog ActivityLog[]
 }
 
 enum InstallationAccountType {
@@ -313,19 +259,9 @@ model Web {
     userId          String?
     githubToken     GitHubToken?
     sessions        Session[]
-    devices         Device[]
     deployableRepos DeployableRepo[]
     applications    Application[]
     deletedAt       DateTime?
     createdAt       DateTime         @default(now())
     updatedAt       DateTime         @updatedAt
-}
-
-model Device {
-    id        String   @id @default(uuid()) @map("_id")
-    localId   String
-    createdAt DateTime @default(now())
-    lastUsed  DateTime
-    web       Web?     @relation(fields: [webId], references: [id])
-    webId     String?
 }
