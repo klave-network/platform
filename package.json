@@ -88,7 +88,7 @@
         "passport": "0.6.0",
         "passport-local": "1.0.0",
         "path-complete-extname": "1.0.0",
-        "pretty-bytes": "5.6.0",
+        "pretty-bytes": "6.1.1",
         "probot": "12.3.1",
         "prompts": "2.4.2",
         "query-string": "8.1.0",
