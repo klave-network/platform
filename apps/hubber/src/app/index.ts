@@ -112,7 +112,7 @@ export const start = async (port: number) => {
     app.use(morganLoggerMiddleware);
     app.use(rateLimiterMiddleware);
     app.use(cors({
-        origin: ['chrome-extension://', `http://localhost:${port}`, `http://127.0.0.1:${port}`, /\.klave\.network$/, /\.klave\.dev$/, /\.secretarium\.com$/, /\.secretarium\.org$/],
+        origin: ['chrome-extension://', `http://localhost:${port}`, `http://127.0.0.1:${port}`, /\.klave\.network$/, /\.klave\.dev$/, /\.klave\.com$/, /\.secretarium\.com$/, /\.secretarium\.org$/],
         credentials: true
     }));
     app.use(express.json());
