@@ -1,4 +1,5 @@
 import ip from 'ip';
+import url from 'url';
 import path from 'node:path';
 import expectCt from 'expect-ct';
 import express from 'express';
@@ -26,6 +27,8 @@ import { trcpMiddlware } from './middleware/trpc';
 import { usersRouter } from './routes';
 import { logger } from '@klave/providers';
 import { webLinkerMiddlware } from './middleware/webLinker';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const eapp = express();
 const { app, getWss } = ews(eapp, undefined, {

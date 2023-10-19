@@ -1,6 +1,6 @@
-import * as nodePath from 'node:path';
-import * as fs from 'fs-extra';
-import * as sigstore from 'sigstore';
+import nodePath from 'node:path';
+import fs from 'fs-extra';
+import sigstore from 'sigstore';
 import fetch from 'node-fetch';
 import { webcrypto } from 'node:crypto';
 import { HttpsProxyAgent } from 'https-proxy-agent';

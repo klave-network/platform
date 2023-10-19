@@ -13,6 +13,11 @@
                 "*.js",
                 "*.jsx"
             ],
+            "parserOptions": {
+                "project": [
+                    "apps/hubber/tsconfig.*?.json"
+                ]
+            },
             "rules": {
                 "@nx/enforce-module-boundaries": [
                     "error",

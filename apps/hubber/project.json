@@ -5,19 +5,33 @@
     "projectType": "application",
     "targets": {
         "build": {
-            "executor": "@nx/webpack:webpack",
+            "executor": "@nx/esbuild:esbuild",
             "outputs": [
                 "{options.outputPath}"
             ],
             "defaultConfiguration": "production",
             "options": {
-                "target": "node",
-                "compiler": "tsc",
+                "platform": "node",
                 "outputPath": "dist/apps/hubber",
+                "format": [
+                    "esm"
+                ],
+                "bundle": true,
                 "main": "apps/hubber/src/main.ts",
                 "tsConfig": "apps/hubber/tsconfig.app.json",
-                "isolatedConfig": true,
-                "webpackConfig": "apps/hubber/webpack.config.js"
+                "assets": [
+                    "apps/hubber/src/assets"
+                ],
+                "external": [
+                    "@klave/as-json"
+                ],
+                "generatePackageJson": true,
+                "esbuildOptions": {
+                    "sourcemap": true,
+                    "outExtension": {
+                        ".js": ".js"
+                    }
+                }
             },
             "configurations": {
                 "development": {
@@ -25,9 +39,17 @@
                 },
                 "production": {
                     "optimization": true,
+                    "minify": true,
+                    "bundle": true,
                     "extractLicenses": true,
                     "generateLockfile": true,
-                    "generatePackageJson": true
+                    "generatePackageJson": true,
+                    "esbuildOptions": {
+                        "sourcemap": false,
+                        "outExtension": {
+                            ".js": ".js"
+                        }
+                    }
                 }
             }
         },
@@ -39,6 +61,7 @@
             },
             "configurations": {
                 "development": {
+                    "watch": true,
                     "buildTarget": "hubber:build:development"
                 },
                 "production": {
