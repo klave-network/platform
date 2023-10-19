@@ -24,10 +24,13 @@ export const dbOps = {
     initialize: async () => {
         try {
             await client.$connect();
+            await client.$runCommandRaw({
+                count: 'deployment'
+            });
             logger.info(`Connected to Mongo via Prisma ${process.env['NX_MONGODB_URL']}`);
             return;
         } catch (e: any) {
-            logger.error(`Connection ${++reconnectAttempt} to Mongo failed: ${e.message}`);
+            logger.error(`Connection ${++reconnectAttempt} to Mongo failed: ${e?.meta?.message ?? e?.message ?? e?.code ?? 'Unknown error'}}`);
             await planReconnection();
         }
     },
