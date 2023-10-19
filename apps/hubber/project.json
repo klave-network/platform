@@ -20,7 +20,9 @@
                 "webpackConfig": "apps/hubber/webpack.config.js"
             },
             "configurations": {
-                "development": {},
+                "development": {
+                    "watch": true
+                },
                 "production": {
                     "optimization": true,
                     "extractLicenses": true,
@@ -92,14 +94,11 @@
                 },
                 {
                     "target": "build",
-                    "dependencies": true
+                    "projects": "ui"
                 }
             ],
             "command": "docker build -f apps/hubber/Dockerfile . -t hubber:latest"
         }
     },
-    "implicitDependencies": [
-        "ui"
-    ],
     "tags": []
 }
