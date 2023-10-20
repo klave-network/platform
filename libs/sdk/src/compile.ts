@@ -2,8 +2,6 @@ import * as fs from 'fs-extra';
 import * as path from 'node:path';
 import * as chalk from 'chalk';
 import { posix as pathCompleteExtname } from 'path-complete-extname';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import { createCompiler, type CompilerHost } from '@klave/compiler';
 import { klaveRcConfigurationSchema as schema } from './rc';
 

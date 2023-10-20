@@ -54,7 +54,6 @@ export async function findGitHubEmail(): Promise<string> {
 /**
  * Get the GitHub username from an email address if the email can be found in any commits on GitHub.
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function findGitHubProfileUrl(email: string): Promise<string> {
     try {
         const username = (await githubUsername(email)) ?? '';

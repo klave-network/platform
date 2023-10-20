@@ -10,6 +10,11 @@
                 "*.js",
                 "*.jsx"
             ],
+            "parserOptions": {
+                "project": [
+                    "apps/ui/tsconfig.*?.json"
+                ]
+            },
             "rules": {
                 "@nx/enforce-module-boundaries": [
                     "error",

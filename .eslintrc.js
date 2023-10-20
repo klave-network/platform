@@ -41,17 +41,11 @@ module.exports = {
         tsconfigRootDir: __dirname,
         project: [
             './tsconfig.eslint.json'
-            // './{packages,apps,libs}/*-e2e/tsconfig.json',
-            // './{packages,apps,libs}/*/tsconfig.e2e.json',
-            // './{packages,apps,libs}/*/tsconfig.lib.json',
-            // './{packages,apps,libs}/*/tsconfig.app.json',
-            // './{packages,apps,libs}/*/tsconfig.spec.json',
-            // './{packages,apps,libs}/*/tsconfig.server.json'
         ],
         EXPERIMENTAL_useProjectService: true
     },
     ignorePatterns: [
-        // '**/*',
+        '**/*',
         '!**/*.json',
         '!**/*.js',
         '!**/*.mjs',

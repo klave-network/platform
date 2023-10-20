@@ -12,7 +12,7 @@ import { router } from '../router';
 export const deployToSubstrate = async (deploymentContext: DeploymentContext<DeploymentPushPayload>) => {
 
     const { octokit, ...context } = deploymentContext;
-    let files: Awaited<ReturnType<typeof octokit.repos.compareCommits>>['data']['files'] = [];
+    let files: NonNullable<Awaited<ReturnType<typeof octokit.repos.compareCommits>>['data']['files']> = [];
 
     if (context.commit.before) {
         try {
@@ -135,8 +135,6 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
             return;
 
         // TODO There is typing error in this location
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         const fileChanged = files.filter(({ filename }) => {
             const commitFileDir = path.normalize(path.join('/', filename));
             const appPath = path.normalize(path.join('/', availableApplicationsConfig[application.name]?.rootDir ?? ''));
