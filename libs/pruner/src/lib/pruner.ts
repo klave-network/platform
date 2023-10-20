@@ -32,6 +32,7 @@ async function terminateExpiredDeployments() {
             status: {
                 in: ['deployed', 'errored']
             },
+            life: 'short',
             expiresOn: {
                 lt: new Date()
             }
@@ -53,10 +54,36 @@ async function terminateExpiredDeployments() {
     });
 }
 
+async function cancelUpdatingDeployments() {
+    const expiredDeploymentList = await prisma.deployment.findMany({
+        where: {
+            status: {
+                in: ['updating']
+            },
+            updatedAt: {
+                lt: new Date(Date.now() - 1000 * 60 * 10)
+            }
+        }
+    });
+    return Promise.allSettled(expiredDeploymentList.map((deployment) => {
+        return prisma.deployment.update({
+            where: {
+                id: deployment.id
+            },
+            data: {
+                status: 'deployed'
+            }
+        });
+    })).catch((e) => {
+        logger.error('Error while rolling back updating deployments', e);
+    });
+}
+
 export async function prune() {
     try {
         await errorLongDeployingDeployments();
         await terminateExpiredDeployments();
+        await cancelUpdatingDeployments();
     } catch (e) {
         logger.error('Error while pruning', e);
     }
