@@ -6,12 +6,30 @@ import { deployToSubstrate } from '../deployment/deploymentController';
 
 export const applicationRouter = createTRPCRouter({
     getAll: publicProcedure
-        .query(async ({ ctx: { prisma, webId } }) => {
+        .query(async ({ ctx: { prisma, webId, user } }) => {
             const manifest = await prisma.application.findMany({
                 where: {
                     webId
                 },
-                include: { deployments: true }
+                include: {
+                    deployments: {
+                        select: {
+                            id: true,
+                            set: true,
+                            branch: true,
+                            version: true,
+                            build: true,
+                            status: true,
+                            released: true,
+                            life: true,
+                            sealed: true
+                        }
+                    }, permissionGrants: {
+                        where: {
+                            userId: user?.id
+                        }
+                    }
+                }
             });
             return manifest;
         }),
