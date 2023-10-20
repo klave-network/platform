@@ -19,7 +19,7 @@ export const applicationRouter = createTRPCRouter({
         .input(z.object({
             appId: z.string().uuid()
         }))
-        .query(async ({ ctx: { prisma }, input: { appId } }) => {
+        .query(async ({ ctx: { prisma, user }, input: { appId } }) => {
             return await prisma.application.findUnique({
                 where: {
                     id: appId
@@ -32,7 +32,16 @@ export const applicationRouter = createTRPCRouter({
                     webhook: true,
                     name: true,
                     tags: true,
-                    repo: true
+                    repo: true,
+                    permissionGrants: {
+                        where: {
+                            userId: user?.id
+                        },
+                        include: {
+                            user: true,
+                            organisation: true
+                        }
+                    }
                 }
             });
         }),
@@ -99,7 +108,16 @@ export const applicationRouter = createTRPCRouter({
                         },
                         catogories: [],
                         tags: [],
-                        author: webId ?? emphemeralKlaveTag ?? sessionID
+                        author: webId ?? emphemeralKlaveTag ?? sessionID,
+                        owner: webId ?? emphemeralKlaveTag ?? sessionID,
+                        permissionGrants: {
+                            create: {
+                                admin: true,
+                                read: true,
+                                write: true,
+                                userId: webId ?? emphemeralKlaveTag ?? sessionID
+                            }
+                        }
                     }
                 });
 

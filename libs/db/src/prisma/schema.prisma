@@ -27,6 +27,13 @@ type GitHubToken {
     createdAt             DateTime
 }
 
+model Organisation {
+    id               String            @id @default(uuid()) @map("_id")
+    name             String
+    slug             String
+    permissionGrants PermissionGrant[]
+}
+
 model User {
     id                        String              @id @default(uuid()) @map("_id")
     loginCode                 String?
@@ -38,6 +45,7 @@ model User {
     updatedAt                 DateTime            @updatedAt
     webs                      Web[]
     webauthCredentials        WebauthCredential[]
+    permissionGrants          PermissionGrant[]
 }
 
 model WebauthCredential {
@@ -193,24 +201,41 @@ model ActivityLog {
 }
 
 model Application {
-    id          String        @id @default(uuid()) @map("_id")
-    web         Web           @relation(fields: [webId], references: [id])
-    webId       String
-    name        String
-    domains     Domain[]
-    license     String?
-    description String?
-    webhook     String?
-    author      String
-    homepage    String?
-    catogories  String[]      @default([])
-    tags        String[]      @default([])
-    repo        Repo          @relation(fields: [repoId], references: [id])
-    repoId      String
-    deployments Deployment[]
-    createdAt   DateTime      @default(now())
-    updatedAt   DateTime      @updatedAt
-    activityLog ActivityLog[]
+    id               String            @id @default(uuid()) @map("_id")
+    web              Web               @relation(fields: [webId], references: [id])
+    webId            String
+    name             String
+    domains          Domain[]
+    license          String?
+    description      String?
+    webhook          String?
+    author           String
+    owner            String?
+    homepage         String?
+    catogories       String[]          @default([])
+    tags             String[]          @default([])
+    repo             Repo              @relation(fields: [repoId], references: [id])
+    repoId           String
+    deployments      Deployment[]
+    createdAt        DateTime          @default(now())
+    updatedAt        DateTime          @updatedAt
+    activityLog      ActivityLog[]
+    permissionGrants PermissionGrant[]
+}
+
+model PermissionGrant {
+    id             String        @id @default(uuid()) @map("_id")
+    user           User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId         String?
+    organisation   Organisation? @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+    organisationId String?
+    application    Application   @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+    applicationId  String
+    read           Boolean
+    write          Boolean
+    admin          Boolean
+    createdAt      DateTime      @default(now())
+    updatedAt      DateTime      @updatedAt
 }
 
 enum InstallationAccountType {

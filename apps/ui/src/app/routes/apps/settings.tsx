@@ -162,6 +162,29 @@ export const AppSettings: FC = () => {
             </p>
         </div>
         <div>
+            <h1 className='font-bold text-xl mb-5'>Manage Access</h1>
+            <div className='flex flex-row gap-3 bg-slate-100 border-slate-100 border rounded-sm p-2'>
+                <div className='flex flex-col gap-1 grow'>
+                    Name
+                </div>
+                <div className='flex flex-col gap-1 items-center'>
+                    Permission
+                </div>
+            </div>
+            {application.permissionGrants?.map((grant, i) =>
+                <div key={i} className='flex flex-row gap-3 border-slate-100 border border-t-0 rounded-sm p-2'>
+                    <div className='flex flex-col gap-1 grow'>
+                        <p className='font-bold'>{grant.user?.emails?.[0] ?? grant.organisation?.name}</p>
+                        <p>{grant.userId ?? grant.organisationId}</p>
+                    </div>
+                    <div className='flex flex-col gap-1 items-center'>
+                        <p className='font-bold'>{grant.admin ? 'Admin' : grant.write ? 'Write' : grant.read ? 'Read' : 'Unknown'}</p>
+                    </div>
+                </div>
+
+            )}
+        </div>
+        <div>
             <h1 className='text-red-700 font-bold text-xl mb-5'>Danger zone</h1>
             <ApplicationDeletion />
         </div>
