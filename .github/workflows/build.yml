@@ -28,7 +28,7 @@ jobs:
           echo "Git head: ${{ env.NX_HEAD }}"
 
       - name: Use Node.js ${{ matrix.node }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
           cache: yarn
