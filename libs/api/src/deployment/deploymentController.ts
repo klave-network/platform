@@ -1,7 +1,7 @@
 import { DeploymentPushPayload } from '../types';
 import { v4 as uuid } from 'uuid';
 import { scp, logger } from '@klave/providers';
-import { prisma } from '@klave/db';
+import { Deployment, prisma, DeploymentAddress } from '@klave/db';
 // import type { KlaveRcConfiguration } from '@klave/sdk';
 import { Utils } from '@secretarium/connector';
 import * as path from 'node:path';
@@ -195,12 +195,6 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                             deploymentAddress: true
                         }
                     });
-
-                    const targetRef = previousDeployment?.deploymentAddress ? await prisma.deploymentAddress.findFirst({
-                        where: {
-                            id: previousDeployment.deploymentAddress.id
-                        }
-                    }) : null;
 
                     if (previousDeployment)
                         await prisma.deployment.update({
@@ -398,99 +392,11 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                         });
                     }
 
-                    logger.debug(`${targetRef ? 'Updating' : 'Registering'} smart contract: ${target}`);
-                    await scp.newTx('wasm-manager', targetRef ? 'update_smart_contract' : 'register_smart_contract', `klave-deployment-${deployment.id}`, {
-                        contract: {
-                            name: target,
-                            own_enclave: false,
-                            wasm_bytes: [],
-                            wasm_bytes_b64: wasmB64
-                        }
-                    }).onExecuted(async () => {
-                        logger.debug(`Successfully ${targetRef ? 'updated' : 'registered'} smart contract: ${target}`);
-                        await prisma.deployment.update({
-                            where: {
-                                id: deployment.id
-                            },
-                            data: {
-                                status: 'deployed'
-                            }
-                        });
-                        if (previousDeployment) {
-                            logger.debug(`Deleting previous deployment ${previousDeployment.id} for ${target}`);
-                            const caller = router.v0.deployments.createCaller({
-                                prisma
-                            } as any);
-                            caller.delete({
-                                deploymentId: previousDeployment.id
-                            }).catch((error) => {
-                                logger.debug(`Failure while deleting previous deployment ${previousDeployment.id} for ${target}:, ${error}`);
-                            });
-                        }
-                    }).onError(async (error) => {
-                        logger.debug(`Error while ${!targetRef ? 'updating' : 'registering'} smart contract ${target}: ${error}`);
-                        if (`${error}`.includes('use register_smart_contract') || `${error}`.includes('use update_smart_contract')) {
-                            // TODO - Remove this when we have a proper way to update smart contracts list with `list_smart_contracts`
-                            logger.debug(`Retrying with ${!targetRef ? 'update_smart_contract' : 'register_smart_contract'}...`);
-                            await scp.newTx('wasm-manager', !targetRef ? 'update_smart_contract' : 'register_smart_contract', `klave-deployment-${deployment.id}`, {
-                                contract: {
-                                    name: target,
-                                    own_enclave: false,
-                                    wasm_bytes: [],
-                                    wasm_bytes_b64: wasmB64
-                                }
-                            }).onExecuted(async () => {
-                                logger.debug(`Successfully ${!targetRef ? 'updated' : 'registered'} smart contract: ${target}`);
-                                await prisma.deployment.update({
-                                    where: {
-                                        id: deployment.id
-                                    },
-                                    data: {
-                                        status: 'deployed'
-                                    }
-                                });
-                                if (previousDeployment) {
-                                    logger.debug(`Deleting previous deployment ${previousDeployment.id} for ${target}`);
-                                    const caller = router.v0.deployments.createCaller({
-                                        prisma
-                                    } as any);
-                                    caller.delete({
-                                        deploymentId: previousDeployment.id
-                                    }).catch((error) => {
-                                        logger.debug(`Failure while deleting previous deployment ${previousDeployment.id} for ${target}: ${error}`);
-                                    });
-                                }
-                            }).onError(async (error) => {
-                                if (previousDeployment) {
-                                    await prisma.deployment.update({
-                                        where: {
-                                            id: previousDeployment.id
-                                        },
-                                        data: {
-                                            status: previousDeployment.status
-                                        }
-                                    });
-                                }
-                                logger.debug(`Error while ${!targetRef ? 'updating' : 'registering'} smart contract ${target}: ${error}`);
-                                // Timeout will eventually error this
-                            }).send().catch(() => {
-                                // Swallow this error
-                            });
-                        } else {
-                            if (previousDeployment) {
-                                await prisma.deployment.update({
-                                    where: {
-                                        id: previousDeployment.id
-                                    },
-                                    data: {
-                                        status: previousDeployment.status
-                                    }
-                                });
-                            }
-                            // Timeout will eventually error this
-                        }
-                    }).send().catch(() => {
-                        // Swallow this error
+                    sendToSecretarium({
+                        deployment,
+                        wasmB64,
+                        target,
+                        previousDeployment
                     });
 
                 } catch (error: any) {
@@ -522,4 +428,118 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
     });
 
     return;
+};
+
+export const sendToSecretarium = async ({
+    deployment,
+    wasmB64,
+    target,
+    previousDeployment
+}: {
+    deployment: Deployment;
+    wasmB64: string;
+    target: string;
+    previousDeployment?: Deployment & { deploymentAddress: DeploymentAddress | null } | null;
+}) => {
+
+    const targetRef = previousDeployment?.deploymentAddress ? await prisma.deploymentAddress.findFirst({
+        where: {
+            id: previousDeployment.deploymentAddress.id
+        }
+    }) : null;
+
+    logger.debug(`${targetRef ? 'Updating' : 'Registering'} smart contract: ${target}`);
+    await scp.newTx('wasm-manager', targetRef ? 'update_smart_contract' : 'register_smart_contract', `klave-deployment-${deployment.id}`, {
+        contract: {
+            name: target,
+            own_enclave: false,
+            wasm_bytes: [],
+            wasm_bytes_b64: wasmB64
+        }
+    }).onExecuted(async () => {
+        logger.debug(`Successfully ${targetRef ? 'updated' : 'registered'} smart contract: ${target}`);
+        await prisma.deployment.update({
+            where: {
+                id: deployment.id
+            },
+            data: {
+                status: 'deployed'
+            }
+        });
+        if (previousDeployment) {
+            logger.debug(`Deleting previous deployment ${previousDeployment.id} for ${target}`);
+            const caller = router.v0.deployments.createCaller({
+                prisma
+            } as any);
+            caller.delete({
+                deploymentId: previousDeployment.id
+            }).catch((error) => {
+                logger.debug(`Failure while deleting previous deployment ${previousDeployment.id} for ${target}:, ${error}`);
+            });
+        }
+    }).onError(async (error) => {
+        logger.debug(`Error while ${!targetRef ? 'updating' : 'registering'} smart contract ${target}: ${error}`);
+        if (`${error}`.includes('use register_smart_contract') || `${error}`.includes('use update_smart_contract')) {
+            // TODO - Remove this when we have a proper way to update smart contracts list with `list_smart_contracts`
+            logger.debug(`Retrying with ${!targetRef ? 'update_smart_contract' : 'register_smart_contract'}...`);
+            await scp.newTx('wasm-manager', !targetRef ? 'update_smart_contract' : 'register_smart_contract', `klave-deployment-${deployment.id}`, {
+                contract: {
+                    name: target,
+                    own_enclave: false,
+                    wasm_bytes: [],
+                    wasm_bytes_b64: wasmB64
+                }
+            }).onExecuted(async () => {
+                logger.debug(`Successfully ${!targetRef ? 'updated' : 'registered'} smart contract: ${target}`);
+                await prisma.deployment.update({
+                    where: {
+                        id: deployment.id
+                    },
+                    data: {
+                        status: 'deployed'
+                    }
+                });
+                if (previousDeployment) {
+                    logger.debug(`Deleting previous deployment ${previousDeployment.id} for ${target}`);
+                    const caller = router.v0.deployments.createCaller({
+                        prisma
+                    } as any);
+                    caller.delete({
+                        deploymentId: previousDeployment.id
+                    }).catch((error) => {
+                        logger.debug(`Failure while deleting previous deployment ${previousDeployment.id} for ${target}: ${error}`);
+                    });
+                }
+            }).onError(async (error) => {
+                if (previousDeployment) {
+                    await prisma.deployment.update({
+                        where: {
+                            id: previousDeployment.id
+                        },
+                        data: {
+                            status: previousDeployment.status
+                        }
+                    });
+                }
+                logger.debug(`Error while ${!targetRef ? 'updating' : 'registering'} smart contract ${target}: ${error}`);
+                // Timeout will eventually error this
+            }).send().catch(() => {
+                // Swallow this error
+            });
+        } else {
+            if (previousDeployment) {
+                await prisma.deployment.update({
+                    where: {
+                        id: previousDeployment.id
+                    },
+                    data: {
+                        status: previousDeployment.status
+                    }
+                });
+            }
+            // Timeout will eventually error this
+        }
+    }).send().catch(() => {
+        // Swallow this error
+    });
 };

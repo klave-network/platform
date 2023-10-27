@@ -1,6 +1,8 @@
 import { z } from 'zod';
+import { v4 as uuid } from 'uuid';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import { logger, scp } from '@klave/providers';
+import { sendToSecretarium } from '../deployment/deploymentController';
 
 export const deploymentRouter = createTRPCRouter({
     getByApplication: publicProcedure
@@ -120,15 +122,69 @@ export const deploymentRouter = createTRPCRouter({
         }))
         .mutation(async ({ ctx: { prisma }, input: { deploymentId } }) => {
 
-            await prisma.deployment.update({
+            // await prisma.deployment.update({
+            //     where: {
+            //         id: deploymentId
+            //     },
+            //     data: {
+            //         released: true,
+            //         life: 'long'
+            //     }
+            // });
+
+            const existing = await prisma.deployment.findUnique({
                 where: {
                     id: deploymentId
-                },
-                data: {
-                    released: true,
-                    life: 'long'
                 }
             });
+
+            if (!existing?.buildOutputWASM)
+                return null;
+
+            const domains = await prisma.domain.findMany({
+                where: {
+                    applicationId: existing.applicationId,
+                    verified: true
+                }
+            });
+
+            const targets = domains
+                .map(domain => `${existing.applicationId.split('-').shift()}.${domain.fqdn}`)
+                .concat(`${existing.applicationId.split('-').shift()}.sta.klave.network`);
+
+
+            targets.forEach(async target => {
+
+                const deployment = await prisma.deployment.create({
+                    data: {
+                        ...existing,
+                        id: undefined,
+                        set: uuid(),
+                        expiresOn: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+                        createdAt: undefined,
+                        updatedAt: undefined,
+                        applicationId: undefined,
+                        application: {
+                            connect: {
+                                id: existing.applicationId
+                            }
+                        },
+                        deploymentAddress: {
+                            create: {
+                                fqdn: target
+                            }
+                        },
+                        life: 'long'
+                    }
+                });
+
+                sendToSecretarium({
+                    deployment,
+                    target,
+                    wasmB64: existing.buildOutputWASM ?? ''
+                });
+            });
+
             return;
 
         })
