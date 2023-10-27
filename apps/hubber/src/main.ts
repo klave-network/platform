@@ -2,9 +2,11 @@ import { startPruner } from '@klave/pruner';
 import { start } from './app';
 import './i18n';
 import { dbOps } from './utils/db';
-import { scpOps, githubOps, logger } from '@klave/providers';
+import { scpOps, githubOps, envOps, dispatchOps, logger } from '@klave/providers';
 
 dbOps.initialize()
+    .then(envOps.initialize)
+    .then(dispatchOps.initialize)
     .then(scpOps.initialize)
     .then(githubOps.initialize)
     .then(async () => {
