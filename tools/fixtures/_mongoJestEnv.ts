@@ -27,9 +27,9 @@ class CustomEnvironment extends NodeEnvironment {
         const mongoUri = this.mongodb.getUri();
         this.global.process.env = {
             ...this.originEnv,
-            NX_EXPRESS_SESSION_SECRETS: 'secret-test-1337',
-            NX_MONGODB_URL: mongoUri,
-            NX_MONGODB_DBNAME: dbName
+            KLAVE_EXPRESS_SESSION_SECRETS: 'secret-test-1337',
+            KLAVE_MONGODB_URL: mongoUri,
+            KLAVE_MONGODB_DBNAME: dbName
         };
     }
 

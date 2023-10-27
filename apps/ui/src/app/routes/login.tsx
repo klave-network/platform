@@ -36,8 +36,8 @@ export const Login: FC = () => {
             source: 'klave'
         });
 
-        const secretariumAuth = new URL(`${process.env['NX_SECRETARIUM_ID_URL']}/login/oauth/authorize'}`);
-        secretariumAuth.searchParams.append('client_id', process.env['NX_KLAVE_SELF_CLIENT_ID'] ?? '');
+        const secretariumAuth = new URL(`${process.env['KLAVE_SECRETARIUM_ID_URL']}/login/oauth/authorize'}`);
+        secretariumAuth.searchParams.append('client_id', process.env['KLAVE_SELF_CLIENT_ID'] ?? '');
         secretariumAuth.searchParams.append('scope', 'read:user,read:gpg_key,read:public_key');
         secretariumAuth.searchParams.append('state', state);
         secretariumAuth.searchParams.append('post_messaging', 'true');

@@ -2,7 +2,7 @@ import { FastifyInstance } from 'fastify';
 import type { SocketStream } from '@fastify/websocket';
 import { v4 as uuid } from 'uuid';
 
-const definitions = process.env.NX_DISPATCH_ENDPOINTS?.split(',') ?? [];
+const definitions = process.env.KLAVE_DISPATCH_ENDPOINTS?.split(',') ?? [];
 const endpoints = definitions.map(def => def.split('#') as [string, string]).filter(def => def.length === 2);
 const connectionPool = new Map<string, SocketStream>();
 
@@ -15,7 +15,7 @@ export async function app(fastify: FastifyInstance) {
 
     fastify.get('/dev', { websocket: true }, (connection) => {
         connection.on('data', (data) => {
-            if (data.toString() === process.env.NX_DISPATCH_SECRET) {
+            if (data.toString() === process.env.KLAVE_DISPATCH_SECRET) {
                 const id = uuid();
                 connection.on('close', () => {
                     connectionPool.delete(id);

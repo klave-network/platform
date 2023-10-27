@@ -4,7 +4,7 @@ import { client as prismaClient } from '../../utils/db';
 import { scp as scpClient } from '@klave/providers';
 
 Sentry.init({
-    dsn: process.env.NX_SENTRY_DSN,
+    dsn: process.env.KLAVE_SENTRY_DSN,
     release: 'klave@0.0.0',
     environment: 'development',
     integrations: [

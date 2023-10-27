@@ -59,8 +59,8 @@ export class BuildMiniVM {
         application: any;
         dependencies: Record<string, string>;
     }) {
-        if (process.env['NX_SQUID_URL'])
-            this.proxyAgent = new HttpsProxyAgent(process.env['NX_SQUID_URL']);
+        if (process.env['KLAVE_SQUID_URL'])
+            this.proxyAgent = new HttpsProxyAgent(process.env['KLAVE_SQUID_URL']);
     }
 
     getContentSync(path: string): string | null {

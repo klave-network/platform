@@ -27,7 +27,7 @@ export const dbOps = {
             await client.$runCommandRaw({
                 count: 'deployment'
             });
-            logger.info(`Connected to Mongo via Prisma ${process.env['NX_MONGODB_URL']}`);
+            logger.info(`Connected to Mongo via Prisma ${process.env['KLAVE_MONGODB_URL']}`);
             return;
         } catch (e: any) {
             logger.error(`Connection ${++reconnectAttempt} to Mongo failed: ${e?.meta?.message ?? e?.message ?? e?.code ?? 'Unknown error'}}`);

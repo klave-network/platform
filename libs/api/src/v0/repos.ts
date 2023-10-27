@@ -67,8 +67,8 @@ export const reposRouter = createTRPCRouter({
                             'Accept': 'application/json'
                         },
                         body: JSON.stringify({
-                            client_id: process.env['NX_GITHUB_CLIENTID'],
-                            client_secret: process.env['NX_GITHUB_CLIENTSECRET'],
+                            client_id: process.env['KLAVE_GITHUB_CLIENTID'],
+                            client_secret: process.env['KLAVE_GITHUB_CLIENTSECRET'],
                             grant_type: 'refreshToken',
                             refreshToken
                         })
@@ -254,8 +254,8 @@ export const reposRouter = createTRPCRouter({
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    client_id: process.env['NX_GITHUB_CLIENTID'],
-                    client_secret: process.env['NX_GITHUB_CLIENTSECRET'],
+                    client_id: process.env['KLAVE_GITHUB_CLIENTID'],
+                    client_secret: process.env['KLAVE_GITHUB_CLIENTSECRET'],
                     code
                 })
             });

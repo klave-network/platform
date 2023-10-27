@@ -160,7 +160,7 @@ export const start = async (port: number) => {
     // };
 
     const sessionOptions: session.SessionOptions = {
-        secret: process.env.NX_EXPRESS_SESSION_SECRETS?.split(',') ?? [],
+        secret: process.env.KLAVE_EXPRESS_SESSION_SECRETS?.split(',') ?? [],
         // Don't save session if unmodified
         resave: true,
         // Don't create session until something stored

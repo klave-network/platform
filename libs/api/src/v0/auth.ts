@@ -8,7 +8,7 @@ import { Utils } from '@secretarium/connector';
 // import * as passport from 'passport';
 import { z } from 'zod';
 
-const origin = process.env['NX_WEBAUTHN_ORIGIN'] ?? 'http://localhost';
+const origin = process.env['KLAVE_WEBAUTHN_ORIGIN'] ?? 'http://localhost';
 const rpID = new URL(origin).hostname;
 
 export const authRouter = createTRPCRouter({
@@ -34,7 +34,7 @@ export const authRouter = createTRPCRouter({
         }))
         .mutation(async ({ ctx: { prisma, webId }, input: { email } }) => {
 
-            const betaDomainsAllowed = process.env['NX_BETA_DOMAIN_FILTER']?.split(',') ?? [];
+            const betaDomainsAllowed = process.env['KLAVE_BETA_DOMAIN_FILTER']?.split(',') ?? [];
             const emailDomain = email.split('@')[1];
             if (!emailDomain || !betaDomainsAllowed.includes(emailDomain))
                 throw new Error('It looks like you are not part of Klave\'s beta program');
@@ -57,7 +57,7 @@ export const authRouter = createTRPCRouter({
                         }
                     });
                 const temporaryCode = `${Math.random()}`.substring(2, 11);
-                const transporter = createTransport(process.env['NX_SMTP_HOST']);
+                const transporter = createTransport(process.env['KLAVE_SMTP_HOST']);
                 await prisma.user.update({
                     where: {
                         id: user.id
@@ -67,18 +67,18 @@ export const authRouter = createTRPCRouter({
                         loginCodeCreatedAt: new Date()
                     }
                 });
-                const [keySelector, domainName] = (process.env['NX_DKIM_DOMAIN'] ?? '@').split('@');
+                const [keySelector, domainName] = (process.env['KLAVE_DKIM_DOMAIN'] ?? '@').split('@');
                 if (!keySelector || !domainName)
                     throw new Error('DKIM domain not set');
                 await transporter.sendMail({
-                    from: 'noreply@klave.network',
+                    from: process.env['KLAVE_NOREPLY_ADDRESS'],
                     to: email,
                     subject: 'Login code',
                     text: `Your Klave login code is: ${temporaryCode.substring(0, 3)}-${temporaryCode.substring(3, 6)}-${temporaryCode.substring(6, 9)}`,
                     dkim: {
                         domainName,
                         keySelector,
-                        privateKey: process.env['NX_DKIM_PRIVATE_KEY'] ?? ''
+                        privateKey: process.env['KLAVE_DKIM_PRIVATE_KEY'] ?? ''
                     }
                 });
                 return {
@@ -148,7 +148,7 @@ export const authRouter = createTRPCRouter({
         }))
         .query(async ({ ctx: { prisma }, input: { email } }) => {
 
-            const betaDomainsAllowed = process.env['NX_BETA_DOMAIN_FILTER']?.split(',') ?? [];
+            const betaDomainsAllowed = process.env['KLAVE_BETA_DOMAIN_FILTER']?.split(',') ?? [];
             const emailDomain = email.split('@')[1];
             if (!emailDomain || !betaDomainsAllowed.includes(emailDomain))
                 throw new Error('It looks like you are not part of Klave\'s beta program');
@@ -289,7 +289,7 @@ export const authRouter = createTRPCRouter({
         }))
         .query(async ({ ctx: { prisma }, input: { email } }) => {
 
-            const betaDomainsAllowed = process.env['NX_BETA_DOMAIN_FILTER']?.split(',') ?? [];
+            const betaDomainsAllowed = process.env['KLAVE_BETA_DOMAIN_FILTER']?.split(',') ?? [];
             const emailDomain = email.split('@')[1];
             if (!emailDomain || !betaDomainsAllowed.includes(emailDomain))
                 throw new Error('It looks like you are not part of Klave\'s beta program');

@@ -10,7 +10,7 @@ export const systemRouter = createTRPCRouter({
         }),
     getSecretariumNode: publicProcedure
         .query(async () => {
-            return process.env['NX_SECRETARIUM_NODE'];
+            return process.env['KLAVE_SECRETARIUM_NODE'];
         })
 });
 

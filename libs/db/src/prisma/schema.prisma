@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
     provider = "mongodb"
-    url      = env("NX_MONGODB_URL")
+    url      = env("KLAVE_MONGODB_URL")
 }
 
 model Environment {
@@ -39,6 +39,7 @@ model Organisation {
     id               String            @id @default(uuid()) @map("_id")
     name             String
     slug             String
+    kredit           BigInt            @default(0)
     permissionGrants PermissionGrant[]
 }
 
