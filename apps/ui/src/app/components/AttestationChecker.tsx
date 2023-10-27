@@ -74,7 +74,7 @@ export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, 
                 validation.set(contractBytesHash, challenge.length);
                 return Utils.hash(validation).then((validationHash) => {
                     const reportHash = reportData.subarray(0, 32);
-                    if (Utils.toHex(reportHash) && Utils.toHex(validationHash))
+                    if (Utils.toHex(reportHash) === Utils.toHex(validationHash))
                         setIsContractValid(true);
                     setIsValidating(false);
                 });
@@ -113,11 +113,11 @@ export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, 
                             {isContractValid ? <UilShieldCheck className='w-8 h-10 p-0 -ml-1 mb-2' /> : <UilShieldExclamation className='w-8 h-10 p-0 -ml-1 mb-2' />}
                             {isValidating ? 'Checking contract validity' : isContractValid ? 'Contract integrity validated successfully' : 'Contract integrity not valid. Tampering detected.'}
                         </pre>
-                        <h3 className='mt-5 mb-3'>MR Enclave Hash</h3>
+                        <h3 className='mt-5 mb-3'>MRENCLAVE</h3>
                         <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 dark:bg-gray-800 p-3'>
                             {mrEnclaveHash}
                         </pre>
-                        <h3 className='mt-5 mb-3'>MR Signer Hash</h3>
+                        <h3 className='mt-5 mb-3'>MRSIGNER</h3>
                         <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 dark:bg-gray-800 p-3'>
                             {mrSignedHash}
                         </pre>
