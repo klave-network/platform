@@ -28,6 +28,7 @@ export const dbOps = {
                 count: 'deployment'
             });
             logger.info(`Connected to Mongo via Prisma ${process.env['KLAVE_MONGODB_URL']}`);
+            reconnectAttempt = 0;
             return;
         } catch (e: any) {
             logger.error(`Connection ${++reconnectAttempt} to Mongo failed: ${e?.meta?.message ?? e?.message ?? e?.code ?? 'Unknown error'}}`);

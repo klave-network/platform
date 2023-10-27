@@ -1,4 +1,5 @@
-import { SCP, Key, Constants } from '@secretarium/connector';
+import { SCP, Key, Constants, EncryptedKeyPair } from '@secretarium/connector';
+import { prisma } from '@klave/db';
 import { logger } from './logger';
 
 const client = new SCP();
@@ -8,14 +9,16 @@ let reconnectAttempt = 0;
 let reconnectionTimeout: NodeJS.Timeout | undefined;
 let lastSCPState = Constants.ConnectionState.closed;
 
-const planReconnection = () => {
-    if (!reconnectionTimeout) {
-        reconnectionTimeout = setTimeout(() => {
-            clearTimeout(reconnectionTimeout);
-            reconnectionTimeout = undefined;
-            scpOps.initialize().catch(() => { return; });
-        }, 3000);
-    }
+const planReconnection = async () => {
+    return new Promise((resolve) => {
+        if (!reconnectionTimeout) {
+            reconnectionTimeout = setTimeout(() => {
+                clearTimeout(reconnectionTimeout);
+                reconnectionTimeout = undefined;
+                scpOps.initialize().then(resolve).catch(() => { return; });
+            }, 3000);
+        }
+    });
 };
 
 client.onStateChange((state) => {
@@ -27,18 +30,39 @@ client.onStateChange((state) => {
 export const scpOps = {
     initialize: async () => {
         try {
-            if (!connectionKey)
-                connectionKey = await Key.createKey();
+            const dbSecret = process.env['KLAVE_SECRETARIUM_SECRET'];
+            if (!dbSecret || (dbSecret?.length ?? 0) === 0)
+                throw new Error('Missing Secretarium secret');
+            if (!connectionKey) {
+                const dbKey = process.env['KLAVE_SECRETARIUM_KEY'];
+                if (!dbKey || (dbKey?.length ?? 0) === 0) {
+                    const newKey = await Key.createKey();
+                    await newKey.seal(dbSecret);
+                    const exportedKey = await newKey.exportEncryptedKey();
+                    await prisma.environment.create({
+                        data: {
+                            name: 'KLAVE_SECRETARIUM_KEY',
+                            value: JSON.stringify(exportedKey)
+                        }
+                    });
+                    connectionKey = newKey;
+                } else {
+                    const theKey = JSON.parse(dbKey) as EncryptedKeyPair;
+                    connectionKey = await Key.importEncryptedKeyPair(theKey, dbSecret);
+                }
+            }
             const [node, trustKey] = process.env['KLAVE_SECRETARIUM_NODE']?.split('|') ?? [];
             if (!node || !trustKey)
                 throw new Error('Missing Secretarium node or trust key');
             await client.connect(node, connectionKey, trustKey);
             logger.info(`Connected to Secretarium ${node}`);
+            logger.info(`PK ${await connectionKey.getRawPublicKeyHex()}`);
             reconnectAttempt = 0;
             return;
         } catch (e) {
             logger.error(`Connection ${++reconnectAttempt} to Secretarium failed: ${e}`);
             lastSCPState = Constants.ConnectionState.closed;
+            await planReconnection();
         }
     },
     isConnected: () => {
