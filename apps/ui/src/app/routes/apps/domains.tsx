@@ -14,7 +14,7 @@ type DomainContextProps = {
 
 const DomainDeletion: FC<DomainContextProps> = ({ domain: { id } }) => {
 
-    const utils = api.useContext().v0.domains;
+    const utils = api.useUtils().v0.domains;
     const mutation = api.v0.domains.delete.useMutation({
         onSuccess: async () => {
             await utils.getByApplication.invalidate();
@@ -59,7 +59,7 @@ type DomainRecordProps = {
 const DomainRecord: FC<DomainRecordProps> = ({ domain }) => {
 
     const { id, fqdn, verified, updatedAt } = domain;
-    const utils = api.useContext().v0.domains;
+    const utils = api.useUtils().v0.domains;
     const mutation = api.v0.domains.validate.useMutation({
         onSuccess: async () => {
             await utils.getByApplication.invalidate();
@@ -89,7 +89,7 @@ const DomainRecord: FC<DomainRecordProps> = ({ domain }) => {
         <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 text-right">
             <div className='flex flex-row flex-nowrap justify-end'>
                 <button className="h-8 inline-flex items-center justify-center font-normal text-gray-400 ml-auto" onClick={() => validate(id)}>
-                    {mutation.isLoading ? <UilSpinner className='inline-block animate-spin h-4' /> : 'Revalidate'}
+                    {mutation.isPending ? <UilSpinner className='inline-block animate-spin h-4' /> : 'Revalidate'}
                 </button>
                 &nbsp;&nbsp;
                 <DomainDeletion domain={domain} />
@@ -105,7 +105,7 @@ type DomainAddBoxProps = {
 const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
 
     const { appId } = useParams();
-    const utils = api.useContext().v0.domains;
+    const utils = api.useUtils().v0.domains;
     const createMutation = api.v0.domains.add.useMutation({
         onSuccess: async () => {
             await utils.getAll.invalidate();
@@ -140,11 +140,11 @@ const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
             </div>
             <button
                 type="submit"
-                disabled={createMutation.isLoading}
+                disabled={createMutation.isPending}
                 className="border bg-primary-500 p-2"
                 onClick={() => validate(createMutation.data.id)}
             >
-                {createMutation.isLoading ? 'Loading' : 'Verify'}
+                {createMutation.isPending ? 'Loading' : 'Verify'}
             </button>
             &nbsp;&nbsp;&nbsp;
             <button
@@ -181,10 +181,10 @@ const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
 
         <button
             type="submit"
-            disabled={createMutation.isLoading}
+            disabled={createMutation.isPending}
             className="border bg-primary-500 p-2"
         >
-            {createMutation.isLoading ? 'Loading' : 'Submit'}
+            {createMutation.isPending ? 'Loading' : 'Submit'}
         </button>
         &nbsp;&nbsp;&nbsp;
         <button

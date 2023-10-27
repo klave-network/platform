@@ -7,12 +7,11 @@ export const Select: FC = () => {
 
     const navigate = useNavigate();
     const [shouldRefresh, setShouldRefresh] = useState(false);
-    const { invalidate } = api.useContext().v0.auth.getSession;
+    const { invalidate } = api.useUtils().v0.auth.getSession;
     const { data: deployables, isLoading, isFetching, isRefetching, isError, refetch, error } = api.v0.repos.deployables.useQuery({
         refreshing: shouldRefresh
     }, {
-        queryKey: ['v0.repos.deployables', { refreshing: shouldRefresh }],
-        cacheTime: 0,
+        gcTime: 0,
         retry: false,
         refetchOnWindowFocus: false,
         refetchOnMount: false

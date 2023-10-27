@@ -1,20 +1,5 @@
 {
     "$schema": "./node_modules/nx/schemas/nx-schema.json",
-    "tasksRunnerOptions": {
-        "default": {
-            "runner": "nx-cloud",
-            "options": {
-                "cacheableOperations": [
-                    "build",
-                    "build-upstream",
-                    "lint",
-                    "test",
-                    "e2e"
-                ],
-                "accessToken": "OWY1ZGY3MjEtOWIzMi00NjM1LWE2YTItZGJhYTE2NGEwNWZlfHJlYWQtd3JpdGU="
-            }
-        }
-    },
     "affected": {
         "defaultBase": "main"
     },
@@ -30,31 +15,38 @@
             "inputs": [
                 "production",
                 "^production"
-            ]
+            ],
+            "cache": true
         },
         "test": {
             "inputs": [
                 "default",
                 "^production",
                 "{workspaceRoot}/jest.preset.js"
-            ]
+            ],
+            "cache": true
         },
         "e2e": {
             "inputs": [
                 "default",
                 "^production"
-            ]
+            ],
+            "cache": true
         },
         "lint": {
             "inputs": [
                 "default",
                 "{workspaceRoot}/.eslintrc.json"
-            ]
+            ],
+            "cache": true
         },
         "version": {
             "dependsOn": [
                 "^version"
             ]
+        },
+        "build-upstream": {
+            "cache": true
         }
     },
     "namedInputs": {
@@ -96,5 +88,6 @@
             "analyzeSourceFiles": true
         }
     },
-    "defaultProject": "hubber"
+    "defaultProject": "hubber",
+    "nxCloudAccessToken": "OWY1ZGY3MjEtOWIzMi00NjM1LWE2YTItZGJhYTE2NGEwNWZlfHJlYWQtd3JpdGU="
 }

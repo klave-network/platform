@@ -14,10 +14,10 @@ export const LoginSecKey: FC = () => {
     const [code, setCode] = useState('');
     const [error, setError] = useState<string>();
     const [screen, setScreen] = useState<'start' | 'code' | 'key'>('start');
-    const { mutate: emailCodeMutation, isLoading: emailCodeLoading } = api.v0.auth.getEmailCode.useMutation();
-    const { mutate: verifyEmailCodeMutation, isLoading: verifyEmailCodeLoading } = api.v0.auth.verifyEmailCode.useMutation();
-    const { mutate: validateWebauthnMutation, isLoading: validateWebauthnLoading } = api.v0.auth.validateWebauthn.useMutation();
-    const { mutate: registerWebauthnMutation, isLoading: registerWebauthnLoading } = api.v0.auth.registerWebauthn.useMutation();
+    const { mutate: emailCodeMutation, isPending: emailCodeLoading } = api.v0.auth.getEmailCode.useMutation();
+    const { mutate: verifyEmailCodeMutation, isPending: verifyEmailCodeLoading } = api.v0.auth.verifyEmailCode.useMutation();
+    const { mutate: validateWebauthnMutation, isPending: validateWebauthnLoading } = api.v0.auth.validateWebauthn.useMutation();
+    const { mutate: registerWebauthnMutation, isPending: registerWebauthnLoading } = api.v0.auth.registerWebauthn.useMutation();
     const { refetch: refetchSession } = api.v0.auth.getSession.useQuery();
     const { refetch: refetchAuthOptions, isFetching: wauthOptionsLoading, error: webauthAuthError } = api.v0.auth.getWebauthAuthenticationOptions.useQuery({
         email

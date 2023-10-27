@@ -10,13 +10,13 @@ export const Select: FC = () => {
     const navigate = useNavigate();
     const repoInfo = useParams() as { owner: string, name: string };
     const { data: deployableRepo, isLoading } = api.v0.repos.getDeployableRepo.useQuery(repoInfo, {
-        refetchInterval(data) {
-            if (data?.isAvailableToKlave)
+        refetchInterval: (data) => {
+            if (data.state.data?.isAvailableToKlave)
                 return false;
             return 1000;
         }
     });
-    const { mutate, isLoading: isTriggeringDeploy, isSuccess: hasTriggeredDeploy, error: mutationError } = api.v0.applications.register.useMutation({
+    const { mutate, isPending: isTriggeringDeploy, isSuccess: hasTriggeredDeploy, error: mutationError } = api.v0.applications.register.useMutation({
         onSuccess: () => navigate('/')
     });
     const { register, handleSubmit, watch } = useForm<{ applications: string[] }>();

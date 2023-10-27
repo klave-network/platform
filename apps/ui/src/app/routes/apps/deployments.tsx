@@ -12,7 +12,7 @@ type DeploymentContextProps = {
 
 export const DeploymentPromotion: FC<DeploymentContextProps> = ({ deployment: { id } }) => {
 
-    const utils = api.useContext().v0.deployments;
+    const utils = api.useUtils().v0.deployments;
     const mutation = api.v0.deployments.release.useMutation({
         onSuccess: async () => {
             await utils.getByApplication.invalidate();
@@ -55,7 +55,7 @@ export const DeploymentDeletion: FC<DeploymentContextProps> = ({ deployment: { i
 
     const navigate = useNavigate();
     const { appId } = useParams();
-    const utils = api.useContext().v0.deployments;
+    const utils = api.useUtils().v0.deployments;
     const mutation = api.v0.deployments.delete.useMutation({
         onSuccess: async () => {
             await utils.getByApplication.invalidate();

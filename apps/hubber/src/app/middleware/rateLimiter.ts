@@ -8,7 +8,10 @@ const rateLimiter = new RateLimiterMemory({
 });
 
 export const rateLimiterMiddleware: RequestHandler = (req, res, next) => {
-    rateLimiter.consume(req.ip)
+    const client = req.ip ?? req.socket.remoteAddress;
+    if (!client)
+        return next();
+    return rateLimiter.consume(client)
         .then(() => {
             next();
         })

@@ -33,12 +33,12 @@ export const dummyMap: Record<string, string | null> = {
                 }
             },
             "dependencies": {
-                "assemblyscript": "^0.27.9",
+                "assemblyscript": "^0.27.14",
                 "chalk": "4.1.2",
                 "fs-extra": "11.1.1",
             },
             "devDependencies": {
-                "fs-extra": "11.1.1"
+                "@types/fs-extra": "11.0.1"
             }
         }`,
     'node_modules/@klave/sdk/index.ts': `

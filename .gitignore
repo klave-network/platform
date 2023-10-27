@@ -25,6 +25,7 @@ node_modules
 **/.vscode
 
 # misc
+/.nx
 /.cache
 /.sass-cache
 /connect.lock

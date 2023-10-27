@@ -13,7 +13,7 @@ const ApplicationDeletion = () => {
     const { appId } = useParams();
     const [nameCopy, setNameCopy] = useState('');
     const [canSubmit, setCanSubmit] = useState(false);
-    const utils = api.useContext().v0.applications;
+    const utils = api.useUtils().v0.applications;
     const mutation = api.v0.applications.delete.useMutation({
         onSuccess: async () => {
             await utils.getAll.invalidate();
@@ -73,7 +73,7 @@ export const AppSettings: FC = () => {
 
     const { appId } = useParams();
     const { data: application, isLoading } = api.v0.applications.getById.useQuery({ appId: appId || '' });
-    const utils = api.useContext().v0.applications;
+    const utils = api.useUtils().v0.applications;
     const mutation = api.v0.applications.update.useMutation({
         onSuccess: async () => {
             await utils.getById.invalidate();
@@ -146,10 +146,10 @@ export const AppSettings: FC = () => {
 
             <button
                 type="submit"
-                disabled={mutation.isLoading}
+                disabled={mutation.isPending}
                 className="border bg-primary-500 p-2"
             >
-                {mutation.isLoading ? 'Loading' : 'Submit'}
+                {mutation.isPending ? 'Loading' : 'Submit'}
             </button>
         </form>
         <div>
