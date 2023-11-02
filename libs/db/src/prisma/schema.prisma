@@ -38,9 +38,15 @@ type GitHubToken {
 model Organisation {
     id               String            @id @default(uuid()) @map("_id")
     name             String
-    slug             String
-    kredit           BigInt            @default(0)
+    slug             String            @unique
+    kredits          BigInt            @default(0)
+    personal         Boolean           @default(false)
+    creator          User?
+    creatorId        String?
+    applications     Application[]
     permissionGrants PermissionGrant[]
+    createdAt        DateTime          @default(now())
+    updatedAt        DateTime          @updatedAt
 }
 
 model User {
@@ -49,12 +55,15 @@ model User {
     loginCodeCreatedAt        DateTime?
     webauthChallenge          String?
     webauthChallengeCreatedAt DateTime?
+    slug                      String              @unique
     emails                    String[]            @default([])
     createdAt                 DateTime            @default(now())
     updatedAt                 DateTime            @updatedAt
     webs                      Web[]
     webauthCredentials        WebauthCredential[]
     permissionGrants          PermissionGrant[]
+    personalOrganisation      Organisation        @relation(fields: [personalOrganisationId], references: [id])
+    personalOrganisationId    String              @unique
 }
 
 model WebauthCredential {
@@ -214,13 +223,13 @@ model Application {
     web              Web               @relation(fields: [webId], references: [id])
     webId            String
     name             String
+    slug             String
     domains          Domain[]
     license          String?
     description      String?
     webhook          String?
-    author           String
-    owner            String?
     homepage         String?
+    kredits          BigInt            @default(0)
     catogories       String[]          @default([])
     tags             String[]          @default([])
     repo             Repo              @relation(fields: [repoId], references: [id])
@@ -230,16 +239,20 @@ model Application {
     updatedAt        DateTime          @updatedAt
     activityLog      ActivityLog[]
     permissionGrants PermissionGrant[]
+    organisation     Organisation      @relation(fields: [organisationId], references: [id])
+    organisationId   String
+
+    @@unique([organisationId, slug])
 }
 
 model PermissionGrant {
     id             String        @id @default(uuid()) @map("_id")
-    user           User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId         String?
+    user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId         String
     organisation   Organisation? @relation(fields: [organisationId], references: [id], onDelete: Cascade)
     organisationId String?
-    application    Application   @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-    applicationId  String
+    application    Application?  @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+    applicationId  String?
     read           Boolean
     write          Boolean
     admin          Boolean

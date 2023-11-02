@@ -13,7 +13,7 @@ export const LoginQR: FC = () => {
     const [addressDestination, setAddressDestination] = useState<string>();
     const [socketUrl] = useState(`${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/bridge`);
     const codeValue = `cryptx_check#${addressDestination}#${uuidBeacon}#${uuidLocator}`;
-    console.log(codeValue);
+
     const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
         reconnectAttempts: 5,
         reconnectInterval: 1,

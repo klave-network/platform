@@ -22,6 +22,28 @@ export const activityRouter = createTRPCRouter({
             });
 
         }),
+    getByOrganisation: publicProcedure
+        .input(z.object({
+            orgId: z.string().uuid()
+        }))
+        .query(async ({ ctx: { prisma }, input: { orgId } }) => {
+
+            if (!orgId)
+                return [];
+
+            return await prisma.activityLog.findMany({
+                where: {
+                    application: {
+                        organisationId: orgId
+                    }
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                },
+                take: 20
+            });
+
+        }),
     getAll: publicProcedure
         .query(async ({ ctx: { prisma, webId } }) => {
 

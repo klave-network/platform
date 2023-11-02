@@ -35,8 +35,9 @@ export const ActivityRecord: FC<ActivityRecordProps> = ({ activity }) => {
 
 export const ActivityRecordListing: FC = () => {
 
-    const { appId } = useParams();
-    const { data: activitiesList, isLoading: isLoadingActivities } = api.v0.activities.getByApplication.useQuery({ appId: appId || '' });
+    const { appSlug, orgSlug } = useParams();
+    const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug || '', orgSlug: orgSlug || '' });
+    const { data: activitiesList, isLoading: isLoadingActivities } = api.v0.activities.getByApplication.useQuery({ appId: application?.id || '' });
 
     if (isLoadingActivities || !activitiesList)
         return <>

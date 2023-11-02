@@ -15,7 +15,7 @@ const syncNodeInfo = async () => {
         if (node)
             connectionInfo = node?.split('|') ?? [];
         else
-            connectionInfo = process.env['KLAVE_SECRETARIUM_NODE']?.split('|') ?? [];
+            connectionInfo = process.env['NX_KLAVE_SECRETARIUM_NODE']?.split('|') ?? [];
         return node;
     });
 };

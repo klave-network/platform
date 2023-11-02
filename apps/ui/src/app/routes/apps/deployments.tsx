@@ -54,7 +54,7 @@ export const DeploymentPromotion: FC<DeploymentContextProps> = ({ deployment: { 
 export const DeploymentDeletion: FC<DeploymentContextProps> = ({ deployment: { id } }) => {
 
     const navigate = useNavigate();
-    const { appId } = useParams();
+    const { orgSlug, appSlug } = useParams();
     const utils = api.useUtils().v0.deployments;
     const mutation = api.v0.deployments.delete.useMutation({
         onSuccess: async () => {
@@ -65,7 +65,7 @@ export const DeploymentDeletion: FC<DeploymentContextProps> = ({ deployment: { i
 
     const deleteDeployment = async (deploymentId: Deployment['id']) => {
         await mutation.mutateAsync({ deploymentId });
-        navigate(`/app/${appId}/deployments`);
+        navigate(`/${orgSlug}/${appSlug}/deployments`);
     };
 
     return <AlertDialog.Root>
@@ -98,8 +98,9 @@ export const DeploymentDeletion: FC<DeploymentContextProps> = ({ deployment: { i
 export const Deployments: FC = () => {
 
     const navigate = useNavigate();
-    const { appId } = useParams();
-    const { data: deploymentList, isLoading: isLoadingDeployments } = api.v0.deployments.getByApplication.useQuery({ appId: appId || '' }, {
+    const { appSlug, orgSlug } = useParams();
+    const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug || '', orgSlug: orgSlug || '' });
+    const { data: deploymentList, isLoading: isLoadingDeployments } = api.v0.deployments.getByApplication.useQuery({ appId: application?.id || '' }, {
         refetchInterval: 5000
     });
 

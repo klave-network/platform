@@ -1,12 +1,12 @@
 import { createTRPCRouter, publicProcedure } from '../trpc';
-import { probot } from '@klave/providers';
+import { probot, scp } from '@klave/providers';
 import type { Application } from '@prisma/client';
 import { z } from 'zod';
 import { deployToSubstrate } from '../deployment/deploymentController';
 
 export const applicationRouter = createTRPCRouter({
     getAll: publicProcedure
-        .query(async ({ ctx: { prisma, webId, user } }) => {
+        .query(async ({ ctx: { prisma, webId, session: { user } } }) => {
             const manifest = await prisma.application.findMany({
                 where: {
                     webId
@@ -24,7 +24,8 @@ export const applicationRouter = createTRPCRouter({
                             life: true,
                             sealed: true
                         }
-                    }, permissionGrants: {
+                    },
+                    permissionGrants: {
                         where: {
                             userId: user?.id
                         }
@@ -33,16 +34,99 @@ export const applicationRouter = createTRPCRouter({
             });
             return manifest;
         }),
+    getByOrganisation: publicProcedure
+        .input(z.object({
+            orgId: z.string().uuid()
+        }).or(z.object({
+            orgSlug: z.string()
+        })))
+        .query(async ({ ctx: { prisma, session: { user } }, input }) => {
+
+            const { orgId, orgSlug } = input as Record<string, string>;
+
+            if ((orgId ?? '').trim() === '' && (orgSlug ?? '').trim() === '')
+                return null;
+
+            return await prisma.application.findMany({
+                where: {
+                    organisation: {
+                        OR: [{
+                            id: orgId
+                        },
+                        {
+                            slug: orgSlug
+                        }]
+                    },
+                    permissionGrants: {
+                        some: {
+                            AND: [{
+                                userId: user?.id
+                            },
+                            {
+                                OR: [{
+                                    read: true
+                                },
+                                {
+                                    write: true
+                                },
+                                {
+                                    admin: true
+                                }]
+                            }]
+                        }
+                    }
+                },
+                include: {
+                    deployments: {
+                        select: {
+                            id: true,
+                            set: true,
+                            branch: true,
+                            version: true,
+                            build: true,
+                            status: true,
+                            released: true,
+                            life: true,
+                            sealed: true
+                        }
+                    },
+                    permissionGrants: {
+                        where: {
+                            userId: user?.id
+                        }
+                    }
+                }
+            });
+        }),
     getById: publicProcedure
         .input(z.object({
             appId: z.string().uuid()
         }))
-        .query(async ({ ctx: { prisma, user }, input: { appId } }) => {
+        .query(async ({ ctx: { prisma, session: { user } }, input: { appId } }) => {
             return await prisma.application.findUnique({
                 where: {
-                    id: appId
+                    id: appId,
+                    permissionGrants: {
+                        some: {
+                            AND: [{
+                                userId: user?.id
+                            },
+                            {
+                                OR: [{
+                                    read: true
+                                },
+                                {
+                                    write: true
+                                },
+                                {
+                                    admin: true
+                                }]
+                            }]
+                        }
+                    }
                 },
                 select: {
+                    id: true,
                     catogories: true,
                     homepage: true,
                     description: true,
@@ -51,6 +135,9 @@ export const applicationRouter = createTRPCRouter({
                     name: true,
                     tags: true,
                     repo: true,
+                    kredits: true,
+                    createdAt: true,
+                    updatedAt: true,
                     permissionGrants: {
                         where: {
                             userId: user?.id
@@ -63,13 +150,108 @@ export const applicationRouter = createTRPCRouter({
                 }
             });
         }),
+    getBySlug: publicProcedure
+        .input(z.object({
+            appSlug: z.string(),
+            orgSlug: z.string()
+        }))
+        .query(async ({ ctx: { prisma, session: { user } }, input: { appSlug, orgSlug } }) => {
+            const org = await prisma.organisation.findUnique({
+                where: {
+                    slug: orgSlug
+                }
+            });
+            if (!org)
+                return null;
+            return await prisma.application.findUnique({
+                where: {
+                    organisationId_slug: {
+                        organisationId: org.id,
+                        slug: appSlug
+                    },
+                    // slug: appSlug,
+                    // organisation: {
+                    //     slug: orgSlug
+                    // },
+                    permissionGrants: {
+                        some: {
+                            AND: [{
+                                userId: user?.id
+                            },
+                            {
+                                OR: [{
+                                    read: true
+                                },
+                                {
+                                    write: true
+                                },
+                                {
+                                    admin: true
+                                }]
+                            }]
+                        }
+                    }
+                },
+                select: {
+                    id: true,
+                    catogories: true,
+                    homepage: true,
+                    description: true,
+                    license: true,
+                    webhook: true,
+                    name: true,
+                    tags: true,
+                    repo: true,
+                    kredits: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    permissionGrants: {
+                        where: {
+                            userId: user?.id
+                        },
+                        include: {
+                            user: true,
+                            organisation: true
+                        }
+                    }
+                }
+            });
+        }),
+    getKreditByAppId: publicProcedure
+        .input(z.object({
+            appId: z.string().uuid()
+        }))
+        .query(async ({ ctx: { prisma }, input: { appId } }) => {
+            const kredits = await new Promise<number>((resolve, reject) => {
+                scp.newTx('wasm-manager', 'get_kredit', `klave-app-kredit-${appId}`, {
+                    app_id: appId
+                }).onResult(async (result: any) => {
+                    resolve(result);
+                }).onError((error: any) => {
+                    reject(error);
+                }).send();
+            });
+            await prisma.application.update({
+                where: {
+                    id: appId
+                },
+                data: {
+                    kredits: kredits
+                }
+            });
+            return kredits;
+        }),
     register: publicProcedure
         .input(z.object({
             deployableRepoId: z.string().uuid(),
             applications: z.array(z.string()),
-            emphemeralKlaveTag: z.string().optional()
+            emphemeralKlaveTag: z.string().optional(),
+            organisationId: z.string().uuid()
         }))
-        .mutation(async ({ ctx: { prisma, session, sessionStore, sessionID, user, webId }, input: { deployableRepoId, applications, emphemeralKlaveTag } }) => {
+        .mutation(async ({ ctx: { prisma, session, sessionStore, sessionID, webId }, input: { deployableRepoId, applications, /*emphemeralKlaveTag,*/ organisationId } }) => {
+
+            if (!session.user)
+                return null;
 
             const deployableRepo = await prisma.deployableRepo.findFirst({
                 where: {
@@ -85,6 +267,7 @@ export const applicationRouter = createTRPCRouter({
                 throw (new Error('There is no configuration repo'));
 
             applications.forEach(async appName => {
+                const appSlug = appName.replaceAll(/\W/g, '-').toLocaleLowerCase();
                 // await prisma.$transaction(async (tx) => {
                 // const repo = await tx.repo.upsert({
                 const repo = await prisma.repo.upsert({
@@ -119,6 +302,12 @@ export const applicationRouter = createTRPCRouter({
                             }
                         },
                         name: appName,
+                        slug: appSlug,
+                        organisation: {
+                            connect: {
+                                id: organisationId
+                            }
+                        },
                         repo: {
                             connect: {
                                 id: repo.id
@@ -126,14 +315,14 @@ export const applicationRouter = createTRPCRouter({
                         },
                         catogories: [],
                         tags: [],
-                        author: webId ?? emphemeralKlaveTag ?? sessionID,
-                        owner: webId ?? emphemeralKlaveTag ?? sessionID,
+                        // author: webId ?? emphemeralKlaveTag ?? sessionID,
+                        // owner: webId ?? emphemeralKlaveTag ?? sessionID,
                         permissionGrants: {
                             create: {
                                 admin: true,
                                 read: true,
                                 write: true,
-                                userId: webId ?? emphemeralKlaveTag ?? sessionID
+                                userId: session.user?.id ?? sessionID
                             }
                         }
                     }
@@ -174,7 +363,7 @@ export const applicationRouter = createTRPCRouter({
                     }
                 });
 
-                if (user === undefined)
+                if (session.user === undefined)
                     await new Promise<void>((resolve, reject) => {
                         sessionStore.set(sessionID, {
                             ...session
@@ -192,14 +381,43 @@ export const applicationRouter = createTRPCRouter({
         .input(z.object({
             appId: z.string().uuid(),
             data: z.custom<Partial<Application>>()
-        }))
-        .mutation(async ({ ctx: { prisma }, input: { appId, data } }) => {
-            await prisma.application.update({
-                where: {
-                    id: appId
-                },
-                data
-            });
+        }).or(z.object({
+            appSlug: z.string(),
+            orgSlug: z.string(),
+            data: z.custom<Partial<Application>>()
+        })))
+        .mutation(async ({ ctx: { prisma }, input }) => {
+
+            const { appId, appSlug, orgSlug, data } = input as Record<string, any>;
+
+            if (appId && data) {
+                await prisma.application.update({
+                    where: {
+                        id: appId
+                    },
+                    data
+                });
+            }
+            else if (appSlug && orgSlug && data) {
+                const org = await prisma.organisation.findUnique({
+                    where: {
+                        slug: orgSlug
+                    }
+                });
+                if (!org)
+                    return null;
+                await prisma.application.update({
+                    where: {
+                        organisationId_slug: {
+                            slug: appSlug,
+                            organisationId: org.id
+                        }
+                    },
+                    data
+                });
+            }
+            else
+                throw (new Error('Invalid input'));
             await prisma.activityLog.create({
                 data: {
                     class: 'environment',
@@ -219,14 +437,29 @@ export const applicationRouter = createTRPCRouter({
     delete: publicProcedure
         .input(z.object({
             applicationId: z.string().uuid()
-        }))
-        .mutation(async ({ ctx: { prisma }, input: { applicationId } }) => {
+        }).or(z.object({
+            applicationSlug: z.string(),
+            organisationId: z.string()
+        })))
+        .mutation(async ({ ctx: { prisma }, input }) => {
 
-            await prisma.application.delete({
-                where: {
-                    id: applicationId
-                }
-            });
+            const { applicationId, applicationSlug, organisationId } = input as Record<string, string>;
+
+            if (applicationId)
+                await prisma.application.delete({
+                    where: {
+                        id: applicationId
+                    }
+                });
+            else if (applicationSlug && organisationId)
+                await prisma.application.delete({
+                    where: {
+                        organisationId_slug: {
+                            slug: applicationSlug,
+                            organisationId: organisationId
+                        }
+                    }
+                });
             return;
 
         })

@@ -22,6 +22,11 @@ import AppDeploymentDetail from './routes/apps/deploymentDetail';
 import AppEnvironment from './routes/apps/environment';
 import AppListing from './routes/apps/listing';
 import AppSettings from './routes/apps/settings';
+import OrgNew from './routes/orgs/new';
+import OrgInfo from './routes/orgs/index';
+import OrgActivity from './routes/orgs/activity';
+import OrgSettings from './routes/orgs/settings';
+import OrgCredits from './routes/orgs/credits';
 import Providers from './Providers';
 import { httpApi } from './utils/api';
 
@@ -74,11 +79,26 @@ const router = sentryCreateBrowserRouter(
                 <Route element={<Dashboard />} >
                     <Route index element={<AppInfo />} />
                     <Route
-                        path="app"
+                        path="organisation"
                     >
-                        <Route index element={<AppInfo />} />
+                        <Route index element={<OrgNew />} />
+                        <Route path="new" element={<OrgNew />} />
                         <Route
-                            path=":appId"
+                            path=":orgSlug"
+                            element={<OrgInfo />}
+                        >
+                            <Route index element={<OrgActivity />} />
+                            <Route path="credits" element={<OrgCredits />} />
+                            <Route path="settings" element={<OrgSettings />} />
+                            <Route path="*" element={<OrgActivity />} />
+                        </Route>
+                    </Route>
+                    <Route
+                        path=":orgSlug"
+                    >
+                        <Route index element={<OrgInfo />} />
+                        <Route
+                            path=":appSlug"
                             element={<AppInfo />}
                         >
                             <Route index element={<AppActivity />} />

@@ -32,7 +32,7 @@ const Header: FC = () => {
                 <div className="flex items-center justify-between h-16 md:h-20">
 
                     {/* Site branding */}
-                    <div className="flex-shrink-0 mr-4">
+                    <div className="flex-shrink-0 flex mr-4 items-center">
                         {/* Logo */}
                         <Link to={pathname === '/' && (data && (data.hasUnclaimedApplications || data.me)) ? '/home' : '/'} className="block ml-0" aria-label="Secretarium Platform">
                             <img alt='Secretarium' src={klaveLogo} width={40} className='h-8 inline-block dark:invert' />
@@ -47,7 +47,7 @@ const Header: FC = () => {
                         <ul className="flex flex-grow justify-end flex-wrap items-center">
                             {data?.me
                                 ? <li>
-                                    <span className="btn-sm ml-3 a-like">Welcome, {data.me.emails[0]}</span>
+                                    <span className="btn-sm ml-3 a-like">Welcome, {data.me.slug}</span>
                                 </li>
                                 : null}
                             {/*

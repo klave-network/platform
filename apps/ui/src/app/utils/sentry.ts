@@ -12,7 +12,7 @@ import { useEffect } from 'react';
 import { client as scpClient } from './secretarium';
 
 Sentry.init({
-    dsn: process.env['KLAVE_SENTRY_DSN'],
+    dsn: process.env['NX_KLAVE_SENTRY_DSN'],
     release: 'klave@0.0.0',
     environment: ['localhost', '::', '127.0.0.1'].includes(window.location.hostname) ? 'development' : window.location.hostname,
     integrations: [

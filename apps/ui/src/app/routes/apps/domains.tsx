@@ -104,7 +104,8 @@ type DomainAddBoxProps = {
 
 const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
 
-    const { appId } = useParams();
+    const { appSlug, orgSlug } = useParams();
+    const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug || '', orgSlug: orgSlug || '' });
     const utils = api.useUtils().v0.domains;
     const createMutation = api.v0.domains.add.useMutation({
         onSuccess: async () => {
@@ -129,7 +130,7 @@ const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
         })
     });
 
-    if (!appId)
+    if (!application)
         return null;
 
     if (createMutation.data)
@@ -159,7 +160,7 @@ const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
     return <form
         onSubmit={methods.handleSubmit(async (data) => {
             await createMutation.mutateAsync({
-                applicationId: appId,
+                applicationId: application.id,
                 ...data
             });
             methods.reset();
@@ -199,8 +200,9 @@ const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
 
 export const DomainListing: FC = () => {
 
-    const { appId } = useParams();
-    const { data: domainsList, isLoading } = api.v0.domains.getByApplication.useQuery({ appId: appId || '' });
+    const { appSlug, orgSlug } = useParams();
+    const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug || '', orgSlug: orgSlug || '' });
+    const { data: domainsList, isLoading } = api.v0.domains.getByApplication.useQuery({ appId: application?.id || '' });
     const [addingDomain, setAddingDomain] = useState(false);
 
     if (isLoading || !domainsList)

@@ -16,7 +16,7 @@ export const authRouter = createTRPCRouter({
         return {
             // session: ctx.session,
             // sessionID: ctx.sessionID,
-            me: ctx.user ?? ctx.session.user,
+            me: /*ctx.user ?? */ctx.session.user,
             webId: ctx.webId,
             hasUnclaimedApplications: false,
             hasGithubToken: !!ctx.web.githubToken
@@ -50,9 +50,16 @@ export const authRouter = createTRPCRouter({
                 if (!user)
                     user = await prisma.user.create({
                         data: {
+                            slug: '~#~',
                             emails: [email],
                             webs: {
                                 connect: { id: webId }
+                            },
+                            personalOrganisation: {
+                                create: {
+                                    name: 'Personal',
+                                    slug: 'personal'
+                                }
                             }
                         }
                     });

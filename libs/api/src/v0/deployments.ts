@@ -9,14 +9,33 @@ export const deploymentRouter = createTRPCRouter({
         .input(z.object({
             appId: z.string().uuid()
         }))
-        .query(async ({ ctx: { prisma }, input: { appId } }) => {
+        .query(async ({ ctx: { prisma, session: { user } }, input: { appId } }) => {
 
+            if (!user)
+                return;
             if (!appId)
                 return [];
 
             return await prisma.deployment.findMany({
                 where: {
-                    applicationId: appId
+                    application: {
+                        id: appId,
+                        permissionGrants: {
+                            some: {
+                                userId: user.id,
+                                AND: {
+                                    OR: [{
+                                        read: true
+                                    }, {
+                                        write: true
+                                    }, {
+                                        admin: true
+                                    }]
+                                }
+                            }
+
+                        }
+                    }
                 },
                 include: {
                     deploymentAddress: {
@@ -36,11 +55,30 @@ export const deploymentRouter = createTRPCRouter({
         .input(z.object({
             deploymentId: z.string().uuid()
         }))
-        .query(async ({ ctx: { prisma }, input: { deploymentId } }) => {
+        .query(async ({ ctx: { prisma, session: { user } }, input: { deploymentId } }) => {
+
+            if (!user)
+                return;
 
             const deployment = await prisma.deployment.findUnique({
                 where: {
-                    id: deploymentId
+                    id: deploymentId,
+                    application: {
+                        permissionGrants: {
+                            some: {
+                                userId: user.id,
+                                AND: {
+                                    OR: [{
+                                        read: true
+                                    }, {
+                                        write: true
+                                    }, {
+                                        admin: true
+                                    }]
+                                }
+                            }
+                        }
+                    }
                 },
                 include: {
                     deploymentAddress: {
@@ -54,12 +92,29 @@ export const deploymentRouter = createTRPCRouter({
             return deployment;
         }),
     getAll: publicProcedure
-        .query(async ({ ctx: { prisma, webId } }) => {
+        .query(async ({ ctx: { prisma, session: { user } } }) => {
+
+            if (!user)
+                return;
 
             const deploymentList = await prisma.deployment.findMany({
                 where: {
                     application: {
-                        webId
+                        permissionGrants: {
+                            some: {
+                                userId: user.id,
+                                AND: {
+                                    OR: [{
+                                        read: true
+                                    }, {
+                                        write: true
+                                    }, {
+                                        admin: true
+                                    }]
+                                }
+                            }
+
+                        }
                     }
                 },
                 orderBy: {
@@ -74,11 +129,25 @@ export const deploymentRouter = createTRPCRouter({
         .input(z.object({
             deploymentId: z.string()
         }))
-        .mutation(async ({ ctx: { prisma }, input: { deploymentId } }) => {
+        .mutation(async ({ ctx: { prisma, session: { user } }, input: { deploymentId } }) => {
+            if (!user)
+                return;
             logger.debug(`Deleting deployment ${deploymentId}`);
             await prisma.deployment.delete({
                 where: {
-                    id: deploymentId
+                    id: deploymentId,
+                    application: {
+                        permissionGrants: {
+                            some: {
+                                userId: user.id,
+                                AND: {
+                                    OR: [{
+                                        admin: true
+                                    }]
+                                }
+                            }
+                        }
+                    }
                 }
             });
             return;
@@ -88,11 +157,27 @@ export const deploymentRouter = createTRPCRouter({
         .input(z.object({
             deploymentId: z.string()
         }))
-        .mutation(async ({ ctx: { prisma }, input: { deploymentId } }) => {
+        .mutation(async ({ ctx: { prisma, session: { user } }, input: { deploymentId } }) => {
+            if (!user)
+                return;
             // TODO The Secretarium connection should be ambient in the server
             await prisma.deployment.update({
                 where: {
-                    id: deploymentId
+                    id: deploymentId,
+                    application: {
+                        permissionGrants: {
+                            some: {
+                                userId: user.id,
+                                AND: {
+                                    OR: [{
+                                        write: true
+                                    }, {
+                                        admin: true
+                                    }]
+                                }
+                            }
+                        }
+                    }
                 },
                 data: {
                     status: 'terminating'
@@ -120,7 +205,10 @@ export const deploymentRouter = createTRPCRouter({
         .input(z.object({
             deploymentId: z.string()
         }))
-        .mutation(async ({ ctx: { prisma }, input: { deploymentId } }) => {
+        .mutation(async ({ ctx: { prisma, session: { user } }, input: { deploymentId } }) => {
+
+            if (!user)
+                return;
 
             // await prisma.deployment.update({
             //     where: {
@@ -134,7 +222,21 @@ export const deploymentRouter = createTRPCRouter({
 
             const existing = await prisma.deployment.findUnique({
                 where: {
-                    id: deploymentId
+                    id: deploymentId,
+                    application: {
+                        permissionGrants: {
+                            some: {
+                                userId: user.id,
+                                AND: {
+                                    OR: [{
+                                        write: true
+                                    }, {
+                                        admin: true
+                                    }]
+                                }
+                            }
+                        }
+                    }
                 }
             });
 

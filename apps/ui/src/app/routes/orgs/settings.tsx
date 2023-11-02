@@ -7,30 +7,30 @@ import { useZodForm } from '../../utils/useZodForm';
 import { z } from 'zod';
 import { useEffect } from 'react';
 
-const ApplicationDeletion = () => {
+const OrganisationDeletion = () => {
 
     const navigate = useNavigate();
-    const { appSlug, orgSlug } = useParams();
+    const { orgSlug } = useParams();
     const [nameCopy, setNameCopy] = useState('');
     const [canSubmit, setCanSubmit] = useState(false);
-    const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug || '', orgSlug: orgSlug || '' });
-    const utils = api.useUtils().v0.applications;
-    const mutation = api.v0.applications.delete.useMutation({
+    const { data: organisation } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug || '' });
+    const utils = api.useUtils().v0.organisations;
+    const mutation = api.v0.organisations.delete.useMutation({
         onSuccess: async () => {
             await utils.getAll.invalidate();
             await utils.getById.invalidate();
-            navigate(`/${orgSlug}`);
+            navigate('/');
         }
     });
 
     useEffect(() => {
-        setCanSubmit(nameCopy === appSlug);
-    }, [nameCopy, appSlug]);
+        setCanSubmit(nameCopy === orgSlug);
+    }, [nameCopy, orgSlug]);
 
-    const deleteApplication = async () => {
-        if (application && appSlug)
+    const deleteOrganisation = async () => {
+        if (organisation)
             await mutation.mutateAsync({
-                applicationId: application.id
+                organisationId: organisation.id
             });
     };
 
@@ -46,22 +46,22 @@ const ApplicationDeletion = () => {
                 <AlertDialog.Title className="AlertDialogTitle">Are you absolutely sure?</AlertDialog.Title>
                 <AlertDialog.Description className="AlertDialogDescription">
                     <p className='my-2'>
-                        This action cannot be undone. This will permanently delete this application and all attached data.
+                        This action cannot be undone. This will permanently delete this organisation and all attached data.
                     </p>
                     <p className='my-2'>
-                        If you are really sure you want to delete this application, please type the application ID below.
+                        If you are really sure you want to delete this organisation, please type the organisation ID below.
                     </p>
                     <p className='my-2'>
-                        <code className='font-bold'>{appSlug}</code>
+                        <code className='font-bold'>{orgSlug}</code>
                     </p>
-                    <input placeholder='Application ID' className='w-full' onChange={e => setNameCopy(e.target.value)} />
+                    <input placeholder='Organisation ID' className='w-full' onChange={e => setNameCopy(e.target.value)} />
                 </AlertDialog.Description>
                 <div style={{ display: 'flex', gap: 25, justifyContent: 'flex-end' }}>
                     <AlertDialog.Cancel asChild>
                         <button className="Button">Cancel</button>
                     </AlertDialog.Cancel>
                     <AlertDialog.Action asChild disabled={!canSubmit}>
-                        <button disabled={!canSubmit} className={`Button ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={() => deleteApplication()}>Yes, delete application</button>
+                        <button disabled={!canSubmit} className={`Button ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={() => deleteOrganisation()}>Yes, delete organisation</button>
                     </AlertDialog.Action>
                 </div>
             </AlertDialog.Content>
@@ -70,35 +70,33 @@ const ApplicationDeletion = () => {
 };
 
 
-export const AppSettings: FC = () => {
+export const OrganisationSettings: FC = () => {
 
-    const { appSlug, orgSlug } = useParams();
-    const { data: application, isLoading } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug || '', orgSlug: orgSlug || '' });
-    const utils = api.useUtils().v0.applications;
-    const mutation = api.v0.applications.update.useMutation({
+    const { orgSlug } = useParams();
+    const { data: organisation, isLoading } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug || '' }, {
+
+    });
+    const utils = api.useUtils().v0.organisations;
+    const mutation = api.v0.organisations.update.useMutation({
         onSuccess: async () => {
-            await utils.getById.invalidate();
+            await utils.getBySlug.invalidate();
         }
     });
 
     const methods = useZodForm({
         schema: z.object({
-            homepage: z.string(),
-            description: z.string(),
-            license: z.string(),
-            webhook: z.string()
+            name: z.string(),
+            slug: z.string()
         }),
         values: {
-            homepage: application?.homepage || '',
-            description: application?.description || '',
-            license: application?.license || '',
-            webhook: application?.webhook || ''
+            name: organisation?.name || '',
+            slug: organisation?.slug || ''
         }
     });
 
-    if (isLoading || !application)
+    if (isLoading || !organisation)
         return <>
-            We are fetching data about your application.<br />
+            We are fetching data about your organisation.<br />
             It will only take a moment...<br />
             <br />
             <UilSpinner className='inline-block animate-spin' />
@@ -107,40 +105,26 @@ export const AppSettings: FC = () => {
     return <div className="flex flex-col gap-10 w-full justify-start mb-7">
         <form
             onSubmit={methods.handleSubmit(async (data) => {
-                await mutation.mutateAsync({ appId: application.id || '', data });
+                await mutation.mutateAsync({ orgSlug: orgSlug || '', data });
                 methods.reset();
             })}
             className="space-y-2 hidden"
         >
             <div className='flex flex-col gap-3'>
                 <label>
-                    Homepage
+                    Name
                     <br />
-                    <input {...methods.register('homepage')} className="border w-2/3" />
+                    <input {...methods.register('name')} className="border w-2/3" />
                 </label>
                 <label>
-                    Description
+                    Slug
                     <br />
-                    <textarea {...methods.register('description')} className="border w-2/3" />
-                </label>
-                <label>
-                    License
-                    <br />
-                    <select {...methods.register('license')} className="select select-bordered w-2/3">
-                        <option>MIT</option>
-                        <option>Apache 2.0</option>
-                        <option>BSD</option>
-                    </select>
-                </label>
-                <label>
-                    Webhook
-                    <br />
-                    <input {...methods.register('webhook')} className="border w-2/3" />
+                    <textarea {...methods.register('slug')} className="border w-2/3" />
                 </label>
 
-                {methods.formState.errors.homepage?.message && (
+                {methods.formState.errors.name?.message && (
                     <p className="text-red-700">
-                        {methods.formState.errors.homepage?.message}
+                        {methods.formState.errors.name?.message}
                     </p>
                 )}
             </div>
@@ -156,16 +140,14 @@ export const AppSettings: FC = () => {
         <div>
             <h1 className='font-bold text-xl mb-5'>Repository information</h1>
             <p>
-                Source: <b>{application.repo.source}</b><br />
-                Owner: <b>{application.repo.owner}</b><br />
-                Name: <b>{application.repo.name}</b><br />
-                Default branch: <b>{application.repo.defaultBranch ?? 'master'}</b><br />
+                Name: <b>{organisation.name}</b><br />
+                Slug: <b>{organisation.slug}</b><br />
             </p>
         </div>
         <div>
             <h1 className='font-bold text-xl mb-5'>Kredit allocation</h1>
             <p>
-                Balance: <b>{parseFloat(application.kredits.toString()).toFixed(3)}</b><br />
+                Balance: <b>{parseFloat(organisation.kredits.toString()).toFixed(3)}</b><br />
             </p>
         </div>
         <div>
@@ -178,14 +160,14 @@ export const AppSettings: FC = () => {
                     Permission
                 </div>
             </div>
-            {application.permissionGrants?.map((grant, i) =>
+            {organisation.permissionGrants?.map((grant, i) =>
                 <div key={i} className='flex flex-row gap-3 border-slate-100 border border-t-0 rounded-sm p-2'>
                     <div className='flex flex-col gap-1 grow'>
                         <p className='font-bold'>{grant.user.slug}</p>
                         <p>{grant.userId ?? grant.organisationId}</p>
                     </div>
                     <div className='flex flex-col gap-1 items-center'>
-                        <p className='font-bold'>{grant.admin ? 'Admin' : grant.write ? 'Write' : grant.read ? 'Read' : 'Unknown'}</p>
+                        <p className='font-bold'>{organisation.personal ? 'Owner' : grant.admin ? 'Admin' : grant.write ? 'Write' : grant.read ? 'Read' : 'Unknown'}</p>
                     </div>
                 </div>
 
@@ -193,9 +175,9 @@ export const AppSettings: FC = () => {
         </div>
         <div>
             <h1 className='text-red-700 font-bold text-xl mb-5'>Danger zone</h1>
-            <ApplicationDeletion />
+            <OrganisationDeletion />
         </div>
     </div>;
 };
 
-export default AppSettings;
+export default OrganisationSettings;
