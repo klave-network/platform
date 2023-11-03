@@ -2656,7 +2656,7 @@
     node-fetch "^2.6.7"
     universal-user-agent "^6.0.0"
 
-"@octokit/rest@^18.0.6", "@octokit/rest@^19":
+"@octokit/rest@^19", "@octokit/rest@^19.0.13":
   version "19.0.13"
   resolved "https://registry.yarnpkg.com/@octokit/rest/-/rest-19.0.13.tgz#e799393264edc6d3c67eeda9e5bd7832dcf974e4"
   integrity sha512-/EzVox5V9gYGdbAI+ovYj3nXQT1TtTHRT+0eZPcuC05UFSWO3mdO9UY1C0i2eLF9Un1ONJkAk+IEtYGAC+TahA==
@@ -8735,12 +8735,12 @@ gitconfiglocal@^1.0.0:
   dependencies:
     ini "^1.3.2"
 
-github-username@6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/github-username/-/github-username-6.0.0.tgz#d543eced7295102996cd8e4e19050ebdcbe60658"
-  integrity sha512-7TTrRjxblSI5l6adk9zd+cV5d6i1OrJSo3Vr9xdGqFLBQo0mz5P9eIfKCDJ7eekVGGFLbce0qbPSnktXV2BjDQ==
+github-username@8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/github-username/-/github-username-8.0.0.tgz#aec3ef7a174f8c730e5c9ac3db148c4bd914ff79"
+  integrity sha512-zq6QMHQKeGfhvdLMyT/nskL8ClE3Y9DFDRv3CgpBAIR1lGiL9GFZcgpmF0nMzegfMMLG3TmsEgHoFf8DcD25Lw==
   dependencies:
-    "@octokit/rest" "^18.0.6"
+    "@octokit/rest" "^19.0.13"
 
 glob-parent@^5.1.2, glob-parent@~5.1.2:
   version "5.1.2"
