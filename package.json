@@ -43,7 +43,7 @@
         "@secretarium/connector": "0.13.5",
         "@secretarium/crypto": "0.1.5",
         "@secretarium/instrumentation": "0.1.6",
-        "@sentry/browser": "7.75.1",
+        "@sentry/browser": "7.77.0",
         "@sentry/react": "7.75.1",
         "@simplewebauthn/browser": "8.3.3",
         "@simplewebauthn/server": "8.3.3",
