@@ -14,7 +14,7 @@ export const AppSidebar: FC = () => {
     const { data: applicationsList, isLoading: isAppsLoading } = api.v0.applications.getByOrganisation.useQuery({
         orgSlug: orgSlug ?? ''
     }, {
-        refetchInterval: 5000
+        refetchInterval: 60000
     });
 
     const sortedApplications = useMemo(() => (applicationsList ?? []).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()), [applicationsList])
