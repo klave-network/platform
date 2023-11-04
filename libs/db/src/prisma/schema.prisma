@@ -47,6 +47,19 @@ model Organisation {
     permissionGrants PermissionGrant[]
     createdAt        DateTime          @default(now())
     updatedAt        DateTime          @updatedAt
+    creditPurchases  CreditPurchase[]
+}
+
+model CreditPurchase {
+    id                    String       @id @default(uuid()) @map("_id")
+    organisation          Organisation @relation(fields: [organisationId], references: [id])
+    organisationId        String
+    kredits               BigInt
+    checkoutSessionId     String
+    checkoutSessionStatus String
+    setteled              Boolean      @default(false)
+    createdAt             DateTime     @default(now())
+    updatedAt             DateTime     @updatedAt
 }
 
 model User {

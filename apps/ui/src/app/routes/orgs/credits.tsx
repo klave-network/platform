@@ -1,18 +1,60 @@
-import { FC, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { FC, useMemo, useEffect } from 'react';
+import { useLocation, useParams, useSearchParams } from 'react-router-dom';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import { UilSpinner, Uil0Plus } from '@iconscout/react-unicons';
+import { loadStripe } from "@stripe/stripe-js";
+import {
+    EmbeddedCheckoutProvider,
+    EmbeddedCheckout
+} from '@stripe/react-stripe-js';
 import api from '../../utils/api';
 // import { useZodForm } from '../../utils/useZodForm';
 // import { z } from 'zod';
-import { useEffect } from 'react';
+
+// Make sure to call loadStripe outside of a component’s render to avoid
+// recreating the Stripe object on every render.
+// This is your test publishable API key.
+const stripePromise = loadStripe(process.env['NX_KLAVE_STRIPE_KEY'] ?? '');
+
+const CheckoutForm = () => {
+
+    const [, setSearchParams] = useSearchParams()
+    const { pathname } = useLocation();
+    const { data } = api.v0.credits.createCheckoutSession.useQuery({
+        pathname,
+        quantity: 1
+    });
+
+    const sessionId = useMemo(() => data?.id, [data?.id]);
+    const clientSecret = useMemo(() => data?.clientSecret, [data?.clientSecret]);
+
+    if (!sessionId || !clientSecret)
+        return <UilSpinner className='inline-block animate-spin' />;
+
+    return <EmbeddedCheckoutProvider
+        stripe={stripePromise}
+        options={{
+            clientSecret,
+            onComplete: () => {
+                setSearchParams({
+                    return: 'true',
+                    checkoutSessionId: sessionId
+                })
+            }
+        }}
+    >
+        <EmbeddedCheckout className='p-0' />
+    </EmbeddedCheckoutProvider>
+}
 
 const OrganisationAddCredit = () => {
 
+    const [searchParams, setSearchParams] = useSearchParams()
+    const isReturningFromCheckout = searchParams.get('return') === 'true';
+    const isPaymentComplete = searchParams.get('paymentCompleted') === 'true';
     // const navigate = useNavigate();
-    const { orgSlug } = useParams();
-    const [nameCopy, setNameCopy] = useState('');
-    const [canSubmit, setCanSubmit] = useState(false);
+    // const { orgSlug } = useParams();
+    // const [canSubmit, setCanSubmit] = useState(false);
     // const utils = api.useUtils().v0.organisations;
     // const mutation = api.v0.organisations.delete.useMutation({
     //     onSuccess: async () => {
@@ -20,48 +62,36 @@ const OrganisationAddCredit = () => {
     //         await utils.getById.invalidate();
     //         navigate('/app');
     //     }
-    // });
-
-    useEffect(() => {
-        setCanSubmit(nameCopy === orgSlug);
-    }, [nameCopy, orgSlug]);
-
-    const deleteOrganisation = async () => {
-        // if (orgId)
-        //     await mutation.mutateAsync({
-        //         organisationId: orgId
-        //     });
-    };
+    // // });
+    // const deleteOrganisation = async () => {
+    //     // if (orgId)
+    //     //     await mutation.mutateAsync({
+    //     //         organisationId: orgId
+    //     //     });
+    // };
 
     return <AlertDialog.Root>
-        <AlertDialog.Trigger asChild>
+        <AlertDialog.Trigger asChild onClick={() => {
+            setSearchParams()
+        }}>
             <button title='Delete' className="mt-3 h-8 inline-flex items-center justify-center text-slate-500 text-md font-normalmt-auto">
                 <Uil0Plus className='inline-block h-full' /> Add credits
             </button>
         </AlertDialog.Trigger>
         <AlertDialog.Portal>
             <AlertDialog.Overlay className="AlertDialogOverlay" />
-            <AlertDialog.Content className="AlertDialogContent">
-                <AlertDialog.Title className="AlertDialogTitle">Add credit to your organisation</AlertDialog.Title>
+            <AlertDialog.Content className="AlertDialogContent overflow-auto w-[calc(412px)]">
+                <AlertDialog.Title className="AlertDialogTitle mb-4">Add credit to your organisation</AlertDialog.Title>
                 <AlertDialog.Description className="AlertDialogDescription">
-                    <p className='my-2'>
-                        This action cannot be undone. This will permanently delete this organisation and all attached data.
-                    </p>
-                    <p className='my-2'>
-                        If you are really sure you want to delete this organisation, please type the organisation ID below.
-                    </p>
-                    <p className='my-2'>
-                        <code className='font-bold'>{orgSlug}</code>
-                    </p>
-                    <input placeholder='Organisation ID' className='w-full' onChange={e => setNameCopy(e.target.value)} />
+                    <CheckoutForm />
                 </AlertDialog.Description>
                 <div style={{ display: 'flex', gap: 25, justifyContent: 'flex-end' }}>
                     <AlertDialog.Cancel asChild>
-                        <button className="Button">Cancel</button>
+                        <button className="Button">{isPaymentComplete || isReturningFromCheckout ? 'Done' : 'Cancel'}</button>
                     </AlertDialog.Cancel>
-                    <AlertDialog.Action asChild disabled={!canSubmit}>
+                    {/* <AlertDialog.Action asChild disabled={!canSubmit}>
                         <button disabled={!canSubmit} className={`Button ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={() => deleteOrganisation()}>Yes, delete organisation</button>
-                    </AlertDialog.Action>
+                    </AlertDialog.Action> */}
                 </div>
             </AlertDialog.Content>
         </AlertDialog.Portal>
@@ -72,7 +102,14 @@ const OrganisationAddCredit = () => {
 export const OrganisationSettings: FC = () => {
 
     const { orgSlug } = useParams();
-    const { data: organisation, isLoading } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug || '' });
+    const [searchParams, setSearchParams] = useSearchParams()
+    const isReturningFromCheckout = searchParams.get('return') === 'true';
+    const checkoutSessionId = searchParams.get('checkoutSessionId') ?? '';
+    const { data: checkoutSessionStatus } = api.v0.credits.sessionStatus.useQuery({ checkoutSessionId }, {
+        refetchInterval: 1000,
+        enabled: isReturningFromCheckout
+    });
+    const { data: organisation, isLoading, refetch: refetchOrganisation } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug || '' });
     const { data: applicationsList, isLoading: isLoadingApps } = api.v0.applications.getByOrganisation.useQuery({ orgSlug: orgSlug || '' });
     const sortedApplications = useMemo(() => (applicationsList ?? []).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()), [applicationsList])
 
@@ -94,6 +131,15 @@ export const OrganisationSettings: FC = () => {
     //     }
     // });
 
+    useEffect(() => {
+        if (isReturningFromCheckout && checkoutSessionStatus?.status === 'complete') {
+            setSearchParams({
+                paymentCompleted: 'true'
+            })
+            refetchOrganisation()
+        }
+    }, [isReturningFromCheckout, checkoutSessionStatus])
+
     if (isLoading || !organisation)
         return <>
             We are fetching data about your organisation.<br />
@@ -107,6 +153,12 @@ export const OrganisationSettings: FC = () => {
             <h1 className='font-bold text-xl mb-5'>Total Balance</h1>
             <p>
                 Balance: <b>{parseFloat(organisation.kredits.toString()).toFixed(3)}</b><br />
+                {isReturningFromCheckout
+                    ? <>
+                        <span className='text-green-700'>Thank you for your purchase! We are updating your balance...</span>
+                        <UilSpinner className='inline-block animate-spin h-4' /><br />
+                    </>
+                    : null}
                 <OrganisationAddCredit />
             </p>
         </div>

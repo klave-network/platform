@@ -17,6 +17,7 @@ import { prisma } from '@klave/db';
 import { rateLimiterMiddleware } from './middleware/rateLimiter';
 import { morganLoggerMiddleware } from './middleware/morganLogger';
 import { probotMiddleware } from './middleware/probot';
+import { stripeMiddlware } from './middleware/stripe';
 import { sentryRequestMiddleware, sentryTracingMiddleware, sentryErrorMiddleware } from './middleware/sentry';
 import { passportLoginCheckMiddleware } from './middleware/passport';
 import { trcpMiddlware } from './middleware/trpc';
@@ -60,7 +61,6 @@ const getApiRouter = (/*port: number*/) => {
     //         // if (!session)
     //         //     return;
     //         const [verb, ...data] = msg.toString().split('#');
-    //         console.log(session, sessionID, sessionStore);
     //         if (verb === 'request') {
     //             logger.info('New bridge client request ...');
     //             const [locator] = data;
@@ -146,6 +146,8 @@ export const start = async (port: number) => {
     app.use('/hook', (req, res, next) => {
         if (req.headers['x-github-event'])
             return probotMiddleware(req, res);
+        if (req.headers['stripe-signature'])
+            return stripeMiddlware(req, res, next);
         next();
     });
 
@@ -221,7 +223,6 @@ export const start = async (port: number) => {
     //     passReqToCallback: true
     // }, (req, username, password, done) => {
     //     const { web, session, user } = req;
-    //     console.log('COUCOU >>>', web, session, user, username, password);
     //     prisma.user.findUnique({ where: { id: user?.id } })
     //         .then((user) => {
     //             if (!user) return done(null, false);
