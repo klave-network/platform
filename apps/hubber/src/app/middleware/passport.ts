@@ -24,7 +24,6 @@ import type { RequestHandler } from 'express';
 //     passReqToCallback: true
 // }, async (req, username, password, cb) => {
 //     const { web, session, user } = req;
-//     console.log('COUCOU >>>', web, session, user, username, password);
 //     try {
 //         if (!username || !password)
 //             return cb(null, false, { message: 'User was not confirmed by remote device.' });
