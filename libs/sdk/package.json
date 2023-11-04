@@ -35,7 +35,7 @@
     },
     "dependencies": {
         "@klave/compiler": "*",
-        "assemblyscript": "^0.27.14",
+        "assemblyscript": "^0.27.15",
         "chalk": "4.1.2",
         "fs-extra": "11.1.1"
     },
