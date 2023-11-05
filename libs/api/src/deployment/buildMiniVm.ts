@@ -72,15 +72,16 @@ export class BuildMiniVM {
 
         const { context: { octokit, ...context }, repo } = this.options;
         const normalisedPath = path?.split(/[\\/]/).filter((s, i) => !(i === 0 && s === '.')).join(nodePath.posix.sep);
+        const errorAcc: string[] = [];
 
         if (!normalisedPath)
             return { data: null };
 
-        try {
-            if (!normalisedPath.includes('node_modules')) {
-                logger.debug(`Getting GitHub content for '${normalisedPath}'`, {
-                    parent: 'bmv'
-                });
+        if (!normalisedPath.includes('node_modules')) {
+            logger.debug(`Getting GitHub content for '${normalisedPath}'`, {
+                parent: 'bmv'
+            });
+            try {
                 return await octokit.repos.getContent({
                     owner: repo.owner,
                     repo: repo.name,
@@ -90,18 +91,21 @@ export class BuildMiniVM {
                         format: 'raw+json'
                     }
                 });
+            } catch (e: any) {
+                errorAcc.push(`Error downloading content from GihHub: ${e.toString()}`);
             }
-        } catch {
-            //
         }
 
-        try {
-            const components = normalisedPath?.split('node_modules') ?? [];
-            const lastComponent = components.pop();
-            if (lastComponent?.startsWith('/')) {
+        const components = normalisedPath?.split('node_modules') ?? [];
+        const lastComponent = components.pop();
+
+        if (lastComponent?.startsWith('/')) {
+            let packageName: string | undefined;
+            let packageVersion: string | undefined;
+            try {
                 const comps = lastComponent.substring(1).split('/');
-                const packageName = comps[0]?.startsWith('@') ? `${comps.shift()}/${comps.shift()}` : comps.shift() ?? '';
-                const packageVersion = packageName ? this.options.dependencies?.[packageName] : undefined;
+                packageName = comps[0]?.startsWith('@') ? `${comps.shift()}/${comps.shift()}` : comps.shift() ?? '';
+                packageVersion = packageName ? this.options.dependencies?.[packageName] : undefined;
                 const filePath = comps.join('/');
                 let version = packageVersion ?? '';
                 let data = '';
@@ -150,22 +154,33 @@ export class BuildMiniVM {
                             digests: {}
                         };
                     this.usedDependencies[packageName]!.digests[filePath] = Utils.toHex(await Utils.hash(new TextEncoder().encode(data)));
-
-                    // TODO - Store the response in a cahing layer
-                    // response.getHeader('location');
                     return { data };
                 }
+            } catch (e: any) {
+                if (packageName && packageVersion)
+                    errorAcc.push(`Error getting content for '${packageName}@${packageVersion}': ${e.toString()}`);
+                else
+                    errorAcc.push(`Error downloading content for node_modules package: ${e.toString()}`);
             }
-        } catch {
-            //
         }
 
-        if (normalisedPath)
-            return { data: this.getContentSync(normalisedPath) };
+        if (normalisedPath) {
+            try {
+                return { data: this.getContentSync(normalisedPath) };
+            } catch (e: any) {
+                errorAcc.push(`Error retreiving from dummyFs ${e.toString()}`);
+            }
+        }
 
-        logger.debug(`Couldn't resolve content for '${normalisedPath}'`, {
-            parent: 'bmv'
-        });
+        if (errorAcc.length > 0)
+            logger.debug(errorAcc.join('\n'), {
+                parent: 'bmv'
+            });
+        else
+            logger.debug(`Couldn't resolve content for '${normalisedPath}'`, {
+                parent: 'bmv'
+            });
+
         return { data: null };
     }
 
