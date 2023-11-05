@@ -14,7 +14,7 @@ import api from '../../utils/api';
 // Make sure to call loadStripe outside of a component’s render to avoid
 // recreating the Stripe object on every render.
 // This is your test publishable API key.
-const stripePromise = loadStripe(process.env['NX_KLAVE_STRIPE_KEY'] ?? '');
+const stripePromise = loadStripe(import.meta.env['VITE_KLAVE_STRIPE_KEY'] ?? '');
 
 const CheckoutForm = () => {
 

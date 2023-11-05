@@ -1,4 +1,5 @@
 # Changelog
+
 ## [0.4.0](///compare/klave@0.3.0...klave@0.4.0) (2023-09-27)
 
 ### Dependency Updates
@@ -11,7 +12,6 @@
 ### Features
 
 * **db,api,klave,deployer:** Add deployment FQDN leaping 221f9a2
-
 
 ### Bug Fixes
 
@@ -31,7 +31,6 @@
 * **klave:** Add Dependencies and Attestation tabs in Deployment interface 04a10a9
 * **klave:** Beautify UI with klave colors + dark theme 689aa60
 
-
 ### Bug Fixes
 
 * **api,klave:** Forcefully expel bad cached credentials 90c1274
@@ -42,6 +41,7 @@
 ### Dependency Updates
 
 * `klave-api` updated to version `0.3.1`
+
 ## [0.2.1](///compare/klave@0.2.0...klave@0.2.1) (2023-06-12)
 
 ### Dependency Updates
@@ -85,7 +85,6 @@
 * **klave:** Making application deletion safer 7c1bda2
 * New Instrumentation package with Sentry compat 3fbde7d
 
-
 ### Bug Fixes
 
 * **hubber,klave:** Resolve Secretarium URI and key exposition dae9c79
@@ -94,7 +93,6 @@
 * **klave:** Issue with wrong state in the query builder console c163867
 * **klave:** Pause the user flow to wait for the repository to be ready d66a28b
 * **klave:** Websocket protocol targeting 5ab8486
-
 
 ### Reverts
 
