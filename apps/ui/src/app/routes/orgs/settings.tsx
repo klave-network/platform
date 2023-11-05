@@ -56,7 +56,7 @@ const OrganisationDeletion = () => {
                     </p>
                     <input placeholder='Organisation ID' className='w-full' onChange={e => setNameCopy(e.target.value)} />
                 </AlertDialog.Description>
-                <div style={{ display: 'flex', gap: 25, justifyContent: 'flex-end' }}>
+                <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
                         <button className="Button">Cancel</button>
                     </AlertDialog.Cancel>

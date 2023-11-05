@@ -41,45 +41,45 @@ export const OrgNew: FC = () => {
         </div>
         <div className="flex items-center space-x-3 sm:mt-7 mt-4" />
     </div>
-        <div className="sm:p-7 p-4">
-            <form
-                onSubmit={methods.handleSubmit(async (data) => {
-                    await mutation.mutateAsync({ slug: orgSlug || '', data });
-                    methods.reset();
-                })}
-                className="space-y-2"
-            >
-                <div className='flex flex-col gap-3'>
-                    <label>
+    <div className="sm:p-7 p-4">
+        <form
+            onSubmit={methods.handleSubmit(async (data) => {
+                await mutation.mutateAsync({ slug: orgSlug || '', data });
+                methods.reset();
+            })}
+            className="space-y-2"
+        >
+            <div className='flex flex-col gap-3'>
+                <label>
                         Organization name
-                        <br />
-                        <input {...methods.register('name')} onChange={e => setOrgName(e.target.value.trim())} className="border w-2/3" /><br />
-                        {isOrgLoading
-                            ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-4' /><br />&nbsp;</span>
-                            : alreadyExists
-                                ? <span className="block mt-1 text-xs text-red-700 leading-tight">The organisation <b>{orgSlug}</b> already exists.<br />&nbsp;</span>
-                                : orgSlug.length
-                                    ? <span className="block mt-1 text-xs text-green-700 leading-tight">This name is available !<br />Your URL on Klave will be https://klave.com/<b>{orgSlug.toLocaleLowerCase()}</b></span>
-                                    : <span className="block mt-1 text-xs leading-tight">&nbsp;<br />&nbsp;</span>}
-                    </label>
+                    <br />
+                    <input {...methods.register('name')} onChange={e => setOrgName(e.target.value.trim())} className="border w-2/3" /><br />
+                    {isOrgLoading
+                        ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-4' /><br />&nbsp;</span>
+                        : alreadyExists
+                            ? <span className="block mt-1 text-xs text-red-700 leading-tight">The organisation <b>{orgSlug}</b> already exists.<br />&nbsp;</span>
+                            : orgSlug.length
+                                ? <span className="block mt-1 text-xs text-green-700 leading-tight">This name is available !<br />Your URL on Klave will be https://klave.com/<b>{orgSlug.toLocaleLowerCase()}</b></span>
+                                : <span className="block mt-1 text-xs leading-tight">&nbsp;<br />&nbsp;</span>}
+                </label>
 
-                    {methods.formState.errors.name?.message && (
-                        <p className="text-red-700">
-                            {methods.formState.errors.name?.message}
-                        </p>
-                    )}
-                </div>
+                {methods.formState.errors.name?.message && (
+                    <p className="text-red-700">
+                        {methods.formState.errors.name?.message}
+                    </p>
+                )}
+            </div>
 
-                <button
-                    type="submit"
-                    disabled={mutation.isPending}
-                    className="border bg-primary-500 p-2"
-                >
-                    {mutation.isPending ? 'Creating' : 'Create'}
-                </button>
-            </form>
-        </div>
-    </>
+            <button
+                type="submit"
+                disabled={mutation.isPending}
+                className="border bg-primary-500 p-2"
+            >
+                {mutation.isPending ? 'Creating' : 'Create'}
+            </button>
+        </form>
+    </div>
+    </>;
 };
 
 export default OrgNew;

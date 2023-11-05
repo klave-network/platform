@@ -38,7 +38,7 @@ export const DeploymentPromotion: FC<DeploymentContextProps> = ({ deployment: { 
                     This will promote the deployment to a production status and will trigger the migration of
                     data from the existing ledger to the new instance.
                 </AlertDialog.Description>
-                <div style={{ display: 'flex', gap: 25, justifyContent: 'flex-end' }}>
+                <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
                         <button className="Button mauve">Cancel</button>
                     </AlertDialog.Cancel>
@@ -82,7 +82,7 @@ export const DeploymentDeletion: FC<DeploymentContextProps> = ({ deployment: { i
                     This action cannot be undone. This will permanently delete this deployment and remove the
                     data attached to this deployment.
                 </AlertDialog.Description>
-                <div style={{ display: 'flex', gap: 25, justifyContent: 'flex-end' }}>
+                <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
                         <button className="Button">Cancel</button>
                     </AlertDialog.Cancel>

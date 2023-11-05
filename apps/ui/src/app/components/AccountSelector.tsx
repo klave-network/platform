@@ -18,8 +18,8 @@ const AccountSelector: FC<{ className?: string; }> = ({ className }) => {
         if (value === '~#NEW#~')
             navigate('/organisation/new');
         else
-            navigate(`/${value}`)
-    }
+            navigate(`/${value}`);
+    };
 
     return <Select.Root value={orgSlug} defaultValue={orgSlug} onValueChange={changeValue}>
         <Select.Trigger className={`inline-flex justify-between flex-grow w-full items-center text-klave-light-blue bg-white data-[placeholder]:text-klave-light-blue mt-3 mb-5 ${className}`}>
@@ -52,8 +52,8 @@ const AccountSelector: FC<{ className?: string; }> = ({ className }) => {
                 </Select.ScrollDownButton>
             </Select.Content>
         </Select.Portal>
-    </Select.Root>
-}
+    </Select.Root>;
+};
 
 const SelectItem = forwardRef<HTMLDivElement, PropsWithChildren<{
     value: string;

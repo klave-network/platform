@@ -2,7 +2,7 @@ import { FC, useMemo, useEffect } from 'react';
 import { useLocation, useParams, useSearchParams } from 'react-router-dom';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import { UilSpinner, Uil0Plus } from '@iconscout/react-unicons';
-import { loadStripe } from "@stripe/stripe-js";
+import { loadStripe } from '@stripe/stripe-js';
 import {
     EmbeddedCheckoutProvider,
     EmbeddedCheckout
@@ -18,7 +18,7 @@ const stripePromise = loadStripe(import.meta.env['VITE_KLAVE_STRIPE_KEY'] ?? '')
 
 const CheckoutForm = () => {
 
-    const [, setSearchParams] = useSearchParams()
+    const [, setSearchParams] = useSearchParams();
     const { pathname } = useLocation();
     const { data } = api.v0.credits.createCheckoutSession.useQuery({
         pathname,
@@ -39,17 +39,17 @@ const CheckoutForm = () => {
                 setSearchParams({
                     return: 'true',
                     checkoutSessionId: sessionId
-                })
+                });
             }
         }}
     >
         <EmbeddedCheckout className='p-0' />
-    </EmbeddedCheckoutProvider>
-}
+    </EmbeddedCheckoutProvider>;
+};
 
 const OrganisationAddCredit = () => {
 
-    const [searchParams, setSearchParams] = useSearchParams()
+    const [searchParams, setSearchParams] = useSearchParams();
     const isReturningFromCheckout = searchParams.get('return') === 'true';
     const isPaymentComplete = searchParams.get('paymentCompleted') === 'true';
     // const navigate = useNavigate();
@@ -72,7 +72,7 @@ const OrganisationAddCredit = () => {
 
     return <AlertDialog.Root>
         <AlertDialog.Trigger asChild onClick={() => {
-            setSearchParams()
+            setSearchParams();
         }}>
             <button title='Delete' className="mt-3 h-8 inline-flex items-center justify-center text-slate-500 text-md font-normalmt-auto">
                 <Uil0Plus className='inline-block h-full' /> Add credits
@@ -82,10 +82,10 @@ const OrganisationAddCredit = () => {
             <AlertDialog.Overlay className="AlertDialogOverlay" />
             <AlertDialog.Content className="AlertDialogContent overflow-auto w-[calc(412px)]">
                 <AlertDialog.Title className="AlertDialogTitle mb-4">Add credit to your organisation</AlertDialog.Title>
-                <AlertDialog.Description className="AlertDialogDescription">
+                <AlertDialog.Description className="AlertDialogDescription" asChild>
                     <CheckoutForm />
                 </AlertDialog.Description>
-                <div style={{ display: 'flex', gap: 25, justifyContent: 'flex-end' }}>
+                <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
                         <button className="Button">{isPaymentComplete || isReturningFromCheckout ? 'Done' : 'Cancel'}</button>
                     </AlertDialog.Cancel>
@@ -102,7 +102,7 @@ const OrganisationAddCredit = () => {
 export const OrganisationSettings: FC = () => {
 
     const { orgSlug } = useParams();
-    const [searchParams, setSearchParams] = useSearchParams()
+    const [searchParams, setSearchParams] = useSearchParams();
     const isReturningFromCheckout = searchParams.get('return') === 'true';
     const checkoutSessionId = searchParams.get('checkoutSessionId') ?? '';
     const { data: checkoutSessionStatus } = api.v0.credits.sessionStatus.useQuery({ checkoutSessionId }, {
@@ -111,7 +111,7 @@ export const OrganisationSettings: FC = () => {
     });
     const { data: organisation, isLoading, refetch: refetchOrganisation } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug || '' });
     const { data: applicationsList, isLoading: isLoadingApps } = api.v0.applications.getByOrganisation.useQuery({ orgSlug: orgSlug || '' });
-    const sortedApplications = useMemo(() => (applicationsList ?? []).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()), [applicationsList])
+    const sortedApplications = useMemo(() => (applicationsList ?? []).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()), [applicationsList]);
 
     // const utils = api.useUtils().v0.organisations;
     // const mutation = api.v0.organisations.update.useMutation({
@@ -135,10 +135,10 @@ export const OrganisationSettings: FC = () => {
         if (isReturningFromCheckout && checkoutSessionStatus?.status === 'complete') {
             setSearchParams({
                 paymentCompleted: 'true'
-            })
-            refetchOrganisation()
+            });
+            refetchOrganisation();
         }
-    }, [isReturningFromCheckout, checkoutSessionStatus])
+    }, [isReturningFromCheckout, checkoutSessionStatus]);
 
     if (isLoading || !organisation)
         return <>
@@ -166,14 +166,15 @@ export const OrganisationSettings: FC = () => {
             <h1 className='font-bold text-xl mb-5'>Application allocations</h1>
             {isLoadingApps
                 ? <><UilSpinner className='inline-block animate-spin' /></>
-                : <><div className='flex flex-row gap-3 bg-slate-100 border-slate-100 border rounded-sm p-2'>
-                    <div className='flex flex-col gap-1 grow'>
-                        Application
+                : <>
+                    <div className='flex flex-row gap-3 bg-slate-100 border-slate-100 border rounded-sm p-2'>
+                        <div className='flex flex-col gap-1 grow'>
+                            Application
+                        </div>
+                        <div className='flex flex-col gap-1 items-center'>
+                            Balance
+                        </div>
                     </div>
-                    <div className='flex flex-col gap-1 items-center'>
-                        Balance
-                    </div>
-                </div>
                     {sortedApplications?.map((application, i) =>
                         <div key={i} className='flex flex-row gap-3 border-slate-100 border border-t-0 rounded-sm p-2'>
                             <div className='flex flex-col gap-1 grow'>
@@ -184,7 +185,6 @@ export const OrganisationSettings: FC = () => {
                                 <p className='font-bold'>{parseFloat(application.kredits.toString()).toFixed(3)}</p>
                             </div>
                         </div>
-
                     )}
                 </>}
         </div>

@@ -1,5 +1,5 @@
 import { FC, useRef } from 'react';
-import { useToggle, useEventListener } from "usehooks-ts";
+import { useToggle, useEventListener } from 'usehooks-ts';
 import LoginSecKey from '../partials/LoginSecKey';
 import LoginQR from '../partials/LoginQR';
 import api from '../utils/api';
@@ -8,20 +8,20 @@ import { useNavigate } from 'react-router-dom';
 export const Login: FC = () => {
 
     const [newPipe, togglePipe] = useToggle(import.meta.env['NODE_ENV'] === 'development');
-    const iframeRef = useRef<HTMLIFrameElement>(null)
+    const iframeRef = useRef<HTMLIFrameElement>(null);
     const navigate = useNavigate();
     const { data } = api.v0.auth.getSession.useQuery();
 
     const onKeyDown = (event: KeyboardEvent) => {
         if (event.altKey && event.code === 'KeyO')
-            togglePipe()
-    }
+            togglePipe();
+    };
 
     const onMessage = (event: MessageEvent) => {
         if (event.data.source !== 'react-devtools-content-script')
-            console.log(event.origin, ': ', event.data)
+            console.log(event.origin, ': ', event.data);
 
-    }
+    };
 
     useEventListener('keydown', onKeyDown);
     useEventListener('message', onMessage);

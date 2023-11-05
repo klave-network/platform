@@ -15,14 +15,14 @@ export const ApplicationRecord: FC<ApplicationRecordProps> = ({ application }) =
     const { orgSlug } = useParams();
     return <span className='h-5 block my-2'>
         Created application <Link to={`/${orgSlug}/${application.id}`} className='font-semibold'>{application.slug}</Link> <i>({formatTimeAgo(application.createdAt)})</i>
-    </span>
+    </span>;
 };
 
 export const OrganisationRecordListing: FC = () => {
 
     const { orgSlug } = useParams();
     const { data: applicationsList, isLoading: isLoadingActivities } = api.v0.applications.getByOrganisation.useQuery({ orgSlug: orgSlug || '' });
-    const sortedApplications = useMemo(() => (applicationsList ?? []).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()), [applicationsList])
+    const sortedApplications = useMemo(() => (applicationsList ?? []).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()), [applicationsList]);
 
     if (isLoadingActivities || !applicationsList)
         return <>

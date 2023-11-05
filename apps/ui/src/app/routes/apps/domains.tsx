@@ -39,7 +39,7 @@ const DomainDeletion: FC<DomainContextProps> = ({ domain: { id } }) => {
                 <AlertDialog.Description className="AlertDialogDescription">
                     This action cannot be undone. This will permanently delete this domain validation.
                 </AlertDialog.Description>
-                <div style={{ display: 'flex', gap: 25, justifyContent: 'flex-end' }}>
+                <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
                         <button className="Button">Cancel</button>
                     </AlertDialog.Cancel>
