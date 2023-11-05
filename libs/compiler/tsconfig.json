@@ -2,9 +2,6 @@
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
         "module": "CommonJS",
-        "lib": [
-            "ESNext"
-        ],
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "strict": true,
