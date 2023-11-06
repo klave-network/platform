@@ -13,7 +13,7 @@ export const apiClientOptions = {
     transformer: superjson,
     links: [
         httpBatchLink({
-            url: '/api/trpc',
+            url: `${import.meta.env['VITE_KLAVE_API_URL']}/trpc`,
             headers() {
                 return {
                     'x-trustless-klave-ephemeral-tag': window.localStorage.getItem('emphemeralKlaveTag') ?? undefined

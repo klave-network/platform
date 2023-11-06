@@ -34,116 +34,71 @@ const eapp = express();
 const { app, getWss } = ews(eapp, undefined, {
     // leaveRouterUntouched: true,
     wsOptions: {
-        path: '/api/bridge',
+        path: '/bridge',
         // noServer: true,
         clientTracking: true
     }
 });
 
-const getApiRouter = (/*port: number*/) => {
-    const router = express();
-    // const { app: router, getWss } = ews(express(), undefined, {
-    //     // leaveRouterUntouched: true,
-    //     wsOptions: {
-    //         path: '/api/bridge'
-    //         // noServer: true,
-    //         // clientTracking: true
-    //     }
-    // });
-
-    // app.ws('/api/bridge', (ws, { session, sessionID, sessionStore }) => {
-    //     (ws as any).sessionID = sessionID;
-    //     ws.on('connection', (ws) => {
-    //         ws.isAlive = true;
-    //         logger.info('Client is alive !');
-    //     });
-    //     ws.on('upgrade', () => {
-    //         logger.info('Client is upgrading ...');
-    //     });
-    //     ws.on('message', (msg) => {
-    //         // if (!session)
-    //         //     return;
-    //         const [verb, ...data] = msg.toString().split('#');
-    //         if (verb === 'request') {
-    //             logger.info('New bridge client request ...');
-    //             const [locator] = data;
-    //             (session as any).locator = locator;
-    //             session.save(() => {
-    //                 ws.send(`sid#${sessionID}#ws://${ip.address('public')}:${port}/bridge`);
-    //             });
-    //             return;
-    //         } else if (verb === 'confirm') {
-    //             logger.info('New remote device confirmation ...');
-    //             const [sid, locator, localId] = data;
-    //             sessionStore.get(sid, (err, rsession) => {
-    //                 if (!rsession)
-    //                     return;
-    //                 if ((rsession as any).locator !== locator)
-    //                     return;
-    //                 (rsession as any).localId = localId;
-    //                 sessionStore.set(sid, rsession, () => {
-    //                     const browserTarget = Array.from(getWss().clients.values()).find(w => (w as any).sessionID === sid);
-    //                     browserTarget?.send('confirmed');
-    //                 });
-    //             });
-    //         }
-    //         ws.send(msg);
-    //     });
-    // });
-
-    router.use(passportLoginCheckMiddleware);
-    router.use('/trpc', trcpMiddlware);
-    router.use(usersRouter);
-
-    router.all('*', (req, res) => {
-        res.json({
-            path: req.path,
-            hubber: true,
-            ok: true
-        });
-    });
-
-    return router;
-};
-
 export const start = async (port: number) => {
-
-    const apiRouter = getApiRouter(/*port*/);
 
     app.use(sentryRequestMiddleware);
     app.use(sentryTracingMiddleware);
     app.use(morganLoggerMiddleware);
     app.use(rateLimiterMiddleware);
-    app.use(cors({
-        origin: ['chrome-extension://', `http://localhost:${port}`, `http://127.0.0.1:${port}`, /\.klave\.network$/, /\.klave\.dev$/, /\.klave\.com$/, /\.secretarium\.com$/, /\.secretarium\.org$/],
-        credentials: true
-    }));
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     // app.use(i18nextMiddleware);
     app.use(multer().none());
+    app.disable('X-Powered-By');
     app.use(helmet({
+        // crossOriginEmbedderPolicy: false,
+        // crossOriginResourcePolicy: false,
+        // crossOriginOpenerPolicy: false,
+        // contentSecurityPolicy: false,
         crossOriginEmbedderPolicy: {
             policy: 'credentialless'
         },
-        // crossOriginOpenerPolicy: false,
-        contentSecurityPolicy: false
-        // {
-        //     useDefaults: true,
-        //     directives: {
-        //         'img-src': ['"self"', 'data:', 'blob:', '"https://*.githubusercontent.com"'],
-        //         'frame-src': ['"self"', '"https://*.klave.dev"', '"https://*.klave.network"', '"https://klave.network"'],
-        //         'connect-src': ['"self"', '"https://*.klave.dev"', '"https://*.klave.network"', '"https://*.ingest.sentry.io"']
-        //     }
-        // }
+        crossOriginResourcePolicy: {
+            policy: 'cross-origin'
+        },
+        crossOriginOpenerPolicy: {
+            policy: 'same-origin'
+        },
+        contentSecurityPolicy: {
+            useDefaults: true
+            // reportOnly: true
+            // directives: {
+            //     'img-src': ['"self"', 'data:', 'blob:', '"https://*.githubusercontent.com"'],
+            //     'frame-src': ['"self"', '"https://*.klave.dev"', '"https://*.klave.network"', '"https://klave.network"'],
+            //     'connect-src': ['"self"', '"https://*.klave.dev"', '"https://*.klave.network"', '"https://*.ingest.sentry.io"']
+            // }
+        }
     }));
+
+    const corsConfiguration = cors({
+        origin: [
+            /^chrome-extension:\/\//,
+            /^http:\/\/localhost/,
+            /^http:\/\/127.0.0.1/,
+            /\.klave\.network$/,
+            /\.klave\.dev$/,
+            /\.klave\.com$/,
+            /\.secretarium\.com$/,
+            /\.secretarium\.org$/
+        ],
+        credentials: true
+    });
+
+    app.options('*', corsConfiguration);
+    app.use(corsConfiguration);
+
     app.use(
         expectCt({
             enforce: true,
             maxAge: 90
         })
     );
-    app.disable('x-powered-by');
 
     // Plug Probot for GitHub Apps
     app.use('/hook', (req, res, next) => {
@@ -241,7 +196,7 @@ export const start = async (port: number) => {
     // Contextualise user session, devices, tags, tokens
     app.use(webLinkerMiddlware);
 
-    app.ws('/api/bridge', (ws, { session, sessionID, sessionStore }) => {
+    app.ws('/bridge', (ws, { session, sessionID, sessionStore }) => {
         (ws as any).sessionID = sessionID;
         ws.on('connection', (ws) => {
             ws.isAlive = true;
@@ -284,12 +239,19 @@ export const start = async (port: number) => {
             ws.send(msg);
         });
     });
-    app.use('/api', apiRouter);
-    // app.use(apiRouter);
 
+    app.use(passportLoginCheckMiddleware);
+    app.use('/trpc', trcpMiddlware);
+    app.use(usersRouter);
     app.use(sentryErrorMiddleware);
 
-    app.use('*', express.static(path.join(__dirname, 'public'), { index: 'index.html' }));
+    app.all('*', (req, res) => {
+        res.json({
+            path: req.path,
+            hubber: true,
+            ok: true
+        });
+    });
 
     return app;
 };

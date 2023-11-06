@@ -11,7 +11,9 @@ export const LoginQR: FC = () => {
     const [uuidLocator, setUuidLocator] = useState<string>();
     const [uuidBeacon, setUuidBeacon] = useState<string>();
     const [addressDestination, setAddressDestination] = useState<string>();
-    const [socketUrl] = useState(`${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/bridge`);
+    const socketAddress = new URL(import.meta.env['VITE_KLAVE_API_URL']);
+    socketAddress.protocol = socketAddress.protocol === 'https:' ? 'wss:' : 'ws:';
+    const [socketUrl] = useState(`${socketAddress.origin}/bridge`);
     const codeValue = `cryptx_check#${addressDestination}#${uuidBeacon}#${uuidLocator}`;
 
     const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
@@ -41,7 +43,9 @@ export const LoginQR: FC = () => {
                 setAddressDestination(address);
                 break;
             case 'confirmed':
-                fetch('/api/login/print').then(res => res.json()).then(udata => login(udata));
+                fetch(`${import.meta.env['VITE_KLAVE_API_URL']}/login/print`, {
+                    credentials: 'include'
+                }).then(res => res.json()).then(udata => login(udata));
                 break;
         }
     }, [lastMessage, login, sendMessage]);

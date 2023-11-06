@@ -27,7 +27,9 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children, userData = {} })
 
     // call this function to sign out logged in user
     const logout = useCallback(() => {
-        fetch('/api/logout').then(res => res.json()).then(() => {
+        fetch(`${import.meta.env['VITE_KLAVE_API_URL']}/logout`, {
+            credentials: 'include'
+        }).then(res => res.json()).then(() => {
             setUser(null);
             navigate('/', { replace: true });
         });

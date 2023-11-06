@@ -29,7 +29,6 @@
             "executor": "@nx/vite:dev-server",
             "defaultConfiguration": "development",
             "options": {
-                "proxyConfig": "apps/ui/proxy.config.js",
                 "buildTarget": "ui:build",
                 "port": 4220
             },
