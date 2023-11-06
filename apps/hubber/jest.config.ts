@@ -3,10 +3,7 @@ export default {
     preset: '../../jest.preset.js',
     testEnvironment: '../../tools/fixtures/_mongoJestEnv.ts',
     transform: {
-        '^.+\\.[tj]s$': [
-            'ts-jest',
-            { tsconfig: '<rootDir>/tsconfig.spec.json' }
-        ]
+        '^.+\\.[tj]s$': '@swc/jest'
     },
     moduleFileExtensions: ['ts', 'js', 'html'],
     coverageDirectory: '../../coverage/apps/hubber'

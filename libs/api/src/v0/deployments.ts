@@ -129,17 +129,17 @@ export const deploymentRouter = createTRPCRouter({
         .input(z.object({
             deploymentId: z.string()
         }))
-        .mutation(async ({ ctx: { prisma, session: { user } }, input: { deploymentId } }) => {
-            if (!user)
+        .mutation(async ({ ctx: { prisma, session: { user }, override }, input: { deploymentId } }) => {
+            if (!user && !override)
                 return;
             logger.debug(`Deleting deployment ${deploymentId}`);
             await prisma.deployment.delete({
                 where: {
                     id: deploymentId,
-                    application: {
+                    application: override !== '__system_post_deploy' && override !== '__system_pruner_cleaner' ? {
                         permissionGrants: {
                             some: {
-                                userId: user.id,
+                                userId: user?.id,
                                 AND: {
                                     OR: [{
                                         admin: true
@@ -147,7 +147,7 @@ export const deploymentRouter = createTRPCRouter({
                                 }
                             }
                         }
-                    }
+                    } : undefined
                 }
             });
             return;
@@ -157,17 +157,17 @@ export const deploymentRouter = createTRPCRouter({
         .input(z.object({
             deploymentId: z.string()
         }))
-        .mutation(async ({ ctx: { prisma, session: { user } }, input: { deploymentId } }) => {
-            if (!user)
+        .mutation(async ({ ctx: { prisma, session: { user }, override }, input: { deploymentId } }) => {
+            if (!user && !override)
                 return;
             // TODO The Secretarium connection should be ambient in the server
             await prisma.deployment.update({
                 where: {
                     id: deploymentId,
-                    application: {
+                    application: override !== '__system_pruner_terminator' ? {
                         permissionGrants: {
                             some: {
-                                userId: user.id,
+                                userId: user?.id,
                                 AND: {
                                     OR: [{
                                         write: true
@@ -177,7 +177,7 @@ export const deploymentRouter = createTRPCRouter({
                                 }
                             }
                         }
-                    }
+                    } : undefined
                 },
                 data: {
                     status: 'terminating'

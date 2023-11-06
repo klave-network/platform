@@ -15,25 +15,10 @@
             ],
             "parserOptions": {
                 "project": [
-                    "apps/hubber/tsconfig.*?.json"
+                    "apps/ui-e2e/tsconfig.*?.json"
                 ]
             },
-            "rules": {
-                "@nx/enforce-module-boundaries": [
-                    "error",
-                    {
-                        "allow": [],
-                        "depConstraints": [
-                            {
-                                "sourceTag": "*",
-                                "onlyDependOnLibsWithTags": [
-                                    "*"
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }
+            "rules": {}
         },
         {
             "files": [

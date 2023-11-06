@@ -26,6 +26,53 @@ async function errorLongDeployingDeployments() {
     });
 }
 
+async function cleanDisconnectedDeployments() {
+
+    const selectTargets = await prisma.deploymentAddress.groupBy({
+        by: ['fqdn'],
+        having: {
+            fqdn: {
+                _count: {
+                    gt: 1
+                }
+            }
+        }
+    });
+
+    selectTargets.forEach(async ({ fqdn }) => {
+        const deploymentsList = await prisma.deployment.findMany({
+            where: {
+                status: {
+                    in: ['deployed']
+                },
+                deploymentAddress: {
+                    fqdn
+                }
+            },
+            select: {
+                id: true,
+                createdAt: true
+            }
+        });
+        if (deploymentsList.length > 1) {
+            const sortedDeployments = deploymentsList.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+            await Promise.allSettled(sortedDeployments.map((deployment) => {
+                const caller = router.v0.deployments.createCaller({
+                    prisma,
+                    session: {},
+                    override: '__system_pruner_cleaner'
+                } as any);
+                return caller.delete({
+                    deploymentId: deployment.id
+                });
+            })).catch((e) => {
+                logger.error('Error while cleaning leaf deployments ', e);
+            });
+        }
+    });
+
+}
+
 async function terminateExpiredDeployments() {
     const expiredDeploymentList = await prisma.deployment.findMany({
         where: {
@@ -40,7 +87,9 @@ async function terminateExpiredDeployments() {
     });
     return Promise.allSettled(expiredDeploymentList.map((deployment) => {
         const caller = router.v0.deployments.createCaller({
-            prisma
+            prisma,
+            session: {},
+            override: '__system_pruner_terminator'
         } as any);
         if (deployment.status === 'deployed')
             return caller.terminateDeployment({
@@ -55,6 +104,7 @@ async function terminateExpiredDeployments() {
 }
 
 async function cancelUpdatingDeployments() {
+
     const expiredDeploymentList = await prisma.deployment.findMany({
         where: {
             status: {
@@ -83,6 +133,7 @@ export async function prune() {
     try {
         await errorLongDeployingDeployments();
         await terminateExpiredDeployments();
+        await cleanDisconnectedDeployments();
         await cancelUpdatingDeployments();
     } catch (e) {
         logger.error('Error while pruning', e);

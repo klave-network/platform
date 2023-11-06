@@ -17,13 +17,13 @@ export const AppSidebar: FC = () => {
         refetchInterval: 60000
     });
 
-    const sortedApplications = useMemo(() => (applicationsList ?? []).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()), [applicationsList])
+    const sortedApplications = useMemo(() => (applicationsList ?? []).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()), [applicationsList]);
 
     if (lastMatch?.pathname === '/organisation/new' || orgSlug === 'new')
         return null;
 
     if (!orgSlug && personalOrg) {
-        navigate(`/${personalOrg.slug}`)
+        navigate(`/${personalOrg.slug}`);
         return null;
     }
 

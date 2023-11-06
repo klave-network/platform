@@ -25,10 +25,10 @@ export const RepoAppSelect: FC = () => {
 
     const { mutate, isPending: isTriggeringDeploy, isSuccess: hasTriggeredDeploy, error: mutationError } = api.v0.applications.register.useMutation({
         onSuccess: () => {
-            const org = organisations?.find(o => o.id === selectedOrgId)
+            const org = organisations?.find(o => o.id === selectedOrgId);
             if (!org)
                 return;
-            navigate(`/${org.slug}`)
+            navigate(`/${org.slug}`);
         }
     });
 
@@ -175,7 +175,7 @@ export const RepoAppSelect: FC = () => {
             deployableRepoId: deployableRepo.id,
             organisationId: selectedOrgId
         });
-    }
+    };
 
     return <>
         <div className='pb-5' >
@@ -189,7 +189,7 @@ export const RepoAppSelect: FC = () => {
                 ? <UilSpinner className='inline-block animate-spin' />
                 : <>
                     <Select.Root value={selectedOrgId} defaultValue={selectedOrgId} onValueChange={setSelectedOrgId}>
-                        <Select.Trigger className={`inline-flex justify-between flex-grow w-full items-center text-klave-light-blue bg-white data-[placeholder]:text-klave-light-blue mt-3 mb-5`}>
+                        <Select.Trigger className={'inline-flex justify-between flex-grow w-full items-center text-klave-light-blue bg-white data-[placeholder]:text-klave-light-blue mt-3 mb-5'}>
                             <Select.Value placeholder="Select an account" />
                             <Select.Icon>
                                 <ChevronDownIcon />

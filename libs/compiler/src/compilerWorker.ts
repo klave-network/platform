@@ -1,7 +1,8 @@
 import { TransferListItem, Worker } from 'node:worker_threads';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { v4 as uuid } from 'uuid';
 import { formatter } from './languageService';
+import { compilerModuleFunction } from './compilerModule';
 
 const deferredMarker = '__klave_deferred__';
 
@@ -154,7 +155,8 @@ export class CompilerHost {
 
 export const createCompiler = async () => {
 
-    const worker = new Worker(__dirname + '/compilerModule.mjs', {
+    const worker = new Worker(compilerModuleFunction.toString().substring(6), {
+        eval: true,
         name: 'Klave WASM Compiler',
         env: {},
         argv: []

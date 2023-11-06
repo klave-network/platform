@@ -70,7 +70,8 @@ export const createContext = async (opts: CreateExpressContextOptions) => {
         webId,
         body,
         login,
-        req
+        req,
+        override: undefined
     };
 };
 

@@ -293,9 +293,10 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                         }
                     });
 
-                    logger.debug(`Starting compilation ${deployment.id}`, {
+                    logger.debug(`Starting compilation ${deployment.id} ...`, {
                         parent: 'dpl'
                     });
+
                     const buildVm = new BuildMiniVM({
                         type: 'github',
                         context: deploymentContext,
@@ -469,7 +470,9 @@ export const sendToSecretarium = async ({
         if (previousDeployment) {
             logger.debug(`Deleting previous deployment ${previousDeployment.id} for ${target}`);
             const caller = router.v0.deployments.createCaller({
-                prisma
+                prisma,
+                session: {},
+                override: '__system_post_deploy'
             } as any);
             caller.delete({
                 deploymentId: previousDeployment.id
@@ -502,7 +505,9 @@ export const sendToSecretarium = async ({
                 if (previousDeployment) {
                     logger.debug(`Deleting previous deployment ${previousDeployment.id} for ${target}`);
                     const caller = router.v0.deployments.createCaller({
-                        prisma
+                        prisma,
+                        session: {},
+                        override: '__system_post_deploy'
                     } as any);
                     caller.delete({
                         deploymentId: previousDeployment.id

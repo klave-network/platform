@@ -46,7 +46,7 @@
 .form-select,
 .form-checkbox,
 .form-radio {
-    @apply bg-white border border-gray-300 focus: border-gray-500;
+    @apply bg-white border border-gray-300 focus:border-gray-500;
 }
 
 .form-input,
