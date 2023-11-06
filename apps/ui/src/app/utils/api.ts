@@ -1,5 +1,5 @@
 import { createTRPCReact } from '@trpc/react-query';
-import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
+import { createTRPCClient, httpBatchLink } from '@trpc/client';
 import type { Router } from '@klave/api';
 import superjson from 'superjson';
 import { v4 as uuid } from 'uuid';
@@ -14,6 +14,12 @@ export const apiClientOptions = {
     links: [
         httpBatchLink({
             url: `${import.meta.env['VITE_KLAVE_API_URL']}/trpc`,
+            fetch(url, options) {
+                return fetch(url, {
+                    ...options,
+                    credentials: 'include'
+                });
+            },
             headers() {
                 return {
                     'x-trustless-klave-ephemeral-tag': window.localStorage.getItem('emphemeralKlaveTag') ?? undefined
@@ -24,5 +30,5 @@ export const apiClientOptions = {
 };
 
 export const hookApi = createTRPCReact<Router>();
-export const httpApi = createTRPCProxyClient<Router>(apiClientOptions);
+export const httpApi = createTRPCClient<Router>(apiClientOptions);
 export default hookApi;
