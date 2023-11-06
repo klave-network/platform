@@ -45,6 +45,8 @@ async function cleanDisconnectedDeployments() {
                 status: {
                     in: ['deployed']
                 },
+                // TODO Check this is the correct behaviour for long lived deployments
+                life: 'short',
                 deploymentAddress: {
                     fqdn
                 }
