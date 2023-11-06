@@ -3,11 +3,13 @@ import 'express-session';
 import 'passport';
 import { type User as UserEntity, GitHubToken, Web } from '@klave/db';
 
+type FilteredUserEntity = Pick<UserEntity, 'id' | 'personalOrganisationId'>;
+
 declare module 'express-session' {
     interface SessionData {
         githubToken?: GitHubToken;
         currentChallenge?: string;
-        user?: UserEntity;
+        user?: FilteredUserEntity;
     }
 }
 
@@ -15,7 +17,7 @@ declare global {
     // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace Express {
         // eslint-disable-next-line @typescript-eslint/no-empty-interface
-        interface User extends UserEntity { }
+        interface User extends FilteredUserEntity { }
         interface Request {
             web: Web;
             webId: string;

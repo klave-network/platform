@@ -45,6 +45,9 @@ export const authRouter = createTRPCRouter({
                         emails: {
                             has: email
                         }
+                    },
+                    select: {
+                        id: true
                     }
                 });
                 if (!user)
@@ -111,6 +114,12 @@ export const authRouter = createTRPCRouter({
                     emails: {
                         has: email
                     }
+                },
+                select: {
+                    id: true,
+                    loginCode: true,
+                    loginCodeCreatedAt: true,
+                    personalOrganisationId: true
                 }
             });
             if (!user || user.loginCode === undefined)
@@ -137,7 +146,10 @@ export const authRouter = createTRPCRouter({
                     session.save(() => {
                         sessionStore.set(session.id, {
                             ...session,
-                            user
+                            user: {
+                                id: user.id,
+                                personalOrganisationId: user.personalOrganisationId
+                            }
                         }, (err) => {
                             if (err)
                                 reject(err);
@@ -165,6 +177,9 @@ export const authRouter = createTRPCRouter({
                     emails: {
                         has: email
                     }
+                },
+                select: {
+                    id: true
                 }
             });
 
@@ -212,8 +227,11 @@ export const authRouter = createTRPCRouter({
                         }
                     }
                 },
-                include: {
-                    webauthCredentials: true
+                select: {
+                    id: true,
+                    webauthChallenge: true,
+                    webauthCredentials: true,
+                    personalOrganisationId: true
                 }
             });
 
@@ -271,7 +289,10 @@ export const authRouter = createTRPCRouter({
                     session.save(() => {
                         sessionStore.set(session.id, {
                             ...session,
-                            user
+                            user: {
+                                id: user.id,
+                                personalOrganisationId: user.personalOrganisationId
+                            }
                         }, (err) => {
                             if (err)
                                 reject(err);
@@ -306,6 +327,9 @@ export const authRouter = createTRPCRouter({
                     emails: {
                         has: email
                     }
+                },
+                select: {
+                    id: true
                 }
             });
 
@@ -363,6 +387,11 @@ export const authRouter = createTRPCRouter({
                     emails: {
                         has: email
                     }
+                },
+                select: {
+                    id: true,
+                    webauthChallenge: true,
+                    personalOrganisationId: true
                 }
             });
 
@@ -400,7 +429,10 @@ export const authRouter = createTRPCRouter({
                     session.save(() => {
                         sessionStore.set(session.id, {
                             ...session,
-                            user
+                            user: {
+                                id: user.id,
+                                personalOrganisationId: user.personalOrganisationId
+                            }
                         }, (err) => {
                             if (err)
                                 reject(err);
