@@ -268,8 +268,6 @@ export const applicationRouter = createTRPCRouter({
 
             applications.forEach(async appName => {
                 const appSlug = appName.replaceAll(/\W/g, '-').toLocaleLowerCase();
-                // await prisma.$transaction(async (tx) => {
-                // const repo = await tx.repo.upsert({
                 const repo = await prisma.repo.upsert({
                     where: {
                         source_owner_name: {
@@ -292,8 +290,6 @@ export const applicationRouter = createTRPCRouter({
                         config: JSON.parse(newConfig) as any
                     }
                 });
-                // /* const application = */ await tx.application.create({
-                /* const application = */
                 await prisma.application.create({
                     data: {
                         web: {

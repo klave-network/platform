@@ -117,6 +117,7 @@ export const authRouter = createTRPCRouter({
                 },
                 select: {
                     id: true,
+                    slug: true,
                     loginCode: true,
                     loginCodeCreatedAt: true,
                     personalOrganisationId: true
@@ -148,7 +149,8 @@ export const authRouter = createTRPCRouter({
                             ...session,
                             user: {
                                 id: user.id,
-                                personalOrganisationId: user.personalOrganisationId
+                                personalOrganisationId: user.personalOrganisationId,
+                                slug: user.slug
                             }
                         }, (err) => {
                             if (err)
@@ -229,6 +231,7 @@ export const authRouter = createTRPCRouter({
                 },
                 select: {
                     id: true,
+                    slug: true,
                     webauthChallenge: true,
                     webauthCredentials: true,
                     personalOrganisationId: true
@@ -291,7 +294,8 @@ export const authRouter = createTRPCRouter({
                             ...session,
                             user: {
                                 id: user.id,
-                                personalOrganisationId: user.personalOrganisationId
+                                personalOrganisationId: user.personalOrganisationId,
+                                slug: user.slug
                             }
                         }, (err) => {
                             if (err)
@@ -390,6 +394,7 @@ export const authRouter = createTRPCRouter({
                 },
                 select: {
                     id: true,
+                    slug: true,
                     webauthChallenge: true,
                     personalOrganisationId: true
                 }
@@ -431,6 +436,7 @@ export const authRouter = createTRPCRouter({
                             ...session,
                             user: {
                                 id: user.id,
+                                slug: user.slug,
                                 personalOrganisationId: user.personalOrganisationId
                             }
                         }, (err) => {
