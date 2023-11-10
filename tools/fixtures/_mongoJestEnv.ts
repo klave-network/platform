@@ -28,8 +28,7 @@ class CustomEnvironment extends NodeEnvironment {
         this.global.process.env = {
             ...this.originEnv,
             KLAVE_EXPRESS_SESSION_SECRETS: 'secret-test-1337',
-            KLAVE_MONGODB_URL: mongoUri,
-            KLAVE_MONGODB_DBNAME: dbName
+            KLAVE_MONGODB_URL: mongoUri
         };
     }
 
