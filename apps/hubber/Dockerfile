@@ -16,6 +16,11 @@ COPY libs/db/src/prisma hubber/prisma
 RUN chown -R hubber:hubber .
 
 RUN cd hubber && yarn install
+
+FROM builder AS db
+
+WORKDIR /app
+
 RUN cd hubber && yarn add prisma
 RUN cd hubber && yarn run prisma generate
 
@@ -31,7 +36,7 @@ RUN addgroup --system hubber && \
 
 COPY dist/apps/hubber hubber
 COPY --from=builder /app/hubber/node_modules hubber/node_modules
-COPY dist/apps/klave hubber/public
+COPY --from=db /app/hubber/node_modules/.prisma hubber/node_modules/.prisma
 RUN chown -R hubber:hubber .
 
 EXPOSE 3333

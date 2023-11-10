@@ -4,11 +4,16 @@ import './i18n';
 import { dbOps } from './utils/db';
 import { scpOps, githubOps, envOps, dispatchOps, logger } from '@klave/providers';
 
+const onlineChain = () => process.env['KLAVE_OFFLINE_DEV'] === 'true'
+    ? Promise.resolve()
+    : Promise.resolve()
+        .then(dispatchOps.initialize)
+        .then(scpOps.initialize)
+        .then(githubOps.initialize);
+
 dbOps.initialize()
     .then(envOps.initialize)
-    .then(dispatchOps.initialize)
-    .then(scpOps.initialize)
-    .then(githubOps.initialize)
+    .then(onlineChain)
     .then(async () => {
 
         const port = Number(process.env.PORT) || 3333;

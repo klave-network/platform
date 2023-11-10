@@ -23,7 +23,8 @@
                     "apps/hubber/src/assets"
                 ],
                 "external": [
-                    "@klave/as-json"
+                    "@klave/as-json",
+                    "typescript"
                 ],
                 "generatePackageJson": true,
                 "esbuildOptions": {
