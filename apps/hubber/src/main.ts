@@ -2,7 +2,7 @@ import { startPruner } from '@klave/pruner';
 import { start } from './app';
 import './i18n';
 import { dbOps } from './utils/db';
-import { scpOps, githubOps, envOps, dispatchOps, logger } from '@klave/providers';
+import { scpOps, githubOps, envOps, dispatchOps, probotOps, logger } from '@klave/providers';
 
 const onlineChain = () => process.env['KLAVE_OFFLINE_DEV'] === 'true'
     ? Promise.resolve()
@@ -13,6 +13,7 @@ const onlineChain = () => process.env['KLAVE_OFFLINE_DEV'] === 'true'
 
 dbOps.initialize()
     .then(envOps.initialize)
+    .then(probotOps.initialize)
     .then(onlineChain)
     .then(async () => {
 
