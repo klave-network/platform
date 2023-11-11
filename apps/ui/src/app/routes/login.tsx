@@ -1,4 +1,4 @@
-import { FC, useRef } from 'react';
+import { FC, useEffect, useRef } from 'react';
 import { useToggle, useEventListener } from 'usehooks-ts';
 import LoginSecKey from '../partials/LoginSecKey';
 import LoginQR from '../partials/LoginQR';
@@ -11,6 +11,11 @@ export const Login: FC = () => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const navigate = useNavigate();
     const { data } = api.v0.auth.getSession.useQuery();
+
+    useEffect(() => {
+        if (data?.me)
+            navigate('/');
+    }, [data, navigate]);
 
     const onKeyDown = (event: KeyboardEvent) => {
         if (event.altKey && event.code === 'KeyO')
@@ -27,7 +32,7 @@ export const Login: FC = () => {
     useEventListener('message', onMessage);
 
     if (data?.me)
-        navigate('/');
+        return null;
 
     if (newPipe) {
 
