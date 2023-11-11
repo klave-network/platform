@@ -113,15 +113,9 @@
         },
         "docker-build": {
             "dependsOn": [
-                {
-                    "target": "build"
-                },
-                {
-                    "target": "build",
-                    "projects": "ui"
-                }
+                "build"
             ],
-            "command": "docker build -f apps/hubber/Dockerfile . -t hubber:latest"
+            "command": "docker build -f apps/hubber/Dockerfile . -t hubber"
         }
     },
     "tags": []

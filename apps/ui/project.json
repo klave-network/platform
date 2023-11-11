@@ -21,7 +21,8 @@
                 },
                 "production": {
                     "mode": "production",
-                    "minify": true
+                    "minify": true,
+                    "bundle": true
                 }
             }
         },
@@ -93,6 +94,12 @@
                     "ui:build"
                 ]
             }
+        },
+        "docker-build": {
+            "dependsOn": [
+                "build"
+            ],
+            "command": "docker build -f apps/ui/Dockerfile . -t ui:latest"
         }
     },
     "tags": []
