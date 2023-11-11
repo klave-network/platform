@@ -1,4 +1,4 @@
-import { FC, useMemo } from 'react';
+import { FC, useEffect, useMemo } from 'react';
 import { Link, NavLink, useMatches, useNavigate, useParams } from 'react-router-dom';
 import { UilFlask, UilSpinner, UilSetting } from '@iconscout/react-unicons';
 import api from '../../utils/api';
@@ -17,15 +17,19 @@ export const AppSidebar: FC = () => {
         refetchInterval: 60000
     });
 
+    useEffect(() => {
+        if (!orgSlug && personalOrg) {
+            navigate(`/${personalOrg.slug}`);
+        }
+    }, [navigate, orgSlug, personalOrg]);
+
     const sortedApplications = useMemo(() => (applicationsList ?? []).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()), [applicationsList]);
 
     if (lastMatch?.pathname === '/organisation/new' || orgSlug === 'new')
         return null;
 
-    if (!orgSlug && personalOrg) {
-        navigate(`/${personalOrg.slug}`);
+    if (!orgSlug && personalOrg)
         return null;
-    }
 
     if (isPeronsalOrgLoading)
         return <>
