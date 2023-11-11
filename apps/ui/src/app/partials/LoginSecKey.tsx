@@ -85,12 +85,13 @@ export const LoginSecKey: FC = () => {
     }, [email, emailCodeMutation]);
 
     const startAuth = useCallback(() => {
+
         if (email.length === 0) {
             setError('Please enter your email address');
             return;
         }
 
-        if (!isWebauthAvailable || (!credentials?.length && code.length === 0))
+        if (!isWebauthAvailable)
             return getLoginCode();
 
         if (credentials?.includes(email)) {
@@ -103,7 +104,7 @@ export const LoginSecKey: FC = () => {
                     }
                     throw new Error('No authentication options available');
                 })
-                .then((auth) => new Promise((resolve, reject) => {
+                .then((auth) => new Promise<any>((resolve, reject) => {
                     validateWebauthnMutation({
                         email,
                         data: auth
@@ -112,7 +113,7 @@ export const LoginSecKey: FC = () => {
                         onError: reject
                     });
                 }))
-                .then((res: any) => {
+                .then((res) => {
                     if (res?.ok) {
                         refetchSession();
                         return;
@@ -154,9 +155,10 @@ export const LoginSecKey: FC = () => {
                     setIsRequestingWebauthnInput(false);
                     setError('An error occured while trying to register your secure key. Please try again later.');
                 });
+            return;
         }
 
-    }, [code.length, credentials, email, getLoginCode, isWebauthAvailable, refetchAuthOptions, refetchRegistrationOptions, refetchSession, registerWebauthnMutation, setCredentials, validateWebauthnMutation]);
+    }, [credentials, email, getLoginCode, isWebauthAvailable, refetchAuthOptions, refetchRegistrationOptions, refetchSession, registerWebauthnMutation, setCredentials, validateWebauthnMutation]);
 
     const verifyEmailCode = useCallback((e: MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
