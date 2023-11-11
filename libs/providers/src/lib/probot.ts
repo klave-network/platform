@@ -26,7 +26,7 @@ export const probotOps = {
             await octokit.apps.listInstallations({
                 per_page: 1
             });
-            logger.info('Connected to  GitHub via Probot');
+            logger.info('Connected to GitHub via Probot');
 
         } catch (e) {
             logger.error(`Connection to GitHub via Probot failed: ${e}`);
