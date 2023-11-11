@@ -50,7 +50,7 @@ export const authRouter = createTRPCRouter({
                         id: true
                     }
                 });
-                if (!user)
+                if (!user) {
                     user = await prisma.user.create({
                         data: {
                             slug: '~#~',
@@ -66,6 +66,16 @@ export const authRouter = createTRPCRouter({
                             }
                         }
                     });
+                    await prisma.organisation.create({
+                        data: {
+                            name: 'Personal',
+                            slug: `personal-${user.id}`,
+                            personal: true,
+                            creatorId: user.id
+                        }
+                    });
+                }
+	
                 const temporaryCode = `${Math.random()}`.substring(2, 11);
                 const transporter = createTransport(process.env['KLAVE_SMTP_HOST']);
                 await prisma.user.update({
