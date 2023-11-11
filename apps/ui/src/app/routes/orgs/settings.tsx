@@ -141,7 +141,7 @@ export const OrganisationSettings: FC = () => {
             <h1 className='font-bold text-xl mb-5'>Repository information</h1>
             <p>
                 Name: <b>{organisation.name}</b><br />
-                Slug: <b>{organisation.slug}</b><br />
+                Slug: <b>{organisation.slug.replace('~$~', '')}</b><br />
             </p>
         </div>
         <div>
@@ -163,7 +163,7 @@ export const OrganisationSettings: FC = () => {
             {organisation.permissionGrants?.map((grant, i) =>
                 <div key={i} className='flex flex-row gap-3 border-slate-100 border border-t-0 rounded-sm p-2'>
                     <div className='flex flex-col gap-1 grow'>
-                        <p className='font-bold'>{grant.user.slug}</p>
+                        <p className='font-bold'>{grant.user.slug.replace('~$~', '')}</p>
                         <p>{grant.userId ?? grant.organisationId}</p>
                     </div>
                     <div className='flex flex-col gap-1 items-center'>

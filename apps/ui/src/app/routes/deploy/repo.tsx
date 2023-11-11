@@ -204,7 +204,7 @@ export const RepoAppSelect: FC = () => {
                                     {personals.length > 0
                                         ? <Select.Group>
                                             <Select.Label className="text-xs text-slate-400 px-3 py-1">Personal Account</Select.Label>
-                                            {personals.map(o => <SelectItem key={o.id} value={o.id} className="px-3 py-2 hover:text-klave-cyan hover:cursor-pointer">{o.slug} <span className='text-slate-400'>- {o.name}</span></SelectItem>)}
+                                            {personals.map(o => <SelectItem key={o.id} value={o.id} className="px-3 py-2 hover:text-klave-cyan hover:cursor-pointer">{o.slug.replace('~$~', '')} <span className='text-slate-400'>- {o.name}</span></SelectItem>)}
                                         </Select.Group>
                                         : null}
                                     <Select.Separator className="text-xs text-slate-400 p-1" />

@@ -47,7 +47,7 @@ const Header: FC = () => {
                         <ul className="flex flex-grow justify-end flex-wrap items-center">
                             {data?.me
                                 ? <li>
-                                    <span className="btn-sm ml-3 a-like">Welcome, {data.me.slug}</span>
+                                    <span className="btn-sm ml-3 a-like">Welcome, {data.me.slug.replace('~$~', '')}</span>
                                 </li>
                                 : null}
                             {/*
