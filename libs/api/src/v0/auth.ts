@@ -1,4 +1,5 @@
 import { logger } from '@klave/providers';
+import idgen from '@ideafast/idgen';
 import { publicProcedure, createTRPCRouter } from '../trpc';
 import { webcrypto } from 'node:crypto';
 import { createTransport } from 'nodemailer';
@@ -36,6 +37,7 @@ export const authRouter = createTRPCRouter({
 
             const betaDomainsAllowed = process.env['KLAVE_BETA_DOMAIN_FILTER']?.split(',') ?? [];
             const emailDomain = email.split('@')[1];
+
             if (!emailDomain || !betaDomainsAllowed.includes(emailDomain))
                 throw new Error('It looks like you are not part of Klave\'s beta program');
 
@@ -51,31 +53,50 @@ export const authRouter = createTRPCRouter({
                     }
                 });
                 if (!user) {
-                    user = await prisma.user.create({
+                    const slug = `~$~${idgen.generate(10)}`;
+                    const newUser = await prisma.user.create({
                         data: {
-                            slug: '~#~',
+                            slug,
                             emails: [email],
                             webs: {
                                 connect: { id: webId }
                             },
-                            personalOrganisation: {
+                            createdOrganisations: {
                                 create: {
                                     name: 'Personal',
-                                    slug: 'personal'
+                                    slug,
+                                    personal: true
                                 }
                             }
+                        },
+                        include: {
+                            createdOrganisations: true
                         }
                     });
-                    await prisma.organisation.create({
+                    if (!newUser.createdOrganisations[0])
+                        throw new Error('Could not create personal organisation');
+                    await prisma.permissionGrant.create({
                         data: {
-                            name: 'Personal',
-                            slug: `personal-${user.id}`,
-                            personal: true,
-                            creatorId: user.id
+                            user: {
+                                connect: {
+                                    id: newUser.id
+                                }
+                            },
+                            organisation: {
+                                connect: {
+                                    id: newUser.createdOrganisations[0].id
+                                }
+                            },
+                            read: true,
+                            write: true,
+                            admin: true
                         }
                     });
+                    user = {
+                        id: newUser.id
+                    };
                 }
-	
+
                 const temporaryCode = `${Math.random()}`.substring(2, 11);
                 const transporter = createTransport(process.env['KLAVE_SMTP_HOST']);
                 await prisma.user.update({
@@ -130,7 +151,16 @@ export const authRouter = createTRPCRouter({
                     slug: true,
                     loginCode: true,
                     loginCodeCreatedAt: true,
-                    personalOrganisationId: true
+                    createdOrganisations: {
+                        where: {
+                            personal: {
+                                equals: true
+                            }
+                        },
+                        select: {
+                            id: true
+                        }
+                    }
                 }
             });
             if (!user || user.loginCode === undefined)
@@ -159,7 +189,7 @@ export const authRouter = createTRPCRouter({
                             ...session,
                             user: {
                                 id: user.id,
-                                personalOrganisationId: user.personalOrganisationId,
+                                personalOrganisationId: user.createdOrganisations[0]?.id,
                                 slug: user.slug
                             }
                         }, (err) => {
@@ -244,7 +274,16 @@ export const authRouter = createTRPCRouter({
                     slug: true,
                     webauthChallenge: true,
                     webauthCredentials: true,
-                    personalOrganisationId: true
+                    createdOrganisations: {
+                        where: {
+                            personal: {
+                                equals: true
+                            }
+                        },
+                        select: {
+                            id: true
+                        }
+                    }
                 }
             });
 
@@ -304,7 +343,7 @@ export const authRouter = createTRPCRouter({
                             ...session,
                             user: {
                                 id: user.id,
-                                personalOrganisationId: user.personalOrganisationId,
+                                personalOrganisationId: user.createdOrganisations[0]?.id,
                                 slug: user.slug
                             }
                         }, (err) => {
@@ -406,7 +445,16 @@ export const authRouter = createTRPCRouter({
                     id: true,
                     slug: true,
                     webauthChallenge: true,
-                    personalOrganisationId: true
+                    createdOrganisations: {
+                        where: {
+                            personal: {
+                                equals: true
+                            }
+                        },
+                        select: {
+                            id: true
+                        }
+                    }
                 }
             });
 
@@ -447,7 +495,7 @@ export const authRouter = createTRPCRouter({
                             user: {
                                 id: user.id,
                                 slug: user.slug,
-                                personalOrganisationId: user.personalOrganisationId
+                                personalOrganisationId: user.createdOrganisations[0]?.id
                             }
                         }, (err) => {
                             if (err)

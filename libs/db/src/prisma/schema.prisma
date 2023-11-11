@@ -41,7 +41,7 @@ model Organisation {
     slug             String            @unique
     kredits          BigInt            @default(0)
     personal         Boolean           @default(false)
-    creator          User?
+    creator          User?             @relation(fields: [creatorId], references: [id])
     creatorId        String?
     applications     Application[]
     permissionGrants PermissionGrant[]
@@ -75,8 +75,7 @@ model User {
     webs                      Web[]
     webauthCredentials        WebauthCredential[]
     permissionGrants          PermissionGrant[]
-    personalOrganisation      Organisation        @relation(fields: [personalOrganisationId], references: [id])
-    personalOrganisationId    String              @unique
+    createdOrganisations      Organisation[]
 }
 
 model WebauthCredential {

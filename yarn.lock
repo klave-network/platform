@@ -1745,6 +1745,11 @@
   dependencies:
     react ">=15.0.0 <17.0.0"
 
+"@ideafast/idgen@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@ideafast/idgen/-/idgen-0.1.1.tgz#966ad2d74238a77881cfa427a8c3e9225ee0c24f"
+  integrity sha512-1kaaUD9LXRYnUqK2yJnwMXon2F3vqKzViAbEZQTeYAghLB60EEIbC4JXoi+KbKKxYNHNB03MGWUR5y3Ec+yEgA==
+
 "@isaacs/cliui@^8.0.2":
   version "8.0.2"
   resolved "https://registry.yarnpkg.com/@isaacs/cliui/-/cliui-8.0.2.tgz#b37667b7bc181c168782259bab42474fbf52b550"

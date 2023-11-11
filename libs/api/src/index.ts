@@ -3,7 +3,7 @@ import 'express-session';
 import 'passport';
 import { type User as UserEntity, GitHubToken, Web } from '@klave/db';
 
-type FilteredUserEntity = Pick<UserEntity, 'id' | 'slug' | 'personalOrganisationId'>;
+type FilteredUserEntity = Pick<UserEntity, 'id' | 'slug'> & { personalOrganisationId?: string };
 
 declare module 'express-session' {
     interface SessionData {
