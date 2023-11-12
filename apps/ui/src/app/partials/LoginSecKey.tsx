@@ -3,6 +3,7 @@ import { platformAuthenticatorIsAvailable, browserSupportsWebAuthn, startAuthent
 import api from '../utils/api';
 import { UilSpinner } from '@iconscout/react-unicons';
 import { useLocalForage } from '../useLocalStorage';
+import { useDebounce } from 'usehooks-ts';
 
 export const LoginSecKey: FC = () => {
 
@@ -14,6 +15,7 @@ export const LoginSecKey: FC = () => {
     const [code, setCode] = useState('');
     const [error, setError] = useState<string>();
     const [screen, setScreen] = useState<'start' | 'code' | 'key'>('start');
+    const debouncedEmail = useDebounce<string>(email, 200);
     const { mutate: emailCodeMutation, isPending: emailCodeLoading } = api.v0.auth.getEmailCode.useMutation();
     const { mutate: verifyEmailCodeMutation, isPending: verifyEmailCodeLoading } = api.v0.auth.verifyEmailCode.useMutation();
     const { mutate: validateWebauthnMutation, isPending: validateWebauthnLoading } = api.v0.auth.validateWebauthn.useMutation();
@@ -31,6 +33,19 @@ export const LoginSecKey: FC = () => {
         enabled: false,
         retry: false
     });
+    const { data: emailHint, refetch: refetchEmailHint, isFetching: isCheckingEmailHint, error: emailHintError } = api.v0.auth.getEmailHints.useQuery({
+        partialEmail: email
+    }, {
+        enabled: false,
+        retry: false
+    });
+
+    console.log(debouncedEmail);
+
+    useEffect(() => {
+        if (debouncedEmail.length > 0)
+            refetchEmailHint();
+    }, [debouncedEmail, refetchEmailHint]);
 
     useEffect(() => {
         if (credentials?.length === 1)
@@ -243,10 +258,17 @@ export const LoginSecKey: FC = () => {
         <form className='relative'>
             {screen === 'start' ? <>
                 <input key='emailField' value={email} onInput={onChangeEmail} alt='email' placeholder='Email address' type='email' className='text-center rounded-md text-black' />
-                <br />
-                <br />
-                <button disabled={isLoading} onClick={handleLoginSubmit} onSubmit={handleLoginSubmit} type='submit' className='bg-blue-600 text-white hover:bg-blue-500 rounded-md'>{isLoading ? <UilSpinner className='inline-block animate-spin' /> : isWebauthAvailable ? 'Log in with secure key' : 'Log in with email code'}</button><br />
-                <button disabled={isLoading} onClick={handleLoginCodeSubmit} className='bg-transparent border-0 shadow-none font-normal text-sm text-blue-600 hover:text-blue-300 hover:cursor-pointer'>Use email code instead</button>
+                <div className='h-8'>
+                    {emailHintError?.data || emailHint?.sucess === false
+                        ? <span className="block mt-1 text-xs text-red-700 leading-tight">{emailHintError?.message ?? emailHint?.message ?? 'We encountered a problem.'}<br />&nbsp;</span>
+                        : emailHint?.message
+                            ? <span className="block mt-1 text-xs text-green-700 leading-tight">{emailHint?.message}</span>
+                            : isCheckingEmailHint
+                                ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-4' /><br />&nbsp;</span>
+                                : <span className="block mt-1 text-xs leading-tight">&nbsp;<br />&nbsp;</span>}
+                </div>
+                <button disabled={isLoading || emailHint?.sucess === false} onClick={handleLoginSubmit} onSubmit={handleLoginSubmit} type='submit' className='bg-blue-600 text-white hover:bg-blue-500 disabled:bg-slate-300 rounded-md'>{isLoading ? <UilSpinner className='inline-block animate-spin' /> : isWebauthAvailable ? 'Log in with secure key' : 'Log in with email code'}</button><br />
+                <button disabled={isLoading || emailHint?.sucess === false} onClick={handleLoginCodeSubmit} className='bg-transparent border-0 shadow-none font-normal text-sm text-blue-600 disabled:text-slate-400 hover:text-blue-300 hover:cursor-pointer'>Use email code instead</button>
             </> : screen === 'code' ? <>
                 <input key='codeField' value={code} onInput={onChangeCode} alt='code' placeholder='Code' type='text' className='text-center rounded-md text-black' />
                 <br />

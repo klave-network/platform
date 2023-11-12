@@ -3,11 +3,17 @@ import idgen from '@ideafast/idgen';
 import { publicProcedure, createTRPCRouter } from '../trpc';
 import { webcrypto } from 'node:crypto';
 import { createTransport } from 'nodemailer';
+import FakeMailGuard from 'fakemail-guard';
 import { generateAuthenticationOptions, generateRegistrationOptions, verifyAuthenticationResponse, verifyRegistrationResponse } from '@simplewebauthn/server';
 import { type startRegistration, type startAuthentication } from '@simplewebauthn/browser';
 import { Utils } from '@secretarium/connector';
 // import * as passport from 'passport';
 import { z } from 'zod';
+
+const mailGuard = new FakeMailGuard({
+    allowDisposable: false,
+    allowFreemail: true
+});
 
 const origin = process.env['KLAVE_WEBAUTHN_ORIGIN'] ?? 'http://localhost';
 const rpID = new URL(origin).hostname;
@@ -29,16 +35,42 @@ export const authRouter = createTRPCRouter({
             // web: ctx.web
         };
     }),
+    getEmailHints: publicProcedure
+        .input(z.object({
+            partialEmail: z.string()
+        }))
+        .query(async ({ input: { partialEmail } }) => {
+            const hint = mailGuard.check(partialEmail);
+            console.log(hint);
+            if (hint.errors.includes('disposable'))
+                return ({
+                    sucess: false,
+                    message: 'We do not accept disposable email addresses.'
+                });
+
+            if (hint.typo)
+                return ({
+                    sucess: true,
+                    message: `Did you mean ${hint.typo}?`
+                });
+            return ({
+                sucess: true
+            });
+        }),
     getEmailCode: publicProcedure
         .input(z.object({
             email: z.string().email()
         }))
         .mutation(async ({ ctx: { prisma, webId }, input: { email } }) => {
 
-            const betaDomainsAllowed = process.env['KLAVE_BETA_DOMAIN_FILTER']?.split(',') ?? [];
-            const emailDomain = email.split('@')[1];
+            const hint = mailGuard.check(email);
+            if (hint.errors.includes('disposable'))
+                throw new Error('We do not accept disposable email addresses.');
 
-            if (!emailDomain || !betaDomainsAllowed.includes(emailDomain))
+            const betaDomainsAllowed = process.env['KLAVE_BETA_DOMAIN_FILTER']?.split(',') ?? [];
+            const emailDomain = hint.domain;
+
+            if (!emailDomain || (betaDomainsAllowed.length > 0 && !betaDomainsAllowed.includes(emailDomain)))
                 throw new Error('It looks like you are not part of Klave\'s beta program');
 
             try {
@@ -209,9 +241,14 @@ export const authRouter = createTRPCRouter({
         }))
         .query(async ({ ctx: { prisma }, input: { email } }) => {
 
+            const hint = mailGuard.check(email);
+            if (hint.errors.includes('disposable'))
+                throw new Error('We do not accept disposable email addresses.');
+
             const betaDomainsAllowed = process.env['KLAVE_BETA_DOMAIN_FILTER']?.split(',') ?? [];
-            const emailDomain = email.split('@')[1];
-            if (!emailDomain || !betaDomainsAllowed.includes(emailDomain))
+            const emailDomain = hint.domain;
+
+            if (!emailDomain || (betaDomainsAllowed.length > 0 && !betaDomainsAllowed.includes(emailDomain)))
                 throw new Error('It looks like you are not part of Klave\'s beta program');
 
             const user = await prisma.user.findFirst({
@@ -370,9 +407,14 @@ export const authRouter = createTRPCRouter({
         }))
         .query(async ({ ctx: { prisma }, input: { email } }) => {
 
+            const hint = mailGuard.check(email);
+            if (hint.errors.includes('disposable'))
+                throw new Error('We do not accept disposable email addresses.');
+
             const betaDomainsAllowed = process.env['KLAVE_BETA_DOMAIN_FILTER']?.split(',') ?? [];
-            const emailDomain = email.split('@')[1];
-            if (!emailDomain || !betaDomainsAllowed.includes(emailDomain))
+            const emailDomain = hint.domain;
+
+            if (!emailDomain || (betaDomainsAllowed.length > 0 && !betaDomainsAllowed.includes(emailDomain)))
                 throw new Error('It looks like you are not part of Klave\'s beta program');
 
             const user = await prisma.user.findFirst({

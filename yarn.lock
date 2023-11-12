@@ -7799,6 +7799,11 @@ external-editor@^3.0.3:
     iconv-lite "^0.4.24"
     tmp "^0.0.33"
 
+fakemail-guard@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/fakemail-guard/-/fakemail-guard-1.0.0.tgz#f1109803ffd7d07e35e125e1e53d5ee2f91fc0bc"
+  integrity sha512-+0+Bh0a+Ta/UgIR8EtmJqmPXxSZZUZL3WQPhCf2i5giHyRmcKUcMdzqT4cY4hmlBl1Kgkr7jI0elrnzGwbb5+Q==
+
 fast-content-type-parse@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/fast-content-type-parse/-/fast-content-type-parse-1.1.0.tgz#4087162bf5af3294d4726ff29b334f72e3a1092c"
