@@ -101,7 +101,6 @@ export const authRouter = createTRPCRouter({
         }))
         .query(async ({ input: { partialEmail } }) => {
             const hint = mailGuard.check(partialEmail);
-            console.log(hint);
             if (hint.errors.includes('disposable'))
                 return ({
                     sucess: false,
