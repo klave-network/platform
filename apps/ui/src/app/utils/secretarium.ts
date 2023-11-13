@@ -3,9 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { SCP, Key } from '@secretarium/connector';
 import { httpApi } from './api';
 
-export const client = new SCP({
-    logger: console
-});
+export const client = new SCP();
 
 let connectionKey: Key | undefined;
 let connectionInfo: Array<string> | undefined;
@@ -34,16 +32,18 @@ export function useSecretariumQuery(app: string, route: string, args?: unknown) 
 
     const [status, setStatus] = useState<{
         loading: boolean;
-        error?: Error;
+        errors?: Array<Error | string>;
         data: Array<any>;
     }>({
         loading: false,
+        errors: [],
         data: []
     });
 
     const refetch = useCallback(async () => {
-        const localAccu: Array<any> = [];
-        setStatus({ loading: true, data: localAccu });
+        const localResultAccu: Array<any> = [];
+        const localErrorAccu: Array<any> = [];
+        setStatus({ loading: true, data: localResultAccu, errors: localErrorAccu });
         if (!connectionInfo)
             await syncNodeInfo();
         if (!connectionKey)
@@ -55,15 +55,19 @@ export function useSecretariumQuery(app: string, route: string, args?: unknown) 
             await client.connect(node, connectionKey, trustKey);
             client.newTx(app, route, `klave-deployment-${app}`, args as any)
                 .onResult(result => {
-                    localAccu.push(result);
-                    setStatus({ loading: false, data: localAccu });
-                }).onError(error => {
-                    setStatus({ loading: false, error: error as any, data: [] });
-                }).send().catch(error => {
-                    setStatus({ loading: false, error: error as any, data: [] });
+                    localResultAccu.push(result);
+                    setStatus({ loading: false, data: localResultAccu, errors: [] });
+                }).onError((error: any) => {
+                    if (error.toString() !== '[UNKNOWN ERROR]' || localErrorAccu.length === 0)
+                        localErrorAccu.push(error);
+                    setStatus({ loading: false, errors: localErrorAccu as any, data: [] });
+                }).send().catch(() => {
+                    // localErrorAccu.push(error);
+                    setStatus({ loading: false, errors: localErrorAccu as any, data: [] });
                 });
         } catch (error) {
-            setStatus({ loading: false, error: error as any, data: [] });
+            localErrorAccu.push(error);
+            setStatus({ loading: false, errors: localErrorAccu as any, data: [] });
         }
     }, [app, route, args]);
 
@@ -75,7 +79,7 @@ export function useSecretariumQuery(app: string, route: string, args?: unknown) 
 
     useEffect(() => {
         if (config.app !== app || config.route !== route)
-            setStatus({ loading: false, error: undefined, data: [] });
+            setStatus({ loading: false, errors: [], data: [] });
         setConfig({
             app,
             route,

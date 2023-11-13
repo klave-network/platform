@@ -29,6 +29,9 @@ client.onStateChange((state) => {
 
 export const scpOps = {
     initialize: async () => {
+        const [node, trustKey] = process.env['KLAVE_SECRETARIUM_NODE']?.split('|') ?? [];
+        if (!node || !trustKey)
+            throw new Error('Missing Secretarium node or trust key');
         try {
             const dbSecret = process.env['KLAVE_SECRETARIUM_SECRET'];
             if (!dbSecret || (dbSecret?.length ?? 0) === 0)
@@ -51,16 +54,13 @@ export const scpOps = {
                     connectionKey = await Key.importEncryptedKeyPair(theKey, dbSecret);
                 }
             }
-            const [node, trustKey] = process.env['KLAVE_SECRETARIUM_NODE']?.split('|') ?? [];
-            if (!node || !trustKey)
-                throw new Error('Missing Secretarium node or trust key');
             await client.connect(node, connectionKey, trustKey);
             logger.info(`Connected to Secretarium ${node}`);
             logger.info(`PK ${await connectionKey.getRawPublicKeyHex()}`);
             reconnectAttempt = 0;
             return;
         } catch (e) {
-            logger.error(`Connection ${++reconnectAttempt} to Secretarium failed: ${e}`);
+            logger.error(`Connection ${++reconnectAttempt} to Secretarium ${node} failed: ${e}`);
             lastSCPState = Constants.ConnectionState.closed;
             await planReconnection();
         }
