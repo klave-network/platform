@@ -35,6 +35,66 @@ export const authRouter = createTRPCRouter({
             // web: ctx.web
         };
     }),
+    updateSlug: publicProcedure
+        .input(z.object({
+            slug: z.string()
+        }))
+        .mutation(async ({ ctx: { prisma, session, sessionStore }, input: { slug } }) => {
+
+            if (!session.user)
+                return;
+
+            const newSlug = slug.replaceAll(/\W/g, '-').toLocaleLowerCase();
+            const existingOrg = await prisma.organisation.findUnique({
+                where: {
+                    slug: newSlug
+                }
+            });
+
+            if (existingOrg)
+                throw new Error('This name is already taken');
+
+            const user = await prisma.user.update({
+                where: {
+                    id: session.user.id
+                },
+                data: {
+                    slug: newSlug
+                }
+            });
+
+            const personalOrg = await prisma.organisation.update({
+                where: {
+                    creatorId: user.id,
+                    personal: true,
+                    slug: session.user.slug
+                },
+                data: {
+                    slug: newSlug
+                }
+            });
+
+            await new Promise<void>((resolve, reject) => {
+                session.save(() => {
+                    sessionStore.set(session.id, {
+                        ...session,
+                        user: {
+                            id: user.id,
+                            slug: user.slug,
+                            personalOrganisationId: personalOrg.id
+                        }
+                    }, (err) => {
+                        if (err)
+                            reject(err);
+                        resolve();
+                    });
+                });
+            });
+
+            return {
+                ok: true
+            };
+        }),
     getEmailHints: publicProcedure
         .input(z.object({
             partialEmail: z.string()
@@ -364,41 +424,44 @@ export const authRouter = createTRPCRouter({
 
             const { newCounter } = authenticationInfo;
 
-            if (user) {
-                await prisma.webauthCredential.update({
-                    where: {
-                        id: authenticator.id
-                    },
-                    data: {
-                        counter: newCounter
-                    }
-                });
+            await prisma.webauthCredential.update({
+                where: {
+                    id: authenticator.id
+                },
+                data: {
+                    counter: newCounter
+                }
+            });
 
-                await new Promise<void>((resolve, reject) => {
-                    session.save(() => {
-                        sessionStore.set(session.id, {
-                            ...session,
-                            user: {
-                                id: user.id,
-                                personalOrganisationId: user.createdOrganisations[0]?.id,
-                                slug: user.slug
-                            }
-                        }, (err) => {
-                            if (err)
-                                reject(err);
-                            resolve();
-                        });
+            await prisma.user.update({
+                where: {
+                    id: user.id
+                },
+                data: {
+                    webauthChallenge: null,
+                    webauthChallengeCreatedAt: null
+                }
+            });
+
+            await new Promise<void>((resolve, reject) => {
+                session.save(() => {
+                    sessionStore.set(session.id, {
+                        ...session,
+                        user: {
+                            id: user.id,
+                            personalOrganisationId: user.createdOrganisations[0]?.id,
+                            slug: user.slug
+                        }
+                    }, (err) => {
+                        if (err)
+                            reject(err);
+                        resolve();
                     });
                 });
+            });
 
-                return {
-                    ok: true
-                };
-            }
-            logger.debug('wan: General failure');
             return {
-                ok: false,
-                error: 'Invalid authentication response'
+                ok: true
             };
         }),
     getWebauthRegistrationOptions: publicProcedure

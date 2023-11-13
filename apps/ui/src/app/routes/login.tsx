@@ -1,9 +1,12 @@
-import { FC, useEffect, useRef } from 'react';
-import { useToggle, useEventListener } from 'usehooks-ts';
+import { FC, useEffect, useRef, useState } from 'react';
+import { useToggle, useEventListener, useDebounce } from 'usehooks-ts';
+import { z } from 'zod';
 import LoginSecKey from '../partials/LoginSecKey';
 import LoginQR from '../partials/LoginQR';
 import api from '../utils/api';
 import { useNavigate } from 'react-router-dom';
+import { useZodForm } from '../utils/useZodForm';
+import { UilSpinner } from '@iconscout/react-unicons';
 
 export const Login: FC = () => {
 
@@ -11,11 +14,27 @@ export const Login: FC = () => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const navigate = useNavigate();
     const { data } = api.v0.auth.getSession.useQuery();
+    const { mutateAsync: updateSlug, isPending: isChangingSlug } = api.v0.auth.updateSlug.useMutation();
+    const [slug, setSlug] = useState('');
+    const [skipAskName, setSkipAskName] = useState(false);
+    const debouncedSlug = useDebounce(slug, 500);
+    const { data: alreadyExists, isLoading: isCheckingIfExists } = api.v0.organisations.exists.useQuery({ orgSlug: debouncedSlug });
+
+    const methods = useZodForm({
+        schema: z.object({
+            slug: z.string()
+        }),
+        values: {
+            slug: slug.replaceAll(/\W/g, '-')
+        }
+    });
 
     useEffect(() => {
-        if (data?.me)
-            navigate('/');
-    }, [data, navigate]);
+        if (data?.me) {
+            if (!data.me.slug.startsWith('~$~') || skipAskName)
+                navigate('/');
+        }
+    }, [data, navigate, skipAskName]);
 
     const onKeyDown = (event: KeyboardEvent) => {
         if (event.altKey && event.code === 'KeyO')
@@ -31,8 +50,73 @@ export const Login: FC = () => {
     useEventListener('keydown', onKeyDown);
     useEventListener('message', onMessage);
 
-    if (data?.me)
+    if (data?.me) {
+        if (data.me.slug.startsWith('~$~') && !skipAskName)
+            return <div id="login">
+
+                <div className="flex flex-col sm:flex-row max-w-6xl mx-auto gap-12 px-4 sm:px-6">
+                    <div className="p-5 min-w-[300px] bg-slate-100 dark:bg-gray-800 rounded-md">
+                        <div className="text-center pb-12 md:pb-16">
+                            <br />
+                            <div>
+                                <h1 className='text-xl font-bold'>Welcome to Klave</h1>
+                            </div>
+                            <div>
+                                So that other users of Klave can find you, please enter a pseudonym for yourself.<br />
+                                This pseudonym may be made available to other users of the service.
+                            </div>
+                            <br />
+                            <br />
+                            <form
+                                onSubmit={methods.handleSubmit(async (data) => {
+                                    await updateSlug(data);
+                                    methods.reset();
+                                })}
+                                className="space-y-2"
+                            >
+                                <div className='flex flex-col gap-3'>
+                                    <label>
+                                        <input {...methods.register('slug')} onChange={e => setSlug(e.target.value.trim())} className="border w-2/3" /><br />
+                                        <div className='h-8'>{isCheckingIfExists
+                                            ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-4' /><br />&nbsp;</span>
+                                            : alreadyExists
+                                                ? <span className="block mt-1 text-xs text-red-700 leading-tight">The name <b>{slug}</b> already exists.<br />&nbsp;</span>
+                                                : slug.length
+                                                    ? <span className="block mt-1 text-xs text-green-700 leading-tight">This name is available !<br />Your URL on Klave will be https://klave.com/<b>{slug.toLocaleLowerCase()}</b></span>
+                                                    : <span className="block mt-1 text-xs leading-tight">&nbsp;<br />&nbsp;</span>}
+                                        </div>
+                                    </label>
+
+                                    {methods.formState.errors.slug?.message && (
+                                        <p className="text-red-700">
+                                            {methods.formState.errors.slug?.message}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className='flex items-center justify-center gap-4'>
+                                    <button
+                                        type="submit"
+                                        disabled={isChangingSlug}
+                                        className="border text-white bg-blue-500 hover:bg-blue-400 p-2"
+                                    >
+                                        {isChangingSlug ? 'Setting up your pseudonym' : 'Set my pseudonymm'}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSkipAskName(true)}
+                                        className="border bg-slate-200 hover:bg-slate-300 p-2"
+                                    >
+                                        Skip for now
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>;
         return null;
+    }
 
     if (newPipe) {
 
