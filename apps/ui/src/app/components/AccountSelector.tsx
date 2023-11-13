@@ -8,7 +8,6 @@ const AccountSelector: FC<{ className?: string; }> = ({ className }) => {
 
     const navigate = useNavigate();
     const { orgSlug } = useParams();
-    // const { data: session } = api.v0.auth.getSession.useQuery();
     const { data: organisations } = api.v0.organisations.getAll.useQuery();
     const personals = useMemo(() => organisations?.filter(Boolean).filter(o => o.personal) ?? [], [organisations]);
     const other = useMemo(() => organisations?.filter(Boolean).filter(o => o.personal === false) ?? [], [organisations]);

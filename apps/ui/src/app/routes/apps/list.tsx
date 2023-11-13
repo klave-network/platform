@@ -11,6 +11,9 @@ export const AppSidebar: FC = () => {
     const matches = useMatches();
     const lastMatch = matches[matches.length - 1];
     const { data: personalOrg, isLoading: isPeronsalOrgLoading } = api.v0.organisations.getPersonal.useQuery();
+    const { data: selectedOrg, isLoading: isLoadingSelectOrg } = api.v0.organisations.getBySlug.useQuery({
+        orgSlug: orgSlug ?? ''
+    });
     const { data: applicationsList, isLoading: isAppsLoading } = api.v0.applications.getByOrganisation.useQuery({
         orgSlug: orgSlug ?? ''
     }, {
@@ -18,10 +21,14 @@ export const AppSidebar: FC = () => {
     });
 
     useEffect(() => {
-        if (!orgSlug && personalOrg) {
+        if (!orgSlug && personalOrg)
             navigate(`/${personalOrg.slug}`);
-        }
     }, [navigate, orgSlug, personalOrg]);
+
+    useEffect(() => {
+        if (orgSlug && personalOrg && !selectedOrg && !isLoadingSelectOrg)
+            navigate(`/${personalOrg.slug}`);
+    }, [navigate, orgSlug, personalOrg, selectedOrg, isLoadingSelectOrg]);
 
     const sortedApplications = useMemo(() => (applicationsList ?? []).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()), [applicationsList]);
 
