@@ -165,7 +165,7 @@ export const AppSettings: FC = () => {
         <div>
             <h1 className='font-bold text-xl mb-5'>Credit allocation</h1>
             <p>
-                Balance: <b>{parseFloat(application.kredits.toString()).toFixed(3)}</b><br />
+                Balance: <b>{parseFloat(application.kredits.toString())}</b><br />
                 <Link to={`/organisation/${orgSlug}/credits`} className='text-klave-light-blue hover:underline'>Manage credit allocations</Link>
             </p>
         </div>

@@ -147,7 +147,7 @@ export const OrganisationSettings: FC = () => {
         <div>
             <h1 className='font-bold text-xl mb-5'>Credit allocation</h1>
             <p>
-                Balance: <b>{parseFloat(organisation.kredits.toString()).toFixed(3)}</b><br />
+                Balance: <b>{parseFloat(organisation.kredits.toString())}</b><br />
             </p>
         </div>
         <div>

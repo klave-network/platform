@@ -164,9 +164,7 @@ async function reconcileApplicationKredits() {
                 .then((kredits) => {
                     if (!kredits)
                         reject('No credits returned');
-                    const { code, kredit } = kredits as any;
-                    console.log(code);
-                    console.log(kredits);
+                    const { kredit } = kredits as any;
                     logger.debug(`Reconciling application ${application.id} with ${kredit} kredits`);
                     prisma.application.update({
                         where: {

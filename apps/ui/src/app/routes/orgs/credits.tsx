@@ -86,13 +86,13 @@ const CreditCellEdit: FC<{
     const { kredits, id } = application;
     const [isEditing, toggleEditing] = useToggle(false);
     const kreditValue = useMemo(() => kredits ? parseFloat(kredits.toString()) : 0, [kredits]);
-    const [currentValue, setCurrentValue] = useState(kreditValue.toFixed(3));
+    const [currentValue, setCurrentValue] = useState(kreditValue.toString());
     const { mutateAsync, isPending } = api.v0.organisations.allocationCredits.useMutation();
     const orgAPIUtils = api.useUtils().v0.organisations;
     const appAPIUtils = api.useUtils().v0.applications;
 
     useEffect(() => {
-        setCurrentValue(kreditValue.toFixed(3));
+        setCurrentValue(kreditValue.toString());
     }, [kreditValue]);
 
     if (!id || kredits === undefined)
@@ -109,7 +109,6 @@ const CreditCellEdit: FC<{
             applicationId: id,
             amount: parseFloat(currentValue)
         });
-        console.log('PLOP');
         await orgAPIUtils.getAll.invalidate();
         await orgAPIUtils.getBySlug.invalidate();
         await appAPIUtils.getAll.invalidate();
@@ -126,7 +125,7 @@ const CreditCellEdit: FC<{
         </div>;
 
     return <div className='flex gap-4 items-center align-middle justify-end grow'>
-        <span className='block h-5 font-bold'>{kreditValue.toFixed(3)}</span>
+        <span className='block h-5 font-bold'>{kreditValue}</span>
         <button disabled={isPending} onClick={toggleEditing} className='flex rounded-sm border border-slate-300 bg-slate-100 p-0 h-7 w-7 items-center justify-center hover:bg-slate-200 hover:cursor-pointer'>
             <UilEdit className='h-4' />
         </button>
@@ -168,7 +167,7 @@ export const OrganisationSettings: FC = () => {
         <div>
             <h1 className='font-bold text-xl mb-5'>Total Balance</h1>
             <p>
-                Balance: <b>{parseFloat(organisation.kredits.toString()).toFixed(3)}</b><br />
+                Balance: <b>{parseFloat(organisation.kredits.toString())}</b><br />
                 {isReturningFromCheckout
                     ? <>
                         <span className='text-green-700'>Thank you for your purchase! We are updating your balance...</span>
