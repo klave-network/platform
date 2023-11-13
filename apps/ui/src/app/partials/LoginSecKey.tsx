@@ -40,8 +40,6 @@ export const LoginSecKey: FC = () => {
         retry: false
     });
 
-    console.log(debouncedEmail);
-
     useEffect(() => {
         if (debouncedEmail.length > 0)
             refetchEmailHint();
@@ -133,9 +131,15 @@ export const LoginSecKey: FC = () => {
                         refetchSession();
                         return;
                     }
-                    setError('An error occured while trying to log you in. Please try again later.');
+                    if (res?.error) {
+                        setCredentials(credentials.filter(c => c !== email));
+                        setIsRequestingWebauthnInput(false);
+                        setError(`${res.error}. Please try again.`);
+                        return;
+                    }
                 })
-                .catch(() => {
+                .catch((e) => {
+                    console.error(e);
                     setIsRequestingWebauthnInput(false);
                 });
             return;
@@ -164,9 +168,14 @@ export const LoginSecKey: FC = () => {
                         refetchSession();
                         return;
                     }
-                    setError('An error occured while trying to register you in. Please try again later.');
+                    if (res?.error) {
+                        setIsRequestingWebauthnInput(false);
+                        setError(res.error);
+                        return;
+                    }
                 })
-                .catch(() => {
+                .catch((e) => {
+                    console.error(e);
                     setIsRequestingWebauthnInput(false);
                     setError('An error occured while trying to register your secure key. Please try again later.');
                 });
