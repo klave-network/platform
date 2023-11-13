@@ -6,7 +6,7 @@ import probotApp from '../probot';
 let middlewareReference: RequestHandler | undefined;
 export const probotMiddleware: RequestHandler = (req, res, next) => {
 
-    if (!middlewareReference && (probot as any).uninitialized)
+    if (!middlewareReference && !(probot as any).uninitialized)
         middlewareReference = createNodeMiddleware(probotApp, {
             probot
         });
