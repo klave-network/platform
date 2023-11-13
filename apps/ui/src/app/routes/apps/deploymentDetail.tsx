@@ -83,7 +83,7 @@ export const AppDeploymentDetail: FC = () => {
             </div>
             <div className='mb-10'>
                 <h2 className='font-bold mb-3'>Actions</h2>
-                {status === 'deployed' && life !== 'long' ? <>
+                {window.location.hostname === 'localhost' && status === 'deployed' && life !== 'long' ? <>
                     <DeploymentPromotion deployment={deployment} />
                     &nbsp;&nbsp;
                 </> : null}
