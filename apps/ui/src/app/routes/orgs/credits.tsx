@@ -1,15 +1,12 @@
-import { FC, useMemo, useEffect } from 'react';
-import { useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { FC, useMemo, useEffect, useState, ChangeEvent } from 'react';
+import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
-import { UilSpinner, Uil0Plus } from '@iconscout/react-unicons';
+import { UilSpinner, Uil0Plus, UilEdit, UilCheck } from '@iconscout/react-unicons';
 import { loadStripe } from '@stripe/stripe-js';
-import {
-    EmbeddedCheckoutProvider,
-    EmbeddedCheckout
-} from '@stripe/react-stripe-js';
+import { Application } from '@klave/db';
+import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
 import api from '../../utils/api';
-// import { useZodForm } from '../../utils/useZodForm';
-// import { z } from 'zod';
+import { useToggle } from 'usehooks-ts';
 
 // Make sure to call loadStripe outside of a component’s render to avoid
 // recreating the Stripe object on every render.
@@ -52,23 +49,6 @@ const OrganisationAddCredit = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const isReturningFromCheckout = searchParams.get('return') === 'true';
     const isPaymentComplete = searchParams.get('paymentCompleted') === 'true';
-    // const navigate = useNavigate();
-    // const { orgSlug } = useParams();
-    // const [canSubmit, setCanSubmit] = useState(false);
-    // const utils = api.useUtils().v0.organisations;
-    // const mutation = api.v0.organisations.delete.useMutation({
-    //     onSuccess: async () => {
-    //         await utils.getAll.invalidate();
-    //         await utils.getById.invalidate();
-    //         navigate('/app');
-    //     }
-    // // });
-    // const deleteOrganisation = async () => {
-    //     // if (orgId)
-    //     //     await mutation.mutateAsync({
-    //     //         organisationId: orgId
-    //     //     });
-    // };
 
     return <AlertDialog.Root>
         <AlertDialog.Trigger asChild onClick={() => {
@@ -98,6 +78,60 @@ const OrganisationAddCredit = () => {
     </AlertDialog.Root>;
 };
 
+const CreditCellEdit: FC<{
+    max: bigint,
+    application: Partial<Application>
+}> = ({ application }) => {
+
+    const { kredits, id } = application;
+    const [isEditing, toggleEditing] = useToggle(false);
+    const kreditValue = useMemo(() => kredits ? parseFloat(kredits.toString()) : 0, [kredits]);
+    const [currentValue, setCurrentValue] = useState(kreditValue.toFixed(3));
+    const { mutateAsync, isPending } = api.v0.organisations.allocationCredits.useMutation();
+    const orgAPIUtils = api.useUtils().v0.organisations;
+    const appAPIUtils = api.useUtils().v0.applications;
+
+    useEffect(() => {
+        setCurrentValue(kreditValue.toFixed(3));
+    }, [kreditValue]);
+
+    if (!id || kredits === undefined)
+        return null;
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const sanitized = e.currentTarget.value.replace(/[^0-9.-]/g, '');
+        if (!Number.isNaN(parseFloat(sanitized)))
+            setCurrentValue(sanitized);
+    };
+
+    const allocateCredit = async () => {
+        await mutateAsync({
+            applicationId: id,
+            amount: parseFloat(currentValue)
+        });
+        console.log('PLOP');
+        await orgAPIUtils.getAll.invalidate();
+        await orgAPIUtils.getBySlug.invalidate();
+        await appAPIUtils.getAll.invalidate();
+        await appAPIUtils.getByOrganisation.invalidate();
+        toggleEditing();
+    };
+
+    if (isEditing)
+        return <div className='flex gap-4 items-center align-middle justify-end grow'>
+            <input value={currentValue} onChange={handleChange} className='rounded-sm' />
+            <button disabled={isPending} onClick={allocateCredit} className='flex rounded-sm border border-slate-300 bg-slate-100 p-0 h-7 w-7 items-center justify-center hover:bg-slate-200 hover:cursor-pointer'>
+                {isPending ? <UilSpinner className='inline-block h-4 animate-spin' /> : <UilCheck className='h-4' />}
+            </button>
+        </div>;
+
+    return <div className='flex gap-4 items-center align-middle justify-end grow'>
+        <span className='block h-5 font-bold'>{kreditValue.toFixed(3)}</span>
+        <button disabled={isPending} onClick={toggleEditing} className='flex rounded-sm border border-slate-300 bg-slate-100 p-0 h-7 w-7 items-center justify-center hover:bg-slate-200 hover:cursor-pointer'>
+            <UilEdit className='h-4' />
+        </button>
+    </div>;
+};
 
 export const OrganisationSettings: FC = () => {
 
@@ -112,24 +146,6 @@ export const OrganisationSettings: FC = () => {
     const { data: organisation, isLoading, refetch: refetchOrganisation } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug || '' });
     const { data: applicationsList, isLoading: isLoadingApps } = api.v0.applications.getByOrganisation.useQuery({ orgSlug: orgSlug || '' });
     const sortedApplications = useMemo(() => (applicationsList ?? []).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()), [applicationsList]);
-
-    // const utils = api.useUtils().v0.organisations;
-    // const mutation = api.v0.organisations.update.useMutation({
-    //     onSuccess: async () => {
-    //         await utils.getBySlug.invalidate();
-    //     }
-    // });
-
-    // const methods = useZodForm({
-    //     schema: z.object({
-    //         name: z.string(),
-    //         slug: z.string()
-    //     }),
-    //     values: {
-    //         name: organisation?.name || '',
-    //         slug: organisation?.slug || ''
-    //     }
-    // });
 
     useEffect(() => {
         if (isReturningFromCheckout && checkoutSessionStatus?.status === 'complete') {
@@ -166,27 +182,31 @@ export const OrganisationSettings: FC = () => {
             <h1 className='font-bold text-xl mb-5'>Application allocations</h1>
             {isLoadingApps
                 ? <><UilSpinner className='inline-block animate-spin' /></>
-                : <>
-                    <div className='flex flex-row gap-3 bg-slate-100 border-slate-100 border rounded-sm p-2'>
-                        <div className='flex flex-col gap-1 grow'>
-                            Application
-                        </div>
-                        <div className='flex flex-col gap-1 items-center'>
-                            Balance
-                        </div>
-                    </div>
-                    {sortedApplications?.map((application, i) =>
-                        <div key={i} className='flex flex-row gap-3 border-slate-100 border border-t-0 rounded-sm p-2'>
-                            <div className='flex flex-col gap-1 grow'>
-                                <p className='font-bold'>{application?.name}</p>
-                                <p>{application.slug}</p>
-                            </div>
-                            <div className='flex flex-col gap-1 items-center'>
-                                <p className='font-bold'>{parseFloat(application.kredits.toString()).toFixed(3)}</p>
-                            </div>
-                        </div>
-                    )}
-                </>}
+                : <table className='w-full' cellPadding={10}>
+                    <thead className='bg-slate-100 border-slate-100 border rounded-sm p-2'>
+                        <tr>
+                            <th className='text-left'>
+                                Application
+                            </th>
+                            <th className='text-right'>
+                                Balance
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {sortedApplications?.map((application, i) =>
+                            <tr key={i} className='border-slate-100 border border-t-0 rounded-sm p-2'>
+                                <td>
+                                    <Link to={`/${orgSlug}/${application.slug}`} className='font-bold hover:cursor-pointer hover:text-klave-light-blue'>{application?.name}</Link>
+                                    <p>{application.slug}</p>
+                                </td>
+                                <td>
+                                    <CreditCellEdit key={application.id} max={organisation.kredits} application={application} />
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>}
         </div>
     </div>;
 };

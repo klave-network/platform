@@ -1,18 +1,22 @@
 import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import { Organisation } from '@prisma/client';
+import { scp } from '@klave/providers';
 
 export const organisationRouter = createTRPCRouter({
     getPersonal: publicProcedure
         .query(async ({ ctx: { prisma, session: { user } } }) => {
+
             if (!user)
-                return;
+                throw new Error('Not logged in');
+
             return (await prisma.organisation.findMany({
                 where: {
                     creatorId: user.id,
                     personal: true
                 }
             }))[0];
+
         }),
     getAll: publicProcedure
         .query(async ({ ctx: { prisma, session: { user } } }) => {
@@ -33,6 +37,9 @@ export const organisationRouter = createTRPCRouter({
         }),
     getAllWithWrite: publicProcedure
         .query(async ({ ctx: { prisma, session: { user } } }) => {
+
+            if (!user)
+                throw new Error('Not logged in');
 
             const permissionGrants = await prisma.permissionGrant.findMany({
                 where: {
@@ -60,7 +67,7 @@ export const organisationRouter = createTRPCRouter({
         .query(async ({ ctx: { prisma, session: { user } }, input: { orgId } }) => {
 
             if (!user)
-                return;
+                throw new Error('Not logged in');
 
             return await prisma.organisation.findUnique({
                 where: {
@@ -101,7 +108,7 @@ export const organisationRouter = createTRPCRouter({
         .query(async ({ ctx: { prisma, session: { user } }, input: { orgSlug } }) => {
 
             if (!user)
-                return;
+                throw new Error('Not logged in');
 
             return await prisma.organisation.findUnique({
                 where: {
@@ -162,10 +169,18 @@ export const organisationRouter = createTRPCRouter({
         }))
         .mutation(async ({ ctx: { prisma, session: { user } }, input: { slug: orgSlug, data } }) => {
 
-            const slug = orgSlug.replaceAll(/\W/g, '-').toLocaleLowerCase();
-
             if (!user)
-                return;
+                throw new Error('Not logged in');
+
+            const slug = orgSlug.replaceAll(/\W/g, '-').toLocaleLowerCase();
+            const existingOrg = await prisma.organisation.findUnique({
+                where: {
+                    slug
+                }
+            });
+
+            if (existingOrg)
+                throw new Error('Organisation already exists');
 
             const org = await prisma.organisation.create({
                 data: {
@@ -196,8 +211,10 @@ export const organisationRouter = createTRPCRouter({
             data: z.custom<Partial<Organisation>>()
         })))
         .mutation(async ({ ctx: { prisma, session: { user } }, input: { data, ...orgInfo } }) => {
+
             if (!user)
-                return;
+                throw new Error('Not logged in');
+
             const { orgId, orgSlug } = orgInfo as Record<string, string>;
             if (orgSlug)
                 await prisma.organisation.update({
@@ -232,7 +249,10 @@ export const organisationRouter = createTRPCRouter({
         .input(z.object({
             organisationId: z.string().uuid()
         }))
-        .mutation(async ({ ctx: { prisma }, input: { organisationId } }) => {
+        .mutation(async ({ ctx: { prisma, session: { user } }, input: { organisationId } }) => {
+
+            if (!user)
+                throw new Error('Not logged in');
 
             await prisma.organisation.delete({
                 where: {
@@ -241,6 +261,73 @@ export const organisationRouter = createTRPCRouter({
             });
             return;
 
+        }),
+    allocationCredits: publicProcedure
+        .input(z.object({
+            applicationId: z.string().uuid(),
+            amount: z.number().int()
+        }))
+        .mutation(async ({ ctx: { prisma, session: { user } }, input: { applicationId, amount } }) => {
+
+            if (!user)
+                throw new Error('Not logged in');
+
+            const application = await prisma.application.findUnique({
+                where: {
+                    id: applicationId
+                }
+            });
+
+            if (!application)
+                throw new Error('Application not found');
+
+            const organisation = await prisma.organisation.findUnique({
+                where: {
+                    id: application.organisationId
+                }
+            });
+
+            if (!organisation)
+                throw new Error('Organisation not found');
+
+            if (organisation.kredits < amount)
+                throw new Error('Not enough credits');
+
+            await prisma.$transaction([
+                prisma.application.update({
+                    where: {
+                        id: applicationId
+                    },
+                    data: {
+                        kredits: {
+                            increment: amount
+                        }
+                    }
+                }),
+                prisma.organisation.update({
+                    where: {
+                        id: organisation.id
+                    },
+                    data: {
+                        kredits: {
+                            decrement: amount
+                        }
+                    }
+                })
+            ]);
+
+            await new Promise((resolve, reject) => {
+                scp.newTx('wasm-manager', 'add_kredit', `klave-app-set-kredit-${application.id}`, {
+                    app_id: application.id,
+                    kredit: amount
+                }).onResult(result => {
+                    resolve(result);
+                }).onExecuted(result => {
+                    resolve(result);
+                }).onError(error => {
+                    reject(error);
+                }).send();
+            });
         })
 });
 

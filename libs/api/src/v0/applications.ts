@@ -1,5 +1,5 @@
 import { createTRPCRouter, publicProcedure } from '../trpc';
-import { probot, scp } from '@klave/providers';
+import { probot, scp, scpOps } from '@klave/providers';
 import type { Application } from '@prisma/client';
 import { z } from 'zod';
 import { deployToSubstrate } from '../deployment/deploymentController';
@@ -47,7 +47,7 @@ export const applicationRouter = createTRPCRouter({
             if ((orgId ?? '').trim() === '' && (orgSlug ?? '').trim() === '')
                 return null;
 
-            return await prisma.application.findMany({
+            const apps = await prisma.application.findMany({
                 where: {
                     organisation: {
                         OR: [{
@@ -97,12 +97,62 @@ export const applicationRouter = createTRPCRouter({
                     }
                 }
             });
+
+            if (scpOps.isConnected()) {
+                apps.forEach(async app => {
+                    await new Promise<void>((resolve, reject) => {
+                        scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
+                            app_id: app.id
+                        }).onResult((kredits) => {
+                            if (!kredits)
+                                reject('No credits returned');
+                            const { kredit } = kredits as any;
+                            app.kredits = kredit;
+                            prisma.application.update({
+                                where: {
+                                    id: app.id
+                                },
+                                data: {
+                                    kredits: kredit
+                                }
+                            }).then(() => resolve()).catch(resolve);
+                        }).onError(() => {
+                            resolve();
+                        }).send();
+                    });
+                });
+            }
+
+            return apps;
         }),
     getById: publicProcedure
         .input(z.object({
             appId: z.string().uuid()
         }))
         .query(async ({ ctx: { prisma, session: { user } }, input: { appId } }) => {
+
+            if (scpOps.isConnected()) {
+                await new Promise<void>((resolve, reject) => {
+                    scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${appId}`, {
+                        app_id: appId
+                    }).onResult((kredits) => {
+                        if (!kredits)
+                            reject('No credits returned');
+                        const { kredit } = kredits as any;
+                        prisma.application.update({
+                            where: {
+                                id: appId
+                            },
+                            data: {
+                                kredits: kredit
+                            }
+                        }).then(() => resolve()).catch(resolve);
+                    }).onError(() => {
+                        resolve();
+                    }).send();
+                });
+            }
+
             return await prisma.application.findUnique({
                 where: {
                     id: appId,
@@ -156,23 +206,53 @@ export const applicationRouter = createTRPCRouter({
             orgSlug: z.string()
         }))
         .query(async ({ ctx: { prisma, session: { user } }, input: { appSlug, orgSlug } }) => {
+
             const org = await prisma.organisation.findUnique({
                 where: {
                     slug: orgSlug
                 }
             });
+
             if (!org)
                 return null;
-            return await prisma.application.findUnique({
+
+            const app = await prisma.application.findUnique({
                 where: {
                     organisationId_slug: {
                         organisationId: org.id,
                         slug: appSlug
-                    },
-                    // slug: appSlug,
-                    // organisation: {
-                    //     slug: orgSlug
-                    // },
+                    }
+                }
+            });
+
+            if (!app)
+                return null;
+
+            if (scpOps.isConnected()) {
+                await new Promise<void>((resolve, reject) => {
+                    scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
+                        app_id: app.id
+                    }).onResult((kredits) => {
+                        if (!kredits)
+                            reject('No credits returned');
+                        const { kredit } = kredits as any;
+                        prisma.application.update({
+                            where: {
+                                id: app.id
+                            },
+                            data: {
+                                kredits: kredit
+                            }
+                        }).then(() => resolve()).catch(resolve);
+                    }).onError(() => {
+                        resolve();
+                    }).send();
+                });
+            }
+
+            return await prisma.application.findUnique({
+                where: {
+                    id: app.id,
                     permissionGrants: {
                         some: {
                             AND: [{
@@ -216,30 +296,6 @@ export const applicationRouter = createTRPCRouter({
                     }
                 }
             });
-        }),
-    getKreditByAppId: publicProcedure
-        .input(z.object({
-            appId: z.string().uuid()
-        }))
-        .query(async ({ ctx: { prisma }, input: { appId } }) => {
-            const kredits = await new Promise<number>((resolve, reject) => {
-                scp.newTx('wasm-manager', 'get_kredit', `klave-app-kredit-${appId}`, {
-                    app_id: appId
-                }).onResult(async (result: any) => {
-                    resolve(result);
-                }).onError((error: any) => {
-                    reject(error);
-                }).send();
-            });
-            await prisma.application.update({
-                where: {
-                    id: appId
-                },
-                data: {
-                    kredits: kredits
-                }
-            });
-            return kredits;
         }),
     register: publicProcedure
         .input(z.object({

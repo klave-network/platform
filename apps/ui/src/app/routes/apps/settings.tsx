@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import { UilSpinner, UilTrash } from '@iconscout/react-unicons';
 import api from '../../utils/api';
@@ -163,9 +163,10 @@ export const AppSettings: FC = () => {
             </p>
         </div>
         <div>
-            <h1 className='font-bold text-xl mb-5'>Kredit allocation</h1>
+            <h1 className='font-bold text-xl mb-5'>Credit allocation</h1>
             <p>
                 Balance: <b>{parseFloat(application.kredits.toString()).toFixed(3)}</b><br />
+                <Link to={`/organisation/${orgSlug}/credits`} className='text-klave-light-blue hover:underline'>Manage credit allocations</Link>
             </p>
         </div>
         <div>

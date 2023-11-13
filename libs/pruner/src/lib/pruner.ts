@@ -1,6 +1,6 @@
 import { prisma } from '@klave/db';
 import { router } from '@klave/api';
-import { logger } from '@klave/providers';
+import { logger, scp, scpOps } from '@klave/providers';
 
 let intervalTimer: NodeJS.Timeout;
 
@@ -131,12 +131,65 @@ async function cancelUpdatingDeployments() {
     });
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function reconcileApplicationKredits() {
+
+    const applicationsWithDeployments = await prisma.application.findMany({
+        where: {
+            deployments: {
+                some: {
+                    status: {
+                        in: ['deployed']
+                    }
+                }
+            }
+        }
+    });
+
+    return Promise.allSettled(applicationsWithDeployments.map((application) => {
+        return new Promise((resolve, reject) => {
+            if (!scpOps.isConnected())
+                return reject('Secretarium is not connected');
+            new Promise<unknown>((resolve, reject) => {
+                scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${application.id}`, {
+                    app_id: application.id
+                }).onResult(async (result: any) => {
+                    resolve(result);
+                }).onError((error: any) => {
+                    reject(error);
+                }).send();
+            })
+                .then((kredits) => {
+                    if (!kredits)
+                        reject('No credits returned');
+                    const { code, kredit } = kredits as any;
+                    console.log(code);
+                    console.log(kredits);
+                    logger.debug(`Reconciling application ${application.id} with ${kredit} kredits`);
+                    prisma.application.update({
+                        where: {
+                            id: application.id
+                        },
+                        data: {
+                            kredits: kredit
+                        }
+                    }).then(resolve).catch(reject);
+                });
+        });
+    })).catch((e) => {
+        logger.error('Error while reconciling application credit allications', e);
+    });
+}
+
 export async function prune() {
     try {
         await errorLongDeployingDeployments();
         await terminateExpiredDeployments();
         await cleanDisconnectedDeployments();
         await cancelUpdatingDeployments();
+        // await reconcileApplicationKredits();
     } catch (e) {
         logger.error('Error while pruning', e);
     }
