@@ -98,30 +98,34 @@ export const applicationRouter = createTRPCRouter({
                 }
             });
 
-            if (scpOps.isConnected()) {
-                apps.forEach(async app => {
-                    await new Promise<void>((resolve, reject) => {
-                        scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
-                            app_id: app.id
-                        }).onResult((kredits) => {
-                            if (!kredits)
-                                reject('No credits returned');
-                            const { kredit } = kredits as any;
-                            app.kredits = kredit;
-                            prisma.application.update({
-                                where: {
-                                    id: app.id
-                                },
-                                data: {
-                                    kredits: kredit
-                                }
-                            }).then(() => resolve()).catch(resolve);
-                        }).onError(() => {
-                            resolve();
-                        }).send();
-                    });
-                });
-            }
+            // if (scpOps.isConnected()) {
+            //     apps.forEach(async (app, idx) => {
+            //         try {
+            //             await scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
+            //                 app_id: app.id
+            //             }).send().then((result: any) => {
+            //                 if (result.kredit === undefined)
+            //                     throw (new Error('No credits returned'));
+            //                 const ref = apps[idx];
+            //                 if (ref)
+            //                     ref.kredits = result.kredit;
+            //                 return prisma.application.update({
+            //                     where: {
+            //                         id: app.id
+            //                     },
+            //                     data: {
+            //                         kredits: result.kredit
+            //                     }
+            //                 });
+            //             }).catch(() => {
+            //                 // Swallow this error
+            //             });
+            //         } catch (e) {
+            //             console.error(e);
+            //             ///
+            //         }
+            //     });
+            // }
 
             return apps;
         }),
@@ -132,25 +136,29 @@ export const applicationRouter = createTRPCRouter({
         .query(async ({ ctx: { prisma, session: { user } }, input: { appId } }) => {
 
             if (scpOps.isConnected()) {
-                await new Promise<void>((resolve, reject) => {
-                    scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${appId}`, {
+
+                try {
+                    await scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${appId}`, {
                         app_id: appId
-                    }).onResult((kredits) => {
-                        if (!kredits)
-                            reject('No credits returned');
-                        const { kredit } = kredits as any;
-                        prisma.application.update({
+                    }).send().then((result: any) => {
+                        if (result.kredit === undefined)
+                            throw (new Error('No credits returned'));
+                        return prisma.application.update({
                             where: {
                                 id: appId
                             },
                             data: {
-                                kredits: kredit
+                                kredits: result.kredit
                             }
-                        }).then(() => resolve()).catch(resolve);
-                    }).onError(() => {
-                        resolve();
-                    }).send();
-                });
+                        });
+                    }).catch(() => {
+                        // Swallow this error
+                    });
+                } catch (e) {
+                    console.error(e);
+                    ///
+                }
+
             }
 
             return await prisma.application.findUnique({
@@ -229,25 +237,29 @@ export const applicationRouter = createTRPCRouter({
                 return null;
 
             if (scpOps.isConnected()) {
-                await new Promise<void>((resolve, reject) => {
-                    scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
+
+                try {
+                    await scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
                         app_id: app.id
-                    }).onResult((kredits) => {
-                        if (!kredits)
-                            reject('No credits returned');
-                        const { kredit } = kredits as any;
-                        prisma.application.update({
+                    }).send().then((result: any) => {
+                        if (result.kredit === undefined)
+                            throw (new Error('No credits returned'));
+                        return prisma.application.update({
                             where: {
                                 id: app.id
                             },
                             data: {
-                                kredits: kredit
+                                kredits: result.kredit
                             }
-                        }).then(() => resolve()).catch(resolve);
-                    }).onError(() => {
-                        resolve();
-                    }).send();
-                });
+                        });
+                    }).catch(() => {
+                        // Swallow this error
+                    });
+                } catch (e) {
+                    console.error(e);
+                    ///
+                }
+
             }
 
             return await prisma.application.findUnique({

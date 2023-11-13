@@ -160,8 +160,8 @@ export const deploymentRouter = createTRPCRouter({
         .mutation(async ({ ctx: { prisma, session: { user }, override }, input: { deploymentId } }) => {
             if (!user && !override)
                 return;
-            // TODO The Secretarium connection should be ambient in the server
-            await prisma.deployment.update({
+
+            const dep = await prisma.deployment.update({
                 where: {
                     id: deploymentId,
                     application: override !== '__system_pruner_terminator' ? {
@@ -183,10 +183,9 @@ export const deploymentRouter = createTRPCRouter({
                     status: 'terminating'
                 }
             });
-            await scp.newTx('wasm-manager', 'unregister_smart_contract', `klave-termination-${deploymentId}`, {
-                contract: {
-                    name: `${deploymentId.split('-').pop()}.sta.klave.network`
-                }
+            await scp.newTx('wasm-manager', 'deactivate_instance', `klave-termination-${deploymentId}`, {
+                app_id: dep.applicationId,
+                fqdn: `${deploymentId.split('-').pop()}.sta.klave.network`
             }).onExecuted(async () => {
                 await prisma.deployment.update({
                     where: {
@@ -199,7 +198,9 @@ export const deploymentRouter = createTRPCRouter({
             }).onError((error: any) => {
                 console.error('Secretarium failed', error);
                 // Timeout will eventually error this
-            }).send();
+            }).send().catch(() => {
+                // Swallow this error
+            });
         }),
     release: publicProcedure
         .input(z.object({
@@ -277,13 +278,15 @@ export const deploymentRouter = createTRPCRouter({
                             }
                         },
                         life: 'long'
+                    },
+                    include: {
+                        deploymentAddress: true
                     }
                 });
 
                 sendToSecretarium({
                     deployment,
-                    target,
-                    wasmB64: existing.buildOutputWASM ?? ''
+                    target
                 });
             });
 

@@ -363,12 +363,10 @@ class Deployer {
                 return;
 
             // Send the wasm to the secretarium node
-            await scp.newTx('wasm-manager', 'register_smart_contract', `klave-deployment-${deployment.id}`, {
-                contract: {
-                    name: `${deployment.id.split('-').pop()}.sta.klave.network`,
-                    wasm_bytes: [],
-                    wasm_bytes_b64: Utils.toBase64(wasm)
-                }
+            await scp.newTx('wasm-manager', 'deploy_instance', `klave-deployment-${deployment.id}`, {
+                app_id: deployment.applicationId,
+                fqdn: `${deployment.id.split('-').pop()}.sta.klave.network`,
+                wasm_bytes_b64: Utils.toBase64(wasm)
             }).onExecuted(async () => {
                 await prisma.deployment.update({
                     where: {
