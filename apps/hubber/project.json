@@ -88,14 +88,7 @@
                 "{workspaceRoot}/coverage/{projectRoot}"
             ],
             "options": {
-                "jestConfig": "apps/hubber/jest.config.ts",
-                "passWithNoTests": true
-            },
-            "configurations": {
-                "ci": {
-                    "ci": true,
-                    "codeCoverage": true
-                }
+                "jestConfig": "apps/hubber/jest.config.ts"
             }
         },
         "version": {

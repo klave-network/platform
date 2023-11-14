@@ -22,14 +22,7 @@
                 "{workspaceRoot}/coverage/{projectRoot}"
             ],
             "options": {
-                "jestConfig": "libs/pruner/jest.config.ts",
-                "passWithNoTests": true
-            },
-            "configurations": {
-                "ci": {
-                    "ci": true,
-                    "codeCoverage": true
-                }
+                "jestConfig": "libs/pruner/jest.config.ts"
             }
         }
     },

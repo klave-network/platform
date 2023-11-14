@@ -49,14 +49,7 @@
                 "{workspaceRoot}/coverage/{projectRoot}"
             ],
             "options": {
-                "jestConfig": "libs/compiler/jest.config.ts",
-                "passWithNoTests": true
-            },
-            "configurations": {
-                "ci": {
-                    "ci": true,
-                    "codeCoverage": true
-                }
+                "jestConfig": "libs/compiler/jest.config.ts"
             }
         },
         "version": {

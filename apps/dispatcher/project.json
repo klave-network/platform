@@ -66,14 +66,7 @@
                 "{workspaceRoot}/coverage/{projectRoot}"
             ],
             "options": {
-                "jestConfig": "apps/dispatcher/jest.config.ts",
-                "passWithNoTests": true
-            },
-            "configurations": {
-                "ci": {
-                    "ci": true,
-                    "codeCoverage": true
-                }
+                "jestConfig": "apps/dispatcher/jest.config.ts"
             }
         },
         "docker-build": {

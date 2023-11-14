@@ -45,8 +45,7 @@
                 "{workspaceRoot}/coverage/{projectRoot}"
             ],
             "options": {
-                "jestConfig": "apps/create/jest.config.ts",
-                "passWithNoTests": true
+                "jestConfig": "apps/create/jest.config.ts"
             }
         },
         "version": {

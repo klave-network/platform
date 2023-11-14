@@ -41,8 +41,7 @@
                 "{workspaceRoot}/coverage/{projectRoot}"
             ],
             "options": {
-                "jestConfig": "libs/db/jest.config.ts",
-                "passWithNoTests": true
+                "jestConfig": "libs/db/jest.config.ts"
             }
         },
         "studio": {
