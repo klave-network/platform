@@ -24,8 +24,8 @@ export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, 
         quote: quoteBinary,
         current_time: new Date().getTime()
     }), [quoteBinary]);
-    const { data: quoteData, loading: loadingQuote, error: quoteError, refetch: refetchQuote } = useSecretariumQuery(address, 'klave.get_quote', quoteArgs);
-    const { data: verifyData, loading: loadingVerify, error: verifyError, refetch: refetchVerify } = useSecretariumQuery(address, 'klave.verify_quote', verifyArgs);
+    const { data: quoteData, loading: loadingQuote, errors: quoteErrors, refetch: refetchQuote } = useSecretariumQuery(address, 'klave.get_quote', quoteArgs);
+    const { data: verifyData, loading: loadingVerify, errors: verifyErrors, refetch: refetchVerify } = useSecretariumQuery(address, 'klave.verify_quote', verifyArgs);
 
     useEffect(() => {
         if (!hasLaunched) {
@@ -35,19 +35,19 @@ export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, 
     }, [hasLaunched, refetchQuote]);
 
     useEffect(() => {
-        if (!hasLaunched || !quoteData || loadingQuote || quoteError)
+        if (!hasLaunched || !quoteData || loadingQuote || quoteErrors?.length)
             return;
         const base: any = quoteData[0];
         if (!base || !base.quote_binary)
             return;
         setQuoteBinary(base.quote_binary);
-    }, [hasLaunched, quoteData, loadingQuote, quoteError]);
+    }, [hasLaunched, quoteData, loadingQuote, quoteErrors]);
 
     useEffect(() => {
-        if (!hasLaunched || !quoteData || !quoteBinary.length || !!verifyData.length || loadingVerify || verifyError || quoteError || !verifyArgs.quote.length)
+        if (!hasLaunched || !quoteData || !quoteBinary.length || !!verifyData.length || loadingVerify || verifyErrors?.length || quoteErrors || !verifyArgs.quote.length)
             return;
         refetchVerify();
-    }, [hasLaunched, quoteData, quoteBinary, verifyData, loadingVerify, refetchVerify, verifyError, verifyArgs, quoteError]);
+    }, [hasLaunched, quoteData, quoteBinary, verifyData, loadingVerify, refetchVerify, verifyErrors, verifyArgs, quoteErrors]);
 
     const resetTest = () => {
         setChallenge(Array.from(Utils.getRandomBytes(64)));
@@ -93,12 +93,12 @@ export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, 
         {
             loading
                 ? <UilSpinner className='inline-block animate-spin h-5' />
-                : quoteError || verifyError
+                : quoteErrors?.length || verifyErrors?.length
                     ? <>
                         <h3 className='mt-5 mb-3'>Error</h3>
                         <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-red-100 dark:bg-gray-800 p-3'>
-                            {JSON.stringify(quoteError) ?? ''}{quoteError ? <br /> : ''}
-                            {JSON.stringify(verifyError) ?? ''}
+                            {JSON.stringify(quoteErrors) ?? ''}{quoteErrors?.length ? <br /> : ''}
+                            {JSON.stringify(verifyErrors) ?? ''}
                         </pre>
                         <button onClick={resetTest} className='text-slate-600 font-normal text-sm py-1 px-3 mt-5'>Retry</button>
                     </>
