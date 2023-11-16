@@ -15,8 +15,14 @@ const mailGuard = new FakeMailGuard({
     allowFreemail: true
 });
 
-const origin = process.env['KLAVE_WEBAUTHN_ORIGIN'] ?? 'http://localhost';
-const rpID = new URL(origin).hostname;
+
+let origin: string;
+let rpID: string;
+
+const setWebauthnPrimitives = () => {
+    origin = process.env['KLAVE_WEBAUTHN_ORIGIN'] ?? 'http://localhost';
+    rpID = new URL(origin).hostname;
+};
 
 export const authRouter = createTRPCRouter({
     getSession: publicProcedure.query(async ({ ctx }) => {
@@ -321,6 +327,9 @@ export const authRouter = createTRPCRouter({
                 }
             });
 
+            if (!rpID)
+                setWebauthnPrimitives();
+
             const options = await generateAuthenticationOptions({
                 timeout: 60000,
                 // allowCredentials: user.devices.map(dev => ({
@@ -400,6 +409,9 @@ export const authRouter = createTRPCRouter({
                     error: 'Invalid authentication response'
                 };
             }
+
+            if (!rpID)
+                setWebauthnPrimitives();
 
             const { verified, authenticationInfo } = await verifyAuthenticationResponse({
                 response: data,
@@ -490,6 +502,9 @@ export const authRouter = createTRPCRouter({
                 }
             });
 
+            if (!rpID)
+                setWebauthnPrimitives();
+
             const options = await generateRegistrationOptions({
                 rpName: 'Klave',
                 rpID,
@@ -561,6 +576,9 @@ export const authRouter = createTRPCRouter({
                     }
                 }
             });
+
+            if (!rpID)
+                setWebauthnPrimitives();
 
             const { verified, registrationInfo } = await verifyRegistrationResponse({
                 response: data,
