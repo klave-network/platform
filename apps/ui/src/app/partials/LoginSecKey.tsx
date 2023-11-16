@@ -4,9 +4,12 @@ import api from '../utils/api';
 import { UilSpinner } from '@iconscout/react-unicons';
 import { useLocalForage } from '../useLocalStorage';
 import { useDebounce } from 'usehooks-ts';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export const LoginSecKey: FC = () => {
 
+    const navigate = useNavigate();
+    const location = useLocation();
     const [credentials, setCredentials] = useLocalForage<Array<string>>('enrolledCredentials', []);
     const [isRequestingWebauthnInput, setIsRequestingWebauthnInput] = useState(false);
     const [isWebauthAvailable, setIsWebauthAvailable] = useState<null | boolean>();
@@ -128,6 +131,12 @@ export const LoginSecKey: FC = () => {
                 }))
                 .then((res) => {
                     if (res?.ok) {
+                        if (location.state.from)
+                            navigate(location.state.from, {
+                                state: {
+                                    from: undefined
+                                }
+                            });
                         refetchSession();
                         return;
                     }
@@ -165,6 +174,12 @@ export const LoginSecKey: FC = () => {
                 .then((res: any) => {
                     if (res?.ok) {
                         setCredentials([...(credentials ?? []), email]);
+                        if (location.state.from)
+                            navigate(location.state.from, {
+                                state: {
+                                    from: undefined
+                                }
+                            });
                         refetchSession();
                         return;
                     }
