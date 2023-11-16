@@ -51,12 +51,12 @@ const OrganisationDeletion = () => {
                             This action cannot be undone. This will permanently delete this organisation and all attached data.
                         </p>
                         <p className='my-2'>
-                            If you are really sure you want to delete this organisation, please type the organisation ID below.
+                            If you are really sure you want to delete this organisation, please type the organisation name below.
                         </p>
                         <p className='my-2'>
                             <code className='font-bold'>{orgSlug}</code>
                         </p>
-                        <input placeholder='Organisation ID' className='w-full' onChange={e => setNameCopy(e.target.value)} />
+                        <input placeholder='Organisation Name' className='w-full' onChange={e => setNameCopy(e.target.value)} />
                     </div>
                 </AlertDialog.Description>
                 <div className='flex gap-6 justify-end mt-5'>

@@ -51,12 +51,12 @@ const ApplicationDeletion = () => {
                             This action cannot be undone. This will permanently delete this application and all attached data.
                         </p>
                         <p className='my-2'>
-                            If you are really sure you want to delete this application, please type the application ID below.
+                            If you are really sure you want to delete this application, please type the application name below.
                         </p>
                         <p className='my-2'>
                             <code className='font-bold'>{appSlug}</code>
                         </p>
-                        <input placeholder='Application ID' className='w-full' onChange={e => setNameCopy(e.target.value)} />
+                        <input placeholder='Application Name' className='w-full' onChange={e => setNameCopy(e.target.value)} />
                     </div>
                 </AlertDialog.Description>
                 <div className='flex gap-6 justify-end mt-5'>
