@@ -6,7 +6,7 @@ import { scp as scpClient } from '@klave/providers';
 Sentry.init({
     dsn: process.env.KLAVE_SENTRY_DSN,
     release: 'klave@0.0.0',
-    environment: 'development',
+    environment: process.env.KLAVE_SENTRY_ENV ?? process.env.NODE_ENV ?? 'development',
     integrations: [
         // enable HTTP calls tracing
         new Sentry.Integrations.Http({ tracing: true }),
