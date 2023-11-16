@@ -155,7 +155,8 @@ export class CompilerHost {
 
 export const createCompiler = async () => {
 
-    const worker = new Worker(compilerModuleFunction.toString().substring(6), {
+    const workerCode = compilerModuleFunction.toString();
+    const worker = new Worker(workerCode.substring(workerCode.indexOf('=>') + 2), {
         eval: true,
         name: 'Klave WASM Compiler',
         env: {},
