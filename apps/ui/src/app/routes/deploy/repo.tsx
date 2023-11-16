@@ -123,7 +123,7 @@ export const RepoAppSelect: FC = () => {
         </>;
 
     const selectApplications = ({ applications }: FieldValues) => {
-        setSelectedApplications(applications);
+        setSelectedApplications((Array.isArray(applications) ? applications : [applications]).filter(Boolean));
     };
 
     if (!selectedApplications.length)
