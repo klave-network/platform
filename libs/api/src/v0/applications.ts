@@ -7,6 +7,10 @@ import { deployToSubstrate } from '../deployment/deploymentController';
 export const applicationRouter = createTRPCRouter({
     getAll: publicProcedure
         .query(async ({ ctx: { prisma, webId, session: { user } } }) => {
+
+            if (!user)
+                throw (new Error('You must be logged in to delete an application'));
+
             const manifest = await prisma.application.findMany({
                 where: {
                     webId
@@ -41,6 +45,9 @@ export const applicationRouter = createTRPCRouter({
             orgSlug: z.string()
         })))
         .query(async ({ ctx: { prisma, session: { user } }, input }) => {
+
+            if (!user)
+                throw (new Error('You must be logged in to delete an application'));
 
             const { orgId, orgSlug } = input as Record<string, string>;
 
@@ -135,6 +142,9 @@ export const applicationRouter = createTRPCRouter({
         }))
         .query(async ({ ctx: { prisma, session: { user } }, input: { appId } }) => {
 
+            if (!user)
+                throw (new Error('You must be logged in to delete an application'));
+
             if (scpOps.isConnected()) {
 
                 try {
@@ -214,6 +224,9 @@ export const applicationRouter = createTRPCRouter({
             orgSlug: z.string()
         }))
         .query(async ({ ctx: { prisma, session: { user } }, input: { appSlug, orgSlug } }) => {
+
+            if (!user)
+                throw (new Error('You must be logged in to delete an application'));
 
             const org = await prisma.organisation.findUnique({
                 where: {
@@ -319,7 +332,7 @@ export const applicationRouter = createTRPCRouter({
         .mutation(async ({ ctx: { prisma, session, sessionStore, sessionID, webId }, input: { deployableRepoId, applications, /*emphemeralKlaveTag,*/ organisationId } }) => {
 
             if (!session.user)
-                return null;
+                throw (new Error('You must be logged in to delete an application'));
 
             const deployableRepo = await prisma.deployableRepo.findFirst({
                 where: {
@@ -450,7 +463,10 @@ export const applicationRouter = createTRPCRouter({
             orgSlug: z.string(),
             data: z.custom<Partial<Application>>()
         })))
-        .mutation(async ({ ctx: { prisma }, input }) => {
+        .mutation(async ({ ctx: { prisma, session: { user } }, input }) => {
+
+            if (!user)
+                throw (new Error('You must be logged in to delete an application'));
 
             const { appId, appSlug, orgSlug, data } = input as Record<string, any>;
 
@@ -505,18 +521,22 @@ export const applicationRouter = createTRPCRouter({
             applicationSlug: z.string(),
             organisationId: z.string()
         })))
-        .mutation(async ({ ctx: { prisma }, input }) => {
+        .mutation(async ({ ctx: { prisma, session: { user } }, input }) => {
+
+            if (!user)
+                throw (new Error('You must be logged in to delete an application'));
 
             const { applicationId, applicationSlug, organisationId } = input as Record<string, string>;
+            let app: Application | null = null;
 
             if (applicationId)
-                await prisma.application.delete({
+                app = await prisma.application.findFirst({
                     where: {
                         id: applicationId
                     }
                 });
             else if (applicationSlug && organisationId)
-                await prisma.application.delete({
+                app = await prisma.application.delete({
                     where: {
                         organisationId_slug: {
                             slug: applicationSlug,
@@ -524,8 +544,27 @@ export const applicationRouter = createTRPCRouter({
                         }
                     }
                 });
-            return;
 
+            if (!app)
+                throw (new Error('No application found'));
+
+            await prisma.$transaction([
+                prisma.organisation.update({
+                    where: {
+                        id: app.organisationId
+                    },
+                    data: {
+                        kredits: {
+                            increment: app.kredits
+                        }
+                    }
+                }),
+                prisma.application.delete({
+                    where: {
+                        id: app.id
+                    }
+                })
+            ]);
         })
 });
 

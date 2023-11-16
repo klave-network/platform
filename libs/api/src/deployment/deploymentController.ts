@@ -173,9 +173,10 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
             });
 
             const deploymentSet = uuid();
+            const applicationId = application.id.split('-').shift();
             const targets = domains
                 .map(domain => `${branchName}.${domain.fqdn}`)
-                .concat(`${branchName}.${application.id.split('-').shift()}.sta.klave.network`, `${buildId}.sta.klave.network`);
+                .concat(`${branchName}.${applicationId}.sta.klave.network`, `${buildId}.${applicationId}.sta.klave.network`);
 
             targets.forEach(async target => {
 
@@ -274,6 +275,11 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                     data: {
                                         status: previousDeployment.status
                                     }
+                                }).catch((reason) => {
+                                    logger.debug(`Error while updating previous deployment ${previousDeployment.id} status`, {
+                                        parent: 'dpl',
+                                        reason
+                                    });
                                 });
                             }
                             await prisma.deployment.update({
@@ -497,6 +503,15 @@ export const sendToSecretarium = async ({
             .onExecuted(handleSuccess)
             .onError(async (error) => {
                 rollback();
+                await prisma.deployment.update({
+                    where: {
+                        id: deployment.id
+                    },
+                    data: {
+                        status: 'errored',
+                        buildOutputStdErr: error?.toString()
+                    }
+                });
                 logger.debug(`Error while ${!targetRef ? 'updating' : 'registering'} smart contract ${target}: ${error}`);
             }).send().catch(() => {
                 // Swallow this error
@@ -511,6 +526,15 @@ export const sendToSecretarium = async ({
             .onExecuted(handleSuccess)
             .onError(async (error) => {
                 rollback();
+                await prisma.deployment.update({
+                    where: {
+                        id: deployment.id
+                    },
+                    data: {
+                        status: 'errored',
+                        buildOutputStdErr: error?.toString()
+                    }
+                });
                 logger.debug(`Error while releasing smart contract ${target}: ${error}`);
 
             }).send().catch(() => {

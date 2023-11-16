@@ -181,11 +181,14 @@ export const deploymentRouter = createTRPCRouter({
                 },
                 data: {
                     status: 'terminating'
+                },
+                include: {
+                    deploymentAddress: true
                 }
             });
             await scp.newTx('wasm-manager', 'deactivate_instance', `klave-termination-${deploymentId}`, {
                 app_id: dep.applicationId,
-                fqdn: `${deploymentId.split('-').pop()}.sta.klave.network`
+                fqdn: dep.deploymentAddress?.fqdn
             }).onExecuted(async () => {
                 await prisma.deployment.update({
                     where: {
