@@ -25,6 +25,7 @@ import OrgInfo from './routes/orgs/index';
 import OrgActivity from './routes/orgs/activity';
 import OrgSettings from './routes/orgs/settings';
 import OrgCredits from './routes/orgs/credits';
+import RedeemCreditCoupon from './routes/redeem/coupon';
 import Providers from './Providers';
 import { httpApi } from './utils/api';
 
@@ -62,6 +63,10 @@ const router = sentryCreateBrowserRouter(
                     />
                 </Route>
             </Route>
+            <Route
+                path="redeem/:code"
+                element={<RedeemCreditCoupon />}
+            />
             <Route
                 path="auth"
                 loader={authLoader}

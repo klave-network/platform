@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import Stripe from 'stripe';
 import { createTRPCRouter, publicProcedure } from '../trpc';
+import idgen from '@ideafast/idgen';
 
 const stripe = new Stripe(process.env['KLAVE_STRIPE_KEY'] ?? '');
 
@@ -10,7 +11,9 @@ export const creditsRouter = createTRPCRouter({
             pathname: z.string(),
             quantity: z.number().int().min(1)
         }))
-        .query(async ({ ctx: { prisma }, input: { pathname, quantity } }) => {
+        .query(async ({ ctx: { prisma, session: { user } }, input: { pathname, quantity } }) => {
+            if (!user)
+                throw new Error('Not logged in');
             const origin = process.env['KLAVE_WEBAUTHN_ORIGIN'];
             const priceId = process.env['KLAVE_STRIPE_PRICE_ID'];
             if (!origin || !priceId)
@@ -50,7 +53,9 @@ export const creditsRouter = createTRPCRouter({
         .input(z.object({
             checkoutSessionId: z.string()
         }))
-        .query(async ({ input: { checkoutSessionId } }) => {
+        .query(async ({ ctx: { session: { user } }, input: { checkoutSessionId } }) => {
+            if (!user)
+                throw new Error('Not logged in');
             const creditPurchase = (await prisma?.creditPurchase.findMany({
                 where: {
                     checkoutSessionId
@@ -62,6 +67,63 @@ export const creditsRouter = createTRPCRouter({
 
             return {
                 status: creditPurchase.checkoutSessionStatus
+            };
+        }),
+    redeem: publicProcedure
+        .input(z.object({
+            code: z.string()
+        }))
+        .mutation(async ({ ctx: { prisma, session: { user } }, input: { code } }) => {
+
+            if (!user)
+                throw new Error('Not logged in');
+            if (!idgen.validate(code))
+                throw new Error('Invalid code');
+
+            const creditCoupon = (await prisma?.coupon.findMany({
+                where: {
+                    code,
+                    used: false
+                }
+            }))?.[0];
+
+            if (!creditCoupon)
+                throw new Error('Invalid code');
+
+            const organisation = await prisma?.organisation.findUnique({
+                where: {
+                    id: user.personalOrganisationId
+                }
+            });
+
+            if (!organisation)
+                throw new Error('Invalid organisation');
+
+            await prisma.$transaction([
+                prisma.organisation.update({
+                    where: {
+                        id: organisation.id
+                    },
+                    data: {
+                        kredits: {
+                            increment: creditCoupon.kredits
+                        }
+                    }
+                }),
+                prisma.coupon.update({
+                    where: {
+                        id: creditCoupon.id
+                    },
+                    data: {
+                        used: true,
+                        userId: user.id
+                    }
+                })
+            ]);
+
+            return {
+                coupon: creditCoupon,
+                organisation
             };
         })
 });
