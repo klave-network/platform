@@ -2,7 +2,7 @@ const git = require('git-rev-sync');
 const { version } = require('./package.json');
 
 module.exports = {
-    sourcemap: true,
+    sourcemap: process.env.NODE_ENV === 'development' ? true : false,
     outExtension: {
         '.js': '.js'
     },

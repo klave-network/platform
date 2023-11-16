@@ -40,12 +40,7 @@
                     "extractLicenses": true,
                     "generateLockfile": true,
                     "generatePackageJson": true,
-                    "esbuildOptions": {
-                        "sourcemap": false,
-                        "outExtension": {
-                            ".js": ".js"
-                        }
-                    }
+                    "esbuildConfig": "apps/hubber/esbuild.config.js"
                 }
             }
         },
