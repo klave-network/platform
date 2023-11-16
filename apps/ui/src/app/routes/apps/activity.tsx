@@ -1,12 +1,10 @@
 import { UilSpinner } from '@iconscout/react-unicons';
 import { ActivityLog } from '@prisma/client';
 import type { DeploymentPullRequestPayload, DeploymentPushPayload } from '@klave/api';
-import { FC } from 'react';
+import { type FC } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../../utils/api';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
-// import { UilSpinner } from '@iconscout/react-unicons';
-// import api from '../../utils/api';
 
 type ActivityRecordProps = {
     activity: ActivityLog
