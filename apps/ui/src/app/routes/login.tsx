@@ -13,7 +13,7 @@ export const Login: FC = () => {
     const [newPipe, togglePipe] = useToggle(import.meta.env['NODE_ENV'] === 'development');
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const navigate = useNavigate();
-    const { data } = api.v0.auth.getSession.useQuery();
+    const { data, refetch: refetchSession } = api.v0.auth.getSession.useQuery();
     const { mutateAsync: updateSlug, isPending: isChangingSlug } = api.v0.auth.updateSlug.useMutation();
     const [slug, setSlug] = useState('');
     const [skipAskName, setSkipAskName] = useState(false);
@@ -69,7 +69,14 @@ export const Login: FC = () => {
                             <br />
                             <form
                                 onSubmit={methods.handleSubmit(async (data) => {
-                                    await updateSlug(data);
+                                    await updateSlug(data, {
+                                        onSuccess(data) {
+                                            if (data?.ok) {
+                                                refetchSession();
+                                                navigate('/');
+                                            }
+                                        }
+                                    });
                                     methods.reset();
                                 })}
                                 className="space-y-2"
