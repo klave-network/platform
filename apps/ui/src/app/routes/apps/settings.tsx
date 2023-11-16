@@ -20,6 +20,7 @@ const ApplicationDeletion = () => {
             await utils.getAll.invalidate();
             await utils.getById.invalidate();
             await utils.getBySlug.invalidate();
+            await utils.getByOrganisation.invalidate();
             navigate(`/${orgSlug}`);
         }
     });
