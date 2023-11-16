@@ -28,7 +28,7 @@ interface State<T> {
     isLoading: boolean;
     data?: Array<T>
     errors?: Array<Error>;
-    refetch: (args?: SecretariumQueryOptions['args']) => void;
+    refetch: () => void;
 }
 
 type Cache<T> = { [url: string]: Array<T> }
@@ -44,13 +44,14 @@ type SecretariumQueryOptions = {
     app: string;
     route: string;
     args?: unknown;
-    enabled?: boolean;
+    live?: boolean;
 }
 
-export function useSecretariumQuery<T = unknown>(options: SecretariumQueryOptions): State<T> {
+export function useSecretariumQuery<T = unknown>(options: SecretariumQueryOptions, deps: Array<any> = []): State<T> {
 
-    const { app, route, args: firstArgs, enabled = true } = options;
-    const [args, setArgs] = useState<SecretariumQueryOptions['args']>(firstArgs);
+    const [count, setCount] = useState(0);
+    const [opts, setOpts] = useState<SecretariumQueryOptions>();
+    const { app, route, args } = opts ?? {};
     const argDigest = useMemo(() => {
         if (typeof args === 'undefined')
             return '';
@@ -60,8 +61,7 @@ export function useSecretariumQuery<T = unknown>(options: SecretariumQueryOption
             return Object.entries(args as any as Record<string, any>).sort((a, b) => a[0].localeCompare(b[0])).map(([, v]) => v).join('|');
         return Math.random().toString().replaceAll('.', '');
     }, [args]);
-    const [count, setCount] = useState(0);
-    const cacheKey = `${app}|${route}|${enabled ? argDigest : '-'}|${count}`;
+    const cacheKey = useMemo(() => `${app}|${route}|${argDigest}|${count}`, [count]);
     const dataCache = useRef<Cache<T>>({});
     const errorsCache = useRef<Cache<Error>>({});
     const querySent = useRef<boolean>(false);
@@ -69,17 +69,11 @@ export function useSecretariumQuery<T = unknown>(options: SecretariumQueryOption
     // Used to prevent state update if the component is unmounted
     const cancelRequest = useRef<boolean>(false);
 
-    console.log('count', count);
     const initialState: State<T> = {
         isLoading: false,
         errors: undefined,
         data: undefined,
-        refetch: (args?: SecretariumQueryOptions['args']) => {
-            console.log('refetch', args, count);
-            dataCache.current[cacheKey] = [];
-            errorsCache.current[cacheKey] = [];
-            setArgs(args ?? firstArgs);
-            setCount(count + 1);
+        refetch: () => {
             dispatch({ type: 'reset' });
         }
     };
@@ -88,6 +82,7 @@ export function useSecretariumQuery<T = unknown>(options: SecretariumQueryOption
     const fetchReducer = (state: State<T>, action: Action<T>): State<T> => {
         switch (action.type) {
             case 'reset':
+                setOpts(options);
                 return { ...initialState };
             case 'loading':
                 return { ...initialState, isLoading: true };
@@ -101,6 +96,16 @@ export function useSecretariumQuery<T = unknown>(options: SecretariumQueryOption
     };
 
     const [state, dispatch] = useReducer(fetchReducer, initialState);
+
+    useEffect(() => {
+        setCount(count + 1);
+    }, [opts]);
+
+    useEffect(() => {
+        if (options?.live === false)
+            return;
+        setOpts(options);
+    }, deps);
 
     useEffect(() => {
         querySent.current = false;
@@ -180,12 +185,10 @@ export function useSecretariumQuery<T = unknown>(options: SecretariumQueryOption
                     }, 100);
                 });
 
-                // dataCache.current[cacheKey] = [];
+                dataCache.current[cacheKey] = [];
                 errorsCache.current[cacheKey] = [];
-                await client.newTx(app, route, `klave-deployment-${app}-${Math.random().toString().replaceAll('.', '')}`, args as any)
+                await client.newTx(app, route, `klave-deployment-${Math.random().toString().replaceAll('.', '')}`, args as any)
                     .onResult((result: T) => {
-
-                        (result as any).cacheKey = cacheKey;
 
                         if (!dataCache.current[cacheKey])
                             dataCache.current[cacheKey] = [];
@@ -196,9 +199,6 @@ export function useSecretariumQuery<T = unknown>(options: SecretariumQueryOption
                         dataCache.current[cacheKey]?.push(result);
                         dispatch({ type: 'fetched', payload: dataCache.current[cacheKey]! });
 
-
-                        // localResultAccu.push(result);
-                        // setStatus({ loading: false, data: localResultAccu, errors: [] });
                     }).onError((error: any) => {
 
                         if (!errorsCache.current[cacheKey])
@@ -212,16 +212,7 @@ export function useSecretariumQuery<T = unknown>(options: SecretariumQueryOption
 
                         dispatch({ type: 'error', payload: errorsCache.current[cacheKey]! });
 
-                        // setStatus({ loading: false, errors: localErrorAccu as any, data: [] });
                     }).send();
-                // .catch(() => {
-                //     // localErrorAccu.push(error);
-                //     dispatch({ type: 'error', payload: errorsCache.current[cacheKey]! });
-                //     // setStatus({ loading: false, errors: localErrorAccu as any, data: [] });
-                // });
-
-
-                // const response = await fetch('https://api.klave.com/ping', {});
 
             } catch (error) {
 
@@ -231,7 +222,7 @@ export function useSecretariumQuery<T = unknown>(options: SecretariumQueryOption
                 dispatch({ type: 'error', payload: [error as Error] });
             }
         };
-        console.log('fetchData', enabled, !querySent.current);
+
         if (!querySent.current)
             void fetchData();
 
@@ -240,7 +231,7 @@ export function useSecretariumQuery<T = unknown>(options: SecretariumQueryOption
         return () => {
             cancelRequest.current = true;
         };
-    }, [cacheKey, enabled]);
+    }, [cacheKey]);
 
     return state;
 }

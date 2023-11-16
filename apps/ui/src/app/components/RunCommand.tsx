@@ -12,7 +12,7 @@ export const RunCommand: FC<RunCommandProps> = ({ address, functions = [] }) => 
 
     const [route, setRoute] = useState(functions[0] ?? '');
     const [args, setArgs] = useState('');
-    const { data, loading, errors, refetch } = useSecretariumQuery(address, route, args);
+    const { data, isLoading, errors, refetch } = useSecretariumQuery({ app: address, route, args, live: false }, [address]);
 
     return <>
         <h2 className='font-bold mb-3'>Command runner</h2>
@@ -40,10 +40,10 @@ export const RunCommand: FC<RunCommandProps> = ({ address, functions = [] }) => 
             defaultValue={args}
             onChange={value => { if (value) setArgs(value); }}
         />
-        <h3 className='my-3 h-5'>Application response {loading ? <UilSpinner className='inline-block animate-spin h-5' /> : ''}</h3>
+        <h3 className='my-3 h-5'>Application response {isLoading ? <UilSpinner className='inline-block animate-spin h-5' /> : ''}</h3>
         <Editor
             key={`result.${address}`}
-            value={loading ? '// executing...' : data?.length ? JSON.stringify(data, null, 4) : errors?.length ? `// error${errors.length > 1 ? 's' : ''}: ${JSON.stringify(errors, null, 4).replaceAll('\n', '\n// ')}` : ''}
+            value={isLoading ? '// executing...' : data?.length ? JSON.stringify(data, null, 4) : errors?.length ? `// error${errors.length > 1 ? 's' : ''}: ${JSON.stringify(errors, null, 4).replaceAll('\n', '\n// ')}` : ''}
             options={{
                 minimap: { enabled: false },
                 semanticHighlighting: { enabled: false },

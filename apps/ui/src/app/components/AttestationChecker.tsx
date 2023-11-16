@@ -11,28 +11,47 @@ type AttestationCheckerProps = {
 
 export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, address }) => {
 
-    const { data: deployment, isLoading: isLoadingDeployments } = api.v0.deployments.getById.useQuery({ deploymentId: deploymentId || '' }, {
-        refetchInterval: 5000
-    });
+    const { data: deployment, isLoading: isLoadingDeployments } = api.v0.deployments.getById.useQuery({ deploymentId: deploymentId || '' });
     const [challenge, setChallenge] = useState(Array.from(Utils.getRandomBytes(64)));
     const [hasLaunched, setHasLaunched] = useState(false);
     const [isValidating, setIsValidating] = useState(true);
     const [isContractValid, setIsContractValid] = useState(false);
+    const [isQuoting, setIsQuoting] = useState(false);
+    const [isVerifying, setIsVerifying] = useState(false);
     const [quoteBinary, setQuoteBinary] = useState<Array<number>>([]);
     const quoteArgs = useMemo(() => ({ challenge }), [challenge]);
     const verifyArgs = useMemo(() => ({
         quote: quoteBinary,
         current_time: new Date().getTime()
     }), [quoteBinary]);
-    const { data: quoteData, loading: loadingQuote, errors: quoteErrors, refetch: refetchQuote } = useSecretariumQuery(address, 'klave.get_quote', quoteArgs);
-    const { data: verifyData, loading: loadingVerify, errors: verifyErrors, refetch: refetchVerify } = useSecretariumQuery(address, 'klave.verify_quote', verifyArgs);
+    const { data: quoteData, isLoading: loadingQuote, errors: quoteErrors, refetch: refetchQuote } = useSecretariumQuery({
+        app: address,
+        route: 'klave.get_quote',
+        args: quoteArgs,
+        live: false
+    }, [quoteArgs]);
+    const { data: verifyData, isLoading: loadingVerify, errors: verifyErrors, refetch: refetchVerify } = useSecretariumQuery({
+        app: address,
+        route: 'klave.verify_quote',
+        args: verifyArgs,
+        live: false
+    }, [verifyArgs]);
+    const { data: versions, refetch: refetchVersion } = useSecretariumQuery<any>({
+        app: address,
+        route: 'klave.version',
+        live: false
+    }, [deployment?.id]);
 
     useEffect(() => {
         if (!hasLaunched) {
             setHasLaunched(true);
-            refetchQuote();
+            if (!loadingQuote && !isQuoting && !isVerifying) {
+                setIsQuoting(true);
+                refetchQuote();
+            }
+            refetchVersion();
         }
-    }, [hasLaunched, refetchQuote]);
+    }, [hasLaunched, refetchQuote, refetchVersion, isQuoting, isVerifying]);
 
     useEffect(() => {
         if (!hasLaunched || !quoteData || loadingQuote || quoteErrors?.length)
@@ -40,14 +59,22 @@ export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, 
         const base: any = quoteData[0];
         if (!base || !base.quote_binary)
             return;
-        setQuoteBinary(base.quote_binary);
-    }, [hasLaunched, quoteData, loadingQuote, quoteErrors]);
+        if ((verifyData?.length ?? 0) > 0)
+            return;
+        if (!quoteBinary.length) {
+            setQuoteBinary(base.quote_binary);
+            setIsQuoting(false);
+        }
+    }, [hasLaunched, quoteData, loadingQuote, quoteErrors, verifyData]);
 
     useEffect(() => {
-        if (!hasLaunched || !quoteData || !quoteBinary.length || !!verifyData.length || loadingVerify || verifyErrors?.length || quoteErrors || !verifyArgs.quote.length)
+        if (isVerifying)
             return;
+        if (!hasLaunched || !quoteData || !quoteBinary.length || (verifyData?.length ?? 0) > 0 || loadingVerify || verifyErrors?.length || quoteErrors?.length || !verifyArgs.quote.length)
+            return;
+        setIsVerifying(true);
         refetchVerify();
-    }, [hasLaunched, quoteData, quoteBinary, verifyData, loadingVerify, refetchVerify, verifyErrors, verifyArgs, quoteErrors]);
+    }, [hasLaunched, quoteData, quoteBinary, verifyData, loadingVerify, refetchVerify, verifyErrors, verifyArgs, quoteErrors, loadingVerify, isVerifying]);
 
     const resetTest = () => {
         setChallenge(Array.from(Utils.getRandomBytes(64)));
@@ -56,17 +83,22 @@ export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, 
         setIsContractValid(false);
     };
 
+    const secretariumBackendVersions = versions?.[0] ?? { wasm_version: {}, core_version: {} };
+    const { wasm_version, core_version } = secretariumBackendVersions ?? { wasm_version: {}, core_version: {} };
+    const secretariumCoreVersion = `${core_version.major}.${core_version.minor}.${core_version.patch}`;
+    const secretariumWasmVersion = `${wasm_version.major}.${wasm_version.minor}.${wasm_version.patch}`;
     const verifyResult: any | undefined = verifyData?.[0];
     const loading = loadingQuote || loadingVerify || !verifyResult || isLoadingDeployments;
     const downloadableQuote = new Blob([new Uint8Array(quoteBinary)], { type: 'application/octet-stream' });
     const enclaveOutcomeLevel = QV_LEVEL(verifyResult?.quote_verification_result);
-    const mrEnclaveHash = Utils.toBase64(new Uint8Array(quoteData[0]?.quote?.report_body?.mr_enclave?.m ?? []));
-    const mrSignedHash = Utils.toBase64(new Uint8Array(quoteData[0]?.quote?.report_body?.mr_signer?.m ?? []));
-    const contractIntegrityHash = Utils.toBase64(new Uint8Array(quoteData[0]?.quote?.report_body?.report_data ?? []));
+    const quoteDataTip: any = quoteData?.[0] ?? {};
+    const mrEnclaveHash = Utils.toBase64(new Uint8Array(quoteDataTip?.quote?.report_body?.mr_enclave?.m ?? []));
+    const mrSignedHash = Utils.toBase64(new Uint8Array(quoteDataTip?.quote?.report_body?.mr_signer?.m ?? []));
+    const contractIntegrityHash = Utils.toBase64(new Uint8Array(quoteDataTip?.quote?.report_body?.report_data ?? []));
 
     useEffect(() => {
-        if (quoteData[0]?.quote?.report_body?.report_data && deployment?.buildOutputWASM) {
-            const reportData = new Uint8Array(quoteData[0].quote.report_body.report_data);
+        if (quoteDataTip?.quote?.report_body?.report_data && deployment?.buildOutputWASM) {
+            const reportData = new Uint8Array(quoteDataTip?.quote.report_body.report_data);
             const contractBytes = Utils.fromBase64(deployment.buildOutputWASM);
             Utils.hash(contractBytes).then((contractBytesHash) => {
                 const validation = new Uint8Array(challenge.length + contractBytesHash.length);
@@ -113,6 +145,9 @@ export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, 
                             {isContractValid ? <UilShieldCheck className='w-8 h-10 p-0 -ml-1 mb-2' /> : <UilShieldExclamation className='w-8 h-10 p-0 -ml-1 mb-2' />}
                             {isValidating ? 'Checking contract validity' : isContractValid ? 'Contract integrity validated successfully' : 'Contract integrity not valid. Tampering detected.'}
                         </pre>
+                        <h3 className='mt-5 mb-3'>Runtime</h3>
+                        <span className='font-bold'>Secretarium Core :</span> {versions?.length ? <span className='text-gray-400'>v{secretariumCoreVersion} ({core_version.build_number})</span> : '-'}<br />
+                        <span className='font-bold'>Secretarium WASM :</span> {versions?.length ? <span className='text-gray-400'>v{secretariumWasmVersion} ({wasm_version.build_number})</span> : '-'}<br />
                         <h3 className='mt-5 mb-3'>MRENCLAVE</h3>
                         <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 dark:bg-gray-800 p-3'>
                             {mrEnclaveHash}
