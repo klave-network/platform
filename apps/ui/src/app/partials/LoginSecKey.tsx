@@ -16,6 +16,7 @@ export const LoginSecKey: FC = () => {
     const [shouldAttemptWebauthEnroll, setShouldAttemptWebauthEnroll] = useState(true);
     const [email, setEmail] = useState('');
     const [code, setCode] = useState('');
+    const [performedEmailCheck, setPerformedEmailCheck] = useState(false);
     const [error, setError] = useState<string>();
     const [screen, setScreen] = useState<'start' | 'code' | 'key'>('start');
     const debouncedEmail = useDebounce<string>(email, 200);
@@ -42,6 +43,8 @@ export const LoginSecKey: FC = () => {
         enabled: false,
         retry: false
     });
+
+    console.log(credentials, performedEmailCheck);
 
     useEffect(() => {
         if (debouncedEmail.length > 0)
@@ -79,6 +82,11 @@ export const LoginSecKey: FC = () => {
                 .catch(() => setIsWebauthAvailable(false));
         }
     }, [isWebauthAvailable]);
+
+    useEffect(() => {
+        if (performedEmailCheck && isWebauthAvailable)
+            startAuth();
+    }, [performedEmailCheck]);
 
     const getLoginCode = useCallback(() => {
         emailCodeMutation({
@@ -131,8 +139,8 @@ export const LoginSecKey: FC = () => {
                 }))
                 .then((res) => {
                     if (res?.ok) {
-                        if (location.state.from)
-                            navigate(location.state.from, {
+                        if (location.state?.from)
+                            navigate(location.state?.from, {
                                 state: {
                                     from: undefined
                                 }
@@ -153,6 +161,9 @@ export const LoginSecKey: FC = () => {
                 });
             return;
         } else {
+            console.log('registering...', performedEmailCheck);
+            if (!performedEmailCheck)
+                return getLoginCode();
             refetchRegistrationOptions()
                 .then((res) => res.data)
                 .then((options) => {
@@ -174,8 +185,8 @@ export const LoginSecKey: FC = () => {
                 .then((res: any) => {
                     if (res?.ok) {
                         setCredentials([...(credentials ?? []), email]);
-                        if (location.state.from)
-                            navigate(location.state.from, {
+                        if (location.state?.from)
+                            navigate(location.state?.from, {
                                 state: {
                                     from: undefined
                                 }
@@ -197,7 +208,7 @@ export const LoginSecKey: FC = () => {
             return;
         }
 
-    }, [credentials, email, getLoginCode, isWebauthAvailable, refetchAuthOptions, refetchRegistrationOptions, refetchSession, registerWebauthnMutation, setCredentials, validateWebauthnMutation]);
+    }, [credentials, performedEmailCheck, email, getLoginCode, isWebauthAvailable, refetchAuthOptions, refetchRegistrationOptions, refetchSession, registerWebauthnMutation, setCredentials, validateWebauthnMutation]);
 
     const verifyEmailCode = useCallback((e: MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -216,8 +227,8 @@ export const LoginSecKey: FC = () => {
                     setError(error?.message ?? (JSON.parse(error.message) as any)[0]?.message ?? error.message ?? 'An error occured while trying to log you in. Please try again later.');
                 else if (data?.ok) {
                     if (shouldAttemptWebauthEnroll && isWebauthAvailable && !credentials?.length) {
+                        setPerformedEmailCheck(true);
                         setScreen('start');
-                        startAuth();
                     } else
                         refetchSession();
                 } else
