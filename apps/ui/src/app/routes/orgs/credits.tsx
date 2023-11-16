@@ -85,7 +85,7 @@ const CreditCellEdit: FC<{
 
     const { kredits, id } = application;
     const [isEditing, toggleEditing] = useToggle(false);
-    const kreditValue = useMemo(() => kredits ? parseFloat(kredits.toString()) : 0, [kredits]);
+    const kreditValue = useMemo(() => kredits ? parseFloat(kredits.toString()) / 10_000 : 0, [kredits]);
     const [currentValue, setCurrentValue] = useState(kreditValue.toString());
     const { mutateAsync, isPending } = api.v0.organisations.allocationCredits.useMutation();
     const orgAPIUtils = api.useUtils().v0.organisations;
@@ -107,7 +107,7 @@ const CreditCellEdit: FC<{
     const allocateCredit = async () => {
         await mutateAsync({
             applicationId: id,
-            amount: parseFloat(currentValue)
+            amount: parseFloat(currentValue) * 10_000
         });
         await orgAPIUtils.getAll.invalidate();
         await orgAPIUtils.getBySlug.invalidate();
@@ -167,7 +167,7 @@ export const OrganisationSettings: FC = () => {
         <div>
             <h1 className='font-bold text-xl mb-5'>Total Balance</h1>
             <p>
-                Balance: <b>{parseFloat(organisation.kredits.toString())}</b><br />
+                Balance: <b>{parseFloat(organisation.kredits.toString()) / 10_000}</b><br />
                 {isReturningFromCheckout
                     ? <>
                         <span className='text-green-700'>Thank you for your purchase! We are updating your balance...</span>
