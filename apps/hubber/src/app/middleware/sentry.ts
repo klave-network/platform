@@ -2,7 +2,7 @@ import { RequestHandler } from 'express-serve-static-core';
 import * as Sentry from '@sentry/node';
 import * as SecretariumInstruments from '@secretarium/instrumentation';
 import { client as prismaClient } from '../../utils/db';
-import { logger, scp as scpClient } from '@klave/providers';
+import { logger, scp as scpClient, scpOps } from '@klave/providers';
 
 let sentryRequestMiddlewareReference: RequestHandler;
 let sentryTracingMiddlewareReference: RequestHandler;
@@ -31,7 +31,15 @@ const initializeSentry = () => {
         // Set tracesSampleRate to 1.0 to capture 100%
         // of transactions for performance monitoring.
         // We recommend adjusting this value in production
-        tracesSampleRate: 1.0
+        tracesSampleRate: 1.0,
+        beforeSend: (event) => {
+            const secretariumVersion = scpOps.version();
+            if (!event.tags)
+                event.tags = {};
+            event.tags['secretarium.core'] = secretariumVersion.core;
+            event.tags['secretarium.wasm'] = secretariumVersion.wasm;
+            return event;
+        }
     });
 
     const fork = <Handler>(func: () => Handler) => {

@@ -11,6 +11,18 @@ export const systemRouter = createTRPCRouter({
     getSecretariumNode: publicProcedure
         .query(async () => {
             return process.env['KLAVE_SECRETARIUM_NODE'];
+        }),
+    version: publicProcedure
+        .query(async () => {
+            return {
+                version: process.env['GIT_REPO_VERSION'],
+                git: {
+                    commit: process.env['GIT_REPO_COMMIT'],
+                    branch: process.env['GIT_REPO_BRANCH'],
+                    dirty: process.env['GIT_REPO_DIRTY']
+                },
+                secretarium: scpOps.version()
+            };
         })
 });
 

@@ -27,12 +27,7 @@
                     "typescript"
                 ],
                 "generatePackageJson": true,
-                "esbuildOptions": {
-                    "sourcemap": true,
-                    "outExtension": {
-                        ".js": ".js"
-                    }
-                }
+                "esbuildConfig": "apps/hubber/esbuild.config.js"
             },
             "configurations": {
                 "development": {

@@ -1,9 +1,13 @@
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import secretariumLogo from '../images/secretarium-gray.svg';
+import api from '../utils/api';
 // import klaveLogo from '../images/klave-logo.svg';
 
 const Footer: FC = () => {
+
+    const { data: versions } = api.v0.system.version.useQuery();
+
     return (
         <footer>
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -130,7 +134,9 @@ const Footer: FC = () => {
                     {/* Copyrights note */}
                     <div className="text-sm text-gray-600 dark:text-gray-500 mr-4">
                         {/* <Link to="#" className="text-gray-600 hover:text-gray-900 hover:underline transition duration-150 ease-in-out">Terms</Link> · <Link to="#" className="text-gray-600 hover:text-gray-900 hover:underline transition duration-150 ease-in-out">Privacy Policy</Link> ·  */}
-                        <a className="text-klave-dark-blue dark:text-klave-light-blue hover:underline pr-0" href="https://secretarium.com/">Secretarium</a> © {new Date().getFullYear()} All rights reserved
+                        <a className="text-klave-dark-blue dark:text-klave-light-blue hover:underline pr-0" href="https://secretarium.com/">Secretarium</a> © {new Date().getFullYear()} All rights reserved<br />
+                        Klave <i title={import.meta.env.VITE_REPO_BRANCH}>v{import.meta.env.VITE_REPO_VERSION} ({import.meta.env.VITE_REPO_COMMIT?.substring(0, 8)}{import.meta.env.VITE_REPO_DIRTY ? <i title='Dirty'>*</i> : ''})</i>&nbsp;-
+                        Core <i title={versions?.secretarium?.core}>v{versions?.secretarium.core} ({versions?.secretarium.backend?.core_version?.build_number})</i> - WASM <i title={versions?.secretarium?.wasm}>v{versions?.secretarium.wasm} ({versions?.secretarium.backend?.wasm_version?.build_number})</i>
                     </div>
 
                 </div>

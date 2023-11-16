@@ -11,6 +11,9 @@ const onlineChain = () => process.env['KLAVE_OFFLINE_DEV'] === 'true'
         .then(scpOps.initialize)
         .then(githubOps.initialize);
 
+logger.info(`Klave Hubber API v${process.env.GIT_REPO_VERSION}`);
+logger.info(`Branch ${process.env.GIT_REPO_BRANCH} - ${process.env.GIT_REPO_COMMIT?.substring(0, 8)}${process.env.GIT_REPO_DIRTY ? '*' : ''}`);
+
 dbOps.initialize()
     .then(envOps.initialize)
     .then(probotOps.initialize)

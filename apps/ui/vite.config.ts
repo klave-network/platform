@@ -1,6 +1,8 @@
 import { defineConfig as defineViteConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
+import git from 'git-rev-sync';
+import { version } from './package.json';
 
 export default defineViteConfig({
     cacheDir: '../../node_modules/.vite/ui',
@@ -25,7 +27,11 @@ export default defineViteConfig({
     // },
 
     define: {
-        'import.meta.vitest': undefined
+        'import.meta.vitest': undefined,
+        'import.meta.env.VITE_REPO_COMMIT': JSON.stringify(git.long()),
+        'import.meta.env.VITE_REPO_BRANCH': JSON.stringify(git.branch()),
+        'import.meta.env.VITE_REPO_DIRTY': git.isDirty(),
+        'import.meta.env.VITE_REPO_VERSION': JSON.stringify(version)
     },
 
     test: {

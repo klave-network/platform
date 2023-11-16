@@ -2,12 +2,17 @@ import { SCP, Key, Constants, EncryptedKeyPair } from '@secretarium/connector';
 import { prisma } from '@klave/db';
 import { logger } from './logger';
 
-const client = new SCP();
+const client = new SCP({
+    logger: process.env['NODE_ENV'] === 'development' ? console : undefined
+});
 
 let connectionKey: Key | undefined;
 let reconnectAttempt = 0;
 let reconnectionTimeout: NodeJS.Timeout | undefined;
 let lastSCPState = Constants.ConnectionState.closed;
+let secretariumCoreVersion: string | undefined;
+let secretariumWasmVersion: string | undefined;
+let secretariumBackendVersions: any;
 
 const planReconnection = async () => {
     return new Promise((resolve) => {
@@ -57,6 +62,14 @@ export const scpOps = {
             await client.connect(node, connectionKey, trustKey);
             logger.info(`Connected to Secretarium ${node}`);
             logger.info(`PK ${await connectionKey.getRawPublicKeyHex()}`);
+            const version: any = await client.newTx('wasm-manager', 'version', 'version', '').send().catch((e) => {
+                console.error(e);
+            });
+            secretariumBackendVersions = version?.version;
+            const { wasm_version, core_version } = secretariumBackendVersions ?? { wasm_version: {}, core_version: {} };
+            secretariumCoreVersion = `${core_version.major}.${core_version.minor}.${core_version.patch}`;
+            secretariumWasmVersion = `${wasm_version.major}.${wasm_version.minor}.${wasm_version.patch}`;
+            logger.info(`Core v${secretariumCoreVersion} (${core_version.build_number}) - WASM Manager v${secretariumWasmVersion} (${core_version.build_number})`);
             reconnectAttempt = 0;
             return;
         } catch (e) {
@@ -68,6 +81,11 @@ export const scpOps = {
     isConnected: () => {
         return lastSCPState === Constants.ConnectionState.secure;
     },
+    version: () => ({
+        core: secretariumCoreVersion,
+        wasm: secretariumWasmVersion,
+        backend: secretariumBackendVersions
+    }),
     stop: async () => {
         try {
             await client.close();
