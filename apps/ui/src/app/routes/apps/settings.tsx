@@ -19,6 +19,7 @@ const ApplicationDeletion = () => {
         onSuccess: async () => {
             await utils.getAll.invalidate();
             await utils.getById.invalidate();
+            await utils.getBySlug.invalidate();
             navigate(`/${orgSlug}`);
         }
     });
@@ -44,17 +45,19 @@ const ApplicationDeletion = () => {
             <AlertDialog.Overlay className="AlertDialogOverlay" />
             <AlertDialog.Content className="AlertDialogContent">
                 <AlertDialog.Title className="AlertDialogTitle">Are you absolutely sure?</AlertDialog.Title>
-                <AlertDialog.Description className="AlertDialogDescription">
-                    <p className='my-2'>
-                        This action cannot be undone. This will permanently delete this application and all attached data.
-                    </p>
-                    <p className='my-2'>
-                        If you are really sure you want to delete this application, please type the application ID below.
-                    </p>
-                    <p className='my-2'>
-                        <code className='font-bold'>{appSlug}</code>
-                    </p>
-                    <input placeholder='Application ID' className='w-full' onChange={e => setNameCopy(e.target.value)} />
+                <AlertDialog.Description className="AlertDialogDescription" asChild>
+                    <div>
+                        <p className='my-2'>
+                            This action cannot be undone. This will permanently delete this application and all attached data.
+                        </p>
+                        <p className='my-2'>
+                            If you are really sure you want to delete this application, please type the application ID below.
+                        </p>
+                        <p className='my-2'>
+                            <code className='font-bold'>{appSlug}</code>
+                        </p>
+                        <input placeholder='Application ID' className='w-full' onChange={e => setNameCopy(e.target.value)} />
+                    </div>
                 </AlertDialog.Description>
                 <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
