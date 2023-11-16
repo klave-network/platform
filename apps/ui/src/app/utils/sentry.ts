@@ -13,7 +13,7 @@ import { client as scpClient } from './secretarium';
 
 Sentry.init({
     dsn: import.meta.env['VITE_KLAVE_SENTRY_DSN'],
-    release: 'klave@0.0.0',
+    release: `klave@${import.meta.env['VITE_REPO_VERSION']}`,
     environment: ['localhost', '::', '127.0.0.1'].includes(window.location.hostname) ? 'development' : window.location.hostname,
     integrations: [
         new BrowserTracing({
