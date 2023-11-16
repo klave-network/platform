@@ -44,8 +44,6 @@ export const LoginSecKey: FC = () => {
         retry: false
     });
 
-    console.log(credentials, performedEmailCheck);
-
     useEffect(() => {
         if (debouncedEmail.length > 0)
             refetchEmailHint();
@@ -161,7 +159,6 @@ export const LoginSecKey: FC = () => {
                 });
             return;
         } else {
-            console.log('registering...', performedEmailCheck);
             if (!performedEmailCheck)
                 return getLoginCode();
             refetchRegistrationOptions()
