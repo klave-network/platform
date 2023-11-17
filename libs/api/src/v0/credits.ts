@@ -46,7 +46,7 @@ export const creditsRouter = createTRPCRouter({
                 data: {
                     checkoutSessionId: session.id,
                     checkoutSessionStatus: session.status ?? 'pending',
-                    kredits: quantity,
+                    kredits: quantity * 100_000_000,
                     organisation: {
                         connect: {
                             slug: pathname.split('/')[2]
