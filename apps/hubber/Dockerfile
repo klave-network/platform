@@ -39,6 +39,8 @@ COPY --from=builder /app/hubber/node_modules hubber/node_modules
 COPY --from=db /app/hubber/node_modules/.prisma hubber/node_modules/.prisma
 RUN chown -R hubber:hubber .
 
+WORKDIR /app/hubber
+
 EXPOSE 3333
 
-CMD [ "node", "hubber" ]
+CMD [ "node", "main.js" ]

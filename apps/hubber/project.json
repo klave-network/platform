@@ -22,10 +22,6 @@
                 "assets": [
                     "apps/hubber/src/assets"
                 ],
-                "external": [
-                    "@klave/as-json",
-                    "typescript"
-                ],
                 "generatePackageJson": true,
                 "esbuildConfig": "apps/hubber/esbuild.config.js"
             },
