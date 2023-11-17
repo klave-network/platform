@@ -283,13 +283,13 @@ export class BuildMiniVM {
                     }
                 });
             });
-        } catch (error) {
+        } catch (error: any) {
             logger.debug('General failure: ' + error, {
                 parent: 'bmv'
             });
             return {
                 success: false,
-                error: serializeError(error),
+                error: serializeError(error as Error | ErrorObject),
                 dependenciesManifest: this.usedDependencies,
                 stdout: '',
                 stderr: ''

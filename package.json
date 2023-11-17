@@ -110,7 +110,7 @@
         "regenerator-runtime": "0.14.0",
         "replace-in-file": "7.0.2",
         "sanitize-filename": "1.6.3",
-        "serialize-error": "11.0.3",
+        "serialize-error": "8.1.0",
         "sigstore": "2.1.0",
         "strip-ansi": "7.1.0",
         "stripe": "14.4.0",
