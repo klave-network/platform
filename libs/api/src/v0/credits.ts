@@ -3,7 +3,12 @@ import Stripe from 'stripe';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import idgen from '@ideafast/idgen';
 
-const stripe = new Stripe(process.env['KLAVE_STRIPE_KEY'] ?? '');
+let stripe: Stripe | undefined;
+
+const checkStripeInit = () => {
+    if (!stripe)
+        stripe = new Stripe(process.env['KLAVE_STRIPE_KEY'] ?? '');
+};
 
 export const creditsRouter = createTRPCRouter({
     createCheckoutSession: publicProcedure
@@ -19,6 +24,9 @@ export const creditsRouter = createTRPCRouter({
             if (!origin || !priceId)
                 throw new Error('Missing environment variables');
             const returnURL = new URL(`${origin}${pathname}?return=true&checkoutSessionId={CHECKOUT_SESSION_ID}`);
+            checkStripeInit();
+            if (!stripe)
+                throw new Error('Stripe not initialized');
             const session = await stripe.checkout.sessions.create({
                 ui_mode: 'embedded',
                 line_items: [
