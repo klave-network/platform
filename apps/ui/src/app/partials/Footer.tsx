@@ -135,7 +135,7 @@ const Footer: FC = () => {
                     <div className="text-sm text-gray-600 dark:text-gray-500 mr-4">
                         {/* <Link to="#" className="text-gray-600 hover:text-gray-900 hover:underline transition duration-150 ease-in-out">Terms</Link> · <Link to="#" className="text-gray-600 hover:text-gray-900 hover:underline transition duration-150 ease-in-out">Privacy Policy</Link> ·  */}
                         <a className="text-klave-dark-blue dark:text-klave-light-blue hover:underline pr-0" href="https://secretarium.com/">Secretarium</a> © {new Date().getFullYear()} All rights reserved<br />
-                        Klave <i title={import.meta.env.VITE_REPO_BRANCH}>v{import.meta.env.VITE_REPO_VERSION} ({import.meta.env.VITE_REPO_COMMIT?.substring(0, 8)}{import.meta.env.VITE_REPO_DIRTY ? <i title='Dirty'>*</i> : ''})</i>&nbsp;-
+                        Klave <i title={versions?.git?.branch}>v{versions?.version} ({versions?.git?.commit?.substring(0, 8)}{versions?.git?.dirty ? '*' : ''})</i> - UI <i title={import.meta.env.VITE_REPO_BRANCH}>v{import.meta.env.VITE_REPO_VERSION} ({import.meta.env.VITE_REPO_COMMIT?.substring(0, 8)}{import.meta.env.VITE_REPO_DIRTY ? <i title='Dirty'>*</i> : ''})</i> -
                         Core <i title={versions?.secretarium?.core}>v{versions?.secretarium.core} ({versions?.secretarium.backend?.core_version?.build_number})</i> - WASM <i title={versions?.secretarium?.wasm}>v{versions?.secretarium.wasm} ({versions?.secretarium.backend?.wasm_version?.build_number})</i>
                     </div>
 
