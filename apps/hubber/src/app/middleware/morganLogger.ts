@@ -13,12 +13,39 @@ const skip = () => {
 };
 
 export const morganLoggerMiddleware: RequestHandler = morgan(
-    // Define message format string (this is the default one).
-    // The message format is made from tokens, and each token is
-    // defined inside the Morgan library.
-    // You can create your custom token to show what do you want from a request.
-    ':remote-addr :method :url :status :res[content-length] - :response-time ms',
-    // Options: in this case, I overwrote the stream and the skip logic.
-    // See the methods above.
+    (tokens, req, res) => {
+        return [
+            tokens['remote-addr']?.(req, res) ?? '-',
+            tokens.method?.(req, res) ?? '-',
+            [tokens.url?.(req, res)].map(url => {
+                let path = url?.split('?')?.[0];
+                if (!path?.startsWith('/trpc/'))
+                    return path;
+                path = path.substring(6);
+                const queryTree = path.split(',').map(f => f.split('.')).reduce((acc, parts) => {
+                    let obj = acc;
+                    let part: string | undefined;
+                    const value = parts.pop();
+                    const last = parts.pop();
+                    if (!last)
+                        return acc;
+                    while ((part = parts.shift())) {
+                        if (typeof obj[part] !== 'object')
+                            obj[part] = {};
+                        obj = obj[part];
+                    }
+                    if (obj[last])
+                        obj[last].push(value);
+                    else
+                        obj[last] = [value];
+                    return acc;
+                }, {} as any);
+                return `/trpc/${JSON.stringify(queryTree)}`;
+            }),
+            tokens.status?.(req, res) ?? '-',
+            tokens.res?.(req, res, 'content-length'), '-',
+            tokens['response-time']?.(req, res), 'ms'
+        ].join(' ');
+    },
     { stream, skip }
 );
