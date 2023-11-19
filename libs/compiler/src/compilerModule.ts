@@ -1,13 +1,12 @@
-// import Transformer from '@klave/as-json/transform/src/index';
-
 export const compilerModuleFunction = () => {
     const load = async () => {
         'use strict';
 
         const { parentPort } = await import('node:worker_threads');
-        const { PassThrough } = await import('node:stream');
 
         try {
+
+            const { PassThrough } = await import('node:stream');
             const { serializeError } = await import('serialize-error');
             const assemblyscript = await import('assemblyscript/dist/asc.js');
 
@@ -67,7 +66,7 @@ export const compilerModuleFunction = () => {
                                     filename,
                                     id: currentReadIdentifier
                                 });
-                            }).catch(() => {
+                            }).catch(async () => {
                                 const resolve = pendingResolves[currentReadIdentifier];
                                 delete pendingResolves[currentReadIdentifier];
                                 return resolve?.(null) ?? Promise.resolve(null);
@@ -118,11 +117,22 @@ export const compilerModuleFunction = () => {
                 }
             });
         } catch (error) {
+            console.error(error);
+            const result = new Error('Compiler service failure');
             parentPort?.postMessage({
                 type: 'errored',
-                error: new Error('Compiler service failure')
+                error: result,
+                stderr: result.toString()
             });
         }
     };
-    load();
+    load()
+        .then(() => {
+            // Process exited successfully
+            process.exit(0);
+        })
+        .catch((error) => {
+            console.error(error);
+            process.exit(1);
+        });
 };
