@@ -23,6 +23,10 @@
                     "apps/hubber/src/assets"
                 ],
                 "generatePackageJson": true,
+                "external": [
+                    "typescript",
+                    "visitor-as"
+                ],
                 "esbuildConfig": "apps/hubber/esbuild.config.js"
             },
             "configurations": {

@@ -12,8 +12,5 @@
     "author": {
         "email": "florian@secretarium.com",
         "name": "Florian Guitton"
-    },
-    "dependencies": {
-        "typescript": "*"
     }
 }
