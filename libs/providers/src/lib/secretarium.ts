@@ -3,7 +3,23 @@ import { prisma } from '@klave/db';
 import { logger } from './logger';
 
 const client = new SCP({
-    logger: process.env['NODE_ENV'] === 'development' ? console : undefined
+    logger: process.env['NODE_ENV'] === 'development' ? {
+        debug: (message: string, obj: any) => {
+            if (obj) {
+                if (obj.requestId && obj.dcapp && obj.function)
+                    logger.debug(`SCP (${obj.requestId}) ${obj.dcapp}/${obj.function}`);
+                else if (obj.state)
+                    logger.debug(`SCP (${obj.requestId}) T> ${obj.state}`);
+                else
+                    logger.debug(`SCP (${obj.requestId}) Q> Result`);
+            }
+            else
+                logger.debug(message);
+        },
+        info: (message: string) => logger.info(message),
+        warn: (message: string) => logger.warn(message),
+        error: (message: string) => logger.error(message)
+    } : undefined
 });
 
 let connectionKey: Key | undefined;
