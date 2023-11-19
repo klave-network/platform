@@ -29,11 +29,14 @@ const ApplicationDeletion = () => {
         setCanSubmit(nameCopy === appSlug);
     }, [nameCopy, appSlug]);
 
-    const deleteApplication = async () => {
-        if (application && appSlug)
-            await mutation.mutateAsync({
-                applicationId: application.id
-            });
+    const deleteApplication = () => {
+        (async () => {
+            if (application && appSlug)
+                await mutation.mutateAsync({
+                    applicationId: application.id
+                });
+        })()
+            .catch(() => { return; });
     };
 
     return <AlertDialog.Root>
@@ -110,10 +113,13 @@ export const AppSettings: FC = () => {
 
     return <div className="flex flex-col gap-10 w-full justify-start mb-7">
         <form
-            onSubmit={methods.handleSubmit(async (data) => {
-                await mutation.mutateAsync({ appId: application.id || '', data });
-                methods.reset();
-            })}
+            onSubmit={() => {
+                methods.handleSubmit(async (data) => {
+                    await mutation.mutateAsync({ appId: application.id || '', data });
+                    methods.reset();
+                })()
+                    .catch(() => { return; });
+            }}
             className="space-y-2 hidden"
         >
             <div className='flex flex-col gap-3'>

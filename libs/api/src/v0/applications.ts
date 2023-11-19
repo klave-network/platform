@@ -150,20 +150,21 @@ export const applicationRouter = createTRPCRouter({
                 try {
                     await scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${appId}`, {
                         app_id: appId
-                    }).send().then((result: any) => {
-                        if (result.kredit === undefined)
-                            throw (new Error('No credits returned'));
-                        return prisma.application.update({
-                            where: {
-                                id: appId
-                            },
-                            data: {
-                                kredits: result.kredit
-                            }
+                    }).send()
+                        .then(async (result: any) => {
+                            if (result.kredit === undefined)
+                                throw (new Error('No credits returned'));
+                            return prisma.application.update({
+                                where: {
+                                    id: appId
+                                },
+                                data: {
+                                    kredits: result.kredit
+                                }
+                            });
+                        }).catch(() => {
+                            // Swallow this error
                         });
-                    }).catch(() => {
-                        // Swallow this error
-                    });
                 } catch (e) {
                     console.error(e);
                     ///
@@ -254,7 +255,7 @@ export const applicationRouter = createTRPCRouter({
                 try {
                     await scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
                         app_id: app.id
-                    }).send().then((result: any) => {
+                    }).send().then(async (result: any) => {
                         if (result.kredit === undefined)
                             throw (new Error('No credits returned'));
                         return prisma.application.update({
@@ -347,109 +348,112 @@ export const applicationRouter = createTRPCRouter({
             if (newConfig === null)
                 throw (new Error('There is no configuration repo'));
 
-            applications.forEach(async appName => {
-                const appSlug = appName.replaceAll(/\W/g, '-').toLocaleLowerCase();
-                const repo = await prisma.repo.upsert({
-                    where: {
-                        source_owner_name: {
+            applications.forEach(appName => {
+                (async () => {
+                    const appSlug = appName.replaceAll(/\W/g, '-').toLocaleLowerCase();
+                    const repo = await prisma.repo.upsert({
+                        where: {
+                            source_owner_name: {
+                                source: 'github',
+                                owner: deployableRepo.owner,
+                                name: deployableRepo.name
+                            }
+                        },
+                        update: {
+                            // TODO: Use zod to validate the config
+                            defaultBranch: deployableRepo.defaultBranch,
+                            config: JSON.parse(newConfig) as any
+                        },
+                        create: {
                             source: 'github',
                             owner: deployableRepo.owner,
-                            name: deployableRepo.name
+                            name: deployableRepo.name,
+                            defaultBranch: deployableRepo.defaultBranch,
+                            // TODO: Use zod to validate the config
+                            config: JSON.parse(newConfig) as any
                         }
-                    },
-                    update: {
-                        // TODO: Use zod to validate the config
-                        defaultBranch: deployableRepo.defaultBranch,
-                        config: JSON.parse(newConfig) as any
-                    },
-                    create: {
-                        source: 'github',
-                        owner: deployableRepo.owner,
-                        name: deployableRepo.name,
-                        defaultBranch: deployableRepo.defaultBranch,
-                        // TODO: Use zod to validate the config
-                        config: JSON.parse(newConfig) as any
-                    }
-                });
-                await prisma.application.create({
-                    data: {
-                        web: {
-                            connect: {
-                                id: webId
-                            }
-                        },
-                        name: appName,
-                        slug: appSlug,
-                        organisation: {
-                            connect: {
-                                id: organisationId
-                            }
-                        },
-                        repo: {
-                            connect: {
-                                id: repo.id
-                            }
-                        },
-                        catogories: [],
-                        tags: [],
-                        // author: webId ?? emphemeralKlaveTag ?? sessionID,
-                        // owner: webId ?? emphemeralKlaveTag ?? sessionID,
-                        permissionGrants: {
-                            create: {
-                                admin: true,
-                                read: true,
-                                write: true,
-                                userId: session.user?.id ?? sessionID
-                            }
-                        }
-                    }
-                });
-
-                const installationOctokit = await probot.auth(parseInt(deployableRepo.installationRemoteId));
-
-                const lastCommits = await installationOctokit.repos.listCommits({
-                    owner: deployableRepo.owner,
-                    repo: deployableRepo.name,
-                    per_page: 2
-                });
-
-                const [afterCommit] = lastCommits.data;
-
-                if (afterCommit === undefined)
-                    throw (new Error('There is no commit'));
-
-                deployToSubstrate({
-                    octokit: installationOctokit,
-                    class: 'push',
-                    type: 'push',
-                    forceDeploy: true,
-                    repo: {
-                        url: afterCommit.html_url,
-                        owner: deployableRepo.owner,
-                        name: deployableRepo.name
-                    },
-                    commit: {
-                        url: afterCommit.html_url,
-                        ref: afterCommit.sha, // TODO: check if this is the right ref
-                        after: afterCommit.sha
-                    },
-                    pusher: {
-                        login: afterCommit.author?.login ?? afterCommit.committer?.login ?? afterCommit.commit.author?.name ?? 'unknown',
-                        avatarUrl: afterCommit.author?.avatar_url ?? 'https://avatars.githubusercontent.com/u/583231?v=4',
-                        htmlUrl: afterCommit.author?.html_url ?? afterCommit.committer?.html_url ?? ''
-                    }
-                });
-
-                if (session.user === undefined)
-                    await new Promise<void>((resolve, reject) => {
-                        sessionStore.set(sessionID, {
-                            ...session
-                        }, (err) => {
-                            if (err)
-                                return reject(err);
-                            return resolve();
-                        });
                     });
+                    await prisma.application.create({
+                        data: {
+                            web: {
+                                connect: {
+                                    id: webId
+                                }
+                            },
+                            name: appName,
+                            slug: appSlug,
+                            organisation: {
+                                connect: {
+                                    id: organisationId
+                                }
+                            },
+                            repo: {
+                                connect: {
+                                    id: repo.id
+                                }
+                            },
+                            catogories: [],
+                            tags: [],
+                            // author: webId ?? emphemeralKlaveTag ?? sessionID,
+                            // owner: webId ?? emphemeralKlaveTag ?? sessionID,
+                            permissionGrants: {
+                                create: {
+                                    admin: true,
+                                    read: true,
+                                    write: true,
+                                    userId: session.user?.id ?? sessionID
+                                }
+                            }
+                        }
+                    });
+
+                    const installationOctokit = await probot.auth(parseInt(deployableRepo.installationRemoteId));
+
+                    const lastCommits = await installationOctokit.repos.listCommits({
+                        owner: deployableRepo.owner,
+                        repo: deployableRepo.name,
+                        per_page: 2
+                    });
+
+                    const [afterCommit] = lastCommits.data;
+
+                    if (afterCommit === undefined)
+                        throw (new Error('There is no commit'));
+
+                    await deployToSubstrate({
+                        octokit: installationOctokit,
+                        class: 'push',
+                        type: 'push',
+                        forceDeploy: true,
+                        repo: {
+                            url: afterCommit.html_url,
+                            owner: deployableRepo.owner,
+                            name: deployableRepo.name
+                        },
+                        commit: {
+                            url: afterCommit.html_url,
+                            ref: afterCommit.sha, // TODO: check if this is the right ref
+                            after: afterCommit.sha
+                        },
+                        pusher: {
+                            login: afterCommit.author?.login ?? afterCommit.committer?.login ?? afterCommit.commit.author?.name ?? 'unknown',
+                            avatarUrl: afterCommit.author?.avatar_url ?? 'https://avatars.githubusercontent.com/u/583231?v=4',
+                            htmlUrl: afterCommit.author?.html_url ?? afterCommit.committer?.html_url ?? ''
+                        }
+                    });
+
+                    if (session.user === undefined)
+                        await new Promise<void>((resolve, reject) => {
+                            sessionStore.set(sessionID, {
+                                ...session
+                            }, (err) => {
+                                if (err)
+                                    return reject(err);
+                                return resolve();
+                            });
+                        });
+                })()
+                    .catch(() => { return; });
             });
 
             return true;

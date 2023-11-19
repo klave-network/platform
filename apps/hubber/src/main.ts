@@ -4,7 +4,7 @@ import './i18n';
 import { dbOps } from './utils/db';
 import { scpOps, githubOps, envOps, dispatchOps, probotOps, logger } from '@klave/providers';
 
-const onlineChain = () => process.env['KLAVE_OFFLINE_DEV'] === 'true'
+const onlineChain = async () => process.env['KLAVE_OFFLINE_DEV'] === 'true'
     ? Promise.resolve()
     : Promise.resolve()
         .then(dispatchOps.initialize)
@@ -30,7 +30,8 @@ dbOps.initialize()
 
         server.on('error', (error) => {
             logger.error(error);
-            dbOps.stop();
+            dbOps.stop()
+                .catch(() => { return; });
         });
 
         startPruner();

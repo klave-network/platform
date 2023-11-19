@@ -11,7 +11,13 @@ import { useToggle } from 'usehooks-ts';
 // Make sure to call loadStripe outside of a component’s render to avoid
 // recreating the Stripe object on every render.
 // This is your test publishable API key.
-const stripePromise = loadStripe(import.meta.env['VITE_KLAVE_STRIPE_KEY'] ?? '');
+let stripePromise: ReturnType<typeof loadStripe>;
+
+const initialiseStripe = async () => {
+    if (stripePromise === undefined)
+        stripePromise = loadStripe(import.meta.env['VITE_KLAVE_STRIPE_KEY'] ?? '');
+    return stripePromise;
+};
 
 const CheckoutForm = () => {
 
@@ -29,7 +35,7 @@ const CheckoutForm = () => {
         return <UilSpinner className='inline-block animate-spin' />;
 
     return <EmbeddedCheckoutProvider
-        stripe={stripePromise}
+        stripe={initialiseStripe()}
         options={{
             clientSecret,
             onComplete: () => {
@@ -104,16 +110,19 @@ const CreditCellEdit: FC<{
             setCurrentValue(sanitized);
     };
 
-    const allocateCredit = async () => {
-        await mutateAsync({
-            applicationId: id,
-            amount: parseFloat(currentValue) * 10_000
-        });
-        await orgAPIUtils.getAll.invalidate();
-        await orgAPIUtils.getBySlug.invalidate();
-        await appAPIUtils.getAll.invalidate();
-        await appAPIUtils.getByOrganisation.invalidate();
-        toggleEditing();
+    const allocateCredit = () => {
+        (async () => {
+            await mutateAsync({
+                applicationId: id,
+                amount: parseFloat(currentValue) * 10_000
+            });
+            await orgAPIUtils.getAll.invalidate();
+            await orgAPIUtils.getBySlug.invalidate();
+            await appAPIUtils.getAll.invalidate();
+            await appAPIUtils.getByOrganisation.invalidate();
+            toggleEditing();
+        })()
+            .catch(() => { return; });
     };
 
     if (isEditing)
@@ -151,7 +160,8 @@ export const OrganisationSettings: FC = () => {
             setSearchParams({
                 paymentCompleted: 'true'
             });
-            refetchOrganisation();
+            refetchOrganisation()
+                .catch(() => { return; });
         }
     }, [isReturningFromCheckout, checkoutSessionStatus]);
 

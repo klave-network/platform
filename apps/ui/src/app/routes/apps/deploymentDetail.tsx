@@ -24,7 +24,7 @@ export const AppDeploymentDetail: FC = () => {
 
         crypto.subtle.digest('SHA-256', Utils.fromBase64(deployment.buildOutputWASM)).then((hash) => {
             setWASMFingerprint(Utils.toHex(new Uint8Array(hash)));
-        });
+        }).catch(() => { return; });
 
     }, [deployment?.buildOutputWASM]);
 

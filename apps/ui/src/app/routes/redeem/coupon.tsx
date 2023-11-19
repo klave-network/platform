@@ -18,10 +18,13 @@ export const RedeemCreditCoupon: FC = () => {
             navigate('/');
     }, [sessionData, code, navigate]);
 
-    const startRedeeming = async () => {
-        if (typeof code === 'string' && validate(code))
-            await mutateAsync({ code });
-        setRedeemed(true);
+    const startRedeeming = () => {
+        (async () => {
+            if (typeof code === 'string' && validate(code))
+                await mutateAsync({ code });
+            setRedeemed(true);
+        })()
+            .catch(() => { return; });
     };
 
     if (!sessionData?.me)

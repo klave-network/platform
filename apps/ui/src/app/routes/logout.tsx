@@ -11,10 +11,11 @@ export const Logout: FC = () => {
     useEffect(() => {
         if (isIdle)
             mutateAsync()
-                .then(() => invalidate())
+                .then(async () => invalidate())
                 .then(() => {
                     navigate('/');
-                });
+                })
+                .catch(() => { return; });
     }, [invalidate, isIdle, mutateAsync, navigate]);
 
     return <div id="login">

@@ -22,8 +22,10 @@ const DomainDeletion: FC<DomainContextProps> = ({ domain: { id } }) => {
         }
     });
 
-    const deleteDomain = async (domainId: Domain['id']) => {
-        await mutation.mutateAsync({ domainId });
+    const deleteDomain = (domainId: Domain['id']) => {
+        (async () => {
+            await mutation.mutateAsync({ domainId });
+        })().catch(() => { return; });
     };
 
     return <AlertDialog.Root>
@@ -66,8 +68,10 @@ const DomainRecord: FC<DomainRecordProps> = ({ domain }) => {
         }
     });
 
-    const validate = async (domainId: Domain['id']) => {
-        await mutation.mutateAsync({ domainId });
+    const validate = (domainId: Domain['id']) => {
+        (async () => {
+            await mutation.mutateAsync({ domainId });
+        })().catch(() => { return; });
     };
 
     return <tr>
@@ -120,8 +124,10 @@ const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
         }
     });
 
-    const validate = async (domainId: Domain['id']) => {
-        await verifyMutation.mutateAsync({ domainId });
+    const validate = (domainId: Domain['id']) => {
+        (async () => {
+            await verifyMutation.mutateAsync({ domainId });
+        })().catch(() => { return; });
     };
 
     const methods = useZodForm({
@@ -135,7 +141,7 @@ const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
 
     if (createMutation.data)
         return <div>
-            <div className='mb-4' onClick={() => navigator.clipboard.writeText(createMutation.data.token)}>
+            <div className='mb-4' onClick={() => { navigator.clipboard.writeText(createMutation.data.token).catch(() => { return; }); }}>
                 <span className='block'>To verify ownership of the domain please create a TXT record for <b>.{createMutation.data.fqdn}</b> on your DNS.</span>
                 <span className='block rounded-md font-mono cursor-pointer px-1 py-2 bg-slate-200 dark:bg-slate-800 border hover:border-slate-500'>{createMutation.data.token}</span>
             </div>
@@ -158,13 +164,18 @@ const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
         </div>;
 
     return <form
-        onSubmit={methods.handleSubmit(async (data) => {
-            await createMutation.mutateAsync({
-                applicationId: application.id,
-                ...data
-            });
-            methods.reset();
-        })}
+        onSubmit={() => {
+            methods.handleSubmit((data) => {
+                (async () => {
+                    await createMutation.mutateAsync({
+                        applicationId: application.id,
+                        ...data
+                    });
+                    methods.reset();
+                })().catch(() => { return; });
+            })()
+                .catch(() => { return; });
+        }}
         className="space-y-2"
     >
         <div>

@@ -20,13 +20,13 @@ export const Select: FC = () => {
     useEffect(() => {
 
         if (error?.message === 'Credentials refresh required')
-            invalidate().then(() => navigate('/deploy'));
+            invalidate().then(() => navigate('/deploy')).catch(() => { return; });
 
     }, [error, invalidate, navigate]);
 
     const rescanRepos = () => {
         if (shouldRefresh)
-            refetch();
+            refetch().catch(() => { return; });
         else
             setShouldRefresh(true);
     };

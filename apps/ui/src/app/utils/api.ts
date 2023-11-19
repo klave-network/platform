@@ -14,7 +14,7 @@ export const apiClientOptions = {
     links: [
         httpBatchLink({
             url: `${import.meta.env['VITE_KLAVE_API_URL']}/trpc`,
-            fetch(url, options) {
+            fetch: async (url, options) => {
                 return fetch(url, {
                     ...options,
                     credentials: 'include'

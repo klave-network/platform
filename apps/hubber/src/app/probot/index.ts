@@ -194,7 +194,8 @@ const probotApp = (app: Probot) => {
                     avatarUrl: context.payload.sender.avatar_url,
                     htmlUrl: context.payload.sender.html_url
                 }
-            });
+            })
+                .catch(() => { return; });
 
         if (context.name === 'repository') {
             await prisma.repo.updateMany({

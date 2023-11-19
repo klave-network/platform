@@ -189,15 +189,17 @@ export const deploymentRouter = createTRPCRouter({
             await scp.newTx('wasm-manager', 'deactivate_instance', `klave-termination-${deploymentId}`, {
                 app_id: dep.applicationId,
                 fqdn: dep.deploymentAddress?.fqdn
-            }).onExecuted(async () => {
-                await prisma.deployment.update({
-                    where: {
-                        id: deploymentId
-                    },
-                    data: {
-                        status: 'terminated'
-                    }
-                });
+            }).onExecuted(() => {
+                (async () => {
+                    await prisma.deployment.update({
+                        where: {
+                            id: deploymentId
+                        },
+                        data: {
+                            status: 'terminated'
+                        }
+                    });
+                })().catch(() => { return; });
             }).onError((error: any) => {
                 console.error('Secretarium failed', error);
                 // Timeout will eventually error this
@@ -259,38 +261,43 @@ export const deploymentRouter = createTRPCRouter({
                 .concat(`${existing.applicationId.split('-').shift()}.sta.klave.network`);
 
 
-            targets.forEach(async target => {
+            targets.forEach(target => {
 
-                const deployment = await prisma.deployment.create({
-                    data: {
-                        ...existing,
-                        id: undefined,
-                        set: uuid(),
-                        expiresOn: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
-                        createdAt: undefined,
-                        updatedAt: undefined,
-                        applicationId: undefined,
-                        application: {
-                            connect: {
-                                id: existing.applicationId
-                            }
-                        },
-                        deploymentAddress: {
-                            create: {
-                                fqdn: target
-                            }
-                        },
-                        life: 'long'
-                    },
-                    include: {
-                        deploymentAddress: true
-                    }
-                });
+                (async () => {
 
-                sendToSecretarium({
-                    deployment,
-                    target
-                });
+                    const deployment = await prisma.deployment.create({
+                        data: {
+                            ...existing,
+                            id: undefined,
+                            set: uuid(),
+                            expiresOn: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+                            createdAt: undefined,
+                            updatedAt: undefined,
+                            applicationId: undefined,
+                            application: {
+                                connect: {
+                                    id: existing.applicationId
+                                }
+                            },
+                            deploymentAddress: {
+                                create: {
+                                    fqdn: target
+                                }
+                            },
+                            life: 'long'
+                        },
+                        include: {
+                            deploymentAddress: true
+                        }
+                    });
+
+                    await sendToSecretarium({
+                        deployment,
+                        target
+                    });
+                })()
+                    .catch(() => { return; });
+
             });
 
             return;

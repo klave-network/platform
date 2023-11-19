@@ -28,11 +28,14 @@ const OrganisationDeletion = () => {
         setCanSubmit(nameCopy === orgSlug);
     }, [nameCopy, orgSlug]);
 
-    const deleteOrganisation = async () => {
-        if (organisation)
-            await mutation.mutateAsync({
-                organisationId: organisation.id
-            });
+    const deleteOrganisation = () => {
+        (async () => {
+            if (organisation)
+                await mutation.mutateAsync({
+                    organisationId: organisation.id
+                });
+        })()
+            .catch(() => { return; });
     };
 
     return <AlertDialog.Root>
@@ -107,10 +110,13 @@ export const OrganisationSettings: FC = () => {
 
     return <div className="flex flex-col gap-10 w-full justify-start mb-7">
         <form
-            onSubmit={methods.handleSubmit(async (data) => {
-                await mutation.mutateAsync({ orgSlug: orgSlug || '', data });
-                methods.reset();
-            })}
+            onSubmit={() => {
+                methods.handleSubmit(async (data) => {
+                    await mutation.mutateAsync({ orgSlug: orgSlug || '', data });
+                    methods.reset();
+                })()
+                    .catch(() => { return; });
+            }}
             className="space-y-2 hidden"
         >
             <div className='flex flex-col gap-3'>

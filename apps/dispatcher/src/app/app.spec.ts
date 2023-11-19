@@ -4,9 +4,9 @@ import { app } from './app';
 describe('GET /', () => {
     let server: FastifyInstance;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         server = Fastify();
-        server.register(app);
+        await server.register(app);
     });
 
     it('should respond with a 404', async () => {

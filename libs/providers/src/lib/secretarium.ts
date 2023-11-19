@@ -29,7 +29,8 @@ const planReconnection = async () => {
 client.onStateChange((state) => {
     lastSCPState = state;
     if (lastSCPState !== Constants.ConnectionState.secure && lastSCPState !== Constants.ConnectionState.connecting)
-        planReconnection();
+        planReconnection()
+            .catch(() => { return; });
 });
 
 export const scpOps = {

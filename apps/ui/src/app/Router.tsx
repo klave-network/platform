@@ -29,7 +29,7 @@ import RedeemCreditCoupon from './routes/redeem/coupon';
 import Providers from './Providers';
 import { httpApi } from './utils/api';
 
-const getUserData = () => httpApi.v0.auth.getSession.query();
+const getUserData = async () => httpApi.v0.auth.getSession.query();
 
 const router = sentryCreateBrowserRouter(
     createRoutesFromElements(

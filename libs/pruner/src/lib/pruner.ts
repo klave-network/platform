@@ -39,40 +39,42 @@ async function cleanDisconnectedDeployments() {
         }
     });
 
-    selectTargets.forEach(async ({ fqdn }) => {
-        const deploymentsList = await prisma.deployment.findMany({
-            where: {
-                status: {
-                    in: ['deployed']
+    selectTargets.forEach(({ fqdn }) => {
+        (async () => {
+            const deploymentsList = await prisma.deployment.findMany({
+                where: {
+                    status: {
+                        in: ['deployed']
+                    },
+                    // TODO Check this is the correct behaviour for long lived deployments
+                    life: 'short',
+                    deploymentAddress: {
+                        fqdn
+                    }
                 },
-                // TODO Check this is the correct behaviour for long lived deployments
-                life: 'short',
-                deploymentAddress: {
-                    fqdn
+                select: {
+                    id: true,
+                    createdAt: true
                 }
-            },
-            select: {
-                id: true,
-                createdAt: true
-            }
-        });
-        if (deploymentsList.length > 1) {
-            const sortedDeployments = deploymentsList.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-            await Promise.allSettled(sortedDeployments.map((deployment) => {
-                const caller = router.v0.deployments.createCaller({
-                    prisma,
-                    session: {},
-                    override: '__system_pruner_cleaner'
-                } as any);
-                return caller.delete({
-                    deploymentId: deployment.id
-                });
-            })).catch((e) => {
-                logger.error('Error while cleaning leaf deployments ', e);
             });
-        }
+            if (deploymentsList.length > 1) {
+                const sortedDeployments = deploymentsList.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+                await Promise.allSettled(sortedDeployments.map(async (deployment) => {
+                    const caller = router.v0.deployments.createCaller({
+                        prisma,
+                        session: {},
+                        override: '__system_pruner_cleaner'
+                    } as any);
+                    return caller.delete({
+                        deploymentId: deployment.id
+                    });
+                })).catch((e) => {
+                    logger.error('Error while cleaning leaf deployments ', e);
+                });
+            }
+        })()
+            .catch(() => { return; });
     });
-
 }
 
 async function terminateExpiredDeployments() {
@@ -87,7 +89,7 @@ async function terminateExpiredDeployments() {
             }
         }
     });
-    return Promise.allSettled(expiredDeploymentList.map((deployment) => {
+    return Promise.allSettled(expiredDeploymentList.map(async (deployment) => {
         const caller = router.v0.deployments.createCaller({
             prisma,
             session: {},
@@ -117,7 +119,7 @@ async function cancelUpdatingDeployments() {
             }
         }
     });
-    return Promise.allSettled(expiredDeploymentList.map((deployment) => {
+    return Promise.allSettled(expiredDeploymentList.map(async (deployment) => {
         return prisma.deployment.update({
             where: {
                 id: deployment.id
@@ -148,18 +150,18 @@ async function reconcileApplicationKredits() {
         }
     });
 
-    return Promise.allSettled(applicationsWithDeployments.map((application) => {
+    return Promise.allSettled(applicationsWithDeployments.map(async (application) => {
         return new Promise((resolve, reject) => {
             if (!scpOps.isConnected())
                 return reject('Secretarium is not connected');
             new Promise<unknown>((resolve, reject) => {
                 scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${application.id}`, {
                     app_id: application.id
-                }).onResult(async (result: any) => {
+                }).onResult((result: any) => {
                     resolve(result);
                 }).onError((error: any) => {
                     reject(error);
-                }).send();
+                }).send().catch(reject);
             })
                 .then((kredits) => {
                     if (!kredits)
@@ -174,7 +176,8 @@ async function reconcileApplicationKredits() {
                             kredits: kredit
                         }
                     }).then(resolve).catch(reject);
-                });
+                })
+                .catch(reject);
         });
     })).catch((e) => {
         logger.error('Error while reconciling application credit allications', e);
@@ -199,9 +202,9 @@ type PrunerOptions = {
 
 export function startPruner(options?: PrunerOptions) {
     const { interval = 6000 } = options ?? {};
-    prune();
+    prune().catch(() => { return; });
     intervalTimer = setInterval(() => {
-        prune();
+        prune().catch(() => { return; });
     }, interval);
 }
 

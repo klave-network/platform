@@ -326,7 +326,8 @@ export const organisationRouter = createTRPCRouter({
                     resolve(result);
                 }).onError(error => {
                     reject(error);
-                }).send();
+                }).send()
+                    .catch(reject);
             });
         })
 });

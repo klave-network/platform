@@ -20,8 +20,10 @@ export const DeploymentPromotion: FC<DeploymentContextProps> = ({ deployment: { 
         }
     });
 
-    const promoteDeployment = async (deploymentId: Deployment['id']) => {
-        await mutation.mutateAsync({ deploymentId });
+    const promoteDeployment = (deploymentId: Deployment['id']) => {
+        (async () => {
+            await mutation.mutateAsync({ deploymentId });
+        })().catch(() => { return; });
     };
 
     return <AlertDialog.Root>
@@ -63,9 +65,11 @@ export const DeploymentDeletion: FC<DeploymentContextProps> = ({ deployment: { i
         }
     });
 
-    const deleteDeployment = async (deploymentId: Deployment['id']) => {
-        await mutation.mutateAsync({ deploymentId });
-        navigate(`/${orgSlug}/${appSlug}/deployments`);
+    const deleteDeployment = (deploymentId: Deployment['id']) => {
+        (async () => {
+            await mutation.mutateAsync({ deploymentId });
+            navigate(`/${orgSlug}/${appSlug}/deployments`);
+        })().catch(() => { return; });
     };
 
     return <AlertDialog.Root>

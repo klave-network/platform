@@ -68,17 +68,20 @@ export const Login: FC = () => {
                             <br />
                             <br />
                             <form
-                                onSubmit={methods.handleSubmit(async (data) => {
-                                    await updateSlug(data, {
-                                        onSuccess(data) {
-                                            if (data?.ok) {
-                                                refetchSession();
-                                                navigate('/');
+                                onSubmit={() => {
+                                    methods.handleSubmit(async (data) => {
+                                        await updateSlug(data, {
+                                            onSuccess(data) {
+                                                if (data?.ok) {
+                                                    refetchSession().catch(() => { return; });
+                                                    navigate('/');
+                                                }
                                             }
-                                        }
-                                    });
-                                    methods.reset();
-                                })}
+                                        });
+                                        methods.reset();
+                                    })()
+                                        .catch(() => { return; });
+                                }}
                                 className="space-y-2"
                             >
                                 <div className='flex flex-col gap-3'>

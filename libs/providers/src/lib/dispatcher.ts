@@ -30,19 +30,25 @@ export const dispatchOps = {
                     hookSocket.ping();
                 }, 30000);
             });
-            hookSocket.addEventListener('error', async (event) => {
-                logger.error(`Connection ${++reconnectAttempt} to dispatcher failed: ${event.message}`);
-                if (pingInterval)
-                    clearInterval(pingInterval);
-                pingInterval = undefined;
-                await planReconnection();
+            hookSocket.addEventListener('error', (event) => {
+                (async () => {
+                    logger.error(`Connection ${++reconnectAttempt} to dispatcher failed: ${event.message}`);
+                    if (pingInterval)
+                        clearInterval(pingInterval);
+                    pingInterval = undefined;
+                    await planReconnection();
+                })()
+                    .catch(() => { return; });
             });
-            hookSocket.addEventListener('close', async (event) => {
-                logger.error(`Connection ${++reconnectAttempt} to dispatcher has been closed: ${event.code} ${event.reason}`);
-                if (pingInterval)
-                    clearInterval(pingInterval);
-                pingInterval = undefined;
-                await planReconnection();
+            hookSocket.addEventListener('close', (event) => {
+                (async () => {
+                    logger.error(`Connection ${++reconnectAttempt} to dispatcher has been closed: ${event.code} ${event.reason}`);
+                    if (pingInterval)
+                        clearInterval(pingInterval);
+                    pingInterval = undefined;
+                    await planReconnection();
+                })()
+                    .catch(() => { return; });
             });
             hookSocket.addEventListener('message', (event) => {
                 const message = JSON.parse(event.data.toString()) as any;

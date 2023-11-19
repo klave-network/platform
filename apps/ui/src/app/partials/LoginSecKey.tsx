@@ -46,7 +46,8 @@ export const LoginSecKey: FC = () => {
 
     useEffect(() => {
         if (debouncedEmail.length > 0)
-            refetchEmailHint();
+            refetchEmailHint()
+                .catch(() => { return; });
     }, [debouncedEmail, refetchEmailHint]);
 
     useEffect(() => {
@@ -119,14 +120,14 @@ export const LoginSecKey: FC = () => {
         if (credentials?.includes(email)) {
             refetchAuthOptions()
                 .then((res) => res.data)
-                .then((options) => {
+                .then(async (options) => {
                     if (options) {
                         setIsRequestingWebauthnInput(true);
                         return startAuthentication(options);
                     }
                     throw new Error('No authentication options available');
                 })
-                .then((auth) => new Promise<any>((resolve, reject) => {
+                .then(async (auth) => new Promise<any>((resolve, reject) => {
                     validateWebauthnMutation({
                         email,
                         data: auth
@@ -143,7 +144,8 @@ export const LoginSecKey: FC = () => {
                                     from: undefined
                                 }
                             });
-                        refetchSession();
+                        refetchSession()
+                            .catch(() => { return; });
                         return;
                     }
                     if (res?.error) {
@@ -163,14 +165,14 @@ export const LoginSecKey: FC = () => {
                 return getLoginCode();
             refetchRegistrationOptions()
                 .then((res) => res.data)
-                .then((options) => {
+                .then(async (options) => {
                     if (options) {
                         setIsRequestingWebauthnInput(true);
                         return startRegistration(options);
                     }
                     throw new Error('No registration options available');
                 })
-                .then((reg) => new Promise((resolve, reject) => {
+                .then(async (reg) => new Promise((resolve, reject) => {
                     registerWebauthnMutation({
                         email,
                         data: reg
@@ -188,7 +190,8 @@ export const LoginSecKey: FC = () => {
                                     from: undefined
                                 }
                             });
-                        refetchSession();
+                        refetchSession()
+                            .catch(() => { return; });
                         return;
                     }
                     if (res?.error) {
@@ -227,7 +230,8 @@ export const LoginSecKey: FC = () => {
                         setPerformedEmailCheck(true);
                         setScreen('start');
                     } else
-                        refetchSession();
+                        refetchSession()
+                            .catch(() => { return; });
                 } else
                     setError('An error occured while trying to log you in. Please try again later.');
             }

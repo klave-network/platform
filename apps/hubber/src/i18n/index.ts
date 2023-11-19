@@ -21,6 +21,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
         });
 
     return i18n;
-})();
+})()
+    .catch(() => { return; });
 
 export default i18n;

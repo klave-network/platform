@@ -15,7 +15,7 @@ const compile = () => {
         const parsingOutput = schema.safeParse(JSON.parse(configContent));
 
         if (parsingOutput.success)
-            Promise.allSettled(parsingOutput.data.applications.map((app, index) =>
+            Promise.allSettled(parsingOutput.data.applications.map(async (app, index) =>
                 new Promise<void>((resolve, reject) => {
                     const appPathRoot = path.join(CWD, app.rootDir ?? parsingOutput.data.rootDir ?? '.');
                     let appPath = path.join(appPathRoot, app.index ?? '');
@@ -62,7 +62,7 @@ const compile = () => {
                             } else if (message.type === 'errored') {
                                 compiler.terminate().finally(() => {
                                     reject(message.error);
-                                });
+                                }).catch(reject);
                             } else if (message.type === 'done') {
                                 resolve();
                             }
@@ -76,7 +76,8 @@ const compile = () => {
                         process.exit(1);
                     } else
                         process.exit(0);
-                });
+                })
+                .catch(() => { return; });
         else
             console.error(parsingOutput.error.flatten());
     } catch (e) {

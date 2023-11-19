@@ -4,7 +4,7 @@ import { readFileSync } from 'fs';
 // for the test files to be compiled by SWC
 const { exclude: __unusedExclude, ...swcJestConfig } = JSON.parse(
     readFileSync(`${__dirname}/.swcrc`, 'utf-8')
-);
+) as any;
 
 // disable .swcrc look-up by SWC core because we're passing in swcJestConfig ourselves.
 // If we do not disable this, SWC Core will read .swcrc and won't transform our test files due to "exclude"

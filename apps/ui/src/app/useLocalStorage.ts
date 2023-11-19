@@ -27,7 +27,7 @@ export function useLocalForage<D>(key: string, initialValue: D, errorHandler?: E
             } catch (e) {
                 error(e as Error);
             }
-        })();
+        })().catch(error);
     }, []);
 
     const setValue = useCallback((value: any) => {
@@ -40,7 +40,7 @@ export function useLocalForage<D>(key: string, initialValue: D, errorHandler?: E
             }
         }
 
-        set(value);
+        set(value).catch(error);
     }, [key]);
 
     const removeValue = useCallback(() => {
@@ -53,7 +53,7 @@ export function useLocalForage<D>(key: string, initialValue: D, errorHandler?: E
             }
         }
 
-        remove();
+        remove().catch(error);
     }, [key]);
 
     return [storedValue, setValue, removeValue] as const;

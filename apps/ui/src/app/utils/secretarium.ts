@@ -21,7 +21,8 @@ const syncNodeInfo = async () => {
 };
 
 setInterval(() => {
-    syncNodeInfo();
+    syncNodeInfo()
+        .catch(() => { return; });
 }, 1000 * 60 * 5);
 
 interface State<T> {

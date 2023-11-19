@@ -48,10 +48,13 @@ export const OrgNew: FC = () => {
         </div>
         <div className="sm:p-7 p-4">
             <form
-                onSubmit={methods.handleSubmit(async (data) => {
-                    await mutation.mutateAsync({ slug: orgSlug || '', data });
-                    methods.reset();
-                })}
+                onSubmit={() => {
+                    methods.handleSubmit(async (data) => {
+                        await mutation.mutateAsync({ slug: orgSlug || '', data });
+                        methods.reset();
+                    })()
+                        .catch(() => { return; });
+                }}
                 className="space-y-2"
             >
                 <div className='flex flex-col gap-3'>

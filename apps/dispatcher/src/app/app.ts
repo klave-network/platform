@@ -83,7 +83,8 @@ export async function app(fastify: FastifyInstance) {
                 return prev;
             }, {} as Record<string, number>);
 
-        res.status(Object.values(statuses).find(status => status === 200) ? 207 : 500).send({ ok: true, statuses });
+        await res.status(Object.values(statuses).find(status => status === 200) ? 207 : 500)
+            .send({ ok: true, statuses });
 
     });
 }

@@ -45,7 +45,10 @@ export const LoginQR: FC = () => {
             case 'confirmed':
                 fetch(`${import.meta.env['VITE_KLAVE_API_URL']}/login/print`, {
                     credentials: 'include'
-                }).then(res => res.json()).then(udata => login(udata));
+                })
+                    .then(async res => res.json())
+                    .then(udata => login(udata))
+                    .catch(() => { return; });
                 break;
         }
     }, [lastMessage, login, sendMessage]);

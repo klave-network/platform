@@ -32,16 +32,16 @@ const typescriptRules = {
     '@typescript-eslint/no-unused-vars': [
         'error',
         { args: 'after-used', varsIgnorePattern: '^__unused' }
-    ]
+    ],
+    '@typescript-eslint/no-floating-promises': 'error',
+    '@typescript-eslint/promise-function-async': 'error',
+    '@typescript-eslint/no-misused-promises': 'error'
 };
 
 module.exports = {
     root: true,
     parserOptions: {
         tsconfigRootDir: __dirname,
-        project: [
-            './tsconfig.eslint.json'
-        ],
         EXPERIMENTAL_useProjectService: true
     },
     ignorePatterns: [
@@ -60,7 +60,12 @@ module.exports = {
         {
             files: ['*.ts', '*.tsx'],
             extends: ['plugin:@nx/typescript'],
-            rules: typescriptRules
+            rules: typescriptRules,
+            parserOptions: {
+                project: [
+                    './tsconfig.eslint.json'
+                ]
+            }
         },
         {
             files: ['*.js', '*.jsx'],

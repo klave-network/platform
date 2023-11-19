@@ -128,313 +128,322 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
     //     return prev;
     // }, {} as Record<string, any['applications'][number]>);
 
-    repo.applications.forEach(async application => {
+    repo.applications.forEach(application => {
 
-        // Bail out if the application is not in the running configuration
-        if (!availableApplicationsConfig[application.name])
-            return;
+        (async () => {
 
-        // TODO There is typing error in this location
-        const fileChanged = files.filter(({ filename }) => {
-            const commitFileDir = path.normalize(path.join('/', filename));
-            const appPath = path.normalize(path.join('/', availableApplicationsConfig[application.name]?.rootDir ?? ''));
-            return commitFileDir.startsWith(appPath) || filename === 'klave.json';
-        });
+            // Bail out if the application is not in the running configuration
+            if (!availableApplicationsConfig[application.name])
+                return;
 
-        if (fileChanged.length === 0 && !context.forceDeploy)
-            return;
+            // TODO There is typing error in this location
+            const fileChanged = files.filter(({ filename }) => {
+                const commitFileDir = path.normalize(path.join('/', filename));
+                const appPath = path.normalize(path.join('/', availableApplicationsConfig[application.name]?.rootDir ?? ''));
+                return commitFileDir.startsWith(appPath) || filename === 'klave.json';
+            });
 
-        logger.info(`Deploying ${application.name} from ${context.commit.after}`);
+            if (fileChanged.length === 0 && !context.forceDeploy)
+                return;
 
-        await prisma.activityLog.create({
-            data: {
-                class: 'pushHook',
-                application: {
-                    connect: {
-                        id: application.id
+            logger.info(`Deploying ${application.name} from ${context.commit.after}`);
+
+            await prisma.activityLog.create({
+                data: {
+                    class: 'pushHook',
+                    application: {
+                        connect: {
+                            id: application.id
+                        }
+                    },
+                    context: {
+                        type: context.type,
+                        payload: context
                     }
-                },
-                context: {
-                    type: context.type,
-                    payload: context
-                }
-            }
-        });
-
-        const launchDeploy = async () => {
-
-            const branchName = context.commit.ref?.includes('/') ? context.commit.ref.split('/').pop() : repo.defaultBranch ?? 'master';
-            const buildId = context.commit.after.substring(0, 8);
-            const domains = await prisma.domain.findMany({
-                where: {
-                    applicationId: application.id,
-                    verified: true
                 }
             });
 
-            const deploymentSet = uuid();
-            const applicationId = application.id.split('-').shift();
-            const targets = domains
-                .map(domain => `${branchName}.${domain.fqdn}`)
-                .concat(`${branchName}.${applicationId}.sta.klave.network`, `${buildId}.${applicationId}.sta.klave.network`);
+            const launchDeploy = async () => {
 
-            targets.forEach(async target => {
+                const branchName = context.commit.ref?.includes('/') ? context.commit.ref.split('/').pop() : repo.defaultBranch ?? 'master';
+                const buildId = context.commit.after.substring(0, 8);
+                const domains = await prisma.domain.findMany({
+                    where: {
+                        applicationId: application.id,
+                        verified: true
+                    }
+                });
 
-                let contextualDeploymentId: string | undefined;
+                const deploymentSet = uuid();
+                const applicationId = application.id.split('-').shift();
+                const targets = domains
+                    .map(domain => `${branchName}.${domain.fqdn}`)
+                    .concat(`${branchName}.${applicationId}.sta.klave.network`, `${buildId}.${applicationId}.sta.klave.network`);
 
-                try {
-                    const previousDeployment = await prisma.deployment.findFirst({
-                        where: {
-                            deploymentAddress: {
-                                fqdn: target
-                            },
-                            status: {
-                                not: 'errored'
-                            }
-                        },
-                        include: {
-                            deploymentAddress: true
-                        }
-                    });
+                targets.forEach(target => {
 
-                    if (previousDeployment)
-                        await prisma.deployment.update({
-                            where: {
-                                id: previousDeployment.id
-                            },
-                            data: {
-                                status: 'updating'
-                            }
-                        });
+                    (async () => {
 
-                    const deployment = await prisma.deployment.create({
-                        data: {
-                            deploymentAddress: {
-                                create: {
-                                    fqdn: target
+                        let contextualDeploymentId: string | undefined;
+
+                        try {
+                            const previousDeployment = await prisma.deployment.findFirst({
+                                where: {
+                                    deploymentAddress: {
+                                        fqdn: target
+                                    },
+                                    status: {
+                                        not: 'errored'
+                                    }
+                                },
+                                include: {
+                                    deploymentAddress: true
                                 }
-                            },
-                            expiresOn: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
-                            version: availableApplicationsConfig[application.name]?.version,
-                            set: deploymentSet,
-                            build: context.commit.after.substring(0, 8),
-                            branch: branchName,
-                            locations: ['FR'],
-                            application: {
-                                connect: { id: application.id }
-                            }
-                            // TODO: Make sure we get the push event
-                            // pushEvent
-                        }
-                    });
-
-                    contextualDeploymentId = deployment.id;
-
-                    await prisma.activityLog.create({
-                        data: {
-                            class: 'deployment',
-                            application: {
-                                connect: {
-                                    id: application.id
-                                }
-                            },
-                            context: {
-                                type: 'start',
-                                payload: {
-                                    deploymentId: deployment.id
-                                }
-                            }
-                        }
-                    });
-
-                    (new Promise((__unusedResolve, reject) => {
-                        setTimeout(reject, 60000);
-                        return prisma.deployment.update({
-                            where: {
-                                id: deployment.id
-                            },
-                            data: {
-                                status: 'deploying'
-                            }
-                        });
-                    })).catch(async () => {
-                        const currentState = await prisma.deployment.findUnique({
-                            where: {
-                                id: deployment.id
-                            }
-                        });
-                        if (currentState?.status !== 'deployed' && currentState?.status !== 'errored') {
-                            logger.debug(`Deployment ${deployment.id} timed out`, {
-                                parent: 'dpl'
                             });
-                            if (previousDeployment) {
+
+                            if (previousDeployment)
                                 await prisma.deployment.update({
                                     where: {
                                         id: previousDeployment.id
                                     },
                                     data: {
-                                        status: previousDeployment.status
+                                        status: 'updating'
                                     }
-                                }).catch((reason) => {
-                                    logger.debug(`Error while updating previous deployment ${previousDeployment.id} status`, {
-                                        parent: 'dpl',
-                                        reason
-                                    });
                                 });
-                            }
+
+                            const deployment = await prisma.deployment.create({
+                                data: {
+                                    deploymentAddress: {
+                                        create: {
+                                            fqdn: target
+                                        }
+                                    },
+                                    expiresOn: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
+                                    version: availableApplicationsConfig[application.name]?.version,
+                                    set: deploymentSet,
+                                    build: context.commit.after.substring(0, 8),
+                                    branch: branchName,
+                                    locations: ['FR'],
+                                    application: {
+                                        connect: { id: application.id }
+                                    }
+                                    // TODO: Make sure we get the push event
+                                    // pushEvent
+                                }
+                            });
+
+                            contextualDeploymentId = deployment.id;
+
+                            await prisma.activityLog.create({
+                                data: {
+                                    class: 'deployment',
+                                    application: {
+                                        connect: {
+                                            id: application.id
+                                        }
+                                    },
+                                    context: {
+                                        type: 'start',
+                                        payload: {
+                                            deploymentId: deployment.id
+                                        }
+                                    }
+                                }
+                            });
+
+                            (new Promise((__unusedResolve, reject) => {
+                                setTimeout(reject, 60000);
+                                prisma.deployment.update({
+                                    where: {
+                                        id: deployment.id
+                                    },
+                                    data: {
+                                        status: 'deploying'
+                                    }
+                                }).catch(reject);
+                            })).catch(async () => {
+                                const currentState = await prisma.deployment.findUnique({
+                                    where: {
+                                        id: deployment.id
+                                    }
+                                });
+                                if (currentState?.status !== 'deployed' && currentState?.status !== 'errored') {
+                                    logger.debug(`Deployment ${deployment.id} timed out`, {
+                                        parent: 'dpl'
+                                    });
+                                    if (previousDeployment) {
+                                        await prisma.deployment.update({
+                                            where: {
+                                                id: previousDeployment.id
+                                            },
+                                            data: {
+                                                status: previousDeployment.status
+                                            }
+                                        }).catch((reason) => {
+                                            logger.debug(`Error while updating previous deployment ${previousDeployment.id} status`, {
+                                                parent: 'dpl',
+                                                reason
+                                            });
+                                        });
+                                    }
+                                    await prisma.deployment.update({
+                                        where: {
+                                            id: deployment.id
+                                        },
+                                        data: {
+                                            status: 'errored',
+                                            buildOutputStdErr: 'Deployment timed out'
+                                        }
+                                    }).catch((reason) => {
+                                        logger.debug('Error while updating deployment status to error', {
+                                            parent: 'dpl',
+                                            reason
+                                        });
+                                    });
+                                }
+                            });
+
+                            logger.debug(`Starting compilation ${deployment.id} ...`, {
+                                parent: 'dpl'
+                            });
+
+                            const buildVm = new BuildMiniVM({
+                                type: 'github',
+                                context: deploymentContext,
+                                repo,
+                                application: availableApplicationsConfig[application.name],
+                                dependencies: {
+                                    ...(packageJson.optionalDependencies ?? {}),
+                                    ...(packageJson.peerDependencies ?? {}),
+                                    ...(packageJson.dependencies ?? {}),
+                                    ...(packageJson.devDependencies ?? {})
+                                }
+                            });
+
+                            const buildResult = await buildVm.build();
+                            const { stdout, stderr, dependenciesManifest } = buildResult;
+
                             await prisma.deployment.update({
                                 where: {
                                     id: deployment.id
                                 },
                                 data: {
-                                    status: 'errored',
-                                    buildOutputStdErr: 'Deployment timed out'
+                                    dependenciesManifest,
+                                    buildOutputStdOut: stdout,
+                                    buildOutputStdErr: stderr
                                 }
-                            }).catch((reason) => {
-                                logger.debug('Error while updating deployment status to error', {
-                                    parent: 'dpl',
-                                    reason
-                                });
                             });
-                        }
-                    });
 
-                    logger.debug(`Starting compilation ${deployment.id} ...`, {
-                        parent: 'dpl'
-                    });
-
-                    const buildVm = new BuildMiniVM({
-                        type: 'github',
-                        context: deploymentContext,
-                        repo,
-                        application: availableApplicationsConfig[application.name],
-                        dependencies: {
-                            ...(packageJson.optionalDependencies ?? {}),
-                            ...(packageJson.peerDependencies ?? {}),
-                            ...(packageJson.dependencies ?? {}),
-                            ...(packageJson.devDependencies ?? {})
-                        }
-                    });
-
-                    const buildResult = await buildVm.build();
-                    const { stdout, stderr, dependenciesManifest } = buildResult;
-
-                    await prisma.deployment.update({
-                        where: {
-                            id: deployment.id
-                        },
-                        data: {
-                            dependenciesManifest,
-                            buildOutputStdOut: stdout,
-                            buildOutputStdErr: stderr
-                        }
-                    });
-
-                    // TODO - Populate reasons why deployment failed
-                    if (buildResult.success === false) {
-                        logger.debug('Compilation failed', {
-                            parent: 'dpl'
-                        });
-                        await prisma.deployment.update({
-                            where: {
-                                id: deployment.id
-                            },
-                            data: {
-                                status: 'errored',
-                                buildOutputErrorObj: buildResult.error as any
+                            // TODO - Populate reasons why deployment failed
+                            if (buildResult.success === false) {
+                                logger.debug('Compilation failed', {
+                                    parent: 'dpl'
+                                });
+                                await prisma.deployment.update({
+                                    where: {
+                                        id: deployment.id
+                                    },
+                                    data: {
+                                        status: 'errored',
+                                        buildOutputErrorObj: buildResult.error as any
+                                    }
+                                });
+                                return;
                             }
-                        });
-                        return;
-                    }
 
-                    const { result: { wasm, wat, dts } } = buildResult;
-                    const wasmB64 = Utils.toBase64(wasm);
+                            const { result: { wasm, wat, dts } } = buildResult;
+                            const wasmB64 = Utils.toBase64(wasm);
 
-                    logger.debug(`Compilation was successful ${deployment.id} (${prettyBytes(wasmB64.length)})`, {
-                        parent: 'dpl'
-                    });
+                            logger.debug(`Compilation was successful ${deployment.id} (${prettyBytes(wasmB64.length)})`, {
+                                parent: 'dpl'
+                            });
 
-                    // TODO - Populate reasons we fail on empty wasm
-                    if (wasm.length === 0) {
-                        logger.debug('Empty wasm', {
-                            parent: 'dpl'
-                        });
-                        await prisma.deployment.update({
-                            where: {
-                                id: deployment.id
-                            },
-                            data: {
-                                status: 'errored',
-                                buildOutputErrorObj: { error: 'Empty wasm' } as any
+                            // TODO - Populate reasons we fail on empty wasm
+                            if (wasm.length === 0) {
+                                logger.debug('Empty wasm', {
+                                    parent: 'dpl'
+                                });
+                                await prisma.deployment.update({
+                                    where: {
+                                        id: deployment.id
+                                    },
+                                    data: {
+                                        status: 'errored',
+                                        buildOutputErrorObj: { error: 'Empty wasm' } as any
+                                    }
+                                });
+                                return;
                             }
-                        });
-                        return;
-                    }
 
-                    await prisma.deployment.update({
-                        where: {
-                            id: deployment.id
-                        },
-                        data: {
-                            status: 'compiled',
-                            buildOutputWASM: wasmB64,
-                            buildOutputWAT: wat,
-                            buildOutputDTS: dts
-                        }
-                    });
-
-                    if (dts) {
-                        const matches = Array.from(dts.matchAll(/^export declare function (.*)\(/gm));
-                        const validMatches = matches
-                            .map(match => match[1])
-                            .filter(Boolean)
-                            .filter(match => !['__new', '__pin', '__unpin', '__collect', 'register_routes'].includes(match));
-                        await prisma.deployment.update({
-                            where: {
-                                id: deployment.id
-                            },
-                            data: {
-                                contractFunctions: validMatches
-                            }
-                        });
-                    }
-
-                    sendToSecretarium({
-                        deployment,
-                        wasmB64,
-                        target,
-                        previousDeployment
-                    });
-
-                } catch (error: any) {
-                    logger.debug(`Deployment failure for ${target}: ${error}`);
-                    try {
-                        if (contextualDeploymentId)
                             await prisma.deployment.update({
                                 where: {
-                                    id: contextualDeploymentId
+                                    id: deployment.id
                                 },
                                 data: {
-                                    status: 'errored',
-                                    buildOutputErrorObj: {
-                                        message: error.message,
-                                        stack: error.stack
-                                    }
+                                    status: 'compiled',
+                                    buildOutputWASM: wasmB64,
+                                    buildOutputWAT: wat,
+                                    buildOutputDTS: dts
                                 }
                             });
-                    } catch (error) {
-                        logger.debug(`General failure processing ${target}: ${error}`);
-                        // Timeout will eventually error this
-                    }
-                }
-            });
-        };
 
-        if (context.class === 'push')
-            launchDeploy().finally(() => { return; });
+                            if (dts) {
+                                const matches = Array.from(dts.matchAll(/^export declare function (.*)\(/gm));
+                                const validMatches = matches
+                                    .map(match => match[1])
+                                    .filter(Boolean)
+                                    .filter(match => !['__new', '__pin', '__unpin', '__collect', 'register_routes'].includes(match));
+                                await prisma.deployment.update({
+                                    where: {
+                                        id: deployment.id
+                                    },
+                                    data: {
+                                        contractFunctions: validMatches
+                                    }
+                                });
+                            }
+
+                            await sendToSecretarium({
+                                deployment,
+                                wasmB64,
+                                target,
+                                previousDeployment
+                            });
+
+                        } catch (error: any) {
+                            logger.debug(`Deployment failure for ${target}: ${error}`);
+                            try {
+                                if (contextualDeploymentId)
+                                    await prisma.deployment.update({
+                                        where: {
+                                            id: contextualDeploymentId
+                                        },
+                                        data: {
+                                            status: 'errored',
+                                            buildOutputErrorObj: {
+                                                message: error.message,
+                                                stack: error.stack
+                                            }
+                                        }
+                                    });
+                            } catch (error) {
+                                logger.debug(`General failure processing ${target}: ${error}`);
+                                // Timeout will eventually error this
+                            }
+                        }
+                    })()
+                        .catch(() => { return; });
+                });
+            };
+
+            if (context.class === 'push')
+                launchDeploy()
+                    .finally(() => { return; })
+                    .catch(() => { return; });
+        })()
+            .catch(() => { return; });
     });
 
-    return;
 };
 
 export const sendToSecretarium = async ({
@@ -500,19 +509,25 @@ export const sendToSecretarium = async ({
             fqdn: target,
             wasm_bytes_b64: wasmB64
         })
-            .onExecuted(handleSuccess)
-            .onError(async (error) => {
-                rollback();
-                await prisma.deployment.update({
-                    where: {
-                        id: deployment.id
-                    },
-                    data: {
-                        status: 'errored',
-                        buildOutputStdErr: error?.toString()
-                    }
-                });
-                logger.debug(`Error while ${!targetRef ? 'updating' : 'registering'} smart contract ${target}: ${error}`);
+            .onExecuted(() => {
+                (async () => {
+                    await handleSuccess();
+                })().catch(() => { return; });
+            })
+            .onError((error) => {
+                (async () => {
+                    await rollback();
+                    await prisma.deployment.update({
+                        where: {
+                            id: deployment.id
+                        },
+                        data: {
+                            status: 'errored',
+                            buildOutputStdErr: error?.toString()
+                        }
+                    });
+                    logger.debug(`Error while ${!targetRef ? 'updating' : 'registering'} smart contract ${target}: ${error}`);
+                })().catch(() => { return; });
             }).send().catch(() => {
                 // Swallow this error
             });
@@ -523,19 +538,25 @@ export const sendToSecretarium = async ({
             fqdn: target,
             source_fqdn: deployment.deploymentAddress.fqdn
         })
-            .onExecuted(handleSuccess)
-            .onError(async (error) => {
-                rollback();
-                await prisma.deployment.update({
-                    where: {
-                        id: deployment.id
-                    },
-                    data: {
-                        status: 'errored',
-                        buildOutputStdErr: error?.toString()
-                    }
-                });
-                logger.debug(`Error while releasing smart contract ${target}: ${error}`);
+            .onExecuted(() => {
+                (async () => {
+                    await handleSuccess();
+                })().catch(() => { return; });
+            })
+            .onError((error) => {
+                (async () => {
+                    await rollback();
+                    await prisma.deployment.update({
+                        where: {
+                            id: deployment.id
+                        },
+                        data: {
+                            status: 'errored',
+                            buildOutputStdErr: error?.toString()
+                        }
+                    });
+                    logger.debug(`Error while releasing smart contract ${target}: ${error}`);
+                })().catch(() => { return; });
 
             }).send().catch(() => {
                 // Swallow this error

@@ -100,7 +100,7 @@ export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, 
         if (quoteDataTip?.quote?.report_body?.report_data && deployment?.buildOutputWASM) {
             const reportData = new Uint8Array(quoteDataTip?.quote.report_body.report_data);
             const contractBytes = Utils.fromBase64(deployment.buildOutputWASM);
-            Utils.hash(contractBytes).then((contractBytesHash) => {
+            Utils.hash(contractBytes).then(async (contractBytesHash) => {
                 const validation = new Uint8Array(challenge.length + contractBytesHash.length);
                 validation.set(challenge);
                 validation.set(contractBytesHash, challenge.length);
@@ -110,7 +110,7 @@ export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, 
                         setIsContractValid(true);
                     setIsValidating(false);
                 });
-            });
+            }).catch(() => { return; });
         }
     }, [quoteData, deployment, challenge]);
 

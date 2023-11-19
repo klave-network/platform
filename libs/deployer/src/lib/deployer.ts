@@ -294,14 +294,17 @@ class Deployer {
             };
 
             // Set a timeout to mark the deployment as errored if it is not deployed after 60s
-            setTimeout(async () => {
-                const currentState = await prisma.deployment.findUnique({
-                    where: {
-                        id: deployment.id
-                    }
-                });
-                if (currentState?.status !== 'deployed')
-                    errorDeployment();
+            setTimeout(() => {
+                (async () => {
+                    const currentState = await prisma.deployment.findUnique({
+                        where: {
+                            id: deployment.id
+                        }
+                    });
+                    if (currentState?.status !== 'deployed')
+                        await errorDeployment();
+                })()
+                    .catch(() => { return; });
             }, 60000);
 
             const appFs = await this.createFs();
@@ -327,7 +330,7 @@ class Deployer {
             // If the build failed, we mark the deployment as errored
             // TODO - Populate reasons why deployment failed
             if (buildResult.success === false) {
-                errorDeployment({
+                await errorDeployment({
                     buildOutputErrorObj: buildResult.error as any
                 });
                 return Promise.reject();
@@ -367,39 +370,43 @@ class Deployer {
                 app_id: deployment.applicationId,
                 fqdn: `${deployment.id.split('-').pop()}.sta.klave.network`,
                 wasm_bytes_b64: Utils.toBase64(wasm)
-            }).onExecuted(async () => {
-                await prisma.deployment.update({
-                    where: {
-                        id: deployment.id
-                    },
-                    data: {
-                        status: 'deployed'
-                    }
-                });
-                if (previousDeployment) {
-                    logger.debug(`Deleting previous deployment ${previousDeployment.id} for ${target}`);
-                    const caller = router.v0.deployments.createCaller({
-                        prisma
-                    } as any);
-                    caller.delete({
-                        deploymentId: previousDeployment.id
-                    }).catch((error) => {
-                        logger.debug(`Failure while deleting previous deployment ${previousDeployment.id} for ${target}:, ${error}`);
-                    });
-                }
-            }).onError(async (error) => {
-                // Timeout will eventually error this
-                if (previousDeployment) {
+            }).onExecuted(() => {
+                (async () => {
                     await prisma.deployment.update({
                         where: {
-                            id: previousDeployment.id
+                            id: deployment.id
                         },
                         data: {
-                            status: previousDeployment.status
+                            status: 'deployed'
                         }
                     });
-                }
-                console.error('Secretarium failed', error);
+                    if (previousDeployment) {
+                        logger.debug(`Deleting previous deployment ${previousDeployment.id} for ${target}`);
+                        const caller = router.v0.deployments.createCaller({
+                            prisma
+                        } as any);
+                        caller.delete({
+                            deploymentId: previousDeployment.id
+                        }).catch((error) => {
+                            logger.debug(`Failure while deleting previous deployment ${previousDeployment.id} for ${target}:, ${error}`);
+                        });
+                    }
+                })().catch(() => { return; });
+            }).onError((error) => {
+                (async () => {
+                    // Timeout will eventually error this
+                    if (previousDeployment) {
+                        await prisma.deployment.update({
+                            where: {
+                                id: previousDeployment.id
+                            },
+                            data: {
+                                status: previousDeployment.status
+                            }
+                        });
+                    }
+                    console.error('Secretarium failed', error);
+                })().catch(() => { return; });
             }).send();
 
             return;
@@ -433,7 +440,7 @@ class Deployer {
                                 id: message.id,
                                 contents: contents
                             });
-                        });
+                        }).catch(() => { return; });
                     } else if (message.type === 'write') {
                         if ((message.filename as string).endsWith('.wasm'))
                             compiledBinary = message.contents;
@@ -451,7 +458,7 @@ class Deployer {
                                 stdout: message.stdout ?? '',
                                 stderr: message.stderr ?? ''
                             });
-                        });
+                        }).catch(() => { return; });
                     } else if (message.type === 'done') {
                         let signature: sigstore.Bundle;
                         // TODO Add OIDC token
@@ -475,7 +482,7 @@ class Deployer {
                                 };
                                 compiler.terminate().finally(() => {
                                     resolve(output);
-                                });
+                                }).catch(() => { return; });
                             });
                     }
                 });

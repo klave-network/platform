@@ -82,6 +82,9 @@ export const githubOps = {
                 }
             }
         };
-        sync();
+        sync()
+            .catch(() => {
+                logger.error('Failed to sync Github App installations');
+            });
     }
 };

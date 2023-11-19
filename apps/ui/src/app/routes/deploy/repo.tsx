@@ -139,7 +139,10 @@ export const RepoAppSelect: FC = () => {
                 </div>
                 : null}
             <div className='relative'>
-                <form onSubmit={handleSubmit(selectApplications)} >
+                <form onSubmit={() => {
+                    handleSubmit(selectApplications)()
+                        .catch(() => { return; });
+                }} >
                     <div className={!deployableRepo.isAvailableToKlave ? 'opacity-40' : ''}>
                         We found {deployableRepo.config?.applications?.length ?? 0} applications to deploy.<br />
                         Make your selection and be ready in minutes<br />

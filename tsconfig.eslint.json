@@ -11,8 +11,8 @@
     "include": [
         ".eslintrc.js",
         ".commitlintrc.js",
-        "*.js*",
-        "*.ts*",
+        "*.js",
+        "*.ts",
         "tools/**/*.{js,mjs,ts,json}"
     ]
 }

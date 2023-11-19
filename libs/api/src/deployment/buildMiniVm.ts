@@ -228,7 +228,7 @@ export class BuildMiniVM {
                                 id: message.id,
                                 contents: contents.data
                             });
-                        });
+                        }).catch(() => { return; });
                     } else if (message.type === 'write') {
                         this.eventHanlders['emit']?.forEach(handler => handler(message));
                         if ((message.filename as string).endsWith('.wasm'))
@@ -252,7 +252,7 @@ export class BuildMiniVM {
                                 stdout: message.stdout ?? '',
                                 stderr: message.stderr ?? ''
                             });
-                        });
+                        }).catch(() => { return; });
                     } else if (message.type === 'done') {
                         let signature: sigstore.Bundle;
                         // TODO Add OIDC token
@@ -278,7 +278,7 @@ export class BuildMiniVM {
                                 this.eventHanlders['done']?.forEach(handler => handler(output));
                                 compiler.terminate().finally(() => {
                                     resolve(output);
-                                });
+                                }).catch(() => { return; });
                             });
                     }
                 });
