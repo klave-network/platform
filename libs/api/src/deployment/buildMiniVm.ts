@@ -240,7 +240,7 @@ export class BuildMiniVM {
                     } else if (message.type === 'diagnostic') {
                         this.eventHanlders['diagnostic']?.forEach(handler => handler(message));
                     } else if (message.type === 'errored') {
-                        logger.debug('Compiler Errored: ' + message.error?.message ?? message.error, {
+                        logger.debug(`Compiler Errored: ${message.error?.message ?? message.error ?? 'Unknown'}`, {
                             parent: 'bmv'
                         });
                         this.eventHanlders['error']?.forEach(handler => handler(message));
