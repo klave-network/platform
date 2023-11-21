@@ -33,7 +33,7 @@ export const OrgNew: FC = () => {
         }),
         values: {
             name: orgName,
-            slug: orgSlug.replaceAll(/\W/g, '-')
+            slug: orgSlug.replaceAll(/\W/g, '-').trim()
         }
     });
 
