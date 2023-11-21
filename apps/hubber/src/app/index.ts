@@ -27,6 +27,7 @@ import { trcpMiddlware } from './middleware/trpc';
 import { usersRouter } from './routes';
 import { logger } from '@klave/providers';
 import { webLinkerMiddlware } from './middleware/webLinker';
+import { permissiblePeers } from '@klave/api';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -77,16 +78,7 @@ export const start = async (port: number) => {
     }));
 
     const corsConfiguration = cors({
-        origin: [
-            /^chrome-extension:\/\//,
-            /^http:\/\/localhost/,
-            /^http:\/\/127.0.0.1/,
-            /\.klave\.network$/,
-            /\.klave\.dev$/,
-            /\.klave\.com$/,
-            /\.secretarium\.com$/,
-            /\.secretarium\.org$/
-        ],
+        origin: permissiblePeers,
         credentials: true
     });
 
