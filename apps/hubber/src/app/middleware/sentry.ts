@@ -3,12 +3,14 @@ import * as Sentry from '@sentry/node';
 import * as SecretariumInstruments from '@secretarium/instrumentation';
 import { client as prismaClient } from '../../utils/db';
 import { logger, scp as scpClient, scpOps } from '@klave/providers';
+import type { Application } from 'express';
+import { permissiblePeers } from '@klave/api';
 
 let sentryRequestMiddlewareReference: RequestHandler;
 let sentryTracingMiddlewareReference: RequestHandler;
 let sentryErrorMiddlewareReference: RequestHandler;
 
-const initializeSentry = () => {
+const initializeSentry = (app: Application) => {
     logger.info('Initializing Sentry');
     Sentry.init({
         dsn: process.env.KLAVE_SENTRY_DSN,
@@ -18,7 +20,9 @@ const initializeSentry = () => {
             // enable HTTP calls tracing
             new Sentry.Integrations.Http({ tracing: true }),
             // enable Express.js middleware tracing
-            new Sentry.Integrations.Express(),
+            new Sentry.Integrations.Express({
+                app
+            }),
             new Sentry.Integrations.Prisma({
                 client: prismaClient
             }),
@@ -32,6 +36,7 @@ const initializeSentry = () => {
         // of transactions for performance monitoring.
         // We recommend adjusting this value in production
         tracesSampleRate: 1.0,
+        tracePropagationTargets: permissiblePeers,
         beforeSend: (event) => {
             const secretariumVersion = scpOps.version();
             if (!event.tags)
@@ -58,20 +63,20 @@ const initializeSentry = () => {
 export const sentryRequestMiddleware: RequestHandler = (req, res, next) => {
 
     if (!sentryRequestMiddlewareReference)
-        initializeSentry();
+        initializeSentry(req.app);
     return sentryRequestMiddlewareReference(req, res, next);
 };
 
 export const sentryTracingMiddleware: RequestHandler = (req, res, next) => {
 
     if (!sentryTracingMiddlewareReference)
-        initializeSentry();
+        initializeSentry(req.app);
     return sentryTracingMiddlewareReference(req, res, next);
 };
 
 export const sentryErrorMiddleware: RequestHandler = (req, res, next) => {
 
     if (!sentryErrorMiddlewareReference)
-        initializeSentry();
+        initializeSentry(req.app);
     return sentryErrorMiddlewareReference(req, res, next);
 };

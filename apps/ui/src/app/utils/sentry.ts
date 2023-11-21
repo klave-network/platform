@@ -10,6 +10,7 @@ import {
 } from 'react-router-dom';
 import { useEffect } from 'react';
 import { client as scpClient } from './secretarium';
+import { permissiblePeers } from '@klave/api';
 
 Sentry.init({
     dsn: import.meta.env['VITE_KLAVE_SENTRY_DSN'],
@@ -17,6 +18,8 @@ Sentry.init({
     environment: ['localhost', '::', '127.0.0.1'].includes(window.location.hostname) ? 'development' : window.location.hostname,
     integrations: [
         new BrowserTracing({
+            enableHTTPTimings: true,
+            enableLongTask: true,
             routingInstrumentation: Sentry.reactRouterV6Instrumentation(
                 useEffect,
                 useLocation,
@@ -36,7 +39,8 @@ Sentry.init({
     // for finer control
     tracesSampleRate: 1.0,
     replaysOnErrorSampleRate: 1.0,
-    replaysSessionSampleRate: 1.0
+    replaysSessionSampleRate: 1.0,
+    tracePropagationTargets: permissiblePeers
 });
 
 export const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouter(
