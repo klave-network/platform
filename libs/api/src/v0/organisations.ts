@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import { Organisation } from '@prisma/client';
 import { scp } from '@klave/providers';
+import { reservedNames } from '../constants';
 
 export const organisationRouter = createTRPCRouter({
     getPersonal: publicProcedure
@@ -148,10 +149,13 @@ export const organisationRouter = createTRPCRouter({
         }))
         .query(async ({ ctx: { prisma }, input: { orgSlug } }) => {
 
-            const slug = orgSlug.replaceAll(/\W/g, '-').toLocaleLowerCase();
+            const slug = orgSlug.trim().replaceAll(/\W/g, '-').toLocaleLowerCase();
 
-            if (slug.trim() === '')
+            if (slug === '')
                 return false;
+
+            if (reservedNames.includes(slug))
+                return true;
 
             const org = await prisma.organisation.findUnique({
                 where: {
@@ -172,7 +176,11 @@ export const organisationRouter = createTRPCRouter({
             if (!user)
                 throw new Error('Not logged in');
 
-            const slug = orgSlug.replaceAll(/\W/g, '-').toLocaleLowerCase();
+            const slug = orgSlug.trim().replaceAll(/\W/g, '-').toLocaleLowerCase();
+
+            if (reservedNames.includes(slug))
+                throw new Error('Organisation already exists');
+
             const existingOrg = await prisma.organisation.findUnique({
                 where: {
                     slug
