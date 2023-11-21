@@ -504,7 +504,7 @@ export const sendToSecretarium = async ({
 
     if (wasmB64) {
         logger.debug(`${targetRef ? 'Updating' : 'Registering'} smart contract: ${target}`);
-        await scp.newTx('wasm-manager', 'deploy_instance', `klave-deployment-${deployment.id}`, {
+        await scp.newTx('wasm-manager', 'deploy_instance', `klave-${targetRef ? 'update' : 'register'}-${deployment.id}`, {
             app_id: deployment.applicationId,
             fqdn: target,
             wasm_bytes_b64: wasmB64
@@ -533,7 +533,7 @@ export const sendToSecretarium = async ({
             });
     } else if (deployment.deploymentAddress?.fqdn) {
         logger.debug(`Releasing smart contract: ${deployment.deploymentAddress.fqdn} as ${target}`);
-        await scp.newTx('wasm-manager', 'clone_instance', `klave-deployment-${deployment.id}`, {
+        await scp.newTx('wasm-manager', 'clone_instance', `klave-release-${deployment.id}`, {
             app_id: deployment.applicationId,
             fqdn: target,
             source_fqdn: deployment.deploymentAddress.fqdn
