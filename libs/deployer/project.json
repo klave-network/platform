@@ -14,8 +14,7 @@
                 "main": "libs/deployer/src/index.ts",
                 "tsConfig": "libs/deployer/tsconfig.lib.json",
                 "assets": [
-                    "libs/deployer/*.md",
-                    "libs/deployer/src/*.mjs"
+                    "libs/deployer/*.md"
                 ]
             }
         },

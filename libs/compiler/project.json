@@ -14,8 +14,11 @@
                 "main": "libs/compiler/src/index.ts",
                 "tsConfig": "libs/compiler/tsconfig.lib.json",
                 "assets": [
-                    "libs/compiler/*.md",
-                    "libs/compiler/src/*.mjs"
+                    "libs/compiler/*.md"
+                ],
+                "externals": [
+                    "@klave/as-json",
+                    "assemblyscript"
                 ],
                 "generateExportsField": true
             },

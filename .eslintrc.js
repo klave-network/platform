@@ -42,7 +42,8 @@ module.exports = {
     root: true,
     parserOptions: {
         tsconfigRootDir: __dirname,
-        EXPERIMENTAL_useProjectService: true
+        EXPERIMENTAL_useProjectService: true,
+        warnOnUnsupportedTypeScriptVersion: false
     },
     ignorePatterns: [
         '**/*',
@@ -50,6 +51,7 @@ module.exports = {
         '!**/*.js',
         '!**/*.mjs',
         '!**/*.ts',
+        '!**/*.mts',
         'dist/**',
         'tmp/**',
         'tools/**/_msr*',
@@ -58,7 +60,7 @@ module.exports = {
     plugins: ['@nx'],
     overrides: [
         {
-            files: ['*.ts', '*.tsx'],
+            files: ['*.ts', '*.tsx', '*.mts'],
             extends: ['plugin:@nx/typescript'],
             rules: typescriptRules,
             parserOptions: {

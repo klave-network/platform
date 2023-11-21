@@ -24,6 +24,8 @@
                 ],
                 "generatePackageJson": true,
                 "external": [
+                    "@klave/as-json",
+                    "assemblyscript",
                     "typescript",
                     "visitor-as"
                 ],

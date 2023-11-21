@@ -13,6 +13,6 @@
         ".commitlintrc.js",
         "*.js",
         "*.ts",
-        "tools/**/*.{js,mjs,ts,json}"
+        "tools/**/*.{js,mjs,ts,mts,json}"
     ]
 }
