@@ -78,6 +78,8 @@ export const scpOps = {
             }
             await client.connect(node, connectionKey, trustKey);
             logger.info(`Connected to Secretarium ${node}`);
+            const cryptoContext = client.getCryptoContext();
+            logger.info(`CS ${cryptoContext.type} (${cryptoContext.version})`);
             logger.info(`PK ${await connectionKey.getRawPublicKeyHex()}`);
             const version: any = await client.newTx('wasm-manager', 'version', 'version', '').send().catch((e) => {
                 console.error(e);
