@@ -7,7 +7,7 @@ export const permissiblePeers = [
     /\.klave\.com$/,
     /\.secretarium\.com$/,
     /\.secretarium\.org$/
-]
+];
 
 export const reservedNames = [
     '300',
@@ -422,5 +422,5 @@ export const reservedNames = [
     'privacy-preserving',
     'privacy-enabling',
     'jellyfish',
-    'seaslug',
-]
+    'seaslug'
+];

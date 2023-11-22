@@ -4,7 +4,7 @@ import * as SecretariumInstruments from '@secretarium/instrumentation';
 import { client as prismaClient } from '../../utils/db';
 import { logger, scp as scpClient, scpOps } from '@klave/providers';
 import type { Application } from 'express';
-import { permissiblePeers } from '@klave/api';
+import { permissiblePeers } from '@klave/constants';
 
 let sentryRequestMiddlewareReference: RequestHandler;
 let sentryTracingMiddlewareReference: RequestHandler;

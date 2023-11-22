@@ -27,7 +27,7 @@ import { trcpMiddlware } from './middleware/trpc';
 import { usersRouter } from './routes';
 import { logger } from '@klave/providers';
 import { webLinkerMiddlware } from './middleware/webLinker';
-import { permissiblePeers } from '@klave/api';
+import { permissiblePeers } from '@klave/constants';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 

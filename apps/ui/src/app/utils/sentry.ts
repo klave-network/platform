@@ -10,7 +10,7 @@ import {
 } from 'react-router-dom';
 import { useEffect } from 'react';
 import { client as scpClient } from './secretarium';
-import { permissiblePeers } from '@klave/api';
+import { permissiblePeers } from '@klave/constants';
 
 Sentry.init({
     dsn: import.meta.env['VITE_KLAVE_SENTRY_DSN'],

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import { Organisation } from '@prisma/client';
 import { scp } from '@klave/providers';
-import { reservedNames } from '../constants';
+import { reservedNames } from '@klave/constants';
 
 export const organisationRouter = createTRPCRouter({
     getPersonal: publicProcedure

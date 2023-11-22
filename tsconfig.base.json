@@ -35,6 +35,9 @@
             "@klave/compiler": [
                 "libs/compiler/src/index.ts"
             ],
+            "@klave/constants": [
+                "libs/constants/src/index.ts"
+            ],
             "@klave/db": [
                 "libs/db/src/index.ts"
             ],
