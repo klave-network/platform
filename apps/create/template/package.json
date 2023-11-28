@@ -4,7 +4,7 @@
     },
     "devDependencies": {
         "@klave/sdk": "{{KLAVE_SDK_CURRENT_VERSION}}",
-        "assemblyscript": "^0.27.20",
+        "assemblyscript": "^0.27.22",
         "tslib": "^2.6.2",
         "visitor-as": "^0.11.4"
     }
