@@ -18,6 +18,16 @@
             ],
             "cache": true
         },
+        "build-upstream": {
+            "cache": true
+        },
+        "compile": {
+            "inputs": [
+                "production",
+                "^production"
+            ],
+            "cache": true
+        },
         "e2e": {
             "inputs": [
                 "default",
