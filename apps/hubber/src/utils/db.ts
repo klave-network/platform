@@ -1,10 +1,9 @@
-import { PrismaClient } from '@prisma/client';
 // import i18n from '../i18n';
 import { logger } from '@klave/providers';
+import { prisma } from '@klave/db';
 
-export * from '@prisma/client';
+export const client = prisma;
 
-export const client = new PrismaClient();
 let reconnectAttempt = 0;
 let reconnectionTimeout: NodeJS.Timeout | undefined;
 

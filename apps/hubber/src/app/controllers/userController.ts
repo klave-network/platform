@@ -1,11 +1,11 @@
-import db, { Prisma } from '../../utils/db';
+import { prisma, Prisma } from '@klave/db';
 
 export const createUser = async (user: Prisma.UserCreateInput) => {
-    return db.user.create({ data: user });
+    return prisma.user.create({ data: user });
 };
 
 export const getUsers = async (userFilter?: Prisma.UserWhereUniqueInput) => {
     if (userFilter)
-        return await db.user.findUnique({ where: userFilter });
-    return await db.user.findMany();
+        return await prisma.user.findUnique({ where: userFilter });
+    return await prisma.user.findMany();
 };
