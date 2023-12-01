@@ -5,10 +5,11 @@ import { logger } from './logger';
 
 export const githubOps = {
     initialize: async () => {
-        Sentry.startSpan({
-            name: 'GitHub Sync',
+        await Sentry.startSpan({
+            name: 'Boot GitHub Sync',
             op: 'boot.github',
-            description: 'GitHub Sync'
+            origin: 'manual.klave.github.init',
+            description: 'Boot GitHub Sync'
 
         }, async () => {
             const octokit = await probot.auth();
