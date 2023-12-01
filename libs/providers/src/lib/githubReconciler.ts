@@ -1,16 +1,16 @@
-import * as Sentry from '@sentry/node';
+import { trace } from '@sentry/core';
 import { prisma } from '@klave/db';
 import { probot } from './probot';
 import { logger } from './logger';
 
 export const githubOps = {
     initialize: async () => {
-        await Sentry.startSpan({
-            name: 'Boot GitHub Sync',
+
+        return trace({
+            name: 'BOOT GitHub Sync',
             op: 'boot.github',
             origin: 'manual.klave.github.init',
             description: 'Boot GitHub Sync'
-
         }, async () => {
             const octokit = await probot.auth();
             const installationsData = await octokit.paginate(
@@ -88,7 +88,7 @@ export const githubOps = {
                     });
                 }
             }
-        }).catch(() => {
+        }, () => {
             logger.error('Failed to sync Github App installations');
         });
     }
