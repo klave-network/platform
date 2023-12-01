@@ -1,10 +1,16 @@
+import * as Sentry from '@sentry/node';
 import { prisma } from '@klave/db';
 import { probot } from './probot';
 import { logger } from './logger';
 
 export const githubOps = {
     initialize: async () => {
-        const sync = async () => {
+        Sentry.startSpan({
+            name: 'GitHub Sync',
+            op: 'boot.github',
+            description: 'GitHub Sync'
+
+        }, async () => {
             const octokit = await probot.auth();
             const installationsData = await octokit.paginate(
                 octokit.apps.listInstallations,
@@ -81,10 +87,8 @@ export const githubOps = {
                     });
                 }
             }
-        };
-        sync()
-            .catch(() => {
-                logger.error('Failed to sync Github App installations');
-            });
+        }).catch(() => {
+            logger.error('Failed to sync Github App installations');
+        });
     }
 };

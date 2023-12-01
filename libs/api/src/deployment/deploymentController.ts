@@ -1,5 +1,6 @@
 import { DeploymentPushPayload } from '../types';
 import { v4 as uuid } from 'uuid';
+import * as Sentry from '@sentry/node';
 import { scp, logger } from '@klave/providers';
 import { Deployment, prisma, DeploymentAddress } from '@klave/db';
 // import type { KlaveRcConfiguration } from '@klave/sdk';
@@ -501,67 +502,73 @@ export const sendToSecretarium = async ({
             });
         }
     };
-
-    if (wasmB64) {
-        logger.debug(`${targetRef ? 'Updating' : 'Registering'} smart contract: ${target}`);
-        await scp.newTx('wasm-manager', 'deploy_instance', `klave-${targetRef ? 'update' : 'register'}-${deployment.id}`, {
-            app_id: deployment.applicationId,
-            fqdn: target,
-            wasm_bytes_b64: wasmB64
-        })
-            .onExecuted(() => {
-                (async () => {
-                    await handleSuccess();
-                })().catch(() => { return; });
+    await Sentry.startSpan({
+        name: 'SCP Subtask',
+        op: 'scp.task',
+        description: 'Secretarium Task'
+    }, async () => {
+        if (wasmB64) {
+            logger.debug(`${targetRef ? 'Updating' : 'Registering'} smart contract: ${target}`);
+            await scp.newTx('wasm-manager', 'deploy_instance', `klave-${targetRef ? 'update' : 'register'}-${deployment.id}`, {
+                app_id: deployment.applicationId,
+                fqdn: target,
+                wasm_bytes_b64: wasmB64
+                // own_enclave: true,
             })
-            .onError((error) => {
-                (async () => {
-                    await rollback();
-                    await prisma.deployment.update({
-                        where: {
-                            id: deployment.id
-                        },
-                        data: {
-                            status: 'errored',
-                            buildOutputStdErr: error?.toString()
-                        }
-                    });
-                    logger.debug(`Error while ${!targetRef ? 'updating' : 'registering'} smart contract ${target}: ${error}`);
-                })().catch(() => { return; });
-            }).send().catch(() => {
-                // Swallow this error
-            });
-    } else if (deployment.deploymentAddress?.fqdn) {
-        logger.debug(`Releasing smart contract: ${deployment.deploymentAddress.fqdn} as ${target}`);
-        await scp.newTx('wasm-manager', 'clone_instance', `klave-release-${deployment.id}`, {
-            app_id: deployment.applicationId,
-            fqdn: target,
-            source_fqdn: deployment.deploymentAddress.fqdn
-        })
-            .onExecuted(() => {
-                (async () => {
-                    await handleSuccess();
-                })().catch(() => { return; });
+                .onExecuted(() => {
+                    (async () => {
+                        await handleSuccess();
+                    })().catch(() => { return; });
+                })
+                .onError((error) => {
+                    (async () => {
+                        await rollback();
+                        await prisma.deployment.update({
+                            where: {
+                                id: deployment.id
+                            },
+                            data: {
+                                status: 'errored',
+                                buildOutputStdErr: error?.toString()
+                            }
+                        });
+                        logger.debug(`Error while ${!targetRef ? 'updating' : 'registering'} smart contract ${target}: ${error}`);
+                    })().catch(() => { return; });
+                }).send().catch(() => {
+                    // Swallow this error
+                });
+        } else if (deployment.deploymentAddress?.fqdn) {
+            logger.debug(`Releasing smart contract: ${deployment.deploymentAddress.fqdn} as ${target}`);
+            await scp.newTx('wasm-manager', 'clone_instance', `klave-release-${deployment.id}`, {
+                app_id: deployment.applicationId,
+                fqdn: target,
+                source_fqdn: deployment.deploymentAddress.fqdn
             })
-            .onError((error) => {
-                (async () => {
-                    await rollback();
-                    await prisma.deployment.update({
-                        where: {
-                            id: deployment.id
-                        },
-                        data: {
-                            status: 'errored',
-                            buildOutputStdErr: error?.toString()
-                        }
-                    });
-                    logger.debug(`Error while releasing smart contract ${target}: ${error}`);
-                })().catch(() => { return; });
+                .onExecuted(() => {
+                    (async () => {
+                        await handleSuccess();
+                    })().catch(() => { return; });
+                })
+                .onError((error) => {
+                    (async () => {
+                        await rollback();
+                        await prisma.deployment.update({
+                            where: {
+                                id: deployment.id
+                            },
+                            data: {
+                                status: 'errored',
+                                buildOutputStdErr: error?.toString()
+                            }
+                        });
+                        logger.debug(`Error while releasing smart contract ${target}: ${error}`);
+                    })().catch(() => { return; });
 
-            }).send().catch(() => {
-                // Swallow this error
-            });
-    } else {
-        logger.debug(`No wasm to deploy for ${target}`);
-    }
+                }).send().catch(() => {
+                    // Swallow this error
+                });
+        } else {
+            logger.debug(`No wasm to deploy for ${target}`);
+        }
+    });
 };

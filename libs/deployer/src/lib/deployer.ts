@@ -3,6 +3,7 @@ import type { Context } from 'probot';
 import type { Stats } from 'assemblyscript/dist/asc';
 import * as sigstore from 'sigstore';
 import { ErrorObject, serializeError } from 'serialize-error';
+import * as Sentry from '@sentry/node';
 import { Hook, Repo, Application, prisma, Deployment } from '@klave/db';
 import { createCompiler } from '@klave/compiler';
 import { logger, scp } from '@klave/providers';
@@ -365,49 +366,56 @@ class Deployer {
             if (wasm.length === 0)
                 return;
 
-            // Send the wasm to the secretarium node
-            await scp.newTx('wasm-manager', 'deploy_instance', `klave-deployment-${deployment.id}`, {
-                app_id: deployment.applicationId,
-                fqdn: `${deployment.id.split('-').pop()}.sta.klave.network`,
-                wasm_bytes_b64: Utils.toBase64(wasm)
-            }).onExecuted(() => {
-                (async () => {
-                    await prisma.deployment.update({
-                        where: {
-                            id: deployment.id
-                        },
-                        data: {
-                            status: 'deployed'
-                        }
-                    });
-                    if (previousDeployment) {
-                        logger.debug(`Deleting previous deployment ${previousDeployment.id} for ${target}`);
-                        const caller = router.v0.deployments.createCaller({
-                            prisma
-                        } as any);
-                        caller.delete({
-                            deploymentId: previousDeployment.id
-                        }).catch((error) => {
-                            logger.debug(`Failure while deleting previous deployment ${previousDeployment.id} for ${target}:, ${error}`);
-                        });
-                    }
-                })().catch(() => { return; });
-            }).onError((error) => {
-                (async () => {
-                    // Timeout will eventually error this
-                    if (previousDeployment) {
+            await Sentry.startSpan({
+                name: 'SCP Subtask',
+                op: 'scp.task',
+                description: 'Secretarium Task'
+            }, async () => {
+                // Send the wasm to the secretarium node
+                return await scp.newTx('wasm-manager', 'deploy_instance', `klave-deployment-${deployment.id}`, {
+                    app_id: deployment.applicationId,
+                    fqdn: `${deployment.id.split('-').pop()}.sta.klave.network`,
+                    wasm_bytes_b64: Utils.toBase64(wasm)
+                    // own_enclave: true,
+                }).onExecuted(() => {
+                    (async () => {
                         await prisma.deployment.update({
                             where: {
-                                id: previousDeployment.id
+                                id: deployment.id
                             },
                             data: {
-                                status: previousDeployment.status
+                                status: 'deployed'
                             }
                         });
-                    }
-                    console.error('Secretarium failed', error);
-                })().catch(() => { return; });
-            }).send();
+                        if (previousDeployment) {
+                            logger.debug(`Deleting previous deployment ${previousDeployment.id} for ${target}`);
+                            const caller = router.v0.deployments.createCaller({
+                                prisma
+                            } as any);
+                            caller.delete({
+                                deploymentId: previousDeployment.id
+                            }).catch((error) => {
+                                logger.debug(`Failure while deleting previous deployment ${previousDeployment.id} for ${target}:, ${error}`);
+                            });
+                        }
+                    })().catch(() => { return; });
+                }).onError((error) => {
+                    (async () => {
+                        // Timeout will eventually error this
+                        if (previousDeployment) {
+                            await prisma.deployment.update({
+                                where: {
+                                    id: previousDeployment.id
+                                },
+                                data: {
+                                    status: previousDeployment.status
+                                }
+                            });
+                        }
+                        console.error('Secretarium failed', error);
+                    })().catch(() => { return; });
+                }).send();
+            });
 
             return;
         });

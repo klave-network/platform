@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node';
 import { logger } from '@klave/providers';
 import idgen from '@ideafast/idgen';
 import { publicProcedure, createTRPCRouter } from '../trpc';
@@ -208,7 +209,11 @@ export const authRouter = createTRPCRouter({
                 const [keySelector, domainName] = (process.env['KLAVE_DKIM_DOMAIN'] ?? '@').split('@');
                 if (!keySelector || !domainName)
                     throw new Error('DKIM domain not set');
-                await transporter.sendMail({
+                await Sentry.startSpan({
+                    name: 'Email Transport',
+                    op: 'mailer.send',
+                    description: 'Email Transport'
+                }, async () => transporter.sendMail({
                     from: process.env['KLAVE_NOREPLY_ADDRESS'],
                     to: email,
                     subject: 'Login code',
@@ -218,7 +223,7 @@ export const authRouter = createTRPCRouter({
                         keySelector,
                         privateKey: process.env['KLAVE_DKIM_PRIVATE_KEY'] ?? ''
                     }
-                });
+                }));
                 return {
                     ok: true
                 };

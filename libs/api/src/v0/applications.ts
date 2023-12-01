@@ -1,4 +1,5 @@
 import { createTRPCRouter, publicProcedure } from '../trpc';
+import * as Sentry from '@sentry/node';
 import { probot, scp, scpOps } from '@klave/providers';
 import type { Application } from '@prisma/client';
 import { z } from 'zod';
@@ -147,29 +148,34 @@ export const applicationRouter = createTRPCRouter({
 
             if (scpOps.isConnected()) {
 
-                try {
-                    await scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${appId}`, {
-                        app_id: appId
-                    }).send()
-                        .then(async (result: any) => {
-                            if (result.kredit === undefined)
-                                throw (new Error('No credits returned'));
-                            return prisma.application.update({
-                                where: {
-                                    id: appId
-                                },
-                                data: {
-                                    kredits: result.kredit
-                                }
+                await Sentry.startSpan({
+                    name: 'SCP Subtask',
+                    op: 'scp.task',
+                    description: 'Secretarium Task'
+                }, async () => {
+                    try {
+                        await scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${appId}`, {
+                            app_id: appId
+                        }).send()
+                            .then(async (result: any) => {
+                                if (result.kredit === undefined)
+                                    throw (new Error('No credits returned'));
+                                return prisma.application.update({
+                                    where: {
+                                        id: appId
+                                    },
+                                    data: {
+                                        kredits: result.kredit
+                                    }
+                                });
+                            }).catch(() => {
+                                // Swallow this error
                             });
-                        }).catch(() => {
-                            // Swallow this error
-                        });
-                } catch (e) {
-                    console.error(e);
-                    ///
-                }
-
+                    } catch (e) {
+                        console.error(e);
+                        ///
+                    }
+                });
             }
 
             return await prisma.application.findUnique({
@@ -252,27 +258,33 @@ export const applicationRouter = createTRPCRouter({
 
             if (scpOps.isConnected()) {
 
-                try {
-                    await scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
-                        app_id: app.id
-                    }).send().then(async (result: any) => {
-                        if (result.kredit === undefined)
-                            throw (new Error('No credits returned'));
-                        return prisma.application.update({
-                            where: {
-                                id: app.id
-                            },
-                            data: {
-                                kredits: result.kredit
-                            }
+                await Sentry.startSpan({
+                    name: 'SCP Subtask',
+                    op: 'scp.task',
+                    description: 'Secretarium Task'
+                }, async () => {
+                    try {
+                        await scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
+                            app_id: app.id
+                        }).send().then(async (result: any) => {
+                            if (result.kredit === undefined)
+                                throw (new Error('No credits returned'));
+                            return prisma.application.update({
+                                where: {
+                                    id: app.id
+                                },
+                                data: {
+                                    kredits: result.kredit
+                                }
+                            });
+                        }).catch(() => {
+                            // Swallow this error
                         });
-                    }).catch(() => {
-                        // Swallow this error
-                    });
-                } catch (e) {
-                    console.error(e);
-                    ///
-                }
+                    } catch (e) {
+                        console.error(e);
+                        ///
+                    }
+                });
 
             }
 

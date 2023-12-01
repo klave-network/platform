@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import * as Sentry from '@sentry/node';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import { Organisation } from '@prisma/client';
 import { scp } from '@klave/providers';
@@ -323,19 +324,24 @@ export const organisationRouter = createTRPCRouter({
                     }
                 })
             ]);
-
-            await new Promise((resolve, reject) => {
-                scp.newTx('wasm-manager', 'add_kredit', `klave-app-set-kredit-${application.id}`, {
-                    app_id: application.id,
-                    kredit: amount
-                }).onResult(result => {
-                    resolve(result);
-                }).onExecuted(result => {
-                    resolve(result);
-                }).onError(error => {
-                    reject(error);
-                }).send()
-                    .catch(reject);
+            await Sentry.startSpan({
+                name: 'SCP Subtask',
+                op: 'scp.task',
+                description: 'Secretarium Task'
+            }, async () => {
+                return await new Promise((resolve, reject) => {
+                    scp.newTx('wasm-manager', 'add_kredit', `klave-app-set-kredit-${application.id}`, {
+                        app_id: application.id,
+                        kredit: amount
+                    }).onResult(result => {
+                        resolve(result);
+                    }).onExecuted(result => {
+                        resolve(result);
+                    }).onError(error => {
+                        reject(error);
+                    }).send()
+                        .catch(reject);
+                });
             });
         })
 });

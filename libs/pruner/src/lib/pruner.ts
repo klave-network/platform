@@ -1,6 +1,7 @@
 import { prisma } from '@klave/db';
 import { router } from '@klave/api';
 import { logger, scp, scpOps } from '@klave/providers';
+import * as Sentry from '@sentry/node';
 
 let intervalTimer: NodeJS.Timeout;
 
@@ -185,15 +186,21 @@ async function reconcileApplicationKredits() {
 }
 
 export async function prune() {
-    try {
-        await errorLongDeployingDeployments();
-        await terminateExpiredDeployments();
-        await cleanDisconnectedDeployments();
-        await cancelUpdatingDeployments();
-        // await reconcileApplicationKredits();
-    } catch (e) {
-        logger.error('Error while pruning', e);
-    }
+    return Sentry.startSpan({
+        name: 'CRON Prunner',
+        op: 'prunner.cron',
+        status: 'ok'
+    }, async () => {
+        try {
+            await errorLongDeployingDeployments();
+            await terminateExpiredDeployments();
+            await cleanDisconnectedDeployments();
+            await cancelUpdatingDeployments();
+            // await reconcileApplicationKredits();
+        } catch (e) {
+            logger.error('Error while pruning', e);
+        }
+    });
 }
 
 type PrunerOptions = {
