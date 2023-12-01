@@ -1,14 +1,14 @@
-import { RequestHandler } from 'express-serve-static-core';
+import { RequestHandler, ErrorRequestHandler } from 'express-serve-static-core';
 import * as Sentry from '@sentry/node';
 import * as SecretariumInstruments from '@secretarium/instrumentation';
-import { client as prismaClient } from '../../utils/db';
+import { prisma } from '@klave/db';
 import { logger, scp as scpClient, scpOps } from '@klave/providers';
 import type { Application } from 'express';
 import { permissiblePeers } from '@klave/constants';
 
 let sentryRequestMiddlewareReference: RequestHandler;
 let sentryTracingMiddlewareReference: RequestHandler;
-let sentryErrorMiddlewareReference: RequestHandler;
+let sentryErrorMiddlewareReference: ErrorRequestHandler;
 
 const initializeSentry = (app: Application) => {
     logger.info('Initializing Sentry');
@@ -24,7 +24,7 @@ const initializeSentry = (app: Application) => {
                 app
             }),
             new Sentry.Integrations.Prisma({
-                client: prismaClient
+                client: prisma
             }),
             new Sentry.Integrations.Mongo(),
             new SecretariumInstruments.Sentry.ConnectorTracing({
@@ -52,12 +52,12 @@ const initializeSentry = (app: Application) => {
             return () => {
                 //
             };
-        return func() as RequestHandler;
+        return func();
     };
 
     sentryRequestMiddlewareReference = fork(Sentry.Handlers.requestHandler);
     sentryTracingMiddlewareReference = fork(Sentry.Handlers.tracingHandler);
-    sentryErrorMiddlewareReference = fork(Sentry.Handlers.errorHandler);
+    sentryErrorMiddlewareReference = fork<ErrorRequestHandler>(Sentry.Handlers.errorHandler);
 };
 
 export const sentryRequestMiddleware: RequestHandler = (req, res, next) => {
@@ -74,9 +74,9 @@ export const sentryTracingMiddleware: RequestHandler = (req, res, next) => {
     return sentryTracingMiddlewareReference(req, res, next);
 };
 
-export const sentryErrorMiddleware: RequestHandler = (req, res, next) => {
+export const sentryErrorMiddleware: ErrorRequestHandler = (err, req, res, next) => {
 
     if (!sentryErrorMiddlewareReference)
         initializeSentry(req.app);
-    return sentryErrorMiddlewareReference(req, res, next);
+    return sentryErrorMiddlewareReference(err, req, res, next);
 };
