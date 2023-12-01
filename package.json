@@ -64,7 +64,7 @@
         "autoprefixer": "10.4.16",
         "axios": "^1.6.2",
         "base64url": "3.0.1",
-        "chalk": "^4.1.2",
+        "chalk": "^5.3.0",
         "commander": "^7.2.0",
         "connect-mongo": "5.1.0",
         "core-js": "^3.33.3",
