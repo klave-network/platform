@@ -6,7 +6,7 @@
  * tl;dr - this is where all the tRPC server stuff is created and plugged in.
  * The pieces you will need to use are documented accordingly near the end
  */
-
+import * as Sentry from '@sentry/node';
 import { type Context } from './context';
 import { transformer } from './transformer';
 
@@ -26,6 +26,20 @@ const t = initTRPC
             return shape;
         }
     });
+
+const sentryMiddlewarePrimitive =
+    Sentry.Handlers.trpcMiddleware({
+        attachRpcInput: true
+    });
+
+const sentryMiddleware = t.middleware(async (opts) => {
+    return sentryMiddlewarePrimitive({
+        path: opts.path,
+        type: opts.type,
+        next: opts.next,
+        rawInput: opts.getRawInput()
+    });
+});
 
 /**
  * 3. ROUTER & PROCEDURE (THE IMPORTANT BIT)
@@ -47,7 +61,7 @@ export const createTRPCRouter = t.router;
  * tRPC API. It does not guarantee that a user querying is authorized, but you
  * can still access user session data if they are logged in
  */
-export const publicProcedure = t.procedure;
+export const publicProcedure = t.procedure.use(sentryMiddleware);
 
 /**
  * Reusable middleware that enforces users are logged in before running the
