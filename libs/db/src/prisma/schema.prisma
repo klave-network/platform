@@ -54,7 +54,6 @@ model CreditPurchase {
     id                    String       @id @default(uuid()) @map("_id")
     organisation          Organisation @relation(fields: [organisationId], references: [id])
     organisationId        String
-    kredits               BigInt
     checkoutSessionId     String
     checkoutSessionStatus String
     setteled              Boolean      @default(false)
@@ -230,6 +229,11 @@ model ActivityLog {
     createdAt     DateTime          @default(now())
 }
 
+type Limits {
+    queryCallSpend       BigInt @default(0)
+    transactionCallSpend BigInt @default(0)
+}
+
 model Application {
     id               String            @id @default(uuid()) @map("_id")
     web              Web               @relation(fields: [webId], references: [id])
@@ -241,6 +245,7 @@ model Application {
     description      String?
     webhook          String?
     homepage         String?
+    limits           Limits
     kredits          BigInt            @default(0)
     catogories       String[]          @default([])
     tags             String[]          @default([])

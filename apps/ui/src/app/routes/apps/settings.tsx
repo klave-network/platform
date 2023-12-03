@@ -1,12 +1,14 @@
-import { FC, useState } from 'react';
+import { ChangeEvent, FC, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
-import { UilSpinner, UilTrash } from '@iconscout/react-unicons';
+import { UilEdit, UilSpinner, UilTrash } from '@iconscout/react-unicons';
 import api from '../../utils/api';
 import { useZodForm } from '../../utils/useZodForm';
 import { z } from 'zod';
 import { useEffect } from 'react';
 import CreditDisplay from '../../components/CreditDisplay';
+import { Application } from '@klave/db';
+import { useToggle } from 'usehooks-ts';
 
 const ApplicationDeletion = () => {
 
@@ -77,6 +79,66 @@ const ApplicationDeletion = () => {
     </AlertDialog.Root>;
 };
 
+type LimitEditorProps = {
+    kredits: bigint | number
+    application: Partial<Application>
+}
+
+const LimitEditor: FC<LimitEditorProps> = ({ kredits, application: { id } }) => {
+
+    const kreditValue = useMemo(() => Number(kredits), [kredits]);
+    const [isEditing, toggleEditing] = useToggle(false);
+    const [currentValue, setCurrentValue] = useState(kreditValue);
+    const { mutateAsync, error, isPending } = api.v0.applications.setLimits.useMutation();
+    const appAPIUtils = api.useUtils().v0.applications;
+
+    useEffect(() => {
+        setCurrentValue(kreditValue);
+    }, [kreditValue]);
+
+    if (!id || kredits === undefined)
+        return null;
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const sanitized = e.currentTarget.value.replace(/[^0-9.-]/g, '');
+        if (!Number.isNaN(parseFloat(sanitized)))
+            setCurrentValue(parseFloat(sanitized));
+    };
+
+    const setLimits = () => {
+        (async () => {
+            await mutateAsync({
+                applicationId: id,
+                limits: {
+                    transactionCallSpend: currentValue as any as bigint
+                }
+            });
+            await appAPIUtils.getAll.invalidate();
+            await appAPIUtils.getById.invalidate();
+            await appAPIUtils.getBySlug.invalidate();
+            await appAPIUtils.getByOrganisation.invalidate();
+            toggleEditing();
+        })()
+            .catch(() => { return; });
+    };
+
+    if (isEditing)
+        return <form className='flex flex-row gap-2' onSubmit={e => e.preventDefault()}>
+            <div className='leading-snug pt-1'>
+                <input type='text' value={currentValue.toString()} onChange={handleChange} className='inline border p-2 h-6 text-sm' /><br />
+                {isPending
+                    ? <span className='text-xs text-green-700'>Setting the new limit ... <UilSpinner className='inline-block animate-spin h-4' /></span>
+                    : <span className='text-xs text-red-700'>{error?.message?.toString() ?? ''} &nbsp;</span>
+                }
+            </div>
+            <button disabled={isPending} type="submit" className='border bg-primary-500 p-2' onClick={setLimits}>Save</button>
+        </form >;
+
+    if (kreditValue === 0)
+        return <b><span className='text-klave-light-blue'>Unlimited</span> <UilEdit onClick={() => toggleEditing()} className='inline-block h-3 hover:cursor-pointer' /></b>;
+
+    return <b><CreditDisplay compact={true} kredits={kredits} /> <UilEdit onClick={() => toggleEditing()} className='inline-block h-3 hover:cursor-pointer' /></b>;
+};
 
 export const AppSettings: FC = () => {
 
@@ -171,6 +233,13 @@ export const AppSettings: FC = () => {
                 Owner: <b>{application.repo.owner}</b><br />
                 Name: <b>{application.repo.name}</b><br />
                 Default branch: <b>{application.repo.defaultBranch ?? 'master'}</b><br />
+            </p>
+        </div>
+        <div>
+            <h1 className='font-bold text-xl mb-5'>Limits</h1>
+            <p>
+                {/* Query spending limit: <b>{application.limits.queryCallSpend.toString()}</b><br /> */}
+                Transaction spending limit: <LimitEditor kredits={application.limits.transactionCallSpend} application={application} /><br />
             </p>
         </div>
         <div>

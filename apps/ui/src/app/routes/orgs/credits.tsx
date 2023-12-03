@@ -91,7 +91,7 @@ const CreditCellEdit: FC<{
 
     const { kredits, id } = application;
     const [isEditing, toggleEditing] = useToggle(false);
-    const kreditValue = useMemo(() => kredits ? parseFloat(kredits.toString()) : 0, [kredits]);
+    const kreditValue = useMemo(() => Number(kredits), [kredits]);
     const [currentValue, setCurrentValue] = useState(kreditValue);
     const { mutateAsync, error, isPending } = api.v0.organisations.allocationCredits.useMutation();
     const orgAPIUtils = api.useUtils().v0.organisations;
@@ -119,6 +119,8 @@ const CreditCellEdit: FC<{
             await orgAPIUtils.getAll.invalidate();
             await orgAPIUtils.getBySlug.invalidate();
             await appAPIUtils.getAll.invalidate();
+            await appAPIUtils.getById.invalidate();
+            await appAPIUtils.getBySlug.invalidate();
             await appAPIUtils.getByOrganisation.invalidate();
             toggleEditing();
         })()

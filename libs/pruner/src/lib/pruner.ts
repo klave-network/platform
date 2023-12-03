@@ -198,6 +198,7 @@ export async function prune() {
             await cleanDisconnectedDeployments();
             await cancelUpdatingDeployments();
             // await reconcileApplicationKredits();
+            // await reconcileApplicationLimits();
         } catch (e) {
             logger.error('Error while pruning', e);
         }
