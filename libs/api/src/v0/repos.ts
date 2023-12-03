@@ -4,7 +4,7 @@ import { createTRPCRouter, publicProcedure } from '../trpc';
 import { z } from 'zod';
 import { objectToCamel } from 'ts-case-convert';
 import { isTruthy } from './utils/isTruthy';
-import type { DeployableRepo, GitHubToken } from '@prisma/client';
+import type { DeployableRepo, GitHubToken } from '@klave/db';
 import { repoConfigSchema } from './utils/repoConfigChecker';
 
 export const reposRouter = createTRPCRouter({

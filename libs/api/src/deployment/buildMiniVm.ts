@@ -11,7 +11,7 @@ import { createCompiler } from '@klave/compiler';
 import type { Context } from 'probot';
 // import { KlaveRcConfiguration } from '@klave/sdk';
 import { DeploymentPushPayload } from '../types';
-import { Repo } from '@prisma/client';
+import { Repo } from '@klave/db';
 import { dummyMap } from './dummyVmFs';
 import { logger } from '@klave/providers';
 

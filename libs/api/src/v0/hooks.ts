@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@klave/db';
 import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 

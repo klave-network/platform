@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import { UilCheckCircle, UilGlobe, UilPlus, UilSpinner, UilTimesCircle, UilTrash } from '@iconscout/react-unicons';
 import api from '../../utils/api';
-import { Domain } from '@prisma/client';
+import { Domain } from '@klave/db';
 import { useZodForm } from '../../utils/useZodForm';
 import { z } from 'zod';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';

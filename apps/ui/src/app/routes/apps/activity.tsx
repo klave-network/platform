@@ -1,5 +1,5 @@
 import { UilSpinner } from '@iconscout/react-unicons';
-import { ActivityLog } from '@prisma/client';
+import { ActivityLog } from '@klave/db';
 import type { DeploymentPullRequestPayload, DeploymentPushPayload } from '@klave/api';
 import { type FC } from 'react';
 import { useParams } from 'react-router-dom';

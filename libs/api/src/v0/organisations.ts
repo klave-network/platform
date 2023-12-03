@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import * as Sentry from '@sentry/node';
 import { createTRPCRouter, publicProcedure } from '../trpc';
-import { Organisation } from '@prisma/client';
+import { Organisation } from '@klave/db';
 import { scp } from '@klave/providers';
 import { reservedNames } from '@klave/constants';
 

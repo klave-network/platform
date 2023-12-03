@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import { UilSpinner, UilTrash } from '@iconscout/react-unicons';
 import api from '../../utils/api';
-import { Deployment } from '@prisma/client';
+import { Deployment } from '@klave/db';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
 
 type DeploymentContextProps = {

@@ -1,5 +1,5 @@
 import { UilSpinner } from '@iconscout/react-unicons';
-import { Application } from '@prisma/client';
+import { Application } from '@klave/db';
 import { FC, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import api from '../../utils/api';
