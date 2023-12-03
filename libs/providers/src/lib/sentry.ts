@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/node';
+import { ProfilingIntegration } from '@sentry/profiling-node';
 import * as SecretariumInstruments from '@secretarium/instrumentation';
 import { prisma } from '@klave/db';
 import { logger, scp as scpClient, scpOps } from '..';
@@ -28,12 +29,13 @@ export const sentryOps = {
                         connector: scpClient,
                         domains: ['.sta.klave.network']
                     })
-                ],
+                ].concat(process.env['NODE_ENV'] === 'development' ? [new ProfilingIntegration()] : []),
                 // Set tracesSampleRate to 1.0 to capture 100%
                 // of transactions for performance monitoring.
                 // We recommend adjusting this value in production
                 tracesSampleRate: 1.0,
                 tracePropagationTargets: permissiblePeers,
+                profilesSampleRate: 1.0,
                 beforeSend: (event) => {
                     const secretariumVersion = scpOps.version();
                     if (!event.tags)
