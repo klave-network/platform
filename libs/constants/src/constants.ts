@@ -10,6 +10,7 @@ export const permissiblePeers = [
 ];
 
 export const reservedNames = [
+    // Base
     '300',
     '301',
     '302',
@@ -70,6 +71,8 @@ export const reservedNames = [
     'admins',
     'administration',
     'administrations',
+    'administrator',
+    'administrators',
     'advisory',
     'advisories',
     'anonymous',
@@ -95,9 +98,15 @@ export const reservedNames = [
     'case-studies',
     'categories',
     'central',
+    'cert',
+    'certs',
+    'certificate',
+    'certificates',
     'certification',
     'certifications',
     'changelog',
+    'chain',
+    'chains',
     'chat',
     'cli',
     'cloud',
@@ -163,6 +172,8 @@ export const reservedNames = [
     'help',
     'help-wanted',
     'home',
+    'honest',
+    'honestdev',
     'hooks',
     'hosting',
     'hovercards',
@@ -198,6 +209,9 @@ export const reservedNames = [
     'login',
     'logos',
     'logout',
+    'log',
+    'logs',
+    'logchain',
     'mac',
     'maintenance',
     'malware',
@@ -367,6 +381,7 @@ export const reservedNames = [
     'www7',
     'www8',
     'www9',
+    // GAFAM
     'amazon',
     'google',
     'microsoft',
@@ -375,6 +390,7 @@ export const reservedNames = [
     'instagram',
     'facebook',
     'meta',
+    // Domains
     'amlyse',
     'amlytic',
     'cleandataroom',
