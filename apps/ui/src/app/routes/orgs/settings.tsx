@@ -6,6 +6,7 @@ import api from '../../utils/api';
 import { useZodForm } from '../../utils/useZodForm';
 import { z } from 'zod';
 import { useEffect } from 'react';
+import CreditDisplay from '../../components/CreditDisplay';
 
 const OrganisationDeletion = () => {
 
@@ -156,7 +157,7 @@ export const OrganisationSettings: FC = () => {
         <div>
             <h1 className='font-bold text-xl mb-5'>Credit allocation</h1>
             <p>
-                Balance: <b>{parseFloat(organisation.kredits.toString()) / 10_000}</b><br />
+                Balance: <b><CreditDisplay kredits={organisation.kredits} /></b><br />
             </p>
         </div>
         <div>

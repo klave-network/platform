@@ -6,6 +6,7 @@ import api from '../../utils/api';
 import { useZodForm } from '../../utils/useZodForm';
 import { z } from 'zod';
 import { useEffect } from 'react';
+import CreditDisplay from '../../components/CreditDisplay';
 
 const ApplicationDeletion = () => {
 
@@ -175,7 +176,7 @@ export const AppSettings: FC = () => {
         <div>
             <h1 className='font-bold text-xl mb-5'>Credit allocation</h1>
             <p>
-                Balance: <b>{parseFloat(application.kredits.toString()) / 10_000}</b><br />
+                Balance: <b><CreditDisplay kredits={application.kredits} /></b><br />
                 <Link to={`/organisation/${orgSlug}/credits`} className='text-klave-light-blue hover:underline'>Manage credit allocations</Link>
             </p>
         </div>

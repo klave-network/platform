@@ -7,6 +7,7 @@ import { Application } from '@klave/db';
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
 import api from '../../utils/api';
 import { useToggle } from 'usehooks-ts';
+import CreditDisplay from '../../components/CreditDisplay';
 
 // Make sure to call loadStripe outside of a component’s render to avoid
 // recreating the Stripe object on every render.
@@ -24,8 +25,7 @@ const CheckoutForm = () => {
     const [, setSearchParams] = useSearchParams();
     const { pathname } = useLocation();
     const { data } = api.v0.credits.createCheckoutSession.useQuery({
-        pathname,
-        quantity: 1
+        pathname
     });
 
     const sessionId = useMemo(() => data?.id, [data?.id]);
@@ -87,18 +87,18 @@ const OrganisationAddCredit = () => {
 const CreditCellEdit: FC<{
     max: bigint,
     application: Partial<Application>
-}> = ({ application }) => {
+}> = ({ application, max }) => {
 
     const { kredits, id } = application;
     const [isEditing, toggleEditing] = useToggle(false);
-    const kreditValue = useMemo(() => kredits ? parseFloat(kredits.toString()) / 10_000 : 0, [kredits]);
-    const [currentValue, setCurrentValue] = useState(kreditValue.toString());
-    const { mutateAsync, isPending } = api.v0.organisations.allocationCredits.useMutation();
+    const kreditValue = useMemo(() => kredits ? parseFloat(kredits.toString()) : 0, [kredits]);
+    const [currentValue, setCurrentValue] = useState(kreditValue);
+    const { mutateAsync, error, isPending } = api.v0.organisations.allocationCredits.useMutation();
     const orgAPIUtils = api.useUtils().v0.organisations;
     const appAPIUtils = api.useUtils().v0.applications;
 
     useEffect(() => {
-        setCurrentValue(kreditValue.toString());
+        setCurrentValue(kreditValue);
     }, [kreditValue]);
 
     if (!id || kredits === undefined)
@@ -107,14 +107,14 @@ const CreditCellEdit: FC<{
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const sanitized = e.currentTarget.value.replace(/[^0-9.-]/g, '');
         if (!Number.isNaN(parseFloat(sanitized)))
-            setCurrentValue(sanitized);
+            setCurrentValue(parseFloat(sanitized));
     };
 
     const allocateCredit = () => {
         (async () => {
             await mutateAsync({
                 applicationId: id,
-                amount: parseFloat(currentValue) * 10_000
+                amount: currentValue - Number(kredits)
             });
             await orgAPIUtils.getAll.invalidate();
             await orgAPIUtils.getBySlug.invalidate();
@@ -127,14 +127,18 @@ const CreditCellEdit: FC<{
 
     if (isEditing)
         return <div className='flex gap-4 items-center align-middle justify-end grow'>
-            <input value={currentValue} onChange={handleChange} className='rounded-sm' />
+            <CreditDisplay kredits={currentValue} size='small' justify='end' className='w-30' />
+            <div className='leading-snug pt-1'>
+                <input type="range" min={0} max={Number(kredits + max)} onChange={handleChange} value={currentValue} className={`range range-xs w-40 ${error ? 'range-error' : 'range-info'}`} /><br />
+                <span className='text-xs text-red-700'>{error?.message?.toString() ?? ''} &nbsp;</span>
+            </div>
             <button disabled={isPending} onClick={allocateCredit} className='flex rounded-sm border border-slate-300 bg-slate-100 p-0 h-7 w-7 items-center justify-center hover:bg-slate-200 hover:cursor-pointer'>
                 {isPending ? <UilSpinner className='inline-block h-4 animate-spin' /> : <UilCheck className='h-4' />}
             </button>
         </div>;
 
     return <div className='flex gap-4 items-center align-middle justify-end grow'>
-        <span className='block h-5 font-bold'>{kreditValue}</span>
+        <CreditDisplay kredits={kreditValue} size='small' justify='end' className='w-30' />
         <button disabled={isPending} onClick={toggleEditing} className='flex rounded-sm border border-slate-300 bg-slate-100 p-0 h-7 w-7 items-center justify-center hover:bg-slate-200 hover:cursor-pointer'>
             <UilEdit className='h-4' />
         </button>
@@ -177,7 +181,7 @@ export const OrganisationSettings: FC = () => {
         <div>
             <h1 className='font-bold text-xl mb-5'>Total Balance</h1>
             <p>
-                Balance: <b>{parseFloat(organisation.kredits.toString()) / 10_000}</b><br />
+                Balance: <b><CreditDisplay kredits={organisation.kredits} /></b><br />
                 {isReturningFromCheckout
                     ? <>
                         <span className='text-green-700'>Thank you for your purchase! We are updating your balance...</span>
@@ -197,7 +201,7 @@ export const OrganisationSettings: FC = () => {
                             <th className='text-left'>
                                 Application
                             </th>
-                            <th className='text-right'>
+                            <th className='text-right items-end'>
                                 Balance
                             </th>
                         </tr>
