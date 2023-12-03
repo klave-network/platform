@@ -13,10 +13,9 @@ const checkStripeInit = () => {
 export const creditsRouter = createTRPCRouter({
     createCheckoutSession: publicProcedure
         .input(z.object({
-            pathname: z.string(),
-            quantity: z.number().int().min(1)
+            pathname: z.string()
         }))
-        .query(async ({ ctx: { prisma, session: { user } }, input: { pathname, quantity } }) => {
+        .query(async ({ ctx: { prisma, session: { user } }, input: { pathname } }) => {
             if (!user)
                 throw new Error('Not logged in');
             const origin = process.env['KLAVE_WEBAUTHN_ORIGIN'];
@@ -31,9 +30,8 @@ export const creditsRouter = createTRPCRouter({
                 ui_mode: 'embedded',
                 line_items: [
                     {
-                        // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
                         price: priceId,
-                        quantity
+                        quantity: 1
                     }
                 ],
                 mode: 'payment',
@@ -46,7 +44,6 @@ export const creditsRouter = createTRPCRouter({
                 data: {
                     checkoutSessionId: session.id,
                     checkoutSessionStatus: session.status ?? 'pending',
-                    kredits: quantity * 100_000_000,
                     organisation: {
                         connect: {
                             slug: pathname.split('/')[2]
