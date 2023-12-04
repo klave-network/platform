@@ -47,7 +47,11 @@ export const start = async (port: number) => {
     app.use(sentryTracingMiddleware);
     app.use(morganLoggerMiddleware);
     app.use(rateLimiterMiddleware);
-    app.use(express.json());
+    app.use(express.json({
+        verify: (req, __unusedRed, buf) => {
+            (req as any).rawBody = buf;
+        }
+    }));
     app.use(express.urlencoded({ extended: true }));
     // app.use(i18nextMiddleware);
     app.use(multer().none());
