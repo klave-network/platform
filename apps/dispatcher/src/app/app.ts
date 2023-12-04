@@ -37,7 +37,11 @@ export async function app(fastify: FastifyInstance) {
         delete newHeaders.connection;
         delete newHeaders.host;
 
+        // We assume that the request is not too long
+        // We assume that it is not a multipart request either
+        const rawContent = Uint8Array.from(req.raw.read() ?? []);
         const responseRegister: Promise<[string, number]>[] = [];
+
         endpoints.forEach(([name, base]) => {
             responseRegister.push(new Promise(resolve => {
                 setTimeout(() => {
@@ -47,7 +51,7 @@ export async function app(fastify: FastifyInstance) {
                 fetch(base, {
                     method: req.method,
                     headers: newHeaders as Record<string, string>,
-                    body: JSON.stringify(req.body)
+                    body: rawContent
                 }).then((response) => {
                     fastify.log.debug(undefined, `Receiving response from ${name}`);
                     resolve([name, response.status]);
@@ -64,7 +68,7 @@ export async function app(fastify: FastifyInstance) {
                 try {
                     connection.socket.send(JSON.stringify({
                         headers: newHeaders,
-                        body: req.body
+                        body: Array.from(rawContent)
                     }), (err) => {
                         if (err)
                             return resolve([id, 503]);

@@ -19,6 +19,11 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3000;
         bodyLimit: 10485760
     });
 
+    server.removeAllContentTypeParsers();
+    server.addContentTypeParser('*', function (__unusedReq, __unusedPayload, done) {
+        done(null);
+    });
+
     // Register skeleton plugins.
     await server.register(rateLimiter, {
         max: 100,
