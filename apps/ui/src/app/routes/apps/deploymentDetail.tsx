@@ -1,13 +1,14 @@
 import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import * as Tabs from '@radix-ui/react-tabs';
-import { UilSpinner } from '@iconscout/react-unicons';
+import { UilLock, UilLockSlash, UilSpinner } from '@iconscout/react-unicons';
 import { Utils } from '@secretarium/crypto';
 import api from '../../utils/api';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
 import { DeploymentPromotion, DeploymentDeletion } from './deployments';
 import RunCommand from '../../components/RunCommand';
 import AttestationChecker from '../../components/AttestationChecker';
+import { commitVerificationReasons } from '@klave/constants';
 
 export const AppDeploymentDetail: FC = () => {
 
@@ -36,7 +37,7 @@ export const AppDeploymentDetail: FC = () => {
             <UilSpinner className='inline-block animate-spin' />
         </>;
 
-    const { deploymentAddress, createdAt, life, status, version, build, branch } = deployment;
+    const { deploymentAddress, createdAt, life, status, version, build, branch, commit } = deployment;
 
     if (!deploymentAddress)
         return <>
@@ -44,6 +45,14 @@ export const AppDeploymentDetail: FC = () => {
         </>;
 
     const { fqdn } = deploymentAddress;
+    const verification = commit?.verification;
+    const { verified, reason } = verification || {};
+    const badge = !verification ? null : verified
+        ? <div className="badge badge-xs py-2 text-lime-500 border-lime-400"><UilLock className='h-3 w-3 mr-1' />{commitVerificationReasons[reason ?? 'unknown']}</div>
+        : reason === 'unsigned'
+            ? <div className="badge badge-xs py-2 text-slate-400 border-slate-500"><UilLockSlash className='h-3 w-3 mr-1' />{commitVerificationReasons[reason ?? 'unknown']}</div>
+            : <div className="badge badge-xs py-2 text-red-400 border-red-400"><UilLockSlash className='h-3 w-3 mr-1' />{commitVerificationReasons[reason ?? 'unknown']}</div>;
+
 
     return <div className="flex flex-col w-full mb-7">
         <div className="flex w-full justify-between">
@@ -76,8 +85,9 @@ export const AppDeploymentDetail: FC = () => {
             <div className='mb-10'>
                 <h2 className='font-bold mb-3'>Branch</h2>
                 <div className="flex items-center">
-                    <div className="sm:flex hidden flex-col">
-                        <span className='font-mono inline-block rounded dark:text-slate-400 dark:bg-slate-800 text-slate-900 bg-slate-100 px-2 py-1 mb-1 whitespace-nowrap' title={!branch ? undefined : branch}>{branch?.replace('refs/heads/', '')}</span>
+                    <div className="sm:flex hidden flex-row align-middle gap-2 items-center">
+                        <span className='font-mono inline rounded dark:text-slate-400 dark:bg-slate-800 text-slate-900 bg-slate-100 px-2 py-1 mb-1 whitespace-nowrap' title={!branch ? undefined : branch}>{branch?.replace('refs/heads/', '')}</span>
+                        <span className='pb-1'>{badge}</span>
                     </div>
                 </div>
             </div>

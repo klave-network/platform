@@ -1,3 +1,5 @@
+import { Commit } from '@klave/db';
+
 export interface DeploymentBasePayload {
     class: string;
     type: string;
@@ -22,6 +24,7 @@ export interface DeploymentPushPayload extends DeploymentBasePayload {
         before?: string;
         after: string;
     }
+    headCommit: Commit | null;
 }
 
 export interface DeploymentPullRequestPayload extends DeploymentBasePayload {
@@ -32,6 +35,7 @@ export interface DeploymentPullRequestPayload extends DeploymentBasePayload {
         before?: string;
         after: string;
     },
+    headCommit: Commit | null;
     pullRequest: {
         url: string;
         number: number;

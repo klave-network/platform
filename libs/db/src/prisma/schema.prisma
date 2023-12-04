@@ -159,6 +159,40 @@ enum DeploymentLifespan {
     long
 }
 
+enum CommitVerificationReason {
+    expired_key
+    not_signing_key
+    gpgverify_error
+    gpgverify_unavailable
+    unsigned
+    unknown_signature_type
+    no_user
+    unverified_email
+    bad_email
+    unknown_key
+    malformed_signature
+    invalid
+    valid
+    unknown
+}
+
+type CommitVerification {
+    verified  Boolean
+    reason    CommitVerificationReason?
+    signature String?
+    payload   String?
+}
+
+type Commit {
+    source       CodeSource
+    sha          String
+    message      String
+    author       String?
+    date         DateTime
+    parents      String[]
+    verification CommitVerification?
+}
+
 model Deployment {
     id                   String             @id @default(uuid()) @map("_id")
     deploymentAddress    DeploymentAddress?
@@ -166,6 +200,7 @@ model Deployment {
     branch               String?
     version              String?
     build                String?
+    commit               Commit?
     locations            String[]           @default([])
     status               DeploymentStatus   @default(created)
     life                 DeploymentLifespan @default(short)

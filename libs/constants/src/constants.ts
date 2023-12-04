@@ -1,3 +1,5 @@
+import type { CommitVerificationReason } from '@klave/db';
+
 export const permissiblePeers = [
     /^chrome-extension:\/\//,
     /^http:\/\/localhost/,
@@ -8,6 +10,23 @@ export const permissiblePeers = [
     /\.secretarium\.com$/,
     /\.secretarium\.org$/
 ];
+
+export const commitVerificationReasons: Record<CommitVerificationReason, string> = {
+    expired_key: 'Expired Key',
+    not_signing_key: 'Not Signing Key',
+    gpgverify_error: 'GPGVerify Error',
+    gpgverify_unavailable: 'GPGVerify Unavailable',
+    unsigned: 'Unsigned',
+    unknown_signature_type: 'Unknown Signature Type',
+    no_user: 'No User',
+    unverified_email: 'Unverified Email',
+    bad_email: 'Bad Email',
+    unknown_key: 'Unknown Key',
+    malformed_signature: 'Malformed Signature',
+    invalid: 'Invalid',
+    valid: 'Valid',
+    unknown: 'Unknown'
+};
 
 export const reservedNames = [
     // Base

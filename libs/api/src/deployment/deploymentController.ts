@@ -2,7 +2,7 @@ import { DeploymentPushPayload } from '../types';
 import { v4 as uuid } from 'uuid';
 import * as Sentry from '@sentry/node';
 import { scp, logger } from '@klave/providers';
-import { Deployment, prisma, DeploymentAddress } from '@klave/db';
+import { Deployment, prisma, DeploymentAddress, Commit, CommitVerificationReason } from '@klave/db';
 // import type { KlaveRcConfiguration } from '@klave/sdk';
 import { Utils } from '@secretarium/connector';
 import * as path from 'node:path';
@@ -14,18 +14,37 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
 
     const { octokit, ...context } = deploymentContext;
     let files: NonNullable<Awaited<ReturnType<typeof octokit.repos.compareCommits>>['data']['files']> = [];
+    let commit: Commit | null = null;
 
     if (context.commit.before) {
         try {
-            const { data: { files: filesManifest } } = await octokit.repos.compareCommits({
+            const { data } = await octokit.repos.compareCommits({
                 owner: context.repo.owner,
                 repo: context.repo.name,
                 base: context.commit.before,
                 head: context.commit.after
             });
 
-            if (filesManifest)
-                files = filesManifest;
+            const commitData = data.commits.pop();
+            if (commitData)
+                commit = {
+                    source: 'github',
+                    author: commitData.author?.name ?? commitData.committer?.name ?? null,
+                    message: commitData.commit.message,
+                    sha: commitData.sha,
+                    date: new Date(commitData.commit.committer?.date ?? Date.now()),
+                    parents: commitData.parents.map(parent => parent.sha),
+                    verification: {
+                        verified: commitData.commit.verification?.verified ?? false,
+                        reason: (commitData.commit.verification?.reason ?? 'unknown') as CommitVerificationReason,
+                        signature: commitData.commit.verification?.signature ?? null,
+                        payload: commitData.commit.verification?.payload ?? null
+                    }
+                };
+
+            if (data.files)
+                files = data.files;
+
         } catch (e) {
             logger.debug('Error while comparing files from github', e);
         }
@@ -33,14 +52,29 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
 
     if (!files?.length) {
         try {
-            const { data: { files: filesManifest } } = await octokit.repos.getCommit({
+            const { data } = await octokit.repos.getCommit({
                 owner: context.repo.owner,
                 repo: context.repo.name,
                 ref: context.commit.after
             });
 
-            if (filesManifest)
-                files = filesManifest;
+            commit = {
+                source: 'github',
+                author: data.author?.name ?? data.committer?.name ?? null,
+                message: data.commit.message,
+                sha: data.sha,
+                date: new Date(data.commit.committer?.date ?? Date.now()),
+                parents: data.parents.map(parent => parent.sha),
+                verification: {
+                    verified: data.commit.verification?.verified ?? false,
+                    reason: (data.commit.verification?.reason ?? 'unknown') as CommitVerificationReason,
+                    signature: data.commit.verification?.signature ?? null,
+                    payload: data.commit.verification?.payload ?? null
+                }
+            };
+
+            if (data.files)
+                files = data.files;
         } catch (e) {
             logger.error('Error while fetching files from github', e);
         }
@@ -159,7 +193,10 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                     },
                     context: {
                         type: context.type,
-                        payload: context
+                        payload: {
+                            ...context,
+                            headCommit: commit
+                        }
                     }
                 }
             });
@@ -219,6 +256,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                             fqdn: target
                                         }
                                     },
+                                    commit,
                                     expiresOn: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
                                     version: availableApplicationsConfig[application.name]?.version,
                                     set: deploymentSet,

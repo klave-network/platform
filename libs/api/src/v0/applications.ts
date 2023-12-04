@@ -510,6 +510,7 @@ export const applicationRouter = createTRPCRouter({
                             ref: afterCommit.sha, // TODO: check if this is the right ref
                             after: afterCommit.sha
                         },
+                        headCommit: null,
                         pusher: {
                             login: afterCommit.author?.login ?? afterCommit.committer?.login ?? afterCommit.commit.author?.name ?? 'unknown',
                             avatarUrl: afterCommit.author?.avatar_url ?? 'https://avatars.githubusercontent.com/u/583231?v=4',

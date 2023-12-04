@@ -199,6 +199,7 @@ const probotApp = (app: Probot) => {
                             before: context.payload.before,
                             after: context.payload.after
                         },
+                        headCommit: null,
                         pusher: {
                             login: context.payload.sender.login,
                             avatarUrl: context.payload.sender.avatar_url,

@@ -1,10 +1,11 @@
-import { UilSpinner } from '@iconscout/react-unicons';
+import { UilLock, UilLockSlash, UilSpinner } from '@iconscout/react-unicons';
 import { ActivityLog } from '@klave/db';
 import type { DeploymentPullRequestPayload, DeploymentPushPayload } from '@klave/api';
 import { type FC } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../../utils/api';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
+import { commitVerificationReasons } from '@klave/constants';
 
 type ActivityRecordProps = {
     activity: ActivityLog
@@ -23,9 +24,16 @@ export const ActivityRecord: FC<ActivityRecordProps> = ({ activity }) => {
             </span>;
     }
     if (activity.class === 'pushHook') {
-        const { pusher, commit, repo } = activity.context.payload as unknown as DeploymentPushPayload;
+        const { pusher, commit, repo, headCommit } = activity.context.payload as unknown as DeploymentPushPayload;
+        const verification = headCommit?.verification;
+        const { verified, reason } = verification || {};
+        const badge = !verification ? null : verified
+            ? <div className="badge badge-xs py-2 text-lime-500 border-lime-400"><UilLock className='h-3 w-3 mr-1' />{commitVerificationReasons[reason ?? 'unknown']}</div>
+            : reason === 'unsigned'
+                ? <div className="badge badge-xs py-2 text-slate-400 border-slate-500"><UilLockSlash className='h-3 w-3 mr-1' />{commitVerificationReasons[reason ?? 'unknown']}</div>
+                : <div className="badge badge-xs py-2 text-red-400 border-red-400"><UilLockSlash className='h-3 w-3 mr-1' />{commitVerificationReasons[reason ?? 'unknown']}</div>;
         return <span className='h-5 block my-2'>
-            <a target='_blank' rel="noreferrer noopener" href={pusher.htmlUrl} className='font-semibold'><img alt={pusher.login} src={pusher.avatarUrl} className='h-full inline-block rounded-full' /> {pusher.login}</a> pushed commit <a target='_blank' rel="noreferrer noopener" href={repo?.url} className="font-mono rounded bg-klave-light-blue text-klave-dark-blue mx-1 px-2 py-1">{commit.after.substring(0, 8)}</a> to branch <a target='_blank' rel="noreferrer noopener" href={repo?.url} className='text-slate-400'>{commit?.ref?.replace('refs/heads/', '')}</a> <i>({formatTimeAgo(activity.createdAt)})</i>
+            <a target='_blank' rel="noreferrer noopener" href={pusher.htmlUrl} className='font-semibold'><img alt={pusher.login} src={pusher.avatarUrl} className='h-full inline-block rounded-full' /> {pusher.login}</a> pushed commit <a target='_blank' rel="noreferrer noopener" href={repo?.url} className="font-mono kbd kbd-s hover:bg-slate-200 mx-1 px-1 py-0 min-h-0 rounded-sm">{commit.after.substring(0, 8)}</a> {badge} to branch <a target='_blank' rel="noreferrer noopener" href={repo?.url} className='text-slate-400'>{commit?.ref?.replace('refs/heads/', '')}</a> <i>({formatTimeAgo(activity.createdAt)})</i>
         </span>;
     }
     return null;
