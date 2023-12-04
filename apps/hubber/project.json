@@ -41,8 +41,7 @@
                     "bundle": true,
                     "extractLicenses": true,
                     "generateLockfile": true,
-                    "generatePackageJson": true,
-                    "esbuildConfig": "apps/hubber/esbuild.config.js"
+                    "generatePackageJson": true
                 }
             }
         },
