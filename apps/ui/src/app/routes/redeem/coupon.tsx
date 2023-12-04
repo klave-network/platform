@@ -51,7 +51,7 @@ export const RedeemCreditCoupon: FC = () => {
                                             from: window.location.pathname
                                         }
                                     })}
-                                    className="border bg-slate-200 hover:bg-slate-300 p-2"
+                                    className="btn btn-sm border bg-slate-200 hover:bg-slate-300 p-2"
                                 >
                                     Go to the login page
                                 </button>
@@ -90,7 +90,7 @@ export const RedeemCreditCoupon: FC = () => {
                                 <button
                                     type="button"
                                     onClick={() => navigate('/')}
-                                    className="border bg-slate-200 hover:bg-slate-300 p-2"
+                                    className="btn btn-sm border bg-slate-200 hover:bg-slate-300 p-2"
                                 >
                                     Go to the dashboard
                                 </button>
@@ -129,14 +129,14 @@ export const RedeemCreditCoupon: FC = () => {
                                 type="submit"
                                 onClick={startRedeeming}
                                 disabled={isPending}
-                                className="border text-white bg-blue-500 hover:bg-blue-400 p-2"
+                                className="btn btn-sm border text-white bg-blue-500 hover:bg-blue-400 p-2"
                             >
                                 {isPending ? 'Redeeming' : 'Redeem'}
                             </button>
                             <button
                                 type="button"
                                 onClick={() => navigate('/')}
-                                className="border bg-slate-200 hover:bg-slate-300 p-2"
+                                className="btn btn-sm border bg-slate-200 hover:bg-slate-300 p-2"
                             >
                                 Skip for now
                             </button>

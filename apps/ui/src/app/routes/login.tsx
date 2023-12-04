@@ -86,9 +86,9 @@ export const Login: FC = () => {
                             >
                                 <div className='flex flex-col gap-3'>
                                     <label>
-                                        <input {...methods.register('slug')} onChange={e => setSlug(e.target.value.trim())} className="border w-2/3" /><br />
+                                        <input {...methods.register('slug')} onChange={e => setSlug(e.target.value.trim())} className="input input-bordered border w-2/3" /><br />
                                         <div className='h-8'>{isCheckingIfExists
-                                            ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-4' /><br />&nbsp;</span>
+                                            ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-full' /><br />&nbsp;</span>
                                             : alreadyExists
                                                 ? <span className="block mt-1 text-xs text-red-700 leading-tight">The name <b>{slug}</b> already exists.<br />&nbsp;</span>
                                                 : slug.length
@@ -107,14 +107,14 @@ export const Login: FC = () => {
                                     <button
                                         type="submit"
                                         disabled={isChangingSlug}
-                                        className="border text-white bg-blue-500 hover:bg-blue-400 p-2"
+                                        className="btn btn-sm border text-white bg-blue-500 hover:bg-blue-400 p-2"
                                     >
                                         {isChangingSlug ? 'Setting up your pseudonym' : 'Set my pseudonymm'}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setSkipAskName(true)}
-                                        className="border bg-slate-200 hover:bg-slate-300 p-2"
+                                        className="btn btn-sm border bg-slate-200 hover:bg-slate-300 p-2"
                                     >
                                         Skip for now
                                     </button>

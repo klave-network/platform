@@ -56,7 +56,7 @@ export const Select: FC = () => {
                 Error message: {error.message}
                 <br />
                 <br />
-                <button disabled={isWorking} onClick={rescanRepos} className='disabled:text-gray-300'>Rescan</button>
+                <button disabled={isWorking} onClick={rescanRepos} className='btn btn-sm disabled:text-gray-300'>Rescan</button>
             </div>
         </>;
     }
@@ -82,12 +82,12 @@ export const Select: FC = () => {
                 Try rescanning your repositories after.
                 <br />
                 <br />
-                <button disabled={isWorking} onClick={rescanRepos} className='bg-blue-600 text-white hover:bg-blue-500 rounded-md disabled:text-gray-300'>Rescan</button>
+                <button disabled={isWorking} onClick={rescanRepos} className='btn btn-sm bg-blue-600 text-white hover:bg-blue-500 rounded-md disabled:text-gray-300'>Rescan</button>
             </> : <>
                 We looked hard but could not find anyting to deploy.<br />
                 Perhaps try to rescan your repositories<br />
                 <br />
-                <button disabled={isWorking} onClick={rescanRepos} className='bg-blue-600 text-white hover:bg-blue-500 rounded-md disabled:text-gray-300'>Rescan</button>
+                <button disabled={isWorking} onClick={rescanRepos} className='btn btn-sm bg-blue-600 text-white hover:bg-blue-500 rounded-md disabled:text-gray-300'>Rescan</button>
             </>}
         </div>
     </>;

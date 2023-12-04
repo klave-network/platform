@@ -28,7 +28,7 @@ export const DeploymentPromotion: FC<DeploymentContextProps> = ({ deployment: { 
 
     return <AlertDialog.Root>
         <AlertDialog.Trigger asChild onClick={e => e.stopPropagation()}>
-            <button className="h-8 inline-flex items-center justify-center font-normal text-gray-400 ml-auto">
+            <button className="btn btn-sm h-8 inline-flex items-center justify-center font-normal text-gray-400 ml-auto">
                 Release
             </button>
         </AlertDialog.Trigger>
@@ -42,10 +42,10 @@ export const DeploymentPromotion: FC<DeploymentContextProps> = ({ deployment: { 
                 </AlertDialog.Description>
                 <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
-                        <button className="Button mauve">Cancel</button>
+                        <button className="btn btn-sm">Cancel</button>
                     </AlertDialog.Cancel>
                     <AlertDialog.Action asChild>
-                        <button onClick={() => promoteDeployment(id)}>Yes, release</button>
+                        <button className='btn btn-sm' onClick={() => promoteDeployment(id)}>Yes, release</button>
                     </AlertDialog.Action>
                 </div>
             </AlertDialog.Content>
@@ -74,8 +74,8 @@ export const DeploymentDeletion: FC<DeploymentContextProps> = ({ deployment: { i
 
     return <AlertDialog.Root>
         <AlertDialog.Trigger asChild onClick={e => { e.stopPropagation(); }}>
-            <button title='Delete' className="h-8 inline-flex items-center justify-center font-normal text-red-400 mt-auto">
-                <UilTrash className='inline-block h-full' />
+            <button title='Delete' className="btn btn-sm h-8 inline-flex items-center justify-center font-normal text-red-400 mt-auto">
+                <UilTrash className='inline-block h-4 w-4' />
             </button>
         </AlertDialog.Trigger>
         <AlertDialog.Portal>
@@ -88,10 +88,10 @@ export const DeploymentDeletion: FC<DeploymentContextProps> = ({ deployment: { i
                 </AlertDialog.Description>
                 <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
-                        <button className="Button">Cancel</button>
+                        <button className="btn btn-sm">Cancel</button>
                     </AlertDialog.Cancel>
                     <AlertDialog.Action asChild>
-                        <button className="Button bg-red-700 text-white" onClick={() => deleteDeployment(id)}>Yes, delete deployment</button>
+                        <button className="btn btn-sm bg-red-700 text-white" onClick={() => deleteDeployment(id)}>Yes, delete deployment</button>
                     </AlertDialog.Action>
                 </div>
             </AlertDialog.Content>
@@ -143,7 +143,7 @@ export const Deployments: FC = () => {
 
     return <>
         <div className="hidden w-full items-center mb-7">
-            <button className="inline-flex mr-3 items-center h-8 pl-2.5 pr-2 rounded-md shadow dark:text-slate-400 dark:bg-slate-800 text-gray-700 dark:border-gray-800 border border-gray-200 leading-none py-0">
+            <button className="btn btn-sm inline-flex mr-3 items-center h-8 pl-2.5 pr-2 rounded-md shadow dark:text-slate-400 dark:bg-slate-800 text-gray-700 dark:border-gray-800 border border-gray-200 leading-none py-0">
                 <svg viewBox="0 0 24 24" className="w-4 mr-2 text-gray-400 dark:text-gray-600" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                     <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -264,7 +264,7 @@ export const Deployments: FC = () => {
                                 {/*
                                 <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 md:table-cell hidden">
                                     <div className="flex items-center">
-                                        <UilServerNetworkAlt className='inline-block h-4' />
+                                        <UilServerNetworkAlt className='inline-block h-4 w-4' />
                                     </div>
                                 </td>
                                 */}

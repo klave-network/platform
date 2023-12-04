@@ -41,8 +41,8 @@ const OrganisationDeletion = () => {
 
     return <AlertDialog.Root>
         <AlertDialog.Trigger asChild>
-            <button title='Delete' className="h-8 inline-flex items-center justify-center text-md font-normal text-red-700 mt-auto">
-                <UilTrash className='inline-block h-full' /> Delete
+            <button title='Delete' className="btn btn-sm h-8 inline-flex items-center justify-center text-md font-normal text-red-700 mt-auto">
+                <UilTrash className='inline-block h-4 w-4' /> Delete
             </button>
         </AlertDialog.Trigger>
         <AlertDialog.Portal>
@@ -60,15 +60,15 @@ const OrganisationDeletion = () => {
                         <p className='my-2'>
                             <code className='font-bold'>{orgSlug}</code>
                         </p>
-                        <input placeholder='Organisation Name' className='w-full' onChange={e => setNameCopy(e.target.value)} />
+                        <input placeholder='Organisation Name' className='input input-bordered w-full' onChange={e => setNameCopy(e.target.value)} />
                     </div>
                 </AlertDialog.Description>
                 <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
-                        <button className="Button">Cancel</button>
+                        <button className="btn btn-sm">Cancel</button>
                     </AlertDialog.Cancel>
                     <AlertDialog.Action asChild disabled={!canSubmit}>
-                        <button disabled={!canSubmit} className={`Button ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={() => deleteOrganisation()}>Yes, delete organisation</button>
+                        <button disabled={!canSubmit} className={`btn btn-sm ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={() => deleteOrganisation()}>Yes, delete organisation</button>
                     </AlertDialog.Action>
                 </div>
             </AlertDialog.Content>
@@ -124,7 +124,7 @@ export const OrganisationSettings: FC = () => {
                 <label>
                     Name
                     <br />
-                    <input {...methods.register('name')} className="border w-2/3" />
+                    <input {...methods.register('name')} className="input input-bordered border w-2/3" />
                 </label>
                 <label>
                     Slug
@@ -142,7 +142,7 @@ export const OrganisationSettings: FC = () => {
             <button
                 type="submit"
                 disabled={mutation.isPending}
-                className="border bg-primary-500 p-2"
+                className="btn btn-sm border bg-primary-500 p-2"
             >
                 {mutation.isPending ? 'Loading' : 'Submit'}
             </button>

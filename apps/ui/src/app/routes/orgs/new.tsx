@@ -61,9 +61,9 @@ export const OrgNew: FC = () => {
                     <label>
                         Organization name
                         <br />
-                        <input {...methods.register('name')} onChange={e => setOrgName(e.target.value.trim())} className="border w-2/3" /><br />
+                        <input {...methods.register('name')} onChange={e => setOrgName(e.target.value.trim())} className="input input-bordered border w-2/3" /><br />
                         {isOrgLoading
-                            ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-4' /><br />&nbsp;</span>
+                            ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-full' /><br />&nbsp;</span>
                             : alreadyExists
                                 ? <span className="block mt-1 text-xs text-red-700 leading-tight">The organisation <b>{orgSlug}</b> already exists.<br />&nbsp;</span>
                                 : orgSlug.length
@@ -81,12 +81,12 @@ export const OrgNew: FC = () => {
                 <button
                     type="submit"
                     disabled={mutation.isPending}
-                    className="border bg-blue-600 text-white hover:bg-blue-500 mr-2 p-2"
+                    className="btn btn-sm border bg-blue-600 text-white hover:bg-blue-500 mr-2 p-2"
                 >
                     {mutation.isPending ? 'Creating' : 'Create'}
                 </button>
                 <button
-                    className="border p-2"
+                    className="btn btn-sm border p-2"
                     onClick={() => navigate('/')}
                 >
                     Cancel

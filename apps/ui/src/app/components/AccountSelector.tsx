@@ -20,14 +20,11 @@ const AccountSelector: FC<{ className?: string; }> = ({ className }) => {
     };
 
     return <Select.Root value={orgSlug} defaultValue={orgSlug} onValueChange={changeValue}>
-        <Select.Trigger className={`inline-flex justify-between flex-grow w-full items-center text-klave-light-blue bg-white data-[placeholder]:text-klave-light-blue mt-3 mb-5 ${className}`}>
+        <Select.Trigger className={`select select-bordered select-sm inline-flex justify-between flex-grow w-full items-center text-klave-light-blue bg-white data-[placeholder]:text-klave-light-blue mt-3 mb-5 ${className}`}>
             <Select.Value placeholder="Select an account" />
-            <Select.Icon>
-                <ChevronDownIcon />
-            </Select.Icon>
         </Select.Trigger>
         <Select.Portal>
-            <Select.Content className="overflow-hidden bg-white shadow-outline rounded-lg w-full z-[1000]">
+            <Select.Content className="overflow-hidden bg-white shadow-outline shadow rounded-lg w-full z-[1000]">
                 <Select.ScrollUpButton>
                     <ChevronUpIcon />
                 </Select.ScrollUpButton>

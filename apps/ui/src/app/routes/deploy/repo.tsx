@@ -165,7 +165,7 @@ export const RepoAppSelect: FC = () => {
                         </> : null}
                     </div>
                     <Link to="/deploy/select" className='mr-5 disabled:text-gray-300 hover:text-gray-500'>Go back</Link>
-                    <button disabled={!appSelectionWatch.length || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave} type="submit" className='disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Next</button>
+                    <button disabled={!appSelectionWatch.length || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave} type="submit" className='btn btn-sm disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Next</button>
                 </form>
             </div>
         </>;
@@ -225,8 +225,8 @@ export const RepoAppSelect: FC = () => {
                             </Select.Content>
                         </Select.Portal>
                     </Select.Root>
-                    <button type="button" onClick={() => setSelectedApplications([])} className='mr-5 disabled:text-gray-300 hover:text-gray-500'>Go Back</button>
-                    <button type="submit" onClick={registerApplications} disabled={!selectApplications.length || !selectedOrgId || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave} className='disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Deploy</button>
+                    <button type="button" onClick={() => setSelectedApplications([])} className='btn btn-sm mr-5 disabled:text-gray-300 hover:text-gray-500'>Go Back</button>
+                    <button type="submit" onClick={registerApplications} disabled={!selectApplications.length || !selectedOrgId || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave} className='btn btn-sm disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Deploy</button>
                 </>
             }
         </div>

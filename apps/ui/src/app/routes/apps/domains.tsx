@@ -30,8 +30,8 @@ const DomainDeletion: FC<DomainContextProps> = ({ domain: { id } }) => {
 
     return <AlertDialog.Root>
         <AlertDialog.Trigger asChild>
-            <button title='Delete' className="h-8 inline-flex items-center justify-center font-normal text-red-400 mt-auto">
-                <UilTrash className='inline-block h-full' />
+            <button title='Delete' className="btn btn-sm h-8 inline-flex items-center justify-center font-normal text-red-400 mt-auto">
+                <UilTrash className='inline-block h-4 w-4' />
             </button>
         </AlertDialog.Trigger>
         <AlertDialog.Portal>
@@ -43,10 +43,10 @@ const DomainDeletion: FC<DomainContextProps> = ({ domain: { id } }) => {
                 </AlertDialog.Description>
                 <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
-                        <button className="Button">Cancel</button>
+                        <button className="btn btn-sm">Cancel</button>
                     </AlertDialog.Cancel>
                     <AlertDialog.Action asChild>
-                        <button className="Button bg-red-700 text-white" onClick={() => deleteDomain(id)}>Yes, delete domain</button>
+                        <button className="btn btn-sm bg-red-700 text-white" onClick={() => deleteDomain(id)}>Yes, delete domain</button>
                     </AlertDialog.Action>
                 </div>
             </AlertDialog.Content>
@@ -92,8 +92,8 @@ const DomainRecord: FC<DomainRecordProps> = ({ domain }) => {
         </td>
         <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 text-right">
             <div className='flex flex-row flex-nowrap justify-end'>
-                <button className="h-8 inline-flex items-center justify-center font-normal text-gray-400 ml-auto" onClick={() => validate(id)}>
-                    {mutation.isPending ? <UilSpinner className='inline-block animate-spin h-4' /> : 'Revalidate'}
+                <button className="btn btn-sm h-8 inline-flex items-center justify-center font-normal text-gray-400 ml-auto" onClick={() => validate(id)}>
+                    {mutation.isPending ? <UilSpinner className='inline-block animate-spin h-4 w-4' /> : 'Revalidate'}
                 </button>
                 &nbsp;&nbsp;
                 <DomainDeletion domain={domain} />
@@ -148,7 +148,7 @@ const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
             <button
                 type="submit"
                 disabled={createMutation.isPending}
-                className="border bg-primary-500 p-2"
+                className="btn btn-sm border bg-primary-500 p-2"
                 onClick={() => validate(createMutation.data.id)}
             >
                 {createMutation.isPending ? 'Loading' : 'Verify'}
@@ -157,7 +157,7 @@ const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
             <button
                 type="reset"
                 onClick={onClose}
-                className="border bg-primary-500 p-2"
+                className="btn btn-sm border bg-primary-500 p-2"
             >
                 Cancel
             </button>
@@ -182,7 +182,7 @@ const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
             <label>
                 Domain name
                 <br />
-                <input {...methods.register('fqdn')} className="border w-full" />
+                <input {...methods.register('fqdn')} className="input input-bordered border w-full" />
             </label>
             {methods.formState.errors.fqdn?.message && (
                 <p className="text-red-700">
@@ -194,7 +194,7 @@ const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
         <button
             type="submit"
             disabled={createMutation.isPending}
-            className="border bg-primary-500 p-2"
+            className="btn btn-sm border bg-primary-500 p-2"
         >
             {createMutation.isPending ? 'Loading' : 'Submit'}
         </button>
@@ -202,7 +202,7 @@ const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
         <button
             type="reset"
             onClick={onClose}
-            className="border bg-primary-500 p-2"
+            className="btn btn-sm border bg-primary-500 p-2"
         >
             Cancel
         </button>
@@ -227,7 +227,7 @@ export const DomainListing: FC = () => {
     return <>
         <div className="flex flex-col w-full items-center mb-7">
             <div className='w-full mb-5'>
-                <button onClick={() => setAddingDomain(true)} className="inline-flex mr-3 items-center h-8 pl-2.5 pr-2 rounded-md shadow text-white dark:text-klave-dark-blue bg-blue-500 hover:bg-blue-400 dark:bg-klave-light-blue dark:hover:bg-blue-800 dark:border-gray-800 border border-gray-200 leading-none py-0">
+                <button onClick={() => setAddingDomain(true)} className="btn btn-sm inline-flex mr-3 items-center h-8 pl-2.5 pr-2 rounded-md shadow text-white dark:text-klave-dark-blue bg-blue-500 hover:bg-blue-400 dark:bg-klave-light-blue dark:hover:bg-blue-800 dark:border-gray-800 border border-gray-200 leading-none py-0">
                     <UilPlus className='inline-block h-5 text-white dark:text-klave-dark-blue' />Add a domain
                 </button>
             </div>

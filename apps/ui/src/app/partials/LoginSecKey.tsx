@@ -293,24 +293,24 @@ export const LoginSecKey: FC = () => {
         </div >
         <form className='relative'>
             {screen === 'start' ? <>
-                <input key='emailField' value={email} onInput={onChangeEmail} alt='email' placeholder='Email address' type='email' className='text-center rounded-md text-black' />
+                <input key='emailField' value={email} onInput={onChangeEmail} alt='email' placeholder='Email address' type='email' className='input input-bordered text-center rounded-md text-black' />
                 <div className='h-8'>
                     {emailHintError?.data || emailHint?.sucess === false
                         ? <span className="block mt-1 text-xs text-red-700 leading-tight">{emailHintError?.message ?? emailHint?.message ?? 'We encountered a problem.'}<br />&nbsp;</span>
                         : emailHint?.message
                             ? <span className="block mt-1 text-xs text-green-700 leading-tight">{emailHint?.message}</span>
                             : isCheckingEmailHint
-                                ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-4' /><br />&nbsp;</span>
+                                ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-full' /><br />&nbsp;</span>
                                 : <span className="block mt-1 text-xs leading-tight">&nbsp;<br />&nbsp;</span>}
                 </div>
-                <button disabled={isLoading || emailHint?.sucess === false} onClick={handleLoginSubmit} onSubmit={handleLoginSubmit} type='submit' className='bg-blue-600 text-white hover:bg-blue-500 disabled:bg-slate-300 rounded-md'>{isLoading ? <UilSpinner className='inline-block animate-spin' /> : isWebauthAvailable ? 'Log in with secure key' : 'Log in with email code'}</button><br />
-                <button disabled={isLoading || emailHint?.sucess === false} onClick={handleLoginCodeSubmit} className='bg-transparent border-0 shadow-none font-normal text-sm text-blue-600 disabled:text-slate-400 hover:text-blue-300 hover:cursor-pointer'>Use email code instead</button>
+                <button disabled={isLoading || emailHint?.sucess === false} onClick={handleLoginSubmit} onSubmit={handleLoginSubmit} type='submit' className='btn btn-sm bg-blue-600 text-white hover:bg-blue-500 disabled:bg-slate-300 rounded-md'>{isLoading ? <UilSpinner className='inline-block animate-spin' /> : isWebauthAvailable ? 'Log in with secure key' : 'Log in with email code'}</button><br />
+                <button disabled={isLoading || emailHint?.sucess === false} onClick={handleLoginCodeSubmit} className='btn btn-sm bg-transparent border-0 shadow-none font-normal text-sm text-blue-600 disabled:text-slate-400 hover:text-blue-300 hover:cursor-pointer'>Use email code instead</button>
             </> : screen === 'code' ? <>
-                <input key='codeField' value={code} onInput={onChangeCode} alt='code' placeholder='Code' type='text' className='text-center rounded-md text-black' />
+                <input key='codeField' value={code} onInput={onChangeCode} alt='code' placeholder='Code' type='text' className='input input-bordered text-center rounded-md text-black' />
                 <br />
                 <br />
-                <button disabled={isLoading} onClick={verifyEmailCode} onSubmit={verifyEmailCode} type='submit' className='mx-1 rounded-md bg-blue-600 text-white hover:bg-blue-500'>{isLoading ? <UilSpinner className='inline-block animate-spin' /> : 'Next'}</button>
-                <button onClick={resetLogin} type='button' className='mx-1 rounded-md bg-gray-500 text-white hover:bg-gray-400'>Cancel</button>
+                <button disabled={isLoading} onClick={verifyEmailCode} onSubmit={verifyEmailCode} type='submit' className='btn btn-sm mx-1 rounded-md bg-blue-600 text-white hover:bg-blue-500'>{isLoading ? <UilSpinner className='inline-block animate-spin' /> : 'Next'}</button>
+                <button onClick={resetLogin} type='button' className='btn btn-sm mx-1 rounded-md bg-gray-500 text-white hover:bg-gray-400'>Cancel</button>
             </> : null}
             {error ? <><br /><br /><div className='bg-red-200 p-2 w-full'>{error}</div></> : null}
         </form>

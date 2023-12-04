@@ -53,7 +53,7 @@ export const AppTabs: FC = () => {
                         <div className="text-gray-900 text-lg dark:text-white font-medium" title={application.createdAt.toDateString()}>{formatTimeAgo(application.createdAt)}</div>
                     </div>
                     {/*
-                    <button className="w-8 h-8 ml-4 text-gray-400 shadow dark:text-gray-400 rounded-full flex items-center justify-center border border-gray-200 dark:border-gray-700">
+                    <button className="btn btn-sm w-8 h-8 ml-4 text-gray-400 shadow dark:text-gray-400 rounded-full flex items-center justify-center border border-gray-200 dark:border-gray-700">
                         <svg viewBox="0 0 24 24" className="w-4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
                             <circle cx="12" cy="12" r="1"></circle>
                             <circle cx="19" cy="12" r="1"></circle>

@@ -60,8 +60,8 @@ const OrganisationAddCredit = () => {
         <AlertDialog.Trigger asChild onClick={() => {
             setSearchParams();
         }}>
-            <button title='Delete' className="mt-3 h-8 inline-flex items-center justify-center text-slate-500 text-md font-normalmt-auto">
-                <Uil0Plus className='inline-block h-full' /> Add credits
+            <button title='Delete' className="btn btn-sm mt-3 h-8 inline-flex items-center justify-center text-slate-500 text-md font-normalmt-auto">
+                <Uil0Plus className='inline-block h-4 w-4' /> Add credits
             </button>
         </AlertDialog.Trigger>
         <AlertDialog.Portal>
@@ -73,10 +73,10 @@ const OrganisationAddCredit = () => {
                 </AlertDialog.Description>
                 <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
-                        <button className="Button">{isPaymentComplete || isReturningFromCheckout ? 'Done' : 'Cancel'}</button>
+                        <button className="btn btn-sm ">{isPaymentComplete || isReturningFromCheckout ? 'Done' : 'Cancel'}</button>
                     </AlertDialog.Cancel>
                     {/* <AlertDialog.Action asChild disabled={!canSubmit}>
-                        <button disabled={!canSubmit} className={`Button ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={() => deleteOrganisation()}>Yes, delete organisation</button>
+                        <button disabled={!canSubmit} className={`btn btn-sm  ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={() => deleteOrganisation()}>Yes, delete organisation</button>
                     </AlertDialog.Action> */}
                 </div>
             </AlertDialog.Content>
@@ -134,15 +134,15 @@ const CreditCellEdit: FC<{
                 <input type="range" min={0} max={Number(kredits + max)} onChange={handleChange} value={currentValue} className={`range range-xs w-40 ${error ? 'range-error' : 'range-info'}`} /><br />
                 <span className='text-xs text-red-700'>{error?.message?.toString() ?? ''} &nbsp;</span>
             </div>
-            <button disabled={isPending} onClick={allocateCredit} className='flex rounded-sm border border-slate-300 bg-slate-100 p-0 h-7 w-7 items-center justify-center hover:bg-slate-200 hover:cursor-pointer'>
-                {isPending ? <UilSpinner className='inline-block h-4 animate-spin' /> : <UilCheck className='h-4' />}
+            <button disabled={isPending} onClick={allocateCredit} className='btn btn-sm flex rounded-sm border border-slate-300 bg-slate-100 p-0 h-7 w-7 items-center justify-center hover:bg-slate-200 hover:cursor-pointer'>
+                {isPending ? <UilSpinner className='inline-block h-4 w-4 animate-spin' /> : <UilCheck className='h-4 w-4' />}
             </button>
         </div>;
 
     return <div className='flex gap-4 items-center align-middle justify-end grow'>
         <CreditDisplay kredits={kreditValue} size='small' justify='end' className='w-30' />
-        <button disabled={isPending} onClick={toggleEditing} className='flex rounded-sm border border-slate-300 bg-slate-100 p-0 h-7 w-7 items-center justify-center hover:bg-slate-200 hover:cursor-pointer'>
-            <UilEdit className='h-4' />
+        <button disabled={isPending} onClick={toggleEditing} className='btn btn-sm flex rounded-sm border border-slate-300 bg-slate-100 p-0 h-7 w-7 items-center justify-center hover:bg-slate-200 hover:cursor-pointer'>
+            <UilEdit className='h-4 w-4' />
         </button>
     </div>;
 };
@@ -187,7 +187,7 @@ export const OrganisationSettings: FC = () => {
                 {isReturningFromCheckout
                     ? <>
                         <span className='text-green-700'>Thank you for your purchase! We are updating your balance...</span>
-                        <UilSpinner className='inline-block animate-spin h-4' /><br />
+                        <UilSpinner className='inline-block animate-spin h-full' /><br />
                     </>
                     : null}
                 <OrganisationAddCredit />
