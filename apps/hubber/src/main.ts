@@ -16,8 +16,8 @@ logger.info(`Branch ${process.env.GIT_REPO_BRANCH} - ${process.env.GIT_REPO_COMM
 logger.info(`Node ${process.version} - ${process.cwd()}`);
 
 dbOps.initialize()
-    .then(sentryOps.initialize)
     .then(envOps.initialize)
+    .then(sentryOps.initialize)
     .then(probotOps.initialize)
     .then(onlineChain)
     .then(async () => {
