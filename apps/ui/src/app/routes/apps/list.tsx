@@ -20,19 +20,25 @@ export const AppSidebar: FC = () => {
         refetchInterval: 60000
     });
 
-    useEffect(() => {
-        if (!orgSlug && personalOrg)
-            navigate(`/${personalOrg.slug}`);
-    }, [navigate, orgSlug, personalOrg]);
+    const isCreatingNewOrg = useMemo(() => lastMatch?.pathname === '/organisation/new' || orgSlug === 'new', [lastMatch, orgSlug]);
 
     useEffect(() => {
+        if (isCreatingNewOrg)
+            return;
+        if (!orgSlug && personalOrg)
+            navigate(`/${personalOrg.slug}`);
+    }, [navigate, isCreatingNewOrg, orgSlug, personalOrg]);
+
+    useEffect(() => {
+        if (isCreatingNewOrg)
+            return;
         if (orgSlug && personalOrg && !selectedOrg && !isLoadingSelectOrg)
             navigate(`/${personalOrg.slug}`);
-    }, [navigate, orgSlug, personalOrg, selectedOrg, isLoadingSelectOrg]);
+    }, [navigate, isCreatingNewOrg, orgSlug, personalOrg, selectedOrg, isLoadingSelectOrg]);
 
     const sortedApplications = useMemo(() => (applicationsList ?? []).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()), [applicationsList]);
 
-    if (lastMatch?.pathname === '/organisation/new' || orgSlug === 'new')
+    if (isCreatingNewOrg)
         return null;
 
     if (!orgSlug && personalOrg)
