@@ -1,5 +1,4 @@
 import WebSocket from 'ws';
-import fetch from 'node-fetch';
 import { logger } from './logger';
 
 let reconnectAttempt = 0;
@@ -51,15 +50,17 @@ export const dispatchOps = {
                     .catch(() => { return; });
             });
             hookSocket.addEventListener('message', (event) => {
-                const message = JSON.parse(event.data.toString()) as any;
+                const message = JSON.parse(event.data.toString()) as {
+                    headers: Record<string, string>;
+                    body: Array<number>
+                };
                 // TODO: Try to not use fetch on localhost here. Also get the actual port.
                 fetch('http://127.0.0.1:3333/hook', {
                     method: 'POST',
-                    headers: {
-                        ...message.headers
-                    },
-                    body: JSON.stringify(message.body)
+                    headers: message.headers,
+                    body: Uint8Array.from(message.body)
                 }).catch(reason => {
+                    console.error(reason);
                     logger.warn(`Hook passover failed: ${reason}`);
                 });
             });

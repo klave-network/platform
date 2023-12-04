@@ -91,4 +91,15 @@ export async function app(fastify: FastifyInstance) {
             .send({ ok: true, statuses });
 
     });
+
+    fastify.all('/version', async (__unusedReq, res) => {
+        await res.status(404).send({
+            version: {
+                name: process.env.NX_TASK_TARGET_PROJECT,
+                commit: process.env.GIT_REPO_COMMIT?.substring(0, 8),
+                branch: process.env.GIT_REPO_BRANCH,
+                version: process.env.GIT_REPO_VERSION
+            }
+        });
+    });
 }

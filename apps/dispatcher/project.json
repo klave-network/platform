@@ -19,21 +19,15 @@
                 "assets": [
                     "apps/dispatcher/src/assets"
                 ],
-                "esbuildOptions": {
-                    "sourcemap": true,
-                    "outExtension": {
-                        ".js": ".js"
-                    }
-                },
                 "generatePackageJson": true,
-                "thirdParty": true
+                "thirdParty": true,
+                "esbuildConfig": "apps/dispatcher/esbuild.config.js"
             },
             "configurations": {
                 "production": {
+                    "extractLicenses": true,
                     "generateLockfile": true,
-                    "esbuildOptions": {
-                        "sourcemap": false
-                    }
+                    "generatePackageJson": true
                 }
             }
         },
