@@ -60,7 +60,6 @@ export const dispatchOps = {
                     headers: message.headers,
                     body: Uint8Array.from(message.body)
                 }).catch(reason => {
-                    console.error(reason);
                     logger.warn(`Hook passover failed: ${reason}`);
                 });
             });
