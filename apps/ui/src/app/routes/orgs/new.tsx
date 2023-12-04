@@ -81,9 +81,15 @@ export const OrgNew: FC = () => {
                 <button
                     type="submit"
                     disabled={mutation.isPending}
-                    className="border bg-primary-500 p-2"
+                    className="border bg-blue-600 text-white hover:bg-blue-500 mr-2 p-2"
                 >
                     {mutation.isPending ? 'Creating' : 'Create'}
+                </button>
+                <button
+                    className="border p-2"
+                    onClick={() => navigate('/')}
+                >
+                    Cancel
                 </button>
             </form>
         </div>
