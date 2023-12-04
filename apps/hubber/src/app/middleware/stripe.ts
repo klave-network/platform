@@ -3,8 +3,7 @@ import { prisma } from '@klave/db';
 import Stripe from 'stripe';
 import { logger } from '@klave/providers';
 
-
-export const stripeMiddlware: RequestHandler = (req) => {
+export const stripeMiddlware: RequestHandler = (req, __unusedRes, next) => {
 
     (async () => {
 
@@ -20,13 +19,9 @@ export const stripeMiddlware: RequestHandler = (req) => {
             // We must verife the signature of the Webhook
             // https://stripe.com/docs/webhooks/signatures
             // DO NOT USE THE FOLLOWING COMMENTED LINE CODE
-            let event = req.body as Stripe.Event;
+            // let event = req.body as Stripe.Event;
 
-            try {
-                event = Stripe.webhooks.constructEvent((req as any).rawBody, webhookSignature, webhookSecret);
-            } catch (error: any) {
-                logger.error('Stripe webhook signature verification failed', error.toString().replaceAll('\n', ' '));
-            }
+            const event = Stripe.webhooks.constructEvent((req as any).rawBody, webhookSignature, webhookSecret);
 
             if (event.type === 'checkout.session.completed') {
 
@@ -98,9 +93,11 @@ export const stripeMiddlware: RequestHandler = (req) => {
                 });
             }
 
-        } catch (error) {
-            console.error(error);
+        } catch (error: any) {
+            logger.error('Stripe webhook failed', error.toString().replaceAll('\n', ' '));
         }
+
+        next();
     })()
         .catch(() => { return; });
 };
