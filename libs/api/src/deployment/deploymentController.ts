@@ -260,7 +260,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                         }
                                     },
                                     commit,
-                                    expiresOn: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
+                                    expiresOn: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
                                     version: availableApplicationsConfig[application.name]?.version,
                                     set: deploymentSet,
                                     build: context.commit.after.substring(0, 8),

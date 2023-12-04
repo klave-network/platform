@@ -261,7 +261,7 @@ class Deployer {
             // Create the deployment
             const deployment = await prisma.deployment.create({
                 data: {
-                    expiresOn: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
+                    expiresOn: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
                     version: this.operatingConfig[application.name].version,
                     build: after.substring(0, 8),
                     deploymentAddress: {
