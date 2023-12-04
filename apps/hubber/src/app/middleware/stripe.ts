@@ -44,7 +44,7 @@ export const stripeMiddlware: RequestHandler = (req, __unusedRes, next) => {
                 if (sessionStatus === 'complete' && paymentStatus === 'paid') {
 
                     // We are multiplying by 100_000_000 but `amount_subtotal` is in cents, hence dividing by 100
-                    const kreditIncrement = (session.amount_subtotal ?? 0) * 100_000;
+                    const kreditIncrement = (session.amount_subtotal ?? 0) * 1_000_000;
 
                     await prisma.$transaction([
                         prisma.organisation.update({
