@@ -280,6 +280,7 @@ model Application {
     description      String?
     webhook          String?
     homepage         String?
+    gitSignRequired  Boolean           @default(false)
     limits           Limits
     kredits          BigInt            @default(0)
     catogories       String[]          @default([])

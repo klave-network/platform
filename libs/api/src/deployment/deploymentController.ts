@@ -201,6 +201,9 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                 }
             });
 
+            if (application.gitSignRequired && !commit?.verification?.verified)
+                return;
+
             const launchDeploy = async () => {
 
                 const branchName = context.commit.ref?.includes('/') ? context.commit.ref.split('/').pop() : repo.defaultBranch ?? 'master';

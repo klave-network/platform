@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, useMemo, useState } from 'react';
+import { ChangeEvent, ChangeEventHandler, FC, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import { UilEdit, UilSpinner, UilTrash } from '@iconscout/react-unicons';
@@ -44,8 +44,8 @@ const ApplicationDeletion = () => {
 
     return <AlertDialog.Root>
         <AlertDialog.Trigger asChild>
-            <button title='Delete' className="h-8 inline-flex items-center justify-center text-md font-normal text-red-700 mt-auto">
-                <UilTrash className='inline-block h-full' /> Delete
+            <button title='Delete' className="btn btn-sm h-8 inline-flex items-center justify-center text-md font-normal text-red-700 mt-auto">
+                <UilTrash className='inline-block h-4 w-4' /> Delete
             </button>
         </AlertDialog.Trigger>
         <AlertDialog.Portal>
@@ -63,15 +63,15 @@ const ApplicationDeletion = () => {
                         <p className='my-2'>
                             <code className='font-bold'>{appSlug}</code>
                         </p>
-                        <input placeholder='Application Name' className='w-full' onChange={e => setNameCopy(e.target.value)} />
+                        <input placeholder='Application Name' className='input input-bordered w-full' onChange={e => setNameCopy(e.target.value)} />
                     </div>
                 </AlertDialog.Description>
                 <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
-                        <button className="Button">Cancel</button>
+                        <button className="btn btn-sm">Cancel</button>
                     </AlertDialog.Cancel>
                     <AlertDialog.Action asChild disabled={!canSubmit}>
-                        <button disabled={!canSubmit} className={`Button ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={() => deleteApplication()}>Yes, delete application</button>
+                        <button disabled={!canSubmit} className={`btn btn-sm ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={() => deleteApplication()}>Yes, delete application</button>
                     </AlertDialog.Action>
                 </div>
             </AlertDialog.Content>
@@ -125,13 +125,13 @@ const LimitEditor: FC<LimitEditorProps> = ({ kredits, application: { id } }) => 
     if (isEditing)
         return <form className='flex flex-row gap-2' onSubmit={e => e.preventDefault()}>
             <div className='leading-snug pt-1'>
-                <input type='text' value={currentValue.toString()} onChange={handleChange} className='inline border p-2 h-6 text-sm' /><br />
+                <input type='text' value={currentValue.toString()} onChange={handleChange} className='input input-bordered inline border p-2 h-6 text-sm' /><br />
                 {isPending
-                    ? <span className='text-xs text-green-700'>Setting the new limit ... <UilSpinner className='inline-block animate-spin h-4' /></span>
+                    ? <span className='text-xs text-green-700'>Setting the new limit ... <UilSpinner className='inline-block animate-spin h-full' /></span>
                     : <span className='text-xs text-red-700'>{error?.message?.toString() ?? ''} &nbsp;</span>
                 }
             </div>
-            <button disabled={isPending} type="submit" className='border bg-primary-500 p-2' onClick={setLimits}>Save</button>
+            <button disabled={isPending} type="submit" className='btn btn-sm border bg-primary-500 p-2' onClick={setLimits}>Save</button>
         </form >;
 
     if (kreditValue === 0)
@@ -166,6 +166,8 @@ export const AppSettings: FC = () => {
         }
     });
 
+    const gitSignRequired = useMemo(() => application?.gitSignRequired ?? false, [application]);
+
     if (isLoading || !application)
         return <>
             We are fetching data about your application.<br />
@@ -173,6 +175,16 @@ export const AppSettings: FC = () => {
             <br />
             <UilSpinner className='inline-block animate-spin' />
         </>;
+
+    const handleGitSignRequired: ChangeEventHandler<HTMLInputElement> = (e) => {
+        mutation.mutateAsync({
+            appId: application.id || '', data: {
+                gitSignRequired: e.currentTarget.checked
+            }
+        })
+            .then(async () => utils.getBySlug.invalidate())
+            .catch(() => { return; });
+    };
 
     return <div className="flex flex-col gap-10 w-full justify-start mb-7">
         <form
@@ -189,7 +201,7 @@ export const AppSettings: FC = () => {
                 <label>
                     Homepage
                     <br />
-                    <input {...methods.register('homepage')} className="border w-2/3" />
+                    <input {...methods.register('homepage')} className="input input-bordered border w-2/3" />
                 </label>
                 <label>
                     Description
@@ -208,7 +220,7 @@ export const AppSettings: FC = () => {
                 <label>
                     Webhook
                     <br />
-                    <input {...methods.register('webhook')} className="border w-2/3" />
+                    <input {...methods.register('webhook')} className="input input-bordered border w-2/3" />
                 </label>
 
                 {methods.formState.errors.homepage?.message && (
@@ -247,6 +259,12 @@ export const AppSettings: FC = () => {
             <p>
                 Balance: <b><CreditDisplay kredits={application.kredits} /></b><br />
                 <Link to={`/organisation/${orgSlug}/credits`} className='text-klave-light-blue hover:underline'>Manage credit allocations</Link>
+            </p>
+        </div>
+        <div>
+            <h1 className='font-bold text-xl mb-5'>Security</h1>
+            <p>
+                <label className='flex items-center'><input type="checkbox" className="toggle toggle-sm mr-2" checked={gitSignRequired} onChange={handleGitSignRequired} /><span className='pb-1'>Require valid Git signature prior to deployment</span></label>
             </p>
         </div>
         <div>
