@@ -10,7 +10,7 @@ module.exports = {
         ),
         ...createGlobPatternsForDependencies(__dirname)
     ],
-    darkMode: 'media',
+    darkMode: process.env.NODE_ENV === 'development' ? 'media' : 'class',
     important: true,
     theme: {
         extend: {
@@ -20,6 +20,13 @@ module.exports = {
                 'klave-cyan': '#00FFD5'
             }
         }
+    },
+    daisyui: process.env.NODE_ENV === 'development' ? {
+        logs: true,
+        themes: true
+    } : {
+        themes: false,
+        darkTheme: 'light'
     },
     plugins: [require('@tailwindcss/forms')({
         strategy: 'class'
