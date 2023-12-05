@@ -81,7 +81,7 @@ export const RepoAppSelect: FC = () => {
                     We looked hard but could not find this repo.<br />
                     Head over to the deployment section to find one.<br />
                     <br />
-                    <Link to="/deploy" className='button-like disabled:text-gray-300'>Go to deploy</Link>
+                    <Link to="/deploy" className='btn btn-sm disabled:text-gray-300'>Go to deploy</Link>
                 </>}
             </div>
         </>;
@@ -108,7 +108,7 @@ export const RepoAppSelect: FC = () => {
                         <span>This is taking longer than usual</span><br />
                         <span>Klave still does&apos;t have access to your repository</span><br />
                         <br />
-                        <a href={githubAppInstall.toString()} type="submit" className='button-like mt-5 bg-yellow-800 text-white'>Try installing again</a>
+                        <a href={githubAppInstall.toString()} type="submit" className='btn btn-sm mt-5 bg-yellow-800 text-white'>Try installing again</a>
                     </div>
                     We are waiting to hear from GitHub.<br />
                     This shouldn&apos;t be very long...<br />
@@ -129,13 +129,13 @@ export const RepoAppSelect: FC = () => {
     if (!selectedApplications.length)
         return <>
             <div className='pb-5' >
-                <h1 className='text-xl font-bold'>{`${deployableRepo.owner} / ${deployableRepo.name}`}</h1>
+                <h1 className='text-xl'>{deployableRepo.owner} / <b>{deployableRepo.name}</b></h1>
             </div>
             {!deployableRepo.isAvailableToKlave
                 ? <div className='bg-yellow-200 p-5 mb-10 w-full text-center text-yellow-800'>
                     <UilExclamationTriangle className='inline-block mb-3' /><br />
                     <span>This repository doesn&apos;t have the Klave Github App installed</span><br />
-                    <a href={githubAppInstall.toString()} type="submit" className='button-like mt-5 bg-yellow-800 text-white'>Install it now !</a>
+                    <a href={githubAppInstall.toString()} type="submit" className='btn btn-sm mt-5 bg-yellow-800 text-white'>Install it now !</a>
                 </div>
                 : null}
             <div className='relative'>
@@ -148,12 +148,16 @@ export const RepoAppSelect: FC = () => {
                         Make your selection and be ready in minutes<br />
                         <br />
                         {/* <pre className='text-left w-1/2 bg-slate-200 m-auto p-5'>{JSON.stringify(repoData.config ?? repoData.configError, null, 4)}</pre> */}
-                        {(deployableRepo.config?.applications ?? []).map((app, index) => {
-                            return <div key={index} className={`a-like rounded-full text-white bg-blue-500 checked:bg-slate-500 font-bold mx-1 ${deployableRepo.isAvailableToKlave ? 'hover:bg-blue-400 cursor-pointer' : 'cursor-default'}`}>
-                                <input disabled={!deployableRepo.isAvailableToKlave} id={`application-${index}`} type="checkbox" value={app.name} {...register('applications')} className='mr-3' />
-                                <label htmlFor={`application-${index}`}>{app.name}</label>
-                            </div>;
-                        })}
+                        <div className='grid gap-3 grid-cols-3'>
+                            {(deployableRepo.config?.applications ?? []).map((app, index) => {
+                                return <label key={app.name} htmlFor={`application-${index}`} className={`w-full ${app.name && appSelectionWatch.includes(app.name) ? 'border-sky-400 hover:border-sky-500' : 'border-slate-200 hover:border-slate-400'} hover:cursor-pointer border rounded-lg py-3 px-4 text-left`}>
+                                    <span className='flex flex-row items-center'>
+                                        <input disabled={!deployableRepo.isAvailableToKlave} id={`application-${index}`} type="checkbox" value={app.name} {...register('applications')} className='peer toggle toggle-sm checked:bg-sky-500 checked:border-sky-500 mr-3' />
+                                        {app.name}</span>
+                                    {/* <label htmlFor={`application-${index}`}>{app.name}</label> */}
+                                </label>;
+                            })}
+                        </div>
                         <br />
                         <br />
                         {mutationError ? <>
@@ -166,8 +170,8 @@ export const RepoAppSelect: FC = () => {
                     </div>
                     <Link to="/deploy/select" className='mr-5 disabled:text-gray-300 hover:text-gray-500'>Go back</Link>
                     <button disabled={!appSelectionWatch.length || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave} type="submit" className='btn btn-sm disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Next</button>
-                </form>
-            </div>
+                </form >
+            </div >
         </>;
 
     const registerApplications = () => {
@@ -192,14 +196,11 @@ export const RepoAppSelect: FC = () => {
                 ? <UilSpinner className='inline-block animate-spin' />
                 : <>
                     <Select.Root value={selectedOrgId} defaultValue={selectedOrgId} onValueChange={setSelectedOrgId}>
-                        <Select.Trigger className={'inline-flex justify-between flex-grow w-full items-center text-klave-light-blue bg-white data-[placeholder]:text-klave-light-blue mt-3 mb-5'}>
+                        <Select.Trigger className={'select select-bordered inline-flex justify-between flex-grow w-full items-center text-klave-light-blue bg-white data-[placeholder]:text-klave-light-blue mt-3 mb-5'}>
                             <Select.Value placeholder="Select an account" />
-                            <Select.Icon>
-                                <ChevronDownIcon />
-                            </Select.Icon>
                         </Select.Trigger>
                         <Select.Portal>
-                            <Select.Content className="overflow-hidden bg-white shadow-outline rounded-lg w-full z-[1000]">
+                            <Select.Content className="border overflow-hidden bg-white shadow-outline rounded-lg w-full z-[1000]">
                                 <Select.ScrollUpButton>
                                     <ChevronUpIcon />
                                 </Select.ScrollUpButton>

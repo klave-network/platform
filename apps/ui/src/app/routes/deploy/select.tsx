@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UilExclamationTriangle, UilSpinner } from '@iconscout/react-unicons';
+import { UilGithub, UilSpinner } from '@iconscout/react-unicons';
 import api from '../../utils/api';
 
 export const Select: FC = () => {
@@ -70,10 +70,23 @@ export const Select: FC = () => {
                 Here are the repositories we found could be deployed.<br />
                 Select one to continue...<br />
                 <br />
-                {deployables.map((repo) => {
-                    const fullName = `${repo.owner}/${repo.name}`;
-                    return <Link to={`/deploy/repo/${fullName}`} key={fullName} className={`a-like rounded-full m-1 ${repo.installationRemoteId === '' ? 'bg-yellow-200 hover:bg-yellow-300 text-yellow-700' : 'bg-blue-500 hover:bg-blue-400 font-bold text-white'}`}>{repo.installationRemoteId ? '' : <UilExclamationTriangle className='inline-block h-3 p-0 m-0' />}{fullName}</Link>;
-                })}
+                <div className='grid gap-3 grid-cols-3'>
+                    {deployables.map((repo) => {
+                        const fullName = `${repo.owner}/${repo.name}`;
+                        const isReachableByApp = repo.installationRemoteId !== '';
+                        const config: any = repo.config ? JSON.parse(repo.config) : undefined;
+                        return <Link to={`/deploy/repo/${fullName}`} key={fullName}>
+                            <div className={`w-full border-slate-200 hover:border-slate-400 border rounded-lg py-3 px-4 text-left ${isReachableByApp ? '' : 'opacity-50 bg-yellow-100 hover:bg-yellow-200 text-yellow-700'}`}>
+                                <span className='flex flex-row items-center'><UilGithub className='inline-block h-5 w-5' />{repo.owner}/<b>{repo.name}</b></span>
+                                {isReachableByApp
+                                    ? <i className='text-sm'>We found {config?.applications?.length ?? 0} application{(config?.applications?.length ?? 0) > 1 ? 's' : ''}</i>
+                                    : <>
+                                        <i className='text-sm'>You must install Klave on this reposiroty first</i>
+                                    </>}
+                            </div>
+                        </Link>;
+                    })}
+                </div>
                 <br />
                 <br />
                 <br />
