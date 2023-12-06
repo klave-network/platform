@@ -14,7 +14,7 @@ type ApplicationRecordProps = {
 export const ApplicationRecord: FC<ApplicationRecordProps> = ({ application }) => {
     const { orgSlug } = useParams();
     return <span className='h-6 block my-2 whitespace-nowrap overflow-hidden'>
-        Created application <Link to={`/${orgSlug}/${application.id}`} className='font-semibold'>{application.slug}</Link> <i>({formatTimeAgo(application.createdAt)})</i>
+        Created application <Link to={`/${orgSlug}/${application.slug}`} className='font-semibold'>{application.slug}</Link> <i>({formatTimeAgo(application.createdAt)})</i>
     </span>;
 };
 
