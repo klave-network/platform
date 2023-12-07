@@ -15,17 +15,22 @@ jobs:
         os: [ubuntu-latest]
         node: [20.x]
 
+    permissions:
+      contents: "read"
+      actions: "read"
+
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v3
+        uses: nrwl/nx-set-shas@v4
 
-      - run: |
-          echo "Nx base: ${{ env.NX_BASE }}"
-          echo "Git head: ${{ env.NX_HEAD }}"
+      - name: Print base and head SHAs
+        run: |
+          echo "BASE: ${{ env.NX_BASE }}"
+          echo "HEAD: ${{ env.NX_HEAD }}"
 
       - name: Use Node.js ${{ matrix.node }}
         uses: actions/setup-node@v4
@@ -51,7 +56,7 @@ jobs:
       - name: Install repo dependencies
         run: yarn install --network-timeout 1000000 --forzen-lockfile
 
-      - name: Build the Dev Suite
+      - name: Build Klave components
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
         run: yarn nx affected --target=build --parallel=1 --base=${{ env.NX_BASE }} --head=${{ env.NX_HEAD }}

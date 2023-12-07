@@ -19,11 +19,12 @@ jobs:
           fetch-depth: 0
 
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v3
+        uses: nrwl/nx-set-shas@v4
 
-      - run: |
-          echo "Nx base: ${{ env.NX_BASE }}"
-          echo "Git head: ${{ env.NX_HEAD }}"
+      - name: Print base and head SHAs
+        run: |
+          echo "BASE: ${{ env.NX_BASE }}"
+          echo "HEAD: ${{ env.NX_HEAD }}"
 
       - name: Use Node.js ${{ matrix.node }}
         uses: actions/setup-node@v4
