@@ -76,6 +76,7 @@ export const AppSidebar: FC = () => {
         <div className="space-y-4 mt-3">
             {sortedApplications.map((app, index) => {
                 const deployedCount = app.deployments?.filter(d => d.status === 'deployed').length ?? 0;
+                const terminatedCount = app.deployments?.filter(d => d.status === 'terminated').length ?? 0;
                 const erroredCount = app.deployments?.filter(d => d.status === 'errored').length ?? 0;
                 const destPath = lastMatch.params['appSlug'] ? lastMatch.pathname.split('/').filter(Boolean).slice(0, 3).join('/').replace(lastMatch.params['appSlug'], app.slug) : `/${orgSlug}/${app.slug}`;
                 return <NavLink to={destPath} key={index} className={({ isActive }) => `${isActive ? 'shadow-lg relative ring-2 ring-klave-light-blue hover:ring-klave-cyan focus:outline-none' : ''} bg-white p-3 w-full flex flex-col rounded-md dark:bg-gray-800 shadow hover:bg-gray-100 dark:hover:bg-gray-700`}>
@@ -84,6 +85,7 @@ export const AppSidebar: FC = () => {
                     </div>
                     <div className="flex flex-col items-start justify-start flex-grow-0 gap-2 w-full">
                         {deployedCount ? <div className="text-xs py-1 px-2 leading-none dark:bg-gray-900 bg-green-100 text-green-600 rounded-md">{deployedCount} active deployments</div> : null}
+                        {terminatedCount ? <div className="text-xs py-1 px-2 leading-none dark:bg-gray-900 bg-yellow-100 dark:text-yellow-400 text-yellow-600 rounded-md">{terminatedCount} terminated deployments</div> : null}
                         {erroredCount ? <div className="text-xs py-1 px-2 leading-none dark:bg-gray-900 bg-red-100 text-red-600 rounded-md">{erroredCount} errors</div> : null}
                     </div>
                 </NavLink>;
