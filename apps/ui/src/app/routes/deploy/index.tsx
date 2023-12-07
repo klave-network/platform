@@ -41,8 +41,8 @@ export const Index: FC = () => {
             <p>To deploy a new Project, import an existing Git repository</p>
         </div>
         <div className='relative h-[300px]'>
-            <a href={githubAuth.toString()} className='a-like mb-3 rounded-full bg-black hover:bg-gray-900 text-white'><UilGithub color='white' />&nbsp;Connect to GitHub</a><br />
-            <a href={gitlabAuth.toString()} className='a-like rounded-full bg-[#db7130] hover:bg-[#bb472d] text-white hidden'><UilGitlab color='white' />&nbsp;Connect to GitLab</a>
+            <a href={githubAuth.toString()} className='btn btn-sm mb-3 rounded-full bg-black hover:bg-gray-900 text-white'><UilGithub color='white' />&nbsp;Connect to GitHub</a><br />
+            <a href={gitlabAuth.toString()} className='btn btn-sm rounded-full bg-[#db7130] hover:bg-[#bb472d] text-white hidden'><UilGitlab color='white' />&nbsp;Connect to GitLab</a>
         </div>
     </>;
 };

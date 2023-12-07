@@ -77,7 +77,7 @@ export const Select: FC = () => {
                         const config: any = repo.config ? JSON.parse(repo.config) : undefined;
                         return <Link to={`/deploy/repo/${fullName}`} key={fullName}>
                             <div className={`w-full border-slate-200 hover:border-slate-400 border rounded-lg py-3 px-4 text-left ${isReachableByApp ? '' : 'opacity-50 bg-yellow-100 hover:bg-yellow-200 text-yellow-700'}`}>
-                                <span className='flex flex-row items-center'><UilGithub className='inline-block h-5 w-5' />{repo.owner}/<b>{repo.name}</b></span>
+                                <span className='flex flex-row gap-2 items-center'><UilGithub className='inline-block h-5 w-5' /><span>{repo.owner}/<b>{repo.name}</b></span></span>
                                 {isReachableByApp
                                     ? <i className='text-sm'>We found {config?.applications?.length ?? 0} application{(config?.applications?.length ?? 0) > 1 ? 's' : ''}</i>
                                     : <>

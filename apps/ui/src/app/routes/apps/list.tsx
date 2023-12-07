@@ -1,6 +1,6 @@
 import { FC, useEffect, useMemo } from 'react';
 import { Link, NavLink, useMatches, useNavigate, useParams } from 'react-router-dom';
-import { UilFlask, UilSpinner, UilSetting } from '@iconscout/react-unicons';
+import { UilFlask, UilSpinner, UilSetting, UilCoins, UilBookOpen } from '@iconscout/react-unicons';
 import api from '../../utils/api';
 import AccountSelector from '../../components/AccountSelector';
 
@@ -60,6 +60,16 @@ export const AppSidebar: FC = () => {
     return <>
         <div className="text-xs text-gray-400 tracking-wider">ORGANISATIONS</div>
         <AccountSelector />
+        <Link to={`/organisation/${orgSlug}`}>
+            <div className="flex p-2 rounded-md gap-1 text-black items-center justify-start align-middle bg-slate-100 hover:bg-slate-200">
+                <UilBookOpen className='inline-block text-slate-500 h-5' /><span>Organisation Activity</span>
+            </div >
+        </Link>
+        <Link to={`/organisation/${orgSlug}/credits`}>
+            <div className="flex p-2 rounded-md gap-1 text-black items-center justify-start align-middle bg-slate-100 hover:bg-slate-200">
+                <UilCoins className='inline-block text-slate-500 h-5' /><span>Organisation Credits</span>
+            </div >
+        </Link>
         <Link to={`/organisation/${orgSlug}/settings`}>
             <div className="flex p-2 rounded-md gap-1 text-black items-center justify-start align-middle bg-slate-100 hover:bg-slate-200">
                 <UilSetting className='inline-block text-slate-500 h-5' /><span>Organisation Settings</span>

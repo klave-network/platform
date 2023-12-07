@@ -5,6 +5,7 @@ import AuthCodeReception, { loader as authLoader } from './routes/auth';
 import SetupCallback, { loader as setupLoader } from './routes/setup';
 import ErrorPage from './ErrorPage';
 import Landing from './routes/landing';
+import Welcome from './routes/welcome';
 import { AuthLayout } from './AuthLayout';
 import AppLayout from './AppLayout';
 import { ProtectedLayout } from './ProtectedLayout';
@@ -80,7 +81,7 @@ const router = sentryCreateBrowserRouter(
             <Route path='home' element={<Landing />} />
             <Route element={<ProtectedLayout />}>
                 <Route element={<Dashboard />} >
-                    <Route index element={<AppInfo />} />
+                    <Route index element={<Welcome />} />
                     <Route
                         path="organisation"
                     >
@@ -99,7 +100,7 @@ const router = sentryCreateBrowserRouter(
                     <Route
                         path=":orgSlug"
                     >
-                        <Route index element={<OrgInfo />} />
+                        <Route index element={<Welcome />} />
                         <Route
                             path=":appSlug"
                             element={<AppInfo />}

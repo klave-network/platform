@@ -28,7 +28,10 @@ module.exports = {
         themes: false,
         darkTheme: 'light'
     },
-    plugins: [require('@tailwindcss/forms')({
-        strategy: 'class'
-    }), require('daisyui')]
+    plugins: [
+        require('@tailwindcss/typography'),
+        require('@tailwindcss/forms')({
+            strategy: 'class'
+        }),
+        require('daisyui')]
 };
