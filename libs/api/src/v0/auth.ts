@@ -332,8 +332,17 @@ export const authRouter = createTRPCRouter({
                 }
             });
 
+            if (!user)
+                throw new Error('User not found');
+
             if (!rpID)
                 setWebauthnPrimitives();
+
+            const existingCreds = await prisma.webauthCredential.findMany({
+                where: {
+                    userId: user.id
+                }
+            });
 
             const options = await generateAuthenticationOptions({
                 timeout: 60000,
@@ -342,20 +351,23 @@ export const authRouter = createTRPCRouter({
                 //     type: 'public-key' as const,
                 //     transports: dev.transports
                 // })),
+                allowCredentials: existingCreds.map(cred => ({
+                    id: Buffer.from(cred.credentialID),
+                    type: 'public-key' as const
+                })),
                 userVerification: 'required' as const,
                 rpID
             });
 
-            if (user)
-                await prisma.user.update({
-                    where: {
-                        id: user.id
-                    },
-                    data: {
-                        webauthChallenge: options.challenge,
-                        webauthChallengeCreatedAt: new Date()
-                    }
-                });
+            await prisma.user.update({
+                where: {
+                    id: user.id
+                },
+                data: {
+                    webauthChallenge: options.challenge,
+                    webauthChallengeCreatedAt: new Date()
+                }
+            });
 
             return options;
         }),
@@ -599,7 +611,16 @@ export const authRouter = createTRPCRouter({
                     error: 'Invalid registration response'
                 };
 
-            const { credentialPublicKey, credentialID, counter } = registrationInfo;
+            const {
+                credentialPublicKey,
+                credentialID,
+                credentialType,
+                credentialDeviceType,
+                credentialBackedUp,
+                userVerified,
+                counter,
+                aaguid
+            } = registrationInfo;
 
             if (user) {
                 await prisma.webauthCredential.create({
@@ -611,6 +632,11 @@ export const authRouter = createTRPCRouter({
                         },
                         credentialPublicKey: Utils.toBase64(credentialPublicKey, true),
                         credentialID: Utils.toBase64(credentialID, true),
+                        credentialType,
+                        credentialDeviceType,
+                        credentialBackedUp,
+                        userVerified,
+                        aaguid,
                         counter
                     }
                 });

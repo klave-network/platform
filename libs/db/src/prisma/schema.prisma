@@ -78,12 +78,18 @@ model User {
 }
 
 model WebauthCredential {
-    id                  String @id @default(uuid()) @map("_id")
-    user                User   @relation(fields: [userId], references: [id])
-    userId              String
-    credentialID        String
-    credentialPublicKey String
-    counter             Int
+    id                   String   @id @default(uuid()) @map("_id")
+    user                 User     @relation(fields: [userId], references: [id])
+    userId               String
+    credentialID         String
+    credentialPublicKey  String
+    credentialType       String
+    credentialDeviceType String
+    credentialBackedUp   Boolean
+    userVerified         Boolean
+    aaguid               String
+    counter              Int
+    lastUsedAt           DateTime @default(now())
 }
 
 enum CodeSource {
