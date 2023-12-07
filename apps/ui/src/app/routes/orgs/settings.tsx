@@ -6,7 +6,6 @@ import api from '../../utils/api';
 import { useZodForm } from '../../utils/useZodForm';
 import { z } from 'zod';
 import { useEffect } from 'react';
-import CreditDisplay from '../../components/CreditDisplay';
 
 const OrganisationDeletion = () => {
 
@@ -152,12 +151,6 @@ export const OrganisationSettings: FC = () => {
             <p>
                 Name: <b>{organisation.name}</b><br />
                 Slug: <b>{organisation.slug.replace('~$~', '')}</b><br />
-            </p>
-        </div>
-        <div>
-            <h1 className='font-bold text-xl mb-5'>Credit allocation</h1>
-            <p>
-                Balance: <b><CreditDisplay kredits={organisation.kredits} /></b><br />
             </p>
         </div>
         <div>
