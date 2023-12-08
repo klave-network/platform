@@ -29,6 +29,7 @@ let lastSCPState = Constants.ConnectionState.closed;
 let secretariumCoreVersion: string | undefined;
 let secretariumWasmVersion: string | undefined;
 let secretariumBackendVersions: any;
+let secretariumVersionUpdateTimer: NodeJS.Timeout | undefined;
 
 const planReconnection = async () => {
     return new Promise((resolve) => {
@@ -40,6 +41,30 @@ const planReconnection = async () => {
             }, 3000);
         }
     });
+};
+
+const getBackendVersions = async () => {
+    if (client.isConnected()) {
+        const isFirstVersionFetch = !secretariumBackendVersions;
+        const previousSecretariumCoreVersion = secretariumCoreVersion;
+        const previousSecretariumWasmVersion = secretariumWasmVersion;
+        const previousSecretariumCoreBuild = secretariumBackendVersions?.core_version?.build_number;
+        const previousSecretariumWasmBuild = secretariumBackendVersions?.wasm_version?.build_number;
+        const version: any = await client.newTx('wasm-manager', 'version', 'version', '').send().catch((e) => {
+            console.error(e);
+        });
+        secretariumBackendVersions = version?.version;
+        const { wasm_version, core_version } = secretariumBackendVersions ?? { wasm_version: {}, core_version: {} };
+        secretariumCoreVersion = `${core_version.major}.${core_version.minor}.${core_version.patch}`;
+        secretariumWasmVersion = `${wasm_version.major}.${wasm_version.minor}.${wasm_version.patch}`;
+        if (previousSecretariumCoreVersion !== secretariumCoreVersion || previousSecretariumWasmVersion !== secretariumWasmVersion || previousSecretariumCoreBuild !== core_version.build_number || previousSecretariumWasmBuild !== wasm_version.build_number) {
+            if (!isFirstVersionFetch)
+                logger.info('Secretarium backend versions changed');
+            logger.info(`Core v${secretariumCoreVersion} (${core_version.build_number}) - WASM Manager v${secretariumWasmVersion} (${core_version.build_number})`);
+        }
+    }
+    if (secretariumVersionUpdateTimer !== undefined)
+        secretariumVersionUpdateTimer = setTimeout(() => { getBackendVersions().catch(() => { return; }); }, 300000);
 };
 
 client.onStateChange((state) => {
@@ -81,14 +106,7 @@ export const scpOps = {
             const cryptoContext = client.getCryptoContext();
             logger.info(`CS ${cryptoContext.type} (${cryptoContext.version})`);
             logger.info(`PK ${await connectionKey.getRawPublicKeyHex()}`);
-            const version: any = await client.newTx('wasm-manager', 'version', 'version', '').send().catch((e) => {
-                console.error(e);
-            });
-            secretariumBackendVersions = version?.version;
-            const { wasm_version, core_version } = secretariumBackendVersions ?? { wasm_version: {}, core_version: {} };
-            secretariumCoreVersion = `${core_version.major}.${core_version.minor}.${core_version.patch}`;
-            secretariumWasmVersion = `${wasm_version.major}.${wasm_version.minor}.${wasm_version.patch}`;
-            logger.info(`Core v${secretariumCoreVersion} (${core_version.build_number}) - WASM Manager v${secretariumWasmVersion} (${core_version.build_number})`);
+            await getBackendVersions();
             reconnectAttempt = 0;
             return;
         } catch (e) {
