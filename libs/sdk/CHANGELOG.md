@@ -1,4 +1,14 @@
 # Changelog
+## [0.8.2](https://github.com/klave-network/platform/compare/sdk@0.8.1...sdk@0.8.2) (2023-12-08)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.8.1`
+
+### Bug Fixes
+
+* Revert dependencies to prevent an assemblyscript failure ([6c251f1](https://github.com/klave-network/platform/commit/6c251f15d1235e11c0bf8f9cd75ac9ebbc6ea46d))
+
 ## [0.8.1](///compare/klave-sdk@0.8.0...klave-sdk@0.8.1) (2023-09-07)
 
 ### Dependency Updates
