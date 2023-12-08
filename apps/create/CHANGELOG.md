@@ -1,4 +1,14 @@
 # Changelog
+## [0.3.16](https://github.com/klave-network/platform/compare/create@0.3.15...create@0.3.16) (2023-12-08)
+
+### Dependency Updates
+
+* `sdk` updated to version `0.3.15`
+
+### Bug Fixes
+
+* Revert dependencies to prevent an assemblyscript failure ([6c251f1](https://github.com/klave-network/platform/commit/6c251f15d1235e11c0bf8f9cd75ac9ebbc6ea46d))
+
 ## [0.3.15](https://github.com/secretarium/devsuite-typescript/compare/klave-create@0.3.14...klave-create@0.3.15) (2023-06-06)
 
 ### Dependency Updates
