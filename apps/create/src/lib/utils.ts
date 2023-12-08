@@ -1,13 +1,13 @@
 import chalk from 'chalk';
 import spawn from 'cross-spawn';
 import githubUsername from 'github-username';
-import ora from 'ora';
+import ora, { Options, Ora } from 'ora';
 
-export type StepOptions = ora.Options;
+export type StepOptions = Options;
 
 export async function newStep<Result>(
     title: string,
-    action: (step: ora.Ora) => Promise<Result> | Result,
+    action: (step: Ora) => Promise<Result> | Result,
     options: StepOptions = {}
 ): Promise<Result> {
     const disabled = process.env.CI || process.env.EXPO_DEBUG;

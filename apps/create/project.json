@@ -2,18 +2,23 @@
     "name": "create",
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "sourceRoot": "apps/create/src",
-    "projectType": "library",
+    "projectType": "application",
     "targets": {
         "build": {
-            "executor": "@nx/js:swc",
+            "executor": "@nx/esbuild:esbuild",
             "outputs": [
                 "{options.outputPath}"
             ],
+            "defaultConfiguration": "production",
             "options": {
+                "platform": "node",
                 "outputPath": "dist/apps/create",
-                "tsConfig": "apps/create/tsconfig.lib.json",
-                "packageJson": "apps/create/package.json",
+                "format": [
+                    "cjs"
+                ],
+                "bundle": true,
                 "main": "apps/create/src/index.ts",
+                "tsConfig": "apps/create/tsconfig.app.json",
                 "assets": [
                     {
                         "glob": "**/(\\.*|*)",
@@ -24,7 +29,13 @@
                     "apps/create/template/.gitignore",
                     "apps/create/bin/*",
                     "apps/create/*.md"
-                ]
+                ],
+                "generatePackageJson": true,
+                "esbuildConfig": "apps/dispatcher/esbuild.config.js"
+            },
+            "configurations": {
+                "development": {},
+                "production": {}
             }
         },
         "lint": {

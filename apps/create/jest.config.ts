@@ -1,13 +1,11 @@
+/* eslint-disable */
 export default {
     displayName: 'create',
     preset: '../../jest.preset.js',
     testEnvironment: 'node',
     transform: {
-        '^.+\\.[tj]sx?$': [
-            '@swc/jest',
-            { jsc: { transform: { react: { runtime: 'automatic' } } } }
-        ]
+        '^.+\\.[tj]s$': '@swc/jest'
     },
-    moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
+    moduleFileExtensions: ['ts', 'js', 'html'],
     coverageDirectory: '../../coverage/apps/create'
 };
