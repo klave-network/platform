@@ -1,6 +1,7 @@
 const git = require('git-rev-sync');
 const { version } = require('./package.json');
 
+/** @type {import('esbuild').BuildOptions} */
 module.exports = {
     sourcemap: process.env.NODE_ENV === 'development' ? true : false,
     outExtension: {
