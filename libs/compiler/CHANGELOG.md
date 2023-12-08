@@ -1,4 +1,12 @@
 # Changelog
+## [0.2.6](https://github.com/klave-network/platform/compare/compiler@0.2.5...compiler@0.2.6) (2023-12-08)
+
+
+### Bug Fixes
+
+* **compiler:** Bundled compilation would not yield similar minification of Worker code ([5ea7390](https://github.com/klave-network/platform/commit/5ea73904c5b553115dbacbf187695168255db868))
+* **hubber,compiler:** Compiler in k8s pods could not locate dependencies in wrong CWD ([9785517](https://github.com/klave-network/platform/commit/978551798e0f0707d30e593d5c624f45b2b39030))
+
 ## [0.2.5](///compare/klave-compiler@0.2.4...klave-compiler@0.2.5) (2023-09-07)
 
 
