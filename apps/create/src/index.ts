@@ -2,9 +2,10 @@ import spawnAsync from '@expo/spawn-async';
 import chalk from 'chalk';
 import { Command } from 'commander';
 import fs from 'fs-extra';
-import path from 'path';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import prompts from 'prompts';
-import { replaceInFile } from 'replace-in-file';
+import rif from 'replace-in-file';
 import { getSlugPrompt, getSubstitutionDataPrompts } from './lib/prompts';
 import {
     PackageManagerName,
@@ -15,11 +16,14 @@ import { newStep } from './lib/utils';
 import packageJson from '../package.json';
 import latestVersion from 'latest-version';
 
+const { replaceInFile } = rif;
+const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+
 // `yarn run` may change the current working dir, then we should use `INIT_CWD` env.
 const CWD = process.env.INIT_CWD || process.cwd();
 
 // Docs URL
-const DOCS_URL = 'https://klave.network';
+const DOCS_URL = 'https://klave.com/docs';
 
 /**
  * The main function of the command.
@@ -85,8 +89,9 @@ async function main(target: string | undefined, options: CommandOptions) {
     }
 
     console.log();
-    console.log('✅ Successfully created a Trustless application');
+    console.log('✅ Successfully created a Klave application');
 
+    options.example = true;
     printFurtherInstructions(targetDir, packageManager, options.example);
 }
 
@@ -96,7 +101,7 @@ async function main(target: string | undefined, options: CommandOptions) {
 async function createTemplateAsync(targetDir: string, data: SubstitutionData): Promise<string> {
     return await newStep('Creating template files', async (step) => {
 
-        const sourceDir = path.join(__dirname, '..', 'template', '.');
+        const sourceDir = path.join(dirname, '..', 'template', '.');
         await fs.copy(sourceDir, targetDir, {
             filter: () => true,
             overwrite: false,
@@ -207,12 +212,13 @@ async function confirmTargetDirAsync(targetDir: string): Promise<void> {
  */
 function printFurtherInstructions(
     targetDir: string,
-    __unusedPackageManager: PackageManagerName,
+    packageManager: PackageManagerName,
     includesExample: boolean
 ) {
     if (includesExample) {
         const commands = [
             `cd ${path.relative(CWD, targetDir)}`,
+            `${packageManager} install`,
             'code .'
         ];
 
@@ -223,7 +229,7 @@ function printFurtherInstructions(
         commands.forEach((command) => console.log(chalk.gray('>'), chalk.bold(command)));
         console.log();
     }
-    console.log(`Visit ${chalk.blue.bold(DOCS_URL)} for the documentation on the Klave Network`);
+    console.log(`Visit ${chalk.blue.bold(DOCS_URL)} for the documentation on Klave`);
 }
 
 const program = new Command();
