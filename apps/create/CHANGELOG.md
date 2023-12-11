@@ -1,4 +1,11 @@
 # Changelog
+## [0.3.17](https://github.com/klave-network/platform/compare/create@0.3.16...create@0.3.17) (2023-12-11)
+
+
+### Bug Fixes
+
+* **create:** Expose node binaries with ESM module declaration ([941749a](https://github.com/klave-network/platform/commit/941749a9ee50ef4ad6ebbaf1fd8c13aa5b2ef011))
+
 ## [0.3.16](https://github.com/klave-network/platform/compare/create@0.3.15...create@0.3.16) (2023-12-08)
 
 ### Dependency Updates
