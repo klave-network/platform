@@ -13,8 +13,9 @@
             "options": {
                 "platform": "node",
                 "outputPath": "dist/apps/create",
+                "outputFileName": "src/index.js",
                 "format": [
-                    "cjs"
+                    "esm"
                 ],
                 "bundle": true,
                 "main": "apps/create/src/index.ts",

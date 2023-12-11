@@ -9,7 +9,7 @@
         "name": "Florian Guitton"
     },
     "bin": {
-        "create-on-klave": "./bin/create-on-klave",
-        "create-trustless-app": "./bin/create-trustless-app"
+        "create-on-klave": "./bin/create-on-klave.js",
+        "create-trustless-app": "./bin/create-trustless-app.js"
     }
 }
