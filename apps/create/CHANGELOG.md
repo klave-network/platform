@@ -1,4 +1,14 @@
 # Changelog
+## [0.3.18](https://github.com/klave-network/platform/compare/create@0.3.17...create@0.3.18) (2023-12-12)
+
+### Dependency Updates
+
+* `sdk` updated to version `0.3.17`
+
+### Bug Fixes
+
+* **create:** Ensure new app folder is renamed correctly ([24040ee](https://github.com/klave-network/platform/commit/24040eea5f6ce3ad7ffc374220110cb0e4df1bd2))
+
 ## [0.3.17](https://github.com/klave-network/platform/compare/create@0.3.16...create@0.3.17) (2023-12-11)
 
 
