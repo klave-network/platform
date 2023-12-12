@@ -38,10 +38,7 @@
                 "production": {
                     "optimization": true,
                     "minify": true,
-                    "bundle": true,
-                    "extractLicenses": true,
-                    "generateLockfile": true,
-                    "generatePackageJson": true
+                    "bundle": true
                 }
             }
         },

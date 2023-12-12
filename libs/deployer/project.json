@@ -38,6 +38,19 @@
             "options": {
                 "jestConfig": "libs/deployer/jest.config.ts"
             }
+        },
+        "version": {
+            "executor": "@jscutlery/semver:version",
+            "options": {
+                "preset": "conventional",
+                "trackDeps": true,
+                "changelogHeader": "# Changelog",
+                "tagPrefix": "{projectName}@",
+                "commitMessageFormat": "chore({projectName}): Release version ${version}",
+                "postTargets": [
+                    "deployer:build"
+                ]
+            }
         }
     },
     "tags": []

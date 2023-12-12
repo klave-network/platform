@@ -3,6 +3,6 @@
     "version": "0.1.5",
     "license": "MIT",
     "dependencies": {
-        "typescript": "^5.2.2"
+        "typescript": "^5.3.3"
     }
 }
