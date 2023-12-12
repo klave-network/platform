@@ -16,10 +16,6 @@
                 "assets": [
                     "libs/compiler/*.md"
                 ],
-                "externals": [
-                    "@klave/as-json",
-                    "assemblyscript"
-                ],
                 "generateExportsField": true
             },
             "configurations": {

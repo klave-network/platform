@@ -33,7 +33,6 @@
             "configurations": {
                 "development": {},
                 "production": {
-                    "generateLockfile": true,
                     "esbuildOptions": {
                         "sourcemap": false,
                         "outExtension": {
@@ -78,6 +77,19 @@
                 "build"
             ],
             "command": "docker build -f apps/cli/Dockerfile . -t cli"
+        },
+        "version": {
+            "executor": "@jscutlery/semver:version",
+            "options": {
+                "preset": "conventional",
+                "trackDeps": true,
+                "changelogHeader": "# Changelog",
+                "tagPrefix": "{projectName}@",
+                "commitMessageFormat": "chore({projectName}): Release version ${version}",
+                "postTargets": [
+                    "cli:build"
+                ]
+            }
         }
     },
     "tags": []

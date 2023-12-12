@@ -12,7 +12,6 @@
             "options": {
                 "outputPath": "dist/libs/providers",
                 "tsConfig": "libs/providers/tsconfig.lib.json",
-                "packageJson": "libs/providers/package.json",
                 "main": "libs/providers/src/index.ts",
                 "assets": [
                     "libs/providers/*.md"
@@ -32,6 +31,19 @@
             ],
             "options": {
                 "jestConfig": "libs/providers/jest.config.ts"
+            }
+        },
+        "version": {
+            "executor": "@jscutlery/semver:version",
+            "options": {
+                "preset": "conventional",
+                "trackDeps": true,
+                "changelogHeader": "# Changelog",
+                "tagPrefix": "{projectName}@",
+                "commitMessageFormat": "chore({projectName}): Release version ${version}",
+                "postTargets": [
+                    "providers:build"
+                ]
             }
         }
     },

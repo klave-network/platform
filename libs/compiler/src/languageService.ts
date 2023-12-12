@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import * as ts from 'typescript';
 
 export class LanguageServiceHost implements ts.LanguageServiceHost {
     files: ts.MapLike<ts.IScriptSnapshot> = {};
