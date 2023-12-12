@@ -128,6 +128,8 @@ async function createTemplateAsync(targetDir: string, data: SubstitutionData): P
             disableGlobs: true
         });
 
+        await fs.rename(path.join(targetDir, 'apps', 'hello_world'), path.join(targetDir, 'apps', data.project.slug));
+
         step.succeed('Creating template files');
 
         return path.join(targetDir, 'temp_dl_folder');
