@@ -5,7 +5,12 @@ import git from 'git-rev-sync';
 import { version } from './package.json';
 
 export default defineViteConfig({
+
     cacheDir: '../../node_modules/.vite/ui',
+
+    build: {
+        outDir: '../../dist/apps/ui'
+    },
 
     server: {
         host: 'localhost',

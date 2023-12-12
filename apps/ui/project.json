@@ -64,13 +64,7 @@
             "executor": "@nx/eslint:lint",
             "outputs": [
                 "{options.outputFile}"
-            ],
-            "options": {
-                "lintFilePatterns": [
-                    "apps/ui/**/*.{ts,tsx,js,jsx}",
-                    "apps/ui/package.json"
-                ]
-            }
+            ]
         },
         "test": {
             "executor": "@nx/vite:test",

@@ -17,12 +17,7 @@
             "executor": "@nx/eslint:lint",
             "outputs": [
                 "{options.outputFile}"
-            ],
-            "options": {
-                "lintFilePatterns": [
-                    "apps/ui-e2e/**/*.{js,ts}"
-                ]
-            }
+            ]
         }
     },
     "implicitDependencies": [
