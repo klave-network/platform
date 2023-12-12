@@ -1,4 +1,9 @@
 # Changelog
+## [0.8.3](https://github.com/klave-network/platform/compare/sdk@0.8.2...sdk@0.8.3) (2023-12-12)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.8.2`
 ## [0.8.2](https://github.com/klave-network/platform/compare/sdk@0.8.1...sdk@0.8.2) (2023-12-08)
 
 ### Dependency Updates
