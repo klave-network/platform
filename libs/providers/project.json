@@ -23,13 +23,7 @@
             "executor": "@nx/eslint:lint",
             "outputs": [
                 "{options.outputFile}"
-            ],
-            "options": {
-                "lintFilePatterns": [
-                    "libs/providers/**/*.ts",
-                    "libs/providers/package.json"
-                ]
-            }
+            ]
         },
         "test": {
             "executor": "@nx/jest:jest",

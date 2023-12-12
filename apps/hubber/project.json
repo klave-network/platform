@@ -65,13 +65,7 @@
             "executor": "@nx/eslint:lint",
             "outputs": [
                 "{options.outputFile}"
-            ],
-            "options": {
-                "lintFilePatterns": [
-                    "apps/hubber/**/*.ts",
-                    "apps/hubber/package.json"
-                ]
-            }
+            ]
         },
         "test": {
             "executor": "@nx/jest:jest",

@@ -27,13 +27,7 @@
             "executor": "@nx/eslint:lint",
             "outputs": [
                 "{options.outputFile}"
-            ],
-            "options": {
-                "lintFilePatterns": [
-                    "libs/db/**/*.ts",
-                    "libs/db/package.json"
-                ]
-            }
+            ]
         },
         "test": {
             "executor": "@nx/jest:jest",
