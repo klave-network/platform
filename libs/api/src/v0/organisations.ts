@@ -89,7 +89,6 @@ export const organisationRouter = createTRPCRouter({
                 },
                 select: {
                     id: true,
-                    name: true,
                     slug: true,
                     kredits: true,
                     personal: true,
@@ -130,7 +129,6 @@ export const organisationRouter = createTRPCRouter({
                 },
                 select: {
                     id: true,
-                    name: true,
                     slug: true,
                     kredits: true,
                     personal: true,
@@ -194,7 +192,6 @@ export const organisationRouter = createTRPCRouter({
             const org = await prisma.organisation.create({
                 data: {
                     slug,
-                    name: '',
                     ...data,
                     creatorId: user.id,
                     permissionGrants: {

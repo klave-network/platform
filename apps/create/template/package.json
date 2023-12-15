@@ -1,4 +1,10 @@
 {
+    "name": "{{KLAVE_APP_SLUG}}",
+    "description": "{{KLAVE_APP_DESCRIPTION}}",
+    "author": "{{KLAVE_APP_AUTHOR}}",
+    "version": "{{KLAVE_APP_VERSION}}",
+    "license": "{{KLAVE_APP_LICENSE}}",
+    "repository": "{{KLAVE_APP_REPO}}",
     "scripts": {
         "build": "stac ."
     },

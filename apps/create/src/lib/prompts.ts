@@ -15,22 +15,15 @@ export function getSlugPrompt(customTargetPath?: string | null): PromptObject<st
     return {
         type: 'text',
         name: 'slug',
-        message: 'What is the package name?',
+        message: 'What is the name of your honest application?',
         initial,
         validate: (input) =>
-            validateNpmPackage(sanitize(input)).validForNewPackages || 'Must be a valid npm package name'
+            validateNpmPackage(sanitize(input)).validForNewPackages || 'The name can only contain ASCII letters, digits, and the characters ., -, and _'
     };
 }
 
 export async function getSubstitutionDataPrompts(slug: string): Promise<PromptObject<string>[]> {
     return [
-        {
-            type: 'text',
-            name: 'name',
-            message: 'What is the name of your honest application?',
-            initial: 'My honest application',
-            validate: (input) => !!input || 'The description cannot be empty'
-        },
         {
             type: 'text',
             name: 'description',

@@ -161,7 +161,6 @@ export const authRouter = createTRPCRouter({
                             },
                             createdOrganisations: {
                                 create: {
-                                    name: 'Personal',
                                     slug,
                                     personal: true
                                 }

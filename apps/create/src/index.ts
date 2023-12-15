@@ -115,8 +115,14 @@ async function createTemplateAsync(targetDir: string, data: SubstitutionData): P
 
         await replaceInFile({
             files: path.join(targetDir, 'klave.json'),
-            from: [/{{SMART_CONTRACT_NAME}}/g, /{{SMART_CONTRACT_SLUG}}/g],
-            to: [data.project.name, data.project.slug],
+            from: [/{{KLAVE_APP_SLUG}}/g, /{{KLAVE_APP_DESCRIPTION}}/g, /{{KLAVE_APP_VERSION}}/g],
+            to: [data.project.slug, data.project.description, data.project.version],
+            disableGlobs: true
+        });
+        await replaceInFile({
+            files: path.join(targetDir, 'package.json'),
+            from: [/{{KLAVE_APP_SLUG}}/g, /{{KLAVE_APP_DESCRIPTION}}/g, /{{KLAVE_APP_VERSION}}/g, /{{KLAVE_APP_AUTHOR}}/g, /{{KLAVE_APP_LICENSE}}/g, /{{KLAVE_APP_REPO}}/g],
+            to: [data.project.slug, data.project.description, data.project.version, data.author, data.license, data.repo],
             disableGlobs: true
         });
 
@@ -159,9 +165,7 @@ async function askForSubstitutionDataAsync(slug: string): Promise<SubstitutionDa
     };
 
     const {
-        name,
         description,
-        package: projectPackage,
         authorName,
         authorEmail,
         authorUrl,
@@ -171,10 +175,8 @@ async function askForSubstitutionDataAsync(slug: string): Promise<SubstitutionDa
     return {
         project: {
             slug,
-            name,
-            version: '0.1.0',
-            description,
-            package: projectPackage
+            version: '0.0.0',
+            description
         },
         author: `${authorName} <${authorEmail}> (${authorUrl})`,
         license: 'MIT',

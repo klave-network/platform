@@ -240,6 +240,7 @@ export const applicationRouter = createTRPCRouter({
                 },
                 select: {
                     id: true,
+                    slug: true,
                     catogories: true,
                     homepage: true,
                     description: true,
@@ -247,7 +248,6 @@ export const applicationRouter = createTRPCRouter({
                     webhook: true,
                     limits: true,
                     gitSignRequired: true,
-                    name: true,
                     tags: true,
                     repo: true,
                     kredits: true,
@@ -371,6 +371,7 @@ export const applicationRouter = createTRPCRouter({
                 },
                 select: {
                     id: true,
+                    slug: true,
                     catogories: true,
                     homepage: true,
                     description: true,
@@ -378,7 +379,6 @@ export const applicationRouter = createTRPCRouter({
                     webhook: true,
                     limits: true,
                     gitSignRequired: true,
-                    name: true,
                     tags: true,
                     repo: true,
                     kredits: true,
@@ -421,6 +421,23 @@ export const applicationRouter = createTRPCRouter({
             if (newConfig === null)
                 throw (new Error('There is no configuration repo'));
 
+
+            applications.forEach(appName => {
+                (async () => {
+                    const appSlug = appName.replaceAll(/\W/g, '-').toLocaleLowerCase();
+                    const existingApp = await prisma.application.findFirst({
+                        where: {
+                            organisationId,
+                            slug: appSlug
+                        }
+                    });
+
+                    if (existingApp)
+                        throw (new Error(`There is already an application named ${appSlug}`));
+                })()
+                    .catch((error) => { throw error; });
+            });
+
             applications.forEach(appName => {
                 (async () => {
                     const appSlug = appName.replaceAll(/\W/g, '-').toLocaleLowerCase();
@@ -453,7 +470,6 @@ export const applicationRouter = createTRPCRouter({
                                     id: webId
                                 }
                             },
-                            name: appName,
                             slug: appSlug,
                             organisation: {
                                 connect: {

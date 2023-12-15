@@ -168,20 +168,20 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
         (async () => {
 
             // Bail out if the application is not in the running configuration
-            if (!availableApplicationsConfig[application.name])
+            if (!availableApplicationsConfig[application.slug])
                 return;
 
             // TODO There is typing error in this location
             const fileChanged = files.filter(({ filename }) => {
                 const commitFileDir = path.normalize(path.join('/', filename));
-                const appPath = path.normalize(path.join('/', availableApplicationsConfig[application.name]?.rootDir ?? ''));
+                const appPath = path.normalize(path.join('/', availableApplicationsConfig[application.slug]?.rootDir ?? ''));
                 return commitFileDir.startsWith(appPath) || filename === 'klave.json';
             });
 
             if (fileChanged.length === 0 && !context.forceDeploy)
                 return;
 
-            logger.info(`Deploying ${application.name} from ${context.commit.after}`);
+            logger.info(`Deploying ${application.slug} from ${context.commit.after}`);
 
             await prisma.activityLog.create({
                 data: {
@@ -261,7 +261,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                     },
                                     commit,
                                     expiresOn: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
-                                    version: availableApplicationsConfig[application.name]?.version,
+                                    version: availableApplicationsConfig[application.slug]?.version,
                                     set: deploymentSet,
                                     build: context.commit.after.substring(0, 8),
                                     branch: branchName,
@@ -353,7 +353,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 type: 'github',
                                 context: deploymentContext,
                                 repo,
-                                application: availableApplicationsConfig[application.name],
+                                application: availableApplicationsConfig[application.slug],
                                 dependencies: {
                                     ...(packageJson.optionalDependencies ?? {}),
                                     ...(packageJson.peerDependencies ?? {}),

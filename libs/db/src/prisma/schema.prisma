@@ -37,7 +37,6 @@ type GitHubToken {
 
 model Organisation {
     id               String            @id @default(uuid()) @map("_id")
-    name             String
     slug             String            @unique
     kredits          BigInt            @default(0)
     personal         Boolean           @default(false)
@@ -279,7 +278,6 @@ model Application {
     id               String            @id @default(uuid()) @map("_id")
     web              Web               @relation(fields: [webId], references: [id])
     webId            String
-    name             String
     slug             String
     domains          Domain[]
     license          String?
