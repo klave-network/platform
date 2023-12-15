@@ -91,11 +91,9 @@ export const OrganisationSettings: FC = () => {
 
     const methods = useZodForm({
         schema: z.object({
-            name: z.string(),
             slug: z.string()
         }),
         values: {
-            name: organisation?.name || '',
             slug: organisation?.slug || ''
         }
     });
@@ -121,19 +119,14 @@ export const OrganisationSettings: FC = () => {
         >
             <div className='flex flex-col gap-3'>
                 <label>
-                    Name
-                    <br />
-                    <input {...methods.register('name')} className="input input-bordered border w-2/3" />
-                </label>
-                <label>
                     Slug
                     <br />
                     <textarea {...methods.register('slug')} className="border w-2/3" />
                 </label>
 
-                {methods.formState.errors.name?.message && (
+                {methods.formState.errors.slug?.message && (
                     <p className="text-red-700">
-                        {methods.formState.errors.name?.message}
+                        {methods.formState.errors.slug?.message}
                     </p>
                 )}
             </div>
@@ -149,8 +142,7 @@ export const OrganisationSettings: FC = () => {
         <div>
             <h1 className='font-bold text-xl mb-5'>Repository information</h1>
             <p>
-                Name: <b>{organisation.name}</b><br />
-                Slug: <b>{organisation.slug.replace('~$~', '')}</b><br />
+                Name: <b>{organisation.slug.replace('~$~', '')}</b><br />
             </p>
         </div>
         <div>

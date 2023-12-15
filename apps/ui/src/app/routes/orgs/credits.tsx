@@ -212,7 +212,7 @@ export const OrganisationSettings: FC = () => {
                         {sortedApplications?.map((application, i) =>
                             <tr key={i} className='border-slate-100 border border-t-0 rounded-sm p-2'>
                                 <td>
-                                    <Link to={`/${orgSlug}/${application.slug}`} className='font-bold hover:cursor-pointer hover:text-klave-light-blue'>{application?.name}</Link>
+                                    <Link to={`/${orgSlug}/${application.slug}`} className='font-bold hover:cursor-pointer hover:text-klave-light-blue'>{application?.slug}</Link>
                                     <p>{application.slug}</p>
                                 </td>
                                 <td>

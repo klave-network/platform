@@ -150,10 +150,10 @@ export const RepoAppSelect: FC = () => {
                         {/* <pre className='text-left w-1/2 bg-slate-200 m-auto p-5'>{JSON.stringify(repoData.config ?? repoData.configError, null, 4)}</pre> */}
                         <div className='grid gap-3 grid-cols-3'>
                             {(deployableRepo.config?.applications ?? []).map((app, index) => {
-                                return <label key={app.name} htmlFor={`application-${index}`} className={`w-full ${app.name && appSelectionWatch.includes(app.name) ? 'border-sky-400 hover:border-sky-500' : 'border-slate-200 hover:border-slate-400'} hover:cursor-pointer border rounded-lg py-3 px-4 text-left`}>
+                                return <label key={app.slug} htmlFor={`application-${index}`} className={`w-full ${app.slug && appSelectionWatch.includes(app.slug) ? 'border-sky-400 hover:border-sky-500' : 'border-slate-200 hover:border-slate-400'} hover:cursor-pointer border rounded-lg py-3 px-4 text-left`}>
                                     <span className='flex flex-row items-center'>
-                                        <input disabled={!deployableRepo.isAvailableToKlave} id={`application-${index}`} type="checkbox" value={app.name} {...register('applications')} className='peer toggle toggle-sm checked:bg-sky-500 checked:border-sky-500 mr-3' />
-                                        {app.name}</span>
+                                        <input disabled={!deployableRepo.isAvailableToKlave} id={`application-${index}`} type="checkbox" value={app.slug} {...register('applications')} className='peer toggle toggle-sm checked:bg-sky-500 checked:border-sky-500 mr-3' />
+                                        {app.slug}</span>
                                     {/* <label htmlFor={`application-${index}`}>{app.name}</label> */}
                                 </label>;
                             })}
@@ -208,7 +208,7 @@ export const RepoAppSelect: FC = () => {
                                     {personals.length > 0
                                         ? <Select.Group>
                                             <Select.Label className="text-xs text-slate-400 px-3 py-1">Personal Account</Select.Label>
-                                            {personals.map(o => <SelectItem key={o.id} value={o.id} className="px-3 py-2 hover:text-klave-cyan hover:cursor-pointer">{o.slug.replace('~$~', '')} <span className='text-slate-400'>- {o.name}</span></SelectItem>)}
+                                            {personals.map(o => <SelectItem key={o.id} value={o.id} className="px-3 py-2 hover:text-klave-cyan hover:cursor-pointer">{o.slug.replace('~$~', '')}</SelectItem>)}
                                         </Select.Group>
                                         : null}
                                     {other.length > 0
@@ -216,7 +216,7 @@ export const RepoAppSelect: FC = () => {
                                             <Select.Separator className="text-xs text-slate-400 p-1" />
                                             <Select.Group>
                                                 <Select.Label className="text-xs text-slate-400 px-3 py-1">Organisations</Select.Label>
-                                                {other.map(o => <SelectItem key={o.id} value={o.id} className='px-3 py-2 hover:text-klave-cyan hover:cursor-pointer overflow-hidden'>{o.slug} <span className='text-slate-400 overflow-hidden'>- {o.name}</span></SelectItem>)}
+                                                {other.map(o => <SelectItem key={o.id} value={o.id} className='px-3 py-2 hover:text-klave-cyan hover:cursor-pointer overflow-hidden'>{o.slug}</SelectItem>)}
                                             </Select.Group>
                                         </> : null}
                                 </Select.Viewport>

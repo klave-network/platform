@@ -1,16 +1,13 @@
 import { z } from 'zod';
 
 export const repoConfigSchema = z.object({
-    version: z.string().or(z.number()),
-    name: z.string(),
-    slug: z.string(),
-    branch: z.string(),
-    targetSdk: z.string(),
+    schema: z.string().or(z.number()).optional(),
+    branches: z.array(z.string()).optional(),
     applications: z.array(z.object(
         {
-            name: z.string(),
-            targetSdk: z.string(),
-            root: z.string()
+            slug: z.string(),
+            description: z.string().optional(),
+            rootDir: z.string()
         }
     ))
-}).deepPartial();
+});

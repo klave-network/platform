@@ -17,10 +17,8 @@ export type CommandOptions = {
 export type SubstitutionData = {
     project: {
         slug: string;
-        name: string;
         version: string;
         description: string;
-        package: string;
     };
     author: string;
     license: string;

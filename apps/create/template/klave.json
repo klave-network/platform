@@ -5,10 +5,10 @@
     ],
     "applications": [
         {
-            "name": "{{SMART_CONTRACT_NAME}}",
-            "slug": "{{SMART_CONTRACT_SLUG}}",
-            "version": "0.0.1",
-            "rootDir": "/apps/{{SMART_CONTRACT_SLUG}}"
+            "name": "{{KLAVE_APP_SLUG}}",
+            "description": "{{KLAVE_APP_DESCRIPTION}}",
+            "version": "{{KLAVE_APP_VERSION}}",
+            "rootDir": "/apps/{{KLAVE_APP_SLUG}}"
         }
     ]
 }
