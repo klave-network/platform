@@ -4,6 +4,8 @@ import { FC, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import api from '../../utils/api';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
+import { Octicon, Timeline } from '@primer/react';
+import { CubeIcon } from '@radix-ui/react-icons';
 // import { UilSpinner } from '@iconscout/react-unicons';
 // import api from '../../utils/api';
 
@@ -13,9 +15,15 @@ type ApplicationRecordProps = {
 
 export const ApplicationRecord: FC<ApplicationRecordProps> = ({ application }) => {
     const { orgSlug } = useParams();
-    return <span className='h-6 block my-2 whitespace-nowrap overflow-hidden'>
-        Created application <Link to={`/${orgSlug}/${application.slug}`} className='font-semibold'>{application.slug}</Link> <i>({formatTimeAgo(application.createdAt)})</i>
-    </span>;
+    return <Timeline.Item condensed >
+        <Timeline.Badge>
+            <Octicon icon={CubeIcon} />
+        </Timeline.Badge>
+        <Timeline.Body>
+            Created application <Link to={`/${orgSlug}/${application.slug}`} className='font-semibold'>{application.slug}</Link> <i>({formatTimeAgo(application.createdAt)})</i>
+        </Timeline.Body>
+        <Timeline.Break />
+    </Timeline.Item>;
 };
 
 export const OrganisationRecordListing: FC = () => {
@@ -59,7 +67,9 @@ export const OrganisationRecordListing: FC = () => {
             </div>
             :
             <div className="w-full text-left">
-                {sortedApplications.map(application => <ApplicationRecord key={application.id} application={application} />)}
+                <Timeline clipSidebar>
+                    {sortedApplications.map(application => <ApplicationRecord key={application.id} application={application} />)}
+                </Timeline>
             </div>
         }
     </div>;
