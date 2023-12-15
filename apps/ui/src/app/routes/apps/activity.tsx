@@ -6,6 +6,8 @@ import { useParams } from 'react-router-dom';
 import api from '../../utils/api';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
 import { commitVerificationReasons } from '@klave/constants';
+import { Octicon, Timeline } from '@primer/react';
+import { CommitIcon } from '@radix-ui/react-icons';
 
 type ActivityRecordProps = {
     activity: ActivityLog
@@ -15,13 +17,23 @@ export const ActivityRecord: FC<ActivityRecordProps> = ({ activity }) => {
     if (activity.class === 'pullRequestHook') {
         const { pusher, commit, pullRequest } = activity.context.payload as unknown as DeploymentPullRequestPayload;
         if (activity.context.type === 'opened')
-            return <span className='h-6 block my-2 whitespace-nowrap overflow-hidden'>
-                <a target='_blank' rel="noreferrer noopener" href={pusher.htmlUrl} className='font-semibold'><img alt={pusher.login} src={pusher.avatarUrl} className='h-full inline-block rounded-full' /> {pusher.login}</a> opened a pull request <a target='_blank' rel="noreferrer noopener" href={pullRequest?.url} className='text-slate-400'>#{pullRequest?.number}</a> <i>({formatTimeAgo(activity.createdAt)})</i>
-            </span>;
+            return <Timeline.Item condensed >
+                <Timeline.Badge>
+                    <Octicon icon={CommitIcon} />
+                </Timeline.Badge>
+                <Timeline.Body className="h-6 flex items-center gap-1">
+                    <a target='_blank' rel="noreferrer noopener" href={pusher.htmlUrl} className='flex items-center gap-1 h-full font-semibold'><img alt={pusher.login} src={pusher.avatarUrl} className='h-full inline-block rounded-full' /> {pusher.login}</a> opened a pull request <a target='_blank' rel="noreferrer noopener" href={pullRequest?.url} className='text-slate-400'>#{pullRequest?.number}</a> <i>({formatTimeAgo(activity.createdAt)})</i>
+                </Timeline.Body>
+            </Timeline.Item>;
         if (activity.context.type === 'synchronize')
-            return <span className='h-6 block my-2 whitespace-nowrap overflow-hidden'>
-                <a target='_blank' rel="noreferrer noopener" href={pusher.htmlUrl} className='font-semibold'><img alt={pusher.login} src={pusher.avatarUrl} className='h-full inline-block rounded-full' /> {pusher.login}</a> added <a target='_blank' rel="noreferrer noopener" href={pullRequest?.url} className="font-mono rounded bg-klave-light-blue text-klave-dark-blue mx-1 px-2 py-1">{commit.after.substring(0, 8)}</a> to pull request <a target='_blank' rel="noreferrer noopener" href={pullRequest?.url} className='text-slate-400'>#{pullRequest?.number}</a> <i>({formatTimeAgo(activity.createdAt)})</i>
-            </span>;
+            return <Timeline.Item condensed >
+                <Timeline.Badge>
+                    <Octicon icon={CommitIcon} />
+                </Timeline.Badge>
+                <Timeline.Body className="h-6 flex items-center gap-1">
+                    <a target='_blank' rel="noreferrer noopener" href={pusher.htmlUrl} className='flex items-center gap-1 h-full font-semibold'><img alt={pusher.login} src={pusher.avatarUrl} className='h-full inline-block rounded-full' /> {pusher.login}</a> added <a target='_blank' rel="noreferrer noopener" href={pullRequest?.url} className="font-mono rounded bg-klave-light-blue text-klave-dark-blue mx-1 px-2 py-1">{commit.after.substring(0, 8)}</a> to pull request <a target='_blank' rel="noreferrer noopener" href={pullRequest?.url} className='text-slate-400'>#{pullRequest?.number}</a> <i>({formatTimeAgo(activity.createdAt)})</i>
+                </Timeline.Body>
+            </Timeline.Item>;
     }
     if (activity.class === 'pushHook') {
         const { pusher, commit, repo, headCommit } = activity.context.payload as unknown as DeploymentPushPayload;
@@ -32,9 +44,14 @@ export const ActivityRecord: FC<ActivityRecordProps> = ({ activity }) => {
             : reason === 'unsigned'
                 ? <div className="badge badge-xs py-2 text-slate-400 border-slate-400"><UilLockSlash className='h-3 w-3 mr-1' />{commitVerificationReasons[reason ?? 'unknown']}</div>
                 : <div className="badge badge-xs py-2 text-red-400 border-red-400"><UilLockSlash className='h-3 w-3 mr-1' />{commitVerificationReasons[reason ?? 'unknown']}</div>;
-        return <span className='h-6 block my-2 whitespace-nowrap overflow-hidden'>
-            <a target='_blank' rel="noreferrer noopener" href={pusher.htmlUrl} className='font-semibold'><img alt={pusher.login} src={pusher.avatarUrl} className='h-full inline-block rounded-full' /> {pusher.login}</a> pushed <a target='_blank' rel="noreferrer noopener" href={repo?.url} className="font-mono kbd kbd-s hover:bg-slate-200 mx-1 px-1 py-0 min-h-0 rounded-sm">{commit.after.substring(0, 8)}</a> {badge}{commit.after === commit.ref ? null : <> to <a target='_blank' rel="noreferrer noopener" href={repo?.url} className='text-slate-400'>{commit?.ref?.replace('refs/heads/', '')}</a></>} <i>({formatTimeAgo(activity.createdAt)})</i>
-        </span>;
+        return <Timeline.Item condensed >
+            <Timeline.Badge>
+                <Octicon icon={CommitIcon} />
+            </Timeline.Badge>
+            <Timeline.Body className="h-6 flex items-center gap-1">
+                <a target='_blank' rel="noreferrer noopener" href={pusher.htmlUrl} className='flex items-center gap-1 h-full font-semibold'><img alt={pusher.login} src={pusher.avatarUrl} className='h-full inline-block rounded-full' /> {pusher.login}</a> pushed <a target='_blank' rel="noreferrer noopener" href={repo?.url} className="font-mono kbd kbd-s hover:bg-slate-200 mx-1 px-1 py-0 min-h-0 rounded-sm">{commit.after.substring(0, 8)}</a> {badge}{commit.after === commit.ref ? null : <> to <a target='_blank' rel="noreferrer noopener" href={repo?.url} className='text-slate-400'>{commit?.ref?.replace('refs/heads/', '')}</a></>} <i>({formatTimeAgo(activity.createdAt)})</i>
+            </Timeline.Body>
+        </Timeline.Item>;
     }
     return null;
 };
@@ -80,7 +97,9 @@ export const ActivityRecordListing: FC = () => {
             </div>
             :
             <div className="w-full text-left">
-                {activitiesList.map(activity => <ActivityRecord key={activity.id} activity={activity} />)}
+                <Timeline clipSidebar>
+                    {activitiesList.map(activity => <ActivityRecord key={activity.id} activity={activity} />)}
+                </Timeline>
             </div>
         }
     </div>;
