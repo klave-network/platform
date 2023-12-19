@@ -1,5 +1,5 @@
 import { TransferListItem, Worker } from 'node:worker_threads';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { v4 as uuid } from 'uuid';
 import { formatter } from './languageService';
 import { compilerModuleFunction } from './compilerModule';
