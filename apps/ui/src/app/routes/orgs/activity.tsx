@@ -22,7 +22,6 @@ export const ApplicationRecord: FC<ApplicationRecordProps> = ({ application }) =
         <Timeline.Body>
             Created application <Link to={`/${orgSlug}/${application.slug}`} className='font-semibold'>{application.slug}</Link> <i>({formatTimeAgo(application.createdAt)})</i>
         </Timeline.Body>
-        <Timeline.Break />
     </Timeline.Item>;
 };
 
