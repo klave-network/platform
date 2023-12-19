@@ -1,4 +1,41 @@
 # Changelog
+## [0.6.0](https://github.com/klave-network/platform/compare/api@0.5.0...api@0.6.0) (2023-12-19)
+
+### Dependency Updates
+
+* `db` updated to version `0.5.0`
+* `compiler` updated to version `0.5.0`
+* `providers` updated to version `0.5.0`
+* `constants` updated to version `0.5.0`
+
+### Features
+
+* Add disk caching to circumvent proxy HTTPS limitation ([4b19771](https://github.com/klave-network/platform/commit/4b19771980930cef48aaea3dd4c991ac11b57fc4))
+* Add Stripe payment for credits ([2a7d7ff](https://github.com/klave-network/platform/commit/2a7d7ff011649c2ae81b97989cd45625326e0776))
+* Add support for Organisations ([b4400ce](https://github.com/klave-network/platform/commit/b4400ce5b9603178e8d59d4f6e09f8b0e21eafef))
+* **api,hubber,ui:** Provide versions at compile time ([da280b5](https://github.com/klave-network/platform/commit/da280b518d945b29c519341bc3a0755e13e2d836))
+* **api,ui:** Provide filtering of disposable email domains ([9357e73](https://github.com/klave-network/platform/commit/9357e73132ef6a79204dcd79ef0ad8b1e08969a2))
+* **api,ui:** Provide screen for setting users' own slug ([0d28ecb](https://github.com/klave-network/platform/commit/0d28ecb3bbfe42abacfa2e014a0f647ec6358452))
+* **api:** Ensure the release mechanism redeploys from database ([b488b79](https://github.com/klave-network/platform/commit/b488b79bc39cfd4e5ffd5e672a89e1c608b735ee))
+* **db,api,ui:** Add new permission panel for app settings ([ecca8b6](https://github.com/klave-network/platform/commit/ecca8b62f6247871c2742ee7a420c90f3dad5479))
+* **db,api,ui:** Add screen for coupon redeeming ([7f0742e](https://github.com/klave-network/platform/commit/7f0742ed6934725a2e504a8cbfc2a9679a34914b))
+* **db,api,ui:** Add transaction spending limit selector ([8b9368b](https://github.com/klave-network/platform/commit/8b9368ba18cd6d0af5c6b18c0d2fda9513080fa4))
+* **db,api,ui:** Trigger deployments based on commit signature filter ([7562f89](https://github.com/klave-network/platform/commit/7562f89b533eae5996be563e2637ff06893856e1))
+* **db,constants,api,ui:** Add tracking of commit signatures ([a39311d](https://github.com/klave-network/platform/commit/a39311d03d2f8fa50983958d4a829ec3ab09565f))
+
+
+### Bug Fixes
+
+* **api,constants:** Ensure the API packages only exposes types to the UI ([d325251](https://github.com/klave-network/platform/commit/d325251033fd05fa895f5058ef97e15b5ff89d51))
+* **api,hubber:** Correct forced deployment misfire ([96dbc77](https://github.com/klave-network/platform/commit/96dbc7794da36d1c8070fac3dd7a6e283e8ecfed))
+* **api:** Application and deployment must be marked by appId + User session check ([4bf4160](https://github.com/klave-network/platform/commit/4bf41600aaee23122ef1f6cac706e6b96ce5db06))
+* **api:** Create personal organisation separately to bypass Prisma bug ([c0e803d](https://github.com/klave-network/platform/commit/c0e803d1121a0875d27b57329b019a984cb82437))
+* **api:** Ensure an override on user exist to permit calls from hooks processors ([51587cb](https://github.com/klave-network/platform/commit/51587cbc5d0e6da893025875010dd393f6b553f5))
+* **api:** Make sure rpID is set post initialization ([c8ea7bb](https://github.com/klave-network/platform/commit/c8ea7bba2f04b9727869bfa703ab3df3900b198f))
+* **api:** Make the slug available through the session API ([a2a2d5e](https://github.com/klave-network/platform/commit/a2a2d5efefb5cb45b36d2f4eace07d3b028e18fc))
+* **api:** Optimise deployment query size for listing ([6e6e042](https://github.com/klave-network/platform/commit/6e6e0420e7ff39f631204a5134ead151e223748b))
+* **db,api:** User creation did not set the grants appropriately ([bbf60d4](https://github.com/klave-network/platform/commit/bbf60d4508803ca89a647846c89736b0287791b3))
+
 ## [0.5.0](///compare/klave-api@0.4.0...klave-api@0.5.0) (2023-09-27)
 
 ### Dependency Updates
