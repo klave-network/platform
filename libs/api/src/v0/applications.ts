@@ -496,7 +496,7 @@ export const applicationRouter = createTRPCRouter({
                             config: newConfig
                         }
                     });
-                    await prisma.application.create({
+                    const newApp = await prisma.application.create({
                         data: {
                             web: {
                                 connect: {
@@ -567,6 +567,8 @@ export const applicationRouter = createTRPCRouter({
                             avatarUrl: afterCommit.author?.avatar_url ?? 'https://avatars.githubusercontent.com/u/583231?v=4',
                             htmlUrl: afterCommit.author?.html_url ?? afterCommit.committer?.html_url ?? ''
                         }
+                    }, {
+                        onlyApp: newApp.id
                     });
 
                     if (session.user === undefined)

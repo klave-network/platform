@@ -37,13 +37,18 @@ export const getFinalParseConfig = (config: string | object | null): ReturnType<
                 ...newParse.data,
                 branches: newParse.data.branch ? [newParse.data.branch] : undefined,
                 applications: newParse.data.applications?.map((app: any) => {
-                    app.slug = app.slug ?? app.name;
+                    app.slug = (app.slug ?? app.name).replaceAll(/\W/g, '-').toLocaleLowerCase();
                     delete app.name;
                     return app;
                 })
             } : undefined,
             chainError: originalParse.error
         } as any as ReturnType<typeof repoConfigSchemaV1.safeParse>;
+    } else {
+        originalParse.data.applications = originalParse.data.applications?.map((app: any) => {
+            app.slug = app.slug.replaceAll(/\W/g, '-').toLocaleLowerCase();
+            return app;
+        });
     }
     return originalParse;
 };
