@@ -155,9 +155,11 @@ export const LoginSecKey: FC = () => {
                         return;
                     }
                 })
-                .catch((e) => {
-                    console.error(e);
+                .catch((e: any) => {
+                    setCredentials(credentials.filter(c => c !== email));
                     setIsRequestingWebauthnInput(false);
+                    setError('A problem occurred while authenticating you. Please try again.');
+                    console.error(e);
                 });
             return;
         } else {
