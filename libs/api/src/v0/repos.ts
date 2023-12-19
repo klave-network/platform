@@ -192,7 +192,8 @@ export const reposRouter = createTRPCRouter({
                         }
                     });
 
-                    repo.config = JSON.stringify(getFinalParseConfig(handle.data.toString()));
+                    const result = getFinalParseConfig(handle.data.toString());
+                    repo.config = result.success ? JSON.stringify(result.data) : null;
                     await prisma.deployableRepo.update({ where: { id: repo.id }, data: { config: repo.config } });
                 } catch (e) {
                     // return [];

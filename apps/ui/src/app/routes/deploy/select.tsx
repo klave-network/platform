@@ -75,16 +75,19 @@ export const Select: FC = () => {
                         const fullName = `${repo.owner}/${repo.name}`;
                         const isReachableByApp = repo.installationRemoteId !== '';
                         const config: any = repo.config ? JSON.parse(repo.config) : undefined;
-                        return <Link to={`/deploy/repo/${fullName}`} key={fullName}>
-                            <div className={`w-full border-slate-200 hover:border-slate-400 border rounded-lg py-3 px-4 text-left ${isReachableByApp ? '' : 'opacity-50 bg-yellow-100 hover:bg-yellow-200 text-yellow-700'}`}>
-                                <span className='flex flex-row gap-2 items-center'><UilGithub className='inline-block h-5 w-5' /><span>{repo.owner}/<b>{repo.name}</b></span></span>
-                                {isReachableByApp
-                                    ? <i className='text-sm'>We found {config?.applications?.length ?? 0} application{(config?.applications?.length ?? 0) > 1 ? 's' : ''}</i>
-                                    : <>
-                                        <i className='text-sm'>You must install Klave on this reposiroty first</i>
-                                    </>}
-                            </div>
-                        </Link>;
+                        const insides = <div className={`w-full border-slate-200 border rounded-lg py-3 px-4 text-left ${isReachableByApp ? ((config?.applications?.length ?? 0) === 0 ? 'opacity-30' : 'hover:border-slate-400 hover:cursor-pointer') : 'opacity-50 bg-yellow-100 hover:bg-yellow-200 text-yellow-700'}`}>
+                            <span className='flex flex-row gap-2 items-center'><UilGithub className='inline-block h-5 w-5' /><span>{repo.owner}/<b>{repo.name}</b></span></span>
+                            {isReachableByApp
+                                ? <i className='text-sm'>We found {config?.applications?.length ?? 0} application{(config?.applications?.length ?? 0) > 1 ? 's' : ''}</i>
+                                : <>
+                                    <i className='text-sm'>You must install Klave on this reposiroty first</i>
+                                </>}
+                        </div>;
+                        return (config?.applications?.length ?? 0) === 0
+                            ? <div key={fullName}>{insides}</div>
+                            : <Link to={`/deploy/repo/${fullName}`} key={fullName}>
+                                {insides}
+                            </Link>;
                     })}
                 </div>
                 <br />
