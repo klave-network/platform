@@ -1,5 +1,5 @@
 import { FC, useState, useEffect, useMemo, forwardRef, PropsWithChildren } from 'react';
-import { useForm, FieldValues } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { UilSpinner, UilExclamationTriangle } from '@iconscout/react-unicons';
 import * as Select from '@radix-ui/react-select';
@@ -32,7 +32,7 @@ export const RepoAppSelect: FC = () => {
         }
     });
 
-    const { register, handleSubmit, watch } = useForm<{ applications: string[] }>();
+    const { register, watch } = useForm<{ applications: string[] }>();
     const { postInstall } = qs.parse(window.location.search);
     const [isPostInstall, setIsPostInstall] = useState<boolean>(postInstall === 'true');
     const [isPostInstallStuck, setIsPostInstallStuck] = useState(false);
@@ -81,6 +81,10 @@ export const RepoAppSelect: FC = () => {
                 clearTimeout(updateReceptionTimer);
         };
     }, []);
+
+    useEffect(() => {
+        setSelectedApplications(appSelectionWatch);
+    }, [appSelectionWatch.length]);
 
     if (isLoading || !deployableRepo)
         return <>
@@ -138,10 +142,6 @@ export const RepoAppSelect: FC = () => {
             </div>
         </>;
 
-    const selectApplications = ({ applications }: FieldValues) => {
-        setSelectedApplications((Array.isArray(applications) ? applications : [applications]).filter(Boolean));
-    };
-
     const registerApplications = () => {
         if (!selectedOrgId)
             return;
@@ -164,10 +164,7 @@ export const RepoAppSelect: FC = () => {
             </div>
             : null}
         <div className='relative'>
-            <form onSubmit={() => {
-                handleSubmit(selectApplications)()
-                    .catch(() => { return; });
-            }} >
+            <form >
                 <div className={!deployableRepo.isAvailableToKlave ? 'opacity-40' : ''}>
                     We found {deployableRepo.config?.applications?.length ?? 0} applications to deploy.<br />
                     Make your selection and be ready in minutes<br />
@@ -252,7 +249,7 @@ export const RepoAppSelect: FC = () => {
                     </> : null}
                     {/* <button type="button" onClick={() => setSelectedApplications([])} className='btn btn-sm mr-5 disabled:text-gray-300 hover:text-gray-500'>Go Back</button> */}
                     <Link to="/deploy/select" className='mr-5 disabled:text-gray-300 hover:text-gray-500'>Go back</Link>
-                    <button type="submit" onClick={registerApplications} disabled={!selectApplications.length || !selectedOrgId || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave || Object.values(canRegisterData ?? {}).includes(false)} className='btn btn-sm disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Deploy</button>
+                    <button onClick={registerApplications} disabled={!selectedApplications.length || !selectedOrgId || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave || Object.values(canRegisterData ?? {}).includes(false)} className='btn btn-sm disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Deploy</button>
                 </>
             }
         </div>
