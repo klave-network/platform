@@ -4,6 +4,7 @@ import { probot, scp, scpOps } from '@klave/providers';
 import type { Application, Limits } from '@klave/db';
 import { z } from 'zod';
 import { deployToSubstrate } from '../deployment/deploymentController';
+import { getFinalParseConfig } from './utils/repoConfigChecker';
 
 export const applicationRouter = createTRPCRouter({
     getAll: publicProcedure
@@ -396,6 +397,36 @@ export const applicationRouter = createTRPCRouter({
                 }
             });
         }),
+    canRegister: publicProcedure
+        .input(z.object({
+            applications: z.array(z.string()),
+            organisationId: z.string().uuid()
+        }))
+        .query(async ({ ctx: { prisma, session }, input: { applications, organisationId } }) => {
+
+            if (!session.user)
+                throw (new Error('You must be logged in'));
+
+            return (await Promise.all(applications.map(async appName => {
+                const appSlug = appName.replaceAll(/\W/g, '-').toLocaleLowerCase();
+                return [appName, await (async () => {
+                    const existingApp = await prisma.application.findFirst({
+                        where: {
+                            organisationId,
+                            slug: appSlug
+                        }
+                    });
+
+                    console.log('existingApp ', appSlug, existingApp);
+                    return !existingApp;
+                })()
+                    .catch((error) => { throw error; })
+                ];
+            })) as Array<[string, boolean]>).reduce((acc, [appName, canRegister]) => {
+                acc[appName] = canRegister;
+                return acc;
+            }, {} as Record<string, boolean>);
+        }),
     register: publicProcedure
         .input(z.object({
             deployableRepoId: z.string().uuid(),
@@ -406,7 +437,7 @@ export const applicationRouter = createTRPCRouter({
         .mutation(async ({ ctx: { prisma, session, sessionStore, sessionID, webId }, input: { deployableRepoId, applications, /*emphemeralKlaveTag,*/ organisationId } }) => {
 
             if (!session.user)
-                throw (new Error('You must be logged in to delete an application'));
+                throw (new Error('You must be logged in to register an application'));
 
             const deployableRepo = await prisma.deployableRepo.findFirst({
                 where: {
@@ -417,9 +448,11 @@ export const applicationRouter = createTRPCRouter({
             if (!deployableRepo)
                 throw (new Error('There is no such repo'));
 
-            const newConfig = deployableRepo.config;
+            const newParsedConfig = getFinalParseConfig(deployableRepo.config);
+            const newConfig = newParsedConfig.success ? newParsedConfig.data : null;
+
             if (newConfig === null)
-                throw (new Error('There is no configuration repo'));
+                throw (new Error('There is no configuration in this repo'));
 
 
             applications.forEach(appName => {
@@ -452,7 +485,7 @@ export const applicationRouter = createTRPCRouter({
                         update: {
                             // TODO: Use zod to validate the config
                             defaultBranch: deployableRepo.defaultBranch,
-                            config: JSON.parse(newConfig) as any
+                            config: newConfig
                         },
                         create: {
                             source: 'github',
@@ -460,7 +493,7 @@ export const applicationRouter = createTRPCRouter({
                             name: deployableRepo.name,
                             defaultBranch: deployableRepo.defaultBranch,
                             // TODO: Use zod to validate the config
-                            config: JSON.parse(newConfig) as any
+                            config: newConfig
                         }
                     });
                     await prisma.application.create({

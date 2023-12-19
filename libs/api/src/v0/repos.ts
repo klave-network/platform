@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { objectToCamel } from 'ts-case-convert';
 import { isTruthy } from './utils/isTruthy';
 import type { DeployableRepo, GitHubToken } from '@klave/db';
-import { repoConfigSchema } from './utils/repoConfigChecker';
+import { getFinalParseConfig } from './utils/repoConfigChecker';
 
 export const reposRouter = createTRPCRouter({
     deployables: publicProcedure
@@ -192,7 +192,7 @@ export const reposRouter = createTRPCRouter({
                         }
                     });
 
-                    repo.config = handle.data.toString();
+                    repo.config = JSON.stringify(getFinalParseConfig(handle.data.toString()));
                     await prisma.deployableRepo.update({ where: { id: repo.id }, data: { config: repo.config } });
                 } catch (e) {
                     // return [];
@@ -221,7 +221,7 @@ export const reposRouter = createTRPCRouter({
             if (!data)
                 return null;
 
-            const parsedConfig = typeof data?.config === 'string' ? repoConfigSchema.safeParse(JSON.parse(data?.config)) : null;
+            const parsedConfig = getFinalParseConfig(data?.config);
 
             return {
                 id: data.id,
@@ -230,7 +230,7 @@ export const reposRouter = createTRPCRouter({
                 fullName: data.fullName,
                 isAvailableToKlave: !!data.installationRemoteId && data.installationRemoteId.trim() !== '',
                 config: parsedConfig?.success ? parsedConfig.data : null,
-                configError: !parsedConfig?.success ? parsedConfig?.error.flatten() : null
+                configError: parsedConfig?.chainError ?? (!parsedConfig?.success ? parsedConfig?.error.flatten() : null)
             };
         }),
     registerGitHubCredentials: publicProcedure
