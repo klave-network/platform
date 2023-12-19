@@ -26,10 +26,7 @@
                 "trackDeps": true,
                 "changelogHeader": "# Changelog",
                 "tagPrefix": "{projectName}@",
-                "commitMessageFormat": "chore({projectName}): Release version ${version}",
-                "postTargets": [
-                    "prunner:build"
-                ]
+                "commitMessageFormat": "chore({projectName}): Release version ${version}"
             }
         }
     },
