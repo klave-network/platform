@@ -42,6 +42,22 @@ export const RepoAppSelect: FC = () => {
     let appSelectionWatch = watch('applications');
     appSelectionWatch = (Array.isArray(appSelectionWatch) ? appSelectionWatch : [appSelectionWatch]).filter(Boolean);
 
+    const { data: canRegisterData, isLoading: isCanRegisterLoading, refetch: refetchCanRegister } = api.v0.applications.canRegister.useQuery({
+        applications: appSelectionWatch,
+        organisationId: selectedOrgId ?? ''
+    }, {
+        // refetchInterval: 100000,
+        retry: false,
+        enabled: false
+    });
+
+    useEffect(() => {
+        if (isCanRegisterLoading)
+            return;
+        refetchCanRegister()
+            .catch(() => { return; });
+    }, [selectedOrgId, canRegisterData, refetchCanRegister]);
+
     useEffect(() => {
         if (deployableRepo?.isAvailableToKlave) {
             navigate(window.location.pathname);
@@ -126,54 +142,6 @@ export const RepoAppSelect: FC = () => {
         setSelectedApplications((Array.isArray(applications) ? applications : [applications]).filter(Boolean));
     };
 
-    if (!selectedApplications.length)
-        return <>
-            <div className='pb-5' >
-                <h1 className='text-xl'>{deployableRepo.owner} / <b>{deployableRepo.name}</b></h1>
-            </div>
-            {!deployableRepo.isAvailableToKlave
-                ? <div className='bg-yellow-200 p-5 mb-10 w-full text-center text-yellow-800'>
-                    <UilExclamationTriangle className='inline-block mb-3' /><br />
-                    <span>This repository doesn&apos;t have the Klave Github App installed</span><br />
-                    <a href={githubAppInstall.toString()} type="submit" className='btn btn-sm mt-5 bg-yellow-800 text-white'>Install it now !</a>
-                </div>
-                : null}
-            <div className='relative'>
-                <form onSubmit={() => {
-                    handleSubmit(selectApplications)()
-                        .catch(() => { return; });
-                }} >
-                    <div className={!deployableRepo.isAvailableToKlave ? 'opacity-40' : ''}>
-                        We found {deployableRepo.config?.applications?.length ?? 0} applications to deploy.<br />
-                        Make your selection and be ready in minutes<br />
-                        <br />
-                        {/* <pre className='text-left w-1/2 bg-slate-200 m-auto p-5'>{JSON.stringify(repoData.config ?? repoData.configError, null, 4)}</pre> */}
-                        <div className='grid gap-3 grid-cols-3'>
-                            {(deployableRepo.config?.applications ?? []).map((app, index) => {
-                                return <label key={app.slug} htmlFor={`application-${index}`} className={`w-full ${app.slug && appSelectionWatch.includes(app.slug) ? 'border-sky-400 hover:border-sky-500' : 'border-slate-200 hover:border-slate-400'} hover:cursor-pointer border rounded-lg py-3 px-4 text-left`}>
-                                    <span className='flex flex-row items-center'>
-                                        <input disabled={!deployableRepo.isAvailableToKlave} id={`application-${index}`} type="checkbox" value={app.slug} {...register('applications')} className='peer toggle toggle-sm checked:bg-sky-500 checked:border-sky-500 mr-3' />
-                                        {app.slug}</span>
-                                    {/* <label htmlFor={`application-${index}`}>{app.name}</label> */}
-                                </label>;
-                            })}
-                        </div>
-                        <br />
-                        <br />
-                        {mutationError ? <>
-                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative w-1/2 mx-auto" role="alert">
-                                <strong className="font-bold">Holy smokes!</strong>
-                                <span className="block sm:inline"> {mutationError.message}</span>
-                            </div>
-                            <br />
-                        </> : null}
-                    </div>
-                    <Link to="/deploy/select" className='mr-5 disabled:text-gray-300 hover:text-gray-500'>Go back</Link>
-                    <button disabled={!appSelectionWatch.length || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave} type="submit" className='btn btn-sm disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Next</button>
-                </form >
-            </div >
-        </>;
-
     const registerApplications = () => {
         if (!selectedOrgId)
             return;
@@ -186,10 +154,58 @@ export const RepoAppSelect: FC = () => {
 
     return <>
         <div className='pb-5' >
-            <h1 className='text-xl font-bold'>Where do you want to deploy ?</h1>
+            <h1 className='text-xl'>{deployableRepo.owner} / <b>{deployableRepo.name}</b></h1>
         </div>
+        {!deployableRepo.isAvailableToKlave
+            ? <div className='bg-yellow-200 p-5 mb-10 w-full text-center text-yellow-800'>
+                <UilExclamationTriangle className='inline-block mb-3' /><br />
+                <span>This repository doesn&apos;t have the Klave Github App installed</span><br />
+                <a href={githubAppInstall.toString()} type="submit" className='btn btn-sm mt-5 bg-yellow-800 text-white'>Install it now !</a>
+            </div>
+            : null}
         <div className='relative'>
-            There is one more thing.<br />
+            <form onSubmit={() => {
+                handleSubmit(selectApplications)()
+                    .catch(() => { return; });
+            }} >
+                <div className={!deployableRepo.isAvailableToKlave ? 'opacity-40' : ''}>
+                    We found {deployableRepo.config?.applications?.length ?? 0} applications to deploy.<br />
+                    Make your selection and be ready in minutes<br />
+                    <br />
+                    {deployableRepo.configError ? <>
+                        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mx-auto" role="alert">
+                            We noticed some errors in your <code>klave.json</code> file.<br />
+                            Checkout our documentation at <a href="https://klave.com/docs" target='_blank' >https://klave.com/docs</a> to fix them.<br />
+                        </div>
+                        <br />
+                    </> : null}
+                    {/* <pre className='text-left w-1/2 bg-slate-200 m-auto p-5'>{JSON.stringify(repoData.config ?? repoData.configError, null, 4)}</pre> */}
+                    <div className='grid gap-3 grid-cols-3'>
+                        {(deployableRepo.config?.applications ?? []).map((app, index) => {
+                            return <label key={app.slug} htmlFor={`application-${index}`} className={`w-full ${app.slug && appSelectionWatch.includes(app.slug) ? 'border-sky-400 hover:border-sky-500' : 'border-slate-200 hover:border-slate-400'} hover:cursor-pointer border rounded-lg py-3 px-4 text-left`}>
+                                <span className='flex flex-row items-center'>
+                                    <input disabled={!deployableRepo.isAvailableToKlave} id={`application-${index}`} type="checkbox" value={app.slug} {...register('applications')} className='peer toggle toggle-sm checked:bg-sky-500 checked:border-sky-500 mr-3' />
+                                    {app.slug}</span>
+                                {/* <label htmlFor={`application-${index}`}>{app.name}</label> */}
+                            </label>;
+                        })}
+                    </div>
+                    <br />
+                    <br />
+                    {mutationError ? <>
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative w-1/2 mx-auto" role="alert">
+                            <strong className="font-bold">Holy smokes!</strong>
+                            <span className="block sm:inline"> {mutationError.message}</span>
+                        </div>
+                        <br />
+                    </> : null}
+                </div>
+                {/* <Link to="/deploy/select" className='mr-5 disabled:text-gray-300 hover:text-gray-500'>Go back</Link>
+                <button disabled={!appSelectionWatch.length || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave} type="submit" className='btn btn-sm disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Next</button> */}
+            </form >
+        </div >
+        <div className='relative'>
+            {/* There is one more thing.<br /> */}
             Let us know which organisation you want to create this application in.<br />
             <br />
             {areOrganisationsLoading
@@ -226,12 +242,23 @@ export const RepoAppSelect: FC = () => {
                             </Select.Content>
                         </Select.Portal>
                     </Select.Root>
-                    <button type="button" onClick={() => setSelectedApplications([])} className='btn btn-sm mr-5 disabled:text-gray-300 hover:text-gray-500'>Go Back</button>
-                    <button type="submit" onClick={registerApplications} disabled={!selectApplications.length || !selectedOrgId || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave} className='btn btn-sm disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Deploy</button>
+                    <br />
+                    {Object.values(canRegisterData ?? {}).includes(false) ? <>
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mx-auto" role="alert">
+                            We cannot register all the applications in the selected organisation.<br />
+                            {Object.entries(canRegisterData ?? {}).filter(([, canRegister]) => !canRegister).map(([name]) => `"${name}"`).join(', ')} already exist in this organisation.<br />
+                        </div>
+                        <br />
+                    </> : null}
+                    {/* <button type="button" onClick={() => setSelectedApplications([])} className='btn btn-sm mr-5 disabled:text-gray-300 hover:text-gray-500'>Go Back</button> */}
+                    <Link to="/deploy/select" className='mr-5 disabled:text-gray-300 hover:text-gray-500'>Go back</Link>
+                    <button type="submit" onClick={registerApplications} disabled={!selectApplications.length || !selectedOrgId || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave || Object.values(canRegisterData ?? {}).includes(false)} className='btn btn-sm disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Deploy</button>
                 </>
             }
         </div>
     </>;
+
+
 };
 
 const SelectItem = forwardRef<HTMLDivElement, PropsWithChildren<{
