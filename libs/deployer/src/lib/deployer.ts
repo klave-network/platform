@@ -12,6 +12,7 @@ import { Utils } from '@secretarium/connector';
 import { RepoFs } from './repoFs';
 import GithubFs from './githubFs';
 import { dummyMap } from './dummyVmFs';
+import { RepoConfigSchemaLatest, getFinalParseConfig } from '@klave/api';
 
 type Octokit = Context['octokit'];
 
@@ -59,7 +60,7 @@ class Deployer {
         after?: string;
     };
     // TODO: Add a way to get the config type
-    operatingConfig?: any;
+    operatingConfig?: RepoConfigSchemaLatest;
     applications: Application[] = [];
     fs?: RepoFs;
 
@@ -149,9 +150,11 @@ class Deployer {
                 const fs = await this.createFs();
                 if (fs) {
                     const configFileContent = await fs.getFileContent('klave.json');
-                    if (configFileContent)
-                        // TODO: Find a way to get the config's typings
-                        this.operatingConfig = JSON.parse(configFileContent); // as KlaveRcConfiguration;
+                    if (configFileContent) {
+                        const parsedConfig = getFinalParseConfig(configFileContent);
+                        if (parsedConfig?.success)
+                            this.operatingConfig = parsedConfig.data;
+                    }
                 }
             } catch (e) {
                 //
@@ -210,19 +213,21 @@ class Deployer {
         if (!files?.length)
             return;
 
-        // If no files are in the app, we don't deploy
-        if (files.filter(({ __filename }) => {
-            const commitFileDir = path.normalize(path.join('/', __filename));
-            const appPath = path.normalize(path.join('/', operatingConfig.rootDir ?? ''));
-            return commitFileDir.startsWith(appPath) || __filename === 'klave.json';
-        }).length === 0)
-            return;
-
         // For each application, we create a deployment
         const deploymentsPromises = this.applications.map(async application => {
 
+            const appConfiguration = operatingConfig.applications?.find(({ slug }) => slug === application.slug);
+
+            // If no files are in the app, we don't deploy
+            if (files.filter(({ __filename }) => {
+                const commitFileDir = path.normalize(path.join('/', __filename));
+                const appPath = path.normalize(path.join('/', appConfiguration?.rootDir ?? ''));
+                return commitFileDir.startsWith(appPath) || __filename === 'klave.json';
+            }).length === 0)
+                return;
+
             // Compose target
-            const target = `${application.name.toLocaleLowerCase().replace(/\s/g, '-')}.sta.klave.network`;
+            const target = `${application.slug.toLocaleLowerCase().replace(/\s/g, '-')}.sta.klave.network`;
 
             // Fetch the latest non-errored deployment for this target
             const previousDeployment = await prisma.deployment.findFirst({
@@ -262,14 +267,14 @@ class Deployer {
             const deployment = await prisma.deployment.create({
                 data: {
                     expiresOn: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
-                    version: this.operatingConfig[application.name].version,
+                    version: appConfiguration?.version,
                     build: after.substring(0, 8),
                     deploymentAddress: {
                         create: {
                             fqdn: target
                         }
                     },
-                    set: application.name,
+                    set: application.slug,
                     branch: this.branch,
                     locations: ['FR'],
                     status: 'deploying',
@@ -311,7 +316,7 @@ class Deployer {
             const appFs = await this.createFs();
             if (!appFs)
                 return Promise.reject();
-            appFs.setBasePath(operatingConfig[application.name].basePath ?? '/');
+            appFs.setBasePath(appConfiguration?.rootDir ?? '/');
 
             // Build the application
             const buildResult = await this.build(appFs);
