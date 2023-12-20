@@ -33,4 +33,5 @@ export { router } from './router';
 export type { Context } from './context';
 export { createContext } from './context';
 
+export * from './utils/repoConfigChecker';
 export * from './deployment/deploymentController';

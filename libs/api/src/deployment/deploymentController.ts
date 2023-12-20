@@ -9,7 +9,7 @@ import * as path from 'node:path';
 import prettyBytes from 'pretty-bytes';
 import BuildMiniVM, { DeploymentContext } from './buildMiniVm';
 import { router } from '../router';
-import { getFinalParseConfig } from '../v0/utils/repoConfigChecker';
+import { getFinalParseConfig } from '../utils/repoConfigChecker';
 
 export const deployToSubstrate = async (deploymentContext: DeploymentContext<DeploymentPushPayload>, options?: { onlyApp?: string }) => {
 

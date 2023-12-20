@@ -1,6 +1,6 @@
 import { ZodError, z } from 'zod';
 
-export const repoConfigSchemaV0 = z.object({
+const repoConfigSchemaV0 = z.object({
     version: z.string().or(z.number()).optional(),
     branch: z.string().optional(),
     applications: z.array(z.object(
@@ -13,7 +13,7 @@ export const repoConfigSchemaV0 = z.object({
     )).optional()
 });
 
-export const repoConfigSchemaV1 = z.object({
+const repoConfigSchemaV1 = z.object({
     schema: z.string().or(z.number()).optional(),
     branches: z.array(z.string()).optional(),
     applications: z.array(z.object(
@@ -25,6 +25,9 @@ export const repoConfigSchemaV1 = z.object({
         }
     )).optional()
 });
+
+export const repoConfigSchemaLatest = repoConfigSchemaV1;
+export type RepoConfigSchemaLatest = z.infer<typeof repoConfigSchemaLatest>;
 
 export const getFinalParseConfig = (config: string | object | null): ReturnType<typeof repoConfigSchemaV1.safeParse> & { chainError?: ZodError } => {
     const objectParse = typeof config === 'string' ? JSON.parse(config ?? '{}') : config ?? {};

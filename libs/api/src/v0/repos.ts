@@ -3,9 +3,9 @@ import { Octokit } from '@octokit/rest';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import { z } from 'zod';
 import { objectToCamel } from 'ts-case-convert';
-import { isTruthy } from './utils/isTruthy';
+import { isTruthy } from '../utils/isTruthy';
 import type { DeployableRepo, GitHubToken } from '@klave/db';
-import { getFinalParseConfig } from './utils/repoConfigChecker';
+import { getFinalParseConfig } from '../utils/repoConfigChecker';
 
 export const reposRouter = createTRPCRouter({
     deployables: publicProcedure
