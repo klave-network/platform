@@ -4,7 +4,7 @@ import { probot, scp, scpOps } from '@klave/providers';
 import type { Application, Limits } from '@klave/db';
 import { z } from 'zod';
 import { deployToSubstrate } from '../deployment/deploymentController';
-import { getFinalParseConfig } from './utils/repoConfigChecker';
+import { getFinalParseConfig } from '../utils/repoConfigChecker';
 
 export const applicationRouter = createTRPCRouter({
     getAll: publicProcedure
