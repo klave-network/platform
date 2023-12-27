@@ -9,11 +9,11 @@ import type { Stats } from 'assemblyscript/dist/asc';
 import { Utils } from '@secretarium/connector';
 import { createCompiler } from '@klave/compiler';
 import type { Context } from 'probot';
-// import { KlaveRcConfiguration } from '@klave/sdk';
 import { DeploymentPushPayload } from '../types';
 import { Repo } from '@klave/db';
 import { dummyMap } from './dummyVmFs';
 import { logger } from '@klave/providers';
+import { RepoConfigSchemaLatest } from '@klave/constants';
 
 type BuildDependenciesManifest = Record<string, {
     version: string;
@@ -38,8 +38,8 @@ type BuildOutput = {
     error?: Error | ErrorObject;
 })
 
-type BuildMiniVMEvent = 'start' | 'emit' | 'diagnostic' | 'error' | 'done'
-type BuildMiniVMEventHandler = (result?: BuildOutput) => void;
+// type BuildMiniVMEvent = 'start' | 'emit' | 'diagnostic' | 'error' | 'done'
+// type BuildMiniVMEventHandler = (result?: BuildOutput) => void;
 
 export type DeploymentContext<Type> = {
     octokit: Context['octokit']
@@ -47,7 +47,7 @@ export type DeploymentContext<Type> = {
 
 export class BuildMiniVM {
 
-    private eventHanlders: Partial<Record<BuildMiniVMEvent, BuildMiniVMEventHandler[]>> = {};
+    // private eventHanlders: Partial<Record<BuildMiniVMEvent, BuildMiniVMEventHandler[]>> = {};
     private proxyAgent: HttpsProxyAgent<string> | undefined;
     private usedDependencies: BuildDependenciesManifest = {};
 
@@ -56,7 +56,7 @@ export class BuildMiniVM {
         context: DeploymentContext<DeploymentPushPayload>;
         repo: Repo;
         // TODO Reenable the KlaveRcConfiguration[...] type
-        application: any;
+        application: NonNullable<RepoConfigSchemaLatest['applications']>[number] | undefined;
         dependencies: Record<string, string>;
     }) {
         if (process.env['KLAVE_SQUID_URL'])
@@ -86,13 +86,13 @@ export class BuildMiniVM {
                     owner: repo.owner,
                     repo: repo.name,
                     ref: context.commit.ref,
-                    path: `${this.options.application.rootDir}${normalisedPath ? `/${normalisedPath}` : ''}`,
+                    path: `${this.options.application?.rootDir ?? ''}${normalisedPath ? `/${normalisedPath}` : ''}`,
                     mediaType: {
                         format: 'raw+json'
                     }
                 });
-            } catch (e: any) {
-                errorAcc.push(`Error downloading content from GihHub: ${e.toString()}`);
+            } catch (e) {
+                errorAcc.push(`Error downloading content from GihHub: ${e?.toString()}`);
             }
         }
 
@@ -156,19 +156,19 @@ export class BuildMiniVM {
                     this.usedDependencies[packageName]!.digests[filePath] = Utils.toHex(await Utils.hash(new TextEncoder().encode(data)));
                     return { data };
                 }
-            } catch (e: any) {
+            } catch (e) {
                 if (packageName && packageVersion)
-                    errorAcc.push(`Error getting content for '${packageName}@${packageVersion}': ${e.toString()}`);
+                    errorAcc.push(`Error getting content for '${packageName}@${packageVersion}': ${e?.toString()}`);
                 else
-                    errorAcc.push(`Error downloading content for node_modules package: ${e.toString()}`);
+                    errorAcc.push(`Error downloading content for node_modules package: ${e?.toString()}`);
             }
         }
 
         if (normalisedPath) {
             try {
                 return { data: this.getContentSync(normalisedPath) };
-            } catch (e: any) {
-                errorAcc.push(`Error retreiving from dummyFs ${e.toString()}`);
+            } catch (e) {
+                errorAcc.push(`Error retreiving from dummyFs ${e?.toString()}`);
             }
         }
 
@@ -200,17 +200,17 @@ export class BuildMiniVM {
         }
     }
 
-    on(event: BuildMiniVMEvent, callback: BuildMiniVMEventHandler) {
-        this.eventHanlders[event] = [
-            ...(this.eventHanlders[event] ?? []),
-            callback
-        ];
-    }
+    // on(event: BuildMiniVMEvent, callback: BuildMiniVMEventHandler) {
+    //     this.eventHanlders[event] = [
+    //         ...(this.eventHanlders[event] ?? []),
+    //         callback
+    //     ];
+    // }
 
     async build(): Promise<BuildOutput> {
 
         const rootContent = await this.getRootContent();
-        dummyMap['..ts'] = rootContent?.data?.toString() ?? null;
+        dummyMap['..ts'] = typeof rootContent?.data === 'string' ? rootContent.data : null;
 
         let compiledBinary = new Uint8Array(0);
         let compiledWAT: string | undefined;
@@ -220,30 +220,28 @@ export class BuildMiniVM {
             return new Promise<BuildOutput>((resolve) => {
                 compiler.on('message', (message) => {
                     if (message.type === 'start') {
-                        this.eventHanlders['start']?.forEach(handler => handler());
+                        //
                     } else if (message.type === 'read') {
-                        this.getContent(message.filename).then(contents => {
+                        this.getContent(message.filename).then(response => {
                             compiler.postMessage({
                                 type: 'read',
                                 id: message.id,
-                                contents: contents.data
+                                contents: typeof response.data === 'string' ? response.data : null
                             });
                         }).catch(() => { return; });
                     } else if (message.type === 'write') {
-                        this.eventHanlders['emit']?.forEach(handler => handler(message));
-                        if ((message.filename as string).endsWith('.wasm'))
-                            compiledBinary = message.contents;
-                        if ((message.filename as string).endsWith('.wat'))
-                            compiledWAT = message.contents;
-                        if ((message.filename as string).endsWith('.d.ts'))
-                            compiledDTS = message.contents;
+                        if ((message.filename).endsWith('.wasm'))
+                            compiledBinary = message.contents ? Uint8Array.from(Buffer.from(message.contents)) : new Uint8Array(0);
+                        if ((message.filename).endsWith('.wat'))
+                            compiledWAT = message.contents ?? undefined;
+                        if ((message.filename).endsWith('.d.ts'))
+                            compiledDTS = message.contents ?? undefined;
                     } else if (message.type === 'diagnostic') {
-                        this.eventHanlders['diagnostic']?.forEach(handler => handler(message));
+                        //
                     } else if (message.type === 'errored') {
                         logger.debug(`Compiler errored: ${message.error?.message ?? message.error ?? 'Unknown'}`, {
                             parent: 'bmv'
                         });
-                        this.eventHanlders['error']?.forEach(handler => handler(message));
                         compiler.terminate().finally(() => {
                             resolve({
                                 success: false,
@@ -262,7 +260,7 @@ export class BuildMiniVM {
                             })
                             .catch(() => { return; })
                             .finally(() => {
-                                const output = {
+                                const output: BuildOutput = {
                                     success: true,
                                     result: {
                                         stats: message.stats,
@@ -275,7 +273,6 @@ export class BuildMiniVM {
                                     stdout: message.stdout ?? '',
                                     stderr: message.stderr ?? ''
                                 };
-                                this.eventHanlders['done']?.forEach(handler => handler(output));
                                 compiler.terminate().finally(() => {
                                     resolve(output);
                                 }).catch(() => { return; });
@@ -283,7 +280,7 @@ export class BuildMiniVM {
                     }
                 });
             });
-        } catch (error: any) {
+        } catch (error) {
             logger.debug('General failure: ' + error, {
                 parent: 'bmv'
             });

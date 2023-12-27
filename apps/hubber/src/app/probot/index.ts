@@ -1,5 +1,5 @@
 import { trace } from '@sentry/core';
-import { prisma } from '@klave/db';
+import { InstallationAccountType, prisma } from '@klave/db';
 import type { Probot } from 'probot';
 import { logger } from '@klave/providers';
 import { deployToSubstrate } from '@klave/api';
@@ -42,7 +42,7 @@ const probotApp = (app: Probot) => {
                         source: 'github',
                         event: context.name,
                         remoteId: context.id,
-                        payload: context.payload as any
+                        payload: context.payload as object
                     }
                 });
                 logger.info(`New record of hook '${context.name}' ${hook.id}`);
@@ -64,13 +64,13 @@ const probotApp = (app: Probot) => {
                                 source: 'github',
                                 remoteId: `${payload.installation.id}`,
                                 account: payload.installation.account.login,
-                                accountType: payload.installation.account.type.toLowerCase() as any,
-                                hookPayload: payload as any
+                                accountType: payload.installation.account.type.toLowerCase() as InstallationAccountType,
+                                hookPayload: payload as object
                             },
                             update: {
                                 account: payload.installation.account.login,
-                                accountType: payload.installation.account.type.toLowerCase() as any,
-                                hookPayload: payload as any
+                                accountType: payload.installation.account.type.toLowerCase() as InstallationAccountType,
+                                hookPayload: payload as object
                             }
                         });
 
@@ -85,7 +85,7 @@ const probotApp = (app: Probot) => {
                                         owner: payload.installation.account.login,
                                         fullName: repo.full_name,
                                         private: repo.private,
-                                        installationPayload: repo as any
+                                        installationPayload: repo
                                     }
                                 });
                             }
@@ -135,14 +135,14 @@ const probotApp = (app: Probot) => {
                                         owner: payload.installation.account.login,
                                         fullName: repo.full_name,
                                         private: repo.private,
-                                        installationPayload: repo as any
+                                        installationPayload: repo
                                     },
                                     update: {
                                         name: repo.name,
                                         owner: payload.installation.account.login,
                                         fullName: repo.full_name,
                                         private: repo.private,
-                                        installationPayload: repo as any
+                                        installationPayload: repo
                                     }
                                 });
                                 await prisma.deployableRepo.updateMany({

@@ -14,7 +14,7 @@ usersRouter.get('/whoami', ({ user, web }, res) => {
 usersRouter.get('/login/print', (req, __unusedRes, next) => {
     req.body = {
         username: req.session.id,
-        password: (req.session as any).localId
+        password: (req.session as (typeof req.session & { localId?: string })).localId
     };
     next();
 }, passport.authenticate('local', {

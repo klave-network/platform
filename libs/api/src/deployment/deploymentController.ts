@@ -3,13 +3,13 @@ import { v4 as uuid } from 'uuid';
 import * as Sentry from '@sentry/node';
 import { scp, logger } from '@klave/providers';
 import { Deployment, prisma, DeploymentAddress, Commit, CommitVerificationReason } from '@klave/db';
-// import type { KlaveRcConfiguration } from '@klave/sdk';
 import { Utils } from '@secretarium/connector';
 import * as path from 'node:path';
 import prettyBytes from 'pretty-bytes';
 import BuildMiniVM, { DeploymentContext } from './buildMiniVm';
 import { router } from '../router';
-import { getFinalParseConfig } from '../utils/repoConfigChecker';
+import { Context } from '../context';
+import { getFinalParseConfig } from '@klave/constants';
 
 export const deployToSubstrate = async (deploymentContext: DeploymentContext<DeploymentPushPayload>, options?: { onlyApp?: string }) => {
 
@@ -115,9 +115,14 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
     if (!packageJsonData)
         return;
 
-    let packageJson: any;
+    let packageJson: {
+        optionalDependencies?: Record<string, string>;
+        peerDependencies?: Record<string, string>;
+        dependencies?: Record<string, string>;
+        devDependencies?: Record<string, string>;
+    } | undefined;
     try {
-        packageJson = JSON.parse(packageJsonData.toString()) as any;
+        packageJson = JSON.parse(packageJsonData.toString()) as typeof packageJson;
     } catch (e) {
         logger.error('Error while parsing package.json', e);
         return;
@@ -156,13 +161,6 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
         prev[current.slug] = current;
         return prev;
     }, {} as Record<string, (NonNullable<typeof klaveConfiguration.data['applications']>[number])>) ?? {};
-
-    // TODO Reenable the KlaveRcConfiguration type
-    // const config = repo.config as any;
-    // const availableApplicationsConfig = config.applications.reduce((prev: any, current: any) => {
-    //     prev[current.name] = current;
-    //     return prev;
-    // }, {} as Record<string, any['applications'][number]>);
 
     repo.applications.forEach(application => {
 
@@ -359,10 +357,10 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 repo,
                                 application: availableApplicationsConfig[application.slug],
                                 dependencies: {
-                                    ...(packageJson.optionalDependencies ?? {}),
-                                    ...(packageJson.peerDependencies ?? {}),
-                                    ...(packageJson.dependencies ?? {}),
-                                    ...(packageJson.devDependencies ?? {})
+                                    ...(packageJson?.optionalDependencies ?? {}),
+                                    ...(packageJson?.peerDependencies ?? {}),
+                                    ...(packageJson?.dependencies ?? {}),
+                                    ...(packageJson?.devDependencies ?? {})
                                 }
                             });
 
@@ -391,7 +389,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                     },
                                     data: {
                                         status: 'errored',
-                                        buildOutputErrorObj: buildResult.error as any
+                                        buildOutputErrorObj: buildResult.error as NonNullable<object> ?? null
                                     }
                                 });
                                 return;
@@ -415,7 +413,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                     },
                                     data: {
                                         status: 'errored',
-                                        buildOutputErrorObj: { error: 'Empty wasm' } as any
+                                        buildOutputErrorObj: { message: 'Empty wasm' }
                                     }
                                 });
                                 return;
@@ -456,7 +454,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 previousDeployment
                             });
 
-                        } catch (error: any) {
+                        } catch (error) {
                             logger.debug(`Deployment failure for ${target}: ${error}`);
                             try {
                                 if (contextualDeploymentId)
@@ -466,10 +464,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                         },
                                         data: {
                                             status: 'errored',
-                                            buildOutputErrorObj: {
-                                                message: error.message,
-                                                stack: error.stack
-                                            }
+                                            buildOutputErrorObj: error ?? null
                                         }
                                     });
                             } catch (error) {
@@ -526,7 +521,7 @@ export const sendToSecretarium = async ({
                 prisma,
                 session: {},
                 override: '__system_post_deploy'
-            } as any);
+            } as unknown as Context);
             caller.delete({
                 deploymentId: previousDeployment.id
             }).catch((error) => {

@@ -206,7 +206,7 @@ export const deploymentRouter = createTRPCRouter({
                             }
                         });
                     })().catch(() => { return; });
-                }).onError((error: any) => {
+                }).onError((error) => {
                     console.error('Secretarium failed', error);
                     // Timeout will eventually error this
                 }).send();

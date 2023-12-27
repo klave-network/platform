@@ -3,6 +3,7 @@ import { UilDownloadAlt, UilExternalLinkAlt, UilShieldCheck, UilShieldExclamatio
 import { Utils } from '@secretarium/connector';
 import api from '../utils/api';
 import { useSecretariumQuery } from '../utils/secretarium';
+import { BackendVersion } from '@klave/constants';
 
 type AttestationCheckerProps = {
     deploymentId: string;
@@ -24,19 +25,36 @@ export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, 
         quote: quoteBinary,
         current_time: new Date().getTime()
     }), [quoteBinary]);
-    const { data: quoteData, isLoading: loadingQuote, errors: quoteErrors, refetch: refetchQuote } = useSecretariumQuery({
+    const { data: quoteData, isLoading: loadingQuote, errors: quoteErrors, refetch: refetchQuote } = useSecretariumQuery<{
+        quote: {
+            report_body: {
+                mr_enclave: {
+                    m: Array<number>
+                },
+                mr_signer: {
+                    m: Array<number>
+                },
+                report_data: Array<number>
+            }
+        },
+        quote_binary: Array<number>,
+    }>({
         app: address,
         route: 'klave.get_quote',
         args: quoteArgs,
         live: false
     }, [quoteArgs]);
-    const { data: verifyData, isLoading: loadingVerify, errors: verifyErrors, refetch: refetchVerify } = useSecretariumQuery({
+    const { data: verifyData, isLoading: loadingVerify, errors: verifyErrors, refetch: refetchVerify } = useSecretariumQuery<{
+        quote_verification_result: number;
+        quote_verification_result_description: string;
+        sa_list: string;
+    }>({
         app: address,
         route: 'klave.verify_quote',
         args: verifyArgs,
         live: false
     }, [verifyArgs]);
-    const { data: versions, refetch: refetchVersion } = useSecretariumQuery<any>({
+    const { data: versions, refetch: refetchVersion } = useSecretariumQuery<BackendVersion['version']>({
         app: address,
         route: 'klave.version',
         live: false
@@ -56,7 +74,7 @@ export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, 
     useEffect(() => {
         if (!hasLaunched || !quoteData || loadingQuote || quoteErrors?.length)
             return;
-        const base: any = quoteData[0];
+        const base = quoteData[0];
         if (!base || !base.quote_binary)
             return;
         if ((verifyData?.length ?? 0) > 0)
@@ -83,15 +101,15 @@ export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, 
         setIsContractValid(false);
     };
 
-    const secretariumBackendVersions = versions?.[0] ?? { wasm_version: {}, core_version: {} };
+    const secretariumBackendVersions = versions?.[0];
     const { wasm_version, core_version } = secretariumBackendVersions ?? { wasm_version: {}, core_version: {} };
     const secretariumCoreVersion = `${core_version.major}.${core_version.minor}.${core_version.patch}`;
     const secretariumWasmVersion = `${wasm_version.major}.${wasm_version.minor}.${wasm_version.patch}`;
-    const verifyResult: any | undefined = verifyData?.[0];
+    const verifyResult = verifyData?.[0];
     const loading = loadingQuote || loadingVerify || !verifyResult || isLoadingDeployments;
     const downloadableQuote = new Blob([new Uint8Array(quoteBinary)], { type: 'application/octet-stream' });
     const enclaveOutcomeLevel = QV_LEVEL(verifyResult?.quote_verification_result);
-    const quoteDataTip: any = quoteData?.[0] ?? {};
+    const quoteDataTip = quoteData?.[0];
     const mrEnclaveHash = Utils.toBase64(new Uint8Array(quoteDataTip?.quote?.report_body?.mr_enclave?.m ?? []));
     const mrSignedHash = Utils.toBase64(new Uint8Array(quoteDataTip?.quote?.report_body?.mr_signer?.m ?? []));
     const contractIntegrityHash = Utils.toBase64(new Uint8Array(quoteDataTip?.quote?.report_body?.report_data ?? []));
@@ -168,7 +186,7 @@ export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, 
                         <a download={`intel_quote_${address}_${verifyArgs.current_time}.bin`} href={URL.createObjectURL(downloadableQuote)} className='text-klave-light-blue hover:underline flex align-middle items-center'>Download Quote .bin <UilDownloadAlt className='inline-block h-4' /></a>
                         <h3 className='mt-5 mb-3'>Applicable Intel Security Advisories</h3>
                         {
-                            verifyResult?.sa_list?.split(',')?.map((sa: string) => <a key={sa} title={sa} href={`https://www.intel.com/content/www/us/en/security-center/advisory/${sa.toLocaleLowerCase()}.html`} target='_blank' rel='noreferrer' className='text-klave-light-blue hover:underline flex align-middle items-center'>{sa} <UilExternalLinkAlt className='inline-block h-4' /></a>)
+                            verifyResult.sa_list?.split(',')?.map((sa: string) => <a key={sa} title={sa} href={`https://www.intel.com/content/www/us/en/security-center/advisory/${sa.toLocaleLowerCase()}.html`} target='_blank' rel='noreferrer' className='text-klave-light-blue hover:underline flex align-middle items-center'>{sa} <UilExternalLinkAlt className='inline-block h-4' /></a>)
                         }
                         <h3 className='mt-5 mb-3'>Relying Party</h3>
                         <span className='font-bold'>Secretarium DCAP</span>

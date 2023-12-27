@@ -22,8 +22,9 @@ export const morganLoggerMiddleware: RequestHandler = morgan(
                 if (!path?.startsWith('/trpc/'))
                     return path;
                 path = path.substring(6);
-                const queryTree = path.split(',').map(f => f.split('.')).reduce((acc, parts) => {
-                    let obj = acc;
+                const queryTree = path.split(',').map(f => f.split('.')).reduce<unknown>((acc, parts) => {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    let obj: any = acc;
                     let part: string | undefined;
                     const value = parts.pop();
                     const last = parts.pop();
@@ -34,12 +35,14 @@ export const morganLoggerMiddleware: RequestHandler = morgan(
                             obj[part] = {};
                         obj = obj[part];
                     }
+                    if (!value)
+                        return acc;
                     if (obj[last])
                         obj[last].push(value);
                     else
                         obj[last] = [value];
                     return acc;
-                }, {} as any);
+                }, {});
                 return `/trpc/${JSON.stringify(queryTree)}`;
             }),
             tokens.status?.(req, res) ?? '-',

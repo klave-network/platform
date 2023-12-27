@@ -1,7 +1,8 @@
 import { trace } from '@sentry/core';
 import { prisma } from '@klave/db';
-import { router } from '@klave/api';
+import { Context, router } from '@klave/api';
 import { logger, scp, scpOps } from '@klave/providers';
+import { KlaveGetCreditResult } from '@klave/constants';
 
 let intervalTimer: NodeJS.Timeout;
 
@@ -65,7 +66,7 @@ async function cleanDisconnectedDeployments() {
                         prisma,
                         session: {},
                         override: '__system_pruner_cleaner'
-                    } as any);
+                    } as unknown as Context);
                     return caller.delete({
                         deploymentId: deployment.id
                     });
@@ -95,7 +96,7 @@ async function terminateExpiredDeployments() {
             prisma,
             session: {},
             override: '__system_pruner_terminator'
-        } as any);
+        } as unknown as Context);
         if (deployment.status === 'deployed')
             return caller.terminateDeployment({
                 deploymentId: deployment.id
@@ -155,29 +156,26 @@ async function reconcileApplicationKredits() {
         return new Promise((resolve, reject) => {
             if (!scpOps.isConnected())
                 return reject('Secretarium is not connected');
-            new Promise<unknown>((resolve, reject) => {
-                scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${application.id}`, {
-                    app_id: application.id
-                }).onResult((result: any) => {
-                    resolve(result);
-                }).onError((error: any) => {
-                    reject(error);
-                }).send().catch(reject);
+            scp.newTx<KlaveGetCreditResult>('wasm-manager', 'get_kredit', `klave-app-get-kredit-${application.id}`, {
+                app_id: application.id
+            }).onResult((result) => {
+                resolve(result);
+            }).onError((error) => {
+                reject(error);
+            }).send().then((kredits) => {
+                if (!kredits)
+                    return reject('No credits returned');
+                const { kredit } = kredits;
+                logger.debug(`Reconciling application ${application.id} with ${kredit} kredits`);
+                prisma.application.update({
+                    where: {
+                        id: application.id
+                    },
+                    data: {
+                        kredits: kredit
+                    }
+                }).then(resolve).catch(reject);
             })
-                .then((kredits) => {
-                    if (!kredits)
-                        reject('No credits returned');
-                    const { kredit } = kredits as any;
-                    logger.debug(`Reconciling application ${application.id} with ${kredit} kredits`);
-                    prisma.application.update({
-                        where: {
-                            id: application.id
-                        },
-                        data: {
-                            kredits: kredit
-                        }
-                    }).then(resolve).catch(reject);
-                })
                 .catch(reject);
         });
     })).catch((e) => {

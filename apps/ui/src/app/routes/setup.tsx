@@ -3,14 +3,24 @@ import { LoaderFunction, useLoaderData, useNavigate } from 'react-router-dom';
 import qs from 'query-string';
 import { httpApi } from '../utils/api';
 
+type LoaderResult = {
+    data: Awaited<ReturnType<typeof httpApi.v0.repos.registerGitHubCredentials.query>> | null;
+    state: string;
+} | null
+
 export const loader: LoaderFunction = async ({ request }) => {
     const { host, search, pathname } = new URL(request.url);
     const { code, state } = qs.parse(search);
-    const parsedState: {
+    const parsedState = typeof state === 'string' ? JSON.parse(state) as {
         referer: string;
         source: string;
         redirectUri: string;
-    } = typeof state === 'string' ? JSON.parse(state) as any : {};
+    } : null;
+
+    if (typeof code !== 'string' || typeof state !== 'string')
+        return null;
+    if (!parsedState)
+        return null;
 
     try {
         const refererUrl = new URL(parsedState.referer);
@@ -36,8 +46,8 @@ export const Index: FC = () => {
 
     const navigate = useNavigate();
     const [hasRedirected, setHasRedirected] = useState(false);
-    const { data, state }: { data: any, state: string } = useLoaderData() as any ?? {};
-    const { redirectUri }: { redirectUri: string } = state ? JSON.parse(state) as any : { redirectUri: '/deploy/select' };
+    const { data, state } = useLoaderData() as LoaderResult ?? {};
+    const { redirectUri } = state ? JSON.parse(state) as { redirectUri: string } : { redirectUri: '/deploy/select' };
 
     useEffect(() => {
         if (!hasRedirected && redirectUri && !data?.error) {

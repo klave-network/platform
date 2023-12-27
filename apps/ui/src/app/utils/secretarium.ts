@@ -25,52 +25,52 @@ setInterval(() => {
         .catch(() => { return; });
 }, 1000 * 60 * 5);
 
-interface State<T> {
+interface State<ResultType, ErrorType> {
     isLoading: boolean;
-    data?: Array<T>
-    errors?: Array<Error>;
+    data?: Array<ResultType>
+    errors?: Array<Error | ErrorType>;
     refetch: () => void;
 }
 
 type Cache<T> = { [url: string]: Array<T> }
 
 // discriminated union type
-type Action<T> =
+type Action<ResultType, ErrorType> =
     | { type: 'reset' }
     | { type: 'loading' }
-    | { type: 'fetched'; payload: Array<T> }
-    | { type: 'error'; payload: Array<Error> }
+    | { type: 'fetched'; payload: Array<ResultType> }
+    | { type: 'error'; payload: Array<Error | ErrorType> }
 
 type SecretariumQueryOptions = {
     app: string;
     route: string;
-    args?: unknown;
+    args?: string | Record<string, unknown>;
     live?: boolean;
 }
 
-export function useSecretariumQuery<T = unknown>(options: SecretariumQueryOptions, deps: Array<any> = []): State<T> {
+export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(options: SecretariumQueryOptions, deps: Array<unknown> = []): State<ResultType, ErrorType> {
 
     const [count, setCount] = useState(0);
     const [opts, setOpts] = useState<SecretariumQueryOptions>();
     const { app, route, args } = opts ?? {};
     const argDigest = useMemo(() => {
-        if (typeof args === 'undefined')
+        if (typeof args === 'undefined' || args === null)
             return '';
         if (typeof args === 'string')
             return args;
         if (typeof args === 'object')
-            return Object.entries(args as any as Record<string, any>).sort((a, b) => a[0].localeCompare(b[0])).map(([, v]) => v).join('|');
+            return Object.entries(args).sort((a, b) => a[0].localeCompare(b[0])).map(([, v]) => v).join('|');
         return Math.random().toString().replaceAll('.', '');
     }, [args]);
     const cacheKey = useMemo(() => `${app}|${route}|${argDigest}|${count}`, [count]);
-    const dataCache = useRef<Cache<T>>({});
-    const errorsCache = useRef<Cache<Error>>({});
+    const dataCache = useRef<Cache<ResultType>>({});
+    const errorsCache = useRef<Cache<Error | ErrorType>>({});
     const querySent = useRef<boolean>(false);
 
     // Used to prevent state update if the component is unmounted
     const cancelRequest = useRef<boolean>(false);
 
-    const initialState: State<T> = {
+    const initialState: State<ResultType, ErrorType> = {
         isLoading: false,
         errors: undefined,
         data: undefined,
@@ -80,7 +80,7 @@ export function useSecretariumQuery<T = unknown>(options: SecretariumQueryOption
     };
 
     // Keep state logic separated
-    const fetchReducer = (state: State<T>, action: Action<T>): State<T> => {
+    const fetchReducer = (state: State<ResultType, ErrorType>, action: Action<ResultType, ErrorType>): State<ResultType, ErrorType> => {
         switch (action.type) {
             case 'reset':
                 setOpts(options);
@@ -188,8 +188,8 @@ export function useSecretariumQuery<T = unknown>(options: SecretariumQueryOption
 
                 dataCache.current[cacheKey] = [];
                 errorsCache.current[cacheKey] = [];
-                await client.newTx(app, route, `klave-deployment-${Math.random().toString().replaceAll('.', '')}`, args as any)
-                    .onResult((result: T) => {
+                await client.newTx<ResultType, ErrorType>(app, route, `klave-deployment-${Math.random().toString().replaceAll('.', '')}`, args)
+                    .onResult((result) => {
 
                         if (!dataCache.current[cacheKey])
                             dataCache.current[cacheKey] = [];
@@ -200,7 +200,7 @@ export function useSecretariumQuery<T = unknown>(options: SecretariumQueryOption
                         dataCache.current[cacheKey]?.push(result);
                         dispatch({ type: 'fetched', payload: dataCache.current[cacheKey]! });
 
-                    }).onError((error: any) => {
+                    }).onError((error) => {
 
                         if (!errorsCache.current[cacheKey])
                             errorsCache.current[cacheKey] = [];
@@ -208,7 +208,7 @@ export function useSecretariumQuery<T = unknown>(options: SecretariumQueryOption
                         if (cancelRequest.current)
                             return;
 
-                        if (error.toString() !== '[UNKNOWN ERROR]' || errorsCache.current[cacheKey]!.length === 0)
+                        if (error?.toString() !== '[UNKNOWN ERROR]' || errorsCache.current[cacheKey]!.length === 0)
                             errorsCache.current[cacheKey]!.push(error);
 
                         dispatch({ type: 'error', payload: errorsCache.current[cacheKey]! });

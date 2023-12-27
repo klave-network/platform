@@ -51,10 +51,10 @@ export const githubOps = {
                                 remoteId: `${installation.id}`,
                                 account: installation.account?.name ?? 'unknown', // TODO - is this right?
                                 accountType: 'unknown', // TODO - is this right?
-                                hookPayload: installation as any
+                                hookPayload: installation
                             },
                             update: {
-                                hookPayload: installation as any
+                                hookPayload: installation
                             }
                         });
 
@@ -69,8 +69,6 @@ export const githubOps = {
                         const repos: typeof reposData['repositories'] = [];
                         if (reposData.repositories)
                             repos.push(...reposData.repositories);
-                        if (Array.isArray(reposData))
-                            repos.push(...reposData as any);
 
                         logger.info(`Syncing ${repos.length} repositories for installation ${installation.id}`);
                         for (const repo of repos) {
@@ -91,14 +89,14 @@ export const githubOps = {
                                     fullName: repo.full_name,
                                     defaultBranch: repo.default_branch,
                                     private: repo.private,
-                                    installationPayload: repo as any
+                                    installationPayload: repo
                                 },
                                 update: {
                                     name: repo.name,
                                     owner: repo.owner.login,
                                     fullName: repo.full_name,
                                     private: repo.private,
-                                    installationPayload: repo as any
+                                    installationPayload: repo
                                 }
                             });
                         }

@@ -94,7 +94,7 @@ export const LoginSecKey: FC = () => {
             onSettled(data, error) {
                 if (error) {
                     try {
-                        const parsedError = JSON.parse(error.message) as any;
+                        const parsedError = JSON.parse(error.message) as Error;
                         setError(parsedError?.message ?? 'An error occured while trying to send your email code. Please try again later.');
                     } catch (e) {
                         setError(error.message ?? 'An error occured while trying to send your email code. Please try again later.');
@@ -127,7 +127,7 @@ export const LoginSecKey: FC = () => {
                     }
                     throw new Error('No authentication options available');
                 })
-                .then(async (auth) => new Promise<any>((resolve, reject) => {
+                .then(async (auth) => new Promise<ReturnType<typeof api.v0.auth.validateWebauthn.useMutation>['data']>((resolve, reject) => {
                     validateWebauthnMutation({
                         email,
                         data: auth
@@ -155,7 +155,7 @@ export const LoginSecKey: FC = () => {
                         return;
                     }
                 })
-                .catch((e: any) => {
+                .catch((e) => {
                     setCredentials(credentials.filter(c => c !== email));
                     setIsRequestingWebauthnInput(false);
                     setError('A problem occurred while authenticating you. Please try again.');
@@ -174,7 +174,7 @@ export const LoginSecKey: FC = () => {
                     }
                     throw new Error('No registration options available');
                 })
-                .then(async (reg) => new Promise((resolve, reject) => {
+                .then(async (reg) => new Promise<ReturnType<typeof api.v0.auth.registerWebauthn.useMutation>['data']>((resolve, reject) => {
                     registerWebauthnMutation({
                         email,
                         data: reg
@@ -183,7 +183,7 @@ export const LoginSecKey: FC = () => {
                         onError: reject
                     });
                 }))
-                .then((res: any) => {
+                .then((res) => {
                     if (res?.ok) {
                         setCredentials([...(credentials ?? []), email]);
                         if (location.state?.from)
@@ -226,7 +226,7 @@ export const LoginSecKey: FC = () => {
         }, {
             onSettled(data, error) {
                 if (error)
-                    setError(error?.message ?? (JSON.parse(error.message) as any)[0]?.message ?? error.message ?? 'An error occured while trying to log you in. Please try again later.');
+                    setError(error?.message ?? (JSON.parse(error.message) as Error[])[0]?.message ?? error.message ?? 'An error occured while trying to log you in. Please try again later.');
                 else if (data?.ok) {
                     if (shouldAttemptWebauthEnroll && isWebauthAvailable && !credentials?.length) {
                         setPerformedEmailCheck(true);

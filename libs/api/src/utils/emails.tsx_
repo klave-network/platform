@@ -1,0 +1,42 @@
+import { FC } from 'react';
+import { Body, Container, Head, Heading, Html, Preview, Text } from '@react-email/components';
+import { Tailwind } from '@react-email/tailwind';
+import { render as emailRender } from '@react-email/render';
+
+type LoginCodeEmailProps = {
+    code: string
+}
+
+const LoginCodeEmail: FC<LoginCodeEmailProps> = ({ code }) => {
+
+    const beautifiedCode = `${code.substring(0, 3)}-${code.substring(3, 6)}-${code.substring(6, 9)}`;
+    const textFontFamily = {
+        fontFamily: '-apple-system, BlinkMacSystemFont, \'Segoe UI\', \'Roboto\', \'Oxygen\', \'Ubuntu\', \'Cantarell\', \'Fira Sans\', \'Droid Sans\', \'Helvetica Neue\', sans-serif'
+    };
+
+    return <Html>
+        <Head />
+        <Preview>Klave code ${beautifiedCode}</Preview>
+        <Tailwind>
+            <Body className='bg-white'>
+                <Container className='p-6 mx-auto my-0'>
+                    <Heading className='text-slate-800 text-xl font-bold my-11' style={textFontFamily}>Log in to Klave</Heading>
+                    <Text className='my-6' style={textFontFamily}>
+                        Copy and paste your Klave login code:
+                    </Text>
+                    <code className='bg-slate-200 rounded-md w-9/12 py-2 px-6 inline-block font-mono'>{beautifiedCode}</code>
+                    <Text className='mt-6 mb-7 text-slate-500' style={textFontFamily}>
+                        If you didn&apos;t try to login, you can safely ignore this email.
+                    </Text>
+                    <Text className='mt-6 mb-7 text-slate-500' style={textFontFamily}>
+                        Hint: You can set hardware-based login in your account settings.
+                    </Text>
+                </Container>
+            </Body>
+        </Tailwind>
+    </Html >;
+};
+
+export const createLoginCodeEmail = (temporaryCode: string) => {
+    return emailRender(<LoginCodeEmail code={temporaryCode} />);
+};

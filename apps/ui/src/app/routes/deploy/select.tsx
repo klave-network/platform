@@ -2,6 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UilGithub, UilSpinner } from '@iconscout/react-unicons';
 import api from '../../utils/api';
+import { getFinalParseConfig } from '@klave/constants';
 
 export const Select: FC = () => {
 
@@ -74,7 +75,8 @@ export const Select: FC = () => {
                     {deployables.map((repo) => {
                         const fullName = `${repo.owner}/${repo.name}`;
                         const isReachableByApp = repo.installationRemoteId !== '';
-                        const config: any = repo.config ? JSON.parse(repo.config) : undefined;
+                        const configParseResult = getFinalParseConfig(repo.config);
+                        const config = configParseResult.success ? configParseResult.data : undefined;
                         const insides = <div className={`w-full border-slate-200 border rounded-lg py-3 px-4 text-left ${isReachableByApp ? ((config?.applications?.length ?? 0) === 0 ? 'opacity-30' : 'hover:border-slate-400 hover:cursor-pointer') : 'opacity-50 bg-yellow-100 hover:bg-yellow-200 text-yellow-700'}`}>
                             <span className='flex flex-row gap-2 items-center'><UilGithub className='inline-block h-5 w-5' /><span>{repo.owner}/<b>{repo.name}</b></span></span>
                             {isReachableByApp
