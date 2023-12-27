@@ -1,20 +1,22 @@
 import * as path from 'node:path';
-import type { Context } from 'probot';
+import type { Context as ProbotContext } from 'probot';
 import type { Stats } from 'assemblyscript/dist/asc';
 import * as sigstore from 'sigstore';
+import type { EmitterWebhookEvent } from '@octokit/webhooks';
 import { ErrorObject, serializeError } from 'serialize-error';
 import * as Sentry from '@sentry/node';
 import { Hook, Repo, Application, prisma, Deployment } from '@klave/db';
 import { createCompiler } from '@klave/compiler';
 import { logger, scp } from '@klave/providers';
-import { router } from '@klave/api';
+import { router, Context as TRPCContext } from '@klave/api';
 import { Utils } from '@secretarium/connector';
 import { RepoFs } from './repoFs';
 import GithubFs from './githubFs';
 import { dummyMap } from './dummyVmFs';
-import { RepoConfigSchemaLatest, getFinalParseConfig } from '@klave/api';
+import { RepoConfigSchemaLatest } from '@klave/api';
+import { getFinalParseConfig } from '@klave/constants';
 
-type Octokit = Context['octokit'];
+type Octokit = ProbotContext['octokit'];
 
 type DeployFromHookOptions = {
     octokit?: Octokit;
@@ -84,28 +86,34 @@ class Deployer {
 
     async fromHook(hook: Hook) {
         if (hook.source === 'github') {
-            // TODO: Find a way to get hook's typings
-            const { payload } = hook as any;
+
+            const payload = hook.payload as unknown as EmitterWebhookEvent<'push' | 'check_suite'>['payload'];
+            if (!payload)
+                return;
+
             this.repo = await prisma.repo.findUnique({
                 where: {
                     source_owner_name: {
                         source: hook.source,
-                        owner: payload.repository.owner.login as string,
-                        name: payload.repository.name as string
+                        owner: payload.repository.owner.login,
+                        name: payload.repository.name
                     }
                 }
             }) ?? undefined;
-            if (payload.check_suite) {
-                // For a Check Suite Hook
+
+            if (hook.event === 'check_suite') {
+                // For a Check Suite hooks
+                const locPayload = payload as EmitterWebhookEvent<'check_suite'>['payload'];
                 this.commitRange = {
-                    before: payload.check_suits.before as string,
-                    after: payload.check_suits.after as string
+                    before: locPayload.check_suite.before ?? undefined,
+                    after: locPayload.check_suite.after ?? undefined
                 };
             } else {
-                // Otherwise
+                // Otherwise for Push hooks
+                const locPayload = payload as EmitterWebhookEvent<'push'>['payload'];
                 this.commitRange = {
-                    before: payload.before as string,
-                    after: payload.after as string
+                    before: locPayload.before ?? undefined,
+                    after: locPayload.after ?? undefined
                 };
             }
         }
@@ -168,7 +176,7 @@ class Deployer {
         // Get the list of files that changed
         const files: Array<{ __filename: string } & unknown> = [];
 
-        let candidateFiles: any[] = [];
+        let candidateFiles: Awaited<ReturnType<typeof octokit.repos.compareCommits>>['data']['files'] = [];
         if (before) {
             try {
                 const { data: { files: filesManifest } } = await octokit.repos.compareCommits({
@@ -337,7 +345,7 @@ class Deployer {
             // TODO - Populate reasons why deployment failed
             if (buildResult.success === false) {
                 await errorDeployment({
-                    buildOutputErrorObj: buildResult.error as any
+                    buildOutputErrorObj: buildResult.error as object ?? null
                 });
                 return Promise.reject();
             }
@@ -395,8 +403,10 @@ class Deployer {
                         if (previousDeployment) {
                             logger.debug(`Deleting previous deployment ${previousDeployment.id} for ${target}`);
                             const caller = router.v0.deployments.createCaller({
-                                prisma
-                            } as any);
+                                prisma,
+                                session: {},
+                                override: '__system_post_deploy'
+                            } as unknown as TRPCContext);
                             caller.delete({
                                 deploymentId: previousDeployment.id
                             }).catch((error) => {
@@ -455,12 +465,12 @@ class Deployer {
                             });
                         }).catch(() => { return; });
                     } else if (message.type === 'write') {
-                        if ((message.filename as string).endsWith('.wasm'))
-                            compiledBinary = message.contents;
-                        if ((message.filename as string).endsWith('.wat'))
-                            compiledWAT = message.contents;
-                        if ((message.filename as string).endsWith('.d.ts'))
-                            compiledDTS = message.contents;
+                        if ((message.filename).endsWith('.wasm'))
+                            compiledBinary = message.contents ? new Uint8Array(Buffer.from(message.contents)) : new Uint8Array(0);
+                        if ((message.filename).endsWith('.wat'))
+                            compiledWAT = message.contents ?? undefined;
+                        if ((message.filename).endsWith('.d.ts'))
+                            compiledDTS = message.contents ?? undefined;
                     } else if (message.type === 'diagnostic') {
                         //
                     } else if (message.type === 'errored') {

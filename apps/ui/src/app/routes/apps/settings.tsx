@@ -110,7 +110,7 @@ const LimitEditor: FC<LimitEditorProps> = ({ kredits, application: { id } }) => 
             await mutateAsync({
                 applicationId: id,
                 limits: {
-                    transactionCallSpend: currentValue as any as bigint
+                    transactionCallSpend: BigInt(currentValue)
                 }
             });
             await appAPIUtils.getAll.invalidate();
@@ -264,7 +264,7 @@ export const AppSettings: FC = () => {
         <div>
             <h1 className='font-bold text-xl mb-5'>Security</h1>
             <p>
-                <label className='flex items-center'><input type="checkbox" className="toggle toggle-sm mr-2" checked={gitSignRequired} onChange={handleGitSignRequired} /><span className='pb-1'>Require valid Git signature prior to deployment</span></label>
+                <label className='flex items-center'><input type="checkbox" className="toggle toggle-sm mr-2" checked={gitSignRequired} onChange={handleGitSignRequired} /><span className='pb-1'>Require valid Git signature prior to deployment</span> {mutation.isPending ? <UilSpinner className='inline-block animate-spin' /> : null}</label>
             </p>
         </div>
         <div>

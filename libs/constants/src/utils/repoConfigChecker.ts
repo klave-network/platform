@@ -8,6 +8,7 @@ const repoConfigSchemaV0 = z.object({
             name: z.string(),
             description: z.string().optional(),
             version: z.string().optional(),
+            index: z.string().optional(),
             rootDir: z.string()
         }
     )).optional()
@@ -21,6 +22,7 @@ const repoConfigSchemaV1 = z.object({
             slug: z.string(),
             description: z.string().optional(),
             version: z.string().optional(),
+            index: z.string().optional(),
             rootDir: z.string()
         }
     )).optional()
@@ -29,7 +31,7 @@ const repoConfigSchemaV1 = z.object({
 export const repoConfigSchemaLatest = repoConfigSchemaV1;
 export type RepoConfigSchemaLatest = z.infer<typeof repoConfigSchemaLatest>;
 
-export const getFinalParseConfig = (config: string | object | null): ReturnType<typeof repoConfigSchemaV1.safeParse> & { chainError?: ZodError } => {
+export const getFinalParseConfig = (config: string | object | null): ReturnType<typeof repoConfigSchemaLatest.safeParse> & { chainError?: ZodError } => {
     const objectParse = typeof config === 'string' ? JSON.parse(config ?? '{}') : config ?? {};
     let originalParse = repoConfigSchemaV1.safeParse(objectParse);
     if (!originalParse.success) {
@@ -39,16 +41,18 @@ export const getFinalParseConfig = (config: string | object | null): ReturnType<
             data: newParse.success ? {
                 ...newParse.data,
                 branches: newParse.data.branch ? [newParse.data.branch] : undefined,
-                applications: newParse.data.applications?.map((app: any) => {
-                    app.slug = (app.slug ?? app.name).replaceAll(/\W/g, '-').toLocaleLowerCase();
-                    delete app.name;
-                    return app;
+                applications: newParse.data.applications?.map((app) => {
+                    const newApp: NonNullable<RepoConfigSchemaLatest['applications']>[number] = {
+                        ...app,
+                        slug: app.name.replaceAll(/\W/g, '-').toLocaleLowerCase()
+                    };
+                    return newApp;
                 })
             } : undefined,
             chainError: originalParse.error
-        } as any as ReturnType<typeof repoConfigSchemaV1.safeParse>;
+        } as unknown as ReturnType<typeof repoConfigSchemaLatest.safeParse>;
     } else {
-        originalParse.data.applications = originalParse.data.applications?.map((app: any) => {
+        originalParse.data.applications = originalParse.data.applications?.map((app) => {
             app.slug = app.slug.replaceAll(/\W/g, '-').toLocaleLowerCase();
             return app;
         });

@@ -4,6 +4,7 @@ import { AuthProvider } from './AuthProvider';
 import { AppWrapper } from './AppLayout';
 import Header from './partials/Header';
 import Footer from './partials/Footer';
+import { httpApi } from './utils/api';
 
 const MainWrapper: FC<PropsWithChildren> = ({ children }) => {
     return <main className="flex-grow pt-24">
@@ -23,7 +24,7 @@ const ContentWrapper: FC<PropsWithChildren> = ({ children }) => {
 
 export const AuthLayout = () => {
     const outlet = useOutlet();
-    const { userPromise } = useLoaderData() as { userPromise: any };
+    const { userPromise } = useLoaderData() as { userPromise: ReturnType<typeof httpApi.v0.auth.getSession.query> };
 
     return (
         <Suspense fallback={<div className="flex flex-col min-h-screen overflow-hidden">
@@ -53,7 +54,7 @@ export const AuthLayout = () => {
                     <Footer />
                 </div>
                 }
-                children={(user) =>
+                children={(user: Awaited<typeof userPromise>) =>
                     <AuthProvider userData={user}>
                         <div className="flex flex-col min-h-screen overflow-hidden dark:bg-gray-900 dark:text-white">
                             <Header />

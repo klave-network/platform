@@ -21,7 +21,12 @@ export const stripeMiddlware: RequestHandler = (req, __unusedRes, next) => {
             // DO NOT USE THE FOLLOWING COMMENTED LINE CODE
             // let event = req.body as Stripe.Event;
 
-            const event = Stripe.webhooks.constructEvent((req as any).rawBody, webhookSignature, webhookSecret);
+            const rawBody = (req as unknown as Record<string, object>).rawBody as string | Buffer;
+            if (!rawBody) {
+                logger.warn('Stripe could not obtain hook body');
+                return;
+            }
+            const event = Stripe.webhooks.constructEvent(rawBody, webhookSignature, webhookSecret);
 
             if (event.type === 'checkout.session.completed') {
 
@@ -93,8 +98,8 @@ export const stripeMiddlware: RequestHandler = (req, __unusedRes, next) => {
                 });
             }
 
-        } catch (error: any) {
-            logger.error('Stripe webhook failed', error.toString().replaceAll('\n', ' '));
+        } catch (error) {
+            logger.error('Stripe webhook failed', error?.toString().replaceAll('\n', ' '));
         }
 
         next();

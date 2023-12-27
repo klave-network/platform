@@ -1,26 +1,31 @@
 import { createContext, useContext, useMemo, FC, PropsWithChildren, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocalForage } from './useLocalStorage';
+import { httpApi } from './utils/api';
 
 type AuthContextType = {
-    user?: any;
-    login: (data: any) => void;
+    user: Awaited<ReturnType<typeof httpApi.v0.auth.getSession.query>> | null;
+    login: (data: Awaited<ReturnType<typeof httpApi.v0.auth.getSession.query>> | null) => void;
     logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType>({} as any);
+const AuthContext = createContext<AuthContextType>({
+    user: null,
+    login: () => { },
+    logout: () => { }
+});
 
 type AuthProviderProps = PropsWithChildren & {
-    userData?: any
+    userData?: Awaited<ReturnType<typeof httpApi.v0.auth.getSession.query>>
 }
 
-export const AuthProvider: FC<AuthProviderProps> = ({ children, userData = {} }) => {
+export const AuthProvider: FC<AuthProviderProps> = ({ children, userData }) => {
 
     const [user, setUser] = useLocalForage('user', userData ?? null);
     const navigate = useNavigate();
 
     // call this function when you want to authenticate the user
-    const login = useCallback(async (data: any) => {
+    const login = useCallback(async (data: typeof user) => {
         setUser(data);
         navigate('/dashboard');
     }, [navigate, setUser]);

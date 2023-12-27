@@ -1,6 +1,6 @@
 {
     "jsc": {
-        "target": "es2015",
+        "target": "es2021",
         "parser": {
             "syntax": "typescript",
             "decorators": true,

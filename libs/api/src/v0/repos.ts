@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { objectToCamel } from 'ts-case-convert';
 import { isTruthy } from '../utils/isTruthy';
 import type { DeployableRepo, GitHubToken } from '@klave/db';
-import { getFinalParseConfig } from '../utils/repoConfigChecker';
+import { getFinalParseConfig } from '@klave/constants';
 
 export const reposRouter = createTRPCRouter({
     deployables: publicProcedure
@@ -73,10 +73,11 @@ export const reposRouter = createTRPCRouter({
                             refreshToken
                         })
                     });
-                    const data: any = {
-                        ...objectToCamel(await result.json() as any),
+                    const data = {
+                        ...objectToCamel(await result.json() as object),
                         createdAt: Date.now()
-                    };
+                    } as unknown as GitHubToken & { error?: Error; errorDescription?: string; };
+
                     if (data.error) {
                         await prisma.web.update({
                             where: {
@@ -112,8 +113,8 @@ export const reposRouter = createTRPCRouter({
                             return resolve();
                         });
                     });
-                } catch (e: any) {
-                    if (e.refreshRequired)
+                } catch (e) {
+                    if ((e as { refreshRequired: boolean }).refreshRequired)
                         throw new Error('Credentials refresh required');
                     console.error(e);
                 }
@@ -262,9 +263,9 @@ export const reposRouter = createTRPCRouter({
             });
 
             const data = {
-                ...objectToCamel<GitHubToken & { error?: string; errorDescription?: string; }>(await result.json() as any),
+                ...objectToCamel(await result.json() as object),
                 createdAt: new Date()
-            };
+            } as unknown as GitHubToken & { error?: string; errorDescription?: string; };
 
             if (!data.error) {
                 await prisma.web.update({

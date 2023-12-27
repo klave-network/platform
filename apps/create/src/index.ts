@@ -59,8 +59,8 @@ async function main(target: string | undefined, options: CommandOptions) {
                 stdio: 'ignore'
             });
             step.succeed('Installing dependencies');
-        } catch (e: any) {
-            step.fail(e.toString());
+        } catch (e) {
+            step.fail(e?.toString());
         }
     });
 
@@ -71,8 +71,8 @@ async function main(target: string | undefined, options: CommandOptions) {
                 stdio: 'ignore'
             });
             step.succeed('Created an empty Git repository');
-        } catch (e: any) {
-            step.fail(e.toString());
+        } catch (e) {
+            step.fail(e?.toString());
         }
     });
 

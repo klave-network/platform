@@ -1,10 +1,52 @@
 import { TransferListItem, Worker } from 'node:worker_threads';
 import ts from 'typescript';
 import { v4 as uuid } from 'uuid';
+import type { Stats } from 'assemblyscript/dist/asc';
 import { formatter } from './languageService';
 import { compilerModuleFunction } from './compilerModule';
 
 const deferredMarker = '__klave_deferred__';
+
+type ParentMessage = {
+    type: 'read';
+    id: number;
+    filename?: string;
+    contents: string | null;
+} | {
+    type: 'write';
+    id: number;
+    filename: string;
+    contents: string | null;
+} | {
+    type: 'compile';
+}
+
+type CompilerMessage = {
+    type: 'read';
+    id: number;
+    filename: string;
+} | {
+    type: 'write';
+    filename: string;
+    contents: string | null;
+} | {
+    type: 'diagnostic';
+    diagnostics: string;
+} | {
+    type: 'errored';
+    error: Error;
+    stdout?: string;
+    stderr?: string;
+} | {
+    type: 'done';
+    stats: Stats;
+    stdout?: string;
+    stderr?: string;
+} | {
+    type: 'start';
+} | {
+    type: 'compile';
+}
 
 export class CompilerHost {
 
@@ -13,14 +55,9 @@ export class CompilerHost {
 
     constructor(private worker: Worker) { }
 
-    on(event: 'error', listener: (err: Error) => void): this;
-    on(event: 'exit', listener: (exitCode: number) => void): this;
-    on(event: 'message', listener: (value: any) => void): this;
-    on(event: 'messageerror', listener: (error: Error) => void): this;
-    on(event: 'online', listener: () => void): this;
-    on(event: string | symbol, listener: (...args: any[]) => void): this {
+    on(event: 'message', listener: (value: CompilerMessage) => void): this {
         if (event === 'message') {
-            this.worker.on('message', (message) => {
+            this.worker.on('message', (message: CompilerMessage) => {
                 if (message.type === 'write') {
                     if (message.filename === 'out.d.ts' && message.contents) {
                         let filteredDTS = '';
@@ -65,7 +102,7 @@ export class CompilerHost {
         return this;
     }
 
-    postMessage(value: any, transferList?: ReadonlyArray<TransferListItem>): void {
+    postMessage(value: ParentMessage, transferList?: ReadonlyArray<TransferListItem>): void {
         if (value.type === 'read')
             if (value.id === this.entryFile && value.contents) {
 

@@ -4,7 +4,7 @@ import { probot, scp, scpOps } from '@klave/providers';
 import type { Application, Limits } from '@klave/db';
 import { z } from 'zod';
 import { deployToSubstrate } from '../deployment/deploymentController';
-import { getFinalParseConfig } from '../utils/repoConfigChecker';
+import { getFinalParseConfig, KlaveGetCreditResult } from '@klave/constants';
 
 export const applicationRouter = createTRPCRouter({
     getAll: publicProcedure
@@ -112,7 +112,7 @@ export const applicationRouter = createTRPCRouter({
             //         try {
             //             await scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
             //                 app_id: app.id
-            //             }).send().then((result: any) => {
+            //             }).send().then((result) => {
             //                 if (result.kredit === undefined)
             //                     throw (new Error('No credits returned'));
             //                 const ref = apps[idx];
@@ -132,7 +132,7 @@ export const applicationRouter = createTRPCRouter({
             //             await scp.newTx('wasm-manager', 'get_allowed_kredit_per_transaction', `klave-app-get-transaction-limit-${appId}`, {
             //                 app_id: appId
             //             }).send()
-            //                 .then(async (result: any) => {
+            //                 .then(async (result) => {
             //                     if (result.kredit === undefined)
             //                         throw (new Error('No credits returned'));
             //                     return prisma.application.update({
@@ -177,7 +177,7 @@ export const applicationRouter = createTRPCRouter({
                         await scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${appId}`, {
                             app_id: appId
                         }).send()
-                            .then(async (result: any) => {
+                            .then(async (result) => {
                                 if (result.kredit === undefined)
                                     throw (new Error('No credits returned'));
                                 return prisma.application.update({
@@ -194,7 +194,7 @@ export const applicationRouter = createTRPCRouter({
                         await scp.newTx('wasm-manager', 'get_allowed_kredit_per_transaction', `klave-app-get-transaction-limit-${appId}`, {
                             app_id: appId
                         }).send()
-                            .then(async (result: any) => {
+                            .then(async (result) => {
                                 if (result.kredit === undefined)
                                     throw (new Error('No credits returned'));
                                 return prisma.application.update({
@@ -305,9 +305,9 @@ export const applicationRouter = createTRPCRouter({
                     description: 'Secretarium Task'
                 }, async () => {
                     try {
-                        await scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
+                        await scp.newTx<KlaveGetCreditResult>('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
                             app_id: app.id
-                        }).send().then(async (result: any) => {
+                        }).send().then(async (result) => {
                             if (result.kredit === undefined)
                                 throw (new Error('No credits returned'));
                             return prisma.application.update({
@@ -321,10 +321,10 @@ export const applicationRouter = createTRPCRouter({
                         }).catch(() => {
                             // Swallow this error
                         });
-                        await scp.newTx('wasm-manager', 'get_allowed_kredit_per_transaction', `klave-app-get-transaction-limit-${app.id}`, {
+                        await scp.newTx<KlaveGetCreditResult>('wasm-manager', 'get_allowed_kredit_per_transaction', `klave-app-get-transaction-limit-${app.id}`, {
                             app_id: app.id
                         }).send()
-                            .then(async (result: any) => {
+                            .then(async (result) => {
                                 if (result.kredit === undefined)
                                     throw (new Error('No credits returned'));
                                 return prisma.application.update({
@@ -589,29 +589,22 @@ export const applicationRouter = createTRPCRouter({
         }),
     update: publicProcedure
         .input(z.object({
-            appId: z.string().uuid(),
             data: z.custom<Partial<Application>>()
-        }).or(z.object({
+        }).and(z.discriminatedUnion('withSlug', [z.object({
+            withSlug: z.literal(false),
+            appId: z.string().uuid()
+        }), z.object({
+            withSlug: z.literal(true),
             appSlug: z.string(),
-            orgSlug: z.string(),
-            data: z.custom<Partial<Application>>()
-        })))
+            orgSlug: z.string()
+        })])))
         .mutation(async ({ ctx: { prisma, session: { user } }, input }) => {
 
             if (!user)
                 throw (new Error('You must be logged in to delete an application'));
 
-            const { appId, appSlug, orgSlug, data } = input as Record<string, any>;
-
-            if (appId && data) {
-                await prisma.application.update({
-                    where: {
-                        id: appId
-                    },
-                    data
-                });
-            }
-            else if (appSlug && orgSlug && data) {
+            if (input.withSlug) {
+                const { appSlug, orgSlug, data } = input;
                 const org = await prisma.organisation.findUnique({
                     where: {
                         slug: orgSlug
@@ -619,6 +612,7 @@ export const applicationRouter = createTRPCRouter({
                 });
                 if (!org)
                     return null;
+
                 await prisma.application.update({
                     where: {
                         organisationId_slug: {
@@ -628,23 +622,49 @@ export const applicationRouter = createTRPCRouter({
                     },
                     data
                 });
-            }
-            else
-                throw (new Error('Invalid input'));
-            await prisma.activityLog.create({
-                data: {
-                    class: 'environment',
-                    application: {
-                        connect: {
-                            id: appId
+
+                await prisma.activityLog.create({
+                    data: {
+                        class: 'environment',
+                        application: {
+                            connect: {
+                                organisationId_slug: {
+                                    slug: appSlug,
+                                    organisationId: org.id
+                                }
+                            }
+                        },
+                        context: {
+                            type: 'update',
+                            payload: {}
                         }
-                    },
-                    context: {
-                        type: 'update',
-                        payload: {}
                     }
-                }
-            });
+                });
+            } else {
+                const { appId, data } = input;
+                await prisma.application.update({
+                    where: {
+                        id: appId
+                    },
+                    data
+                });
+
+                await prisma.activityLog.create({
+                    data: {
+                        class: 'environment',
+                        application: {
+                            connect: {
+                                id: appId
+                            }
+                        },
+                        context: {
+                            type: 'update',
+                            payload: {}
+                        }
+                    }
+                });
+            }
+
             return true;
         }),
     delete: publicProcedure
@@ -701,28 +721,24 @@ export const applicationRouter = createTRPCRouter({
         }),
     setLimits: publicProcedure
         .input(z.object({
+            limits: z.custom<Partial<Limits>>()
+        }).and(z.discriminatedUnion('withSlug', [z.object({
+            withSlug: z.literal(false),
             applicationId: z.string().uuid()
-        }).or(z.object({
+        }), z.object({
+            withSlug: z.literal(true),
             applicationSlug: z.string(),
             organisationId: z.string()
-        })).and(z.object({
-            limits: z.custom<Partial<Limits>>()
-        })))
+        })])))
         .mutation(async ({ ctx: { prisma, session: { user } }, input }) => {
 
             if (!user)
                 throw (new Error('You must be logged in to delete an application'));
 
-            const { applicationId, applicationSlug, organisationId } = input as Record<string, any>;
             let app: Application | null = null;
 
-            if (applicationId)
-                app = await prisma.application.findFirst({
-                    where: {
-                        id: applicationId
-                    }
-                });
-            else if (applicationSlug && organisationId)
+            if (input.withSlug) {
+                const { applicationSlug, organisationId } = input;
                 app = await prisma.application.findUnique({
                     where: {
                         organisationId_slug: {
@@ -731,6 +747,14 @@ export const applicationRouter = createTRPCRouter({
                         }
                     }
                 });
+            } else {
+                const { applicationId } = input;
+                app = await prisma.application.findFirst({
+                    where: {
+                        id: applicationId
+                    }
+                });
+            }
 
             if (!app)
                 throw (new Error('No application found'));

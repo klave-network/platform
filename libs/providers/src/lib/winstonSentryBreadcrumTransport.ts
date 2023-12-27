@@ -1,10 +1,10 @@
 import stripAnsi from 'strip-ansi';
 import { addBreadcrumb, SeverityLevel } from '@sentry/node';
 import TransportStream from 'winston-transport';
-
+import type { Logform } from 'winston';
 
 export class SentryBreadcrumb extends TransportStream {
-    override log(info: any, next: () => void): any {
+    override log(info: Logform.TransformableInfo, next: () => void) {
 
         const level = stripAnsi(info[Symbol.for('level')]);
         if (level === 'http')
@@ -18,7 +18,7 @@ export class SentryBreadcrumb extends TransportStream {
             data,
             message: stripAnsi(info.message),
             level: level as SeverityLevel,
-            timestamp: info.timestamp ?? Date.now()
+            timestamp: info['timestamp'] ?? Date.now()
         });
 
         next();

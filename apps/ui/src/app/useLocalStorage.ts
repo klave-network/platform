@@ -30,8 +30,8 @@ export function useLocalForage<D>(key: string, initialValue: D, errorHandler?: E
         })().catch(error);
     }, []);
 
-    const setValue = useCallback((value: any) => {
-        async function set(value: any) {
+    const setValue = useCallback((value: D) => {
+        async function set(value: D) {
             try {
                 setStoredValue(value);
                 await localForage.setItem(key, value);

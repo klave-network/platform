@@ -152,8 +152,8 @@ export const AppDeploymentDetail: FC = () => {
                         <div className='mt-10'>
                             <h2 className='font-bold mb-3'>Errors reported during compilation</h2>
                             <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-red-100 p-3'>
-                                {(deployment.buildOutputErrorObj as any)?.stack ?? JSON.stringify(deployment.buildOutputErrorObj ?? {}, null, 4)}<br />
-                                {(deployment.buildOutputStdErr as any)}
+                                {(deployment.buildOutputErrorObj as unknown as Error)?.stack ?? JSON.stringify(deployment.buildOutputErrorObj ?? {}, null, 4)}<br />
+                                {(deployment.buildOutputStdErr)}
                             </pre>
                         </div>
                     </Tabs.Content>

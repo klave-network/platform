@@ -7,7 +7,6 @@ import applications from './applications';
 import deployments from './deployments';
 import activities from './activities';
 import domains from './domains';
-import hooks from './hooks';
 import system from './system';
 
 export const v0Router = createTRPCRouter({
@@ -19,7 +18,6 @@ export const v0Router = createTRPCRouter({
     deployments,
     activities,
     domains,
-    hooks,
     system
 });
 

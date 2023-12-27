@@ -28,7 +28,7 @@ const javascriptRules = {
 const typescriptRules = {
     ...javascriptRules,
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/no-unused-vars': [
         'error',
         { args: 'after-used', varsIgnorePattern: '^__unused' }
@@ -40,7 +40,9 @@ const typescriptRules = {
 
 module.exports = {
     root: true,
+    env: { es6: true },
     parserOptions: {
+        ecmaVersion: 2021,
         tsconfigRootDir: __dirname,
         EXPERIMENTAL_useProjectService: true,
         warnOnUnsupportedTypeScriptVersion: false
@@ -79,8 +81,7 @@ module.exports = {
             extends: ['plugin:@nx/javascript'],
             rules: javascriptRules,
             parserOptions: {
-                sourceType: 'module',
-                ecmaVersion: 2021
+                sourceType: 'module'
             }
         },
         {

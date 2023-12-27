@@ -49,7 +49,7 @@ export const start = async (port: number) => {
     app.use(rateLimiterMiddleware);
     app.use(express.json({
         verify: (req, __unusedRed, buf) => {
-            (req as any).rawBody = buf;
+            (req as unknown as Record<string, object>).rawBody = buf;
         }
     }));
     app.use(express.urlencoded({ extended: true }));
@@ -193,7 +193,9 @@ export const start = async (port: number) => {
     app.use(webLinkerMiddlware);
 
     app.ws('/bridge', (ws, { session, sessionID, sessionStore }) => {
-        (ws as any).sessionID = sessionID;
+        type WsWithSession = typeof ws & { sessionID: string };
+        type SessionWithLocator = typeof session & { locator?: string, localId?: string };
+        (ws as WsWithSession).sessionID = sessionID;
         ws.on('connection', (ws) => {
             ws.isAlive = true;
             logger.info('PLR: Client is alive !');
@@ -206,7 +208,7 @@ export const start = async (port: number) => {
             if (verb === 'request') {
                 logger.info('New Pocket login bridge client request ...');
                 const [locator] = data;
-                (session as any).locator = locator;
+                (session as SessionWithLocator).locator = locator;
                 session.save(() => {
                     ws.send(`sid#${sessionID}#ws://${ip.address('public')}:${port}/bridge`);
                 });
@@ -223,11 +225,11 @@ export const start = async (port: number) => {
 
                     } if (!rsession)
                         return;
-                    if ((rsession as any).locator !== locator)
+                    if ((rsession as SessionWithLocator).locator !== locator)
                         return;
-                    (rsession as any).localId = localId;
+                    (rsession as SessionWithLocator).localId = localId;
                     sessionStore.set(sid, rsession, () => {
-                        const browserTarget = Array.from(getWss().clients.values()).find(w => (w as any).sessionID === sid);
+                        const browserTarget = Array.from(getWss().clients.values()).find(w => (w as WsWithSession).sessionID === sid);
                         browserTarget?.send('confirmed');
                     });
                 });

@@ -1,10 +1,11 @@
 import { SCP, Key, Constants, EncryptedKeyPair } from '@secretarium/connector';
 import { prisma } from '@klave/db';
 import { logger } from './logger';
+import { BackendVersion } from '@klave/constants';
 
 const client = new SCP({
     logger: process.env['NODE_ENV'] === 'development' ? {
-        debug: (message: string, obj: any) => {
+        debug: (message: string, obj) => {
             if (obj) {
                 if (obj.requestId && obj.dcapp && obj.function)
                     logger.debug(`SCP (${obj.requestId}) ${obj.dcapp}/${obj.function}`);
@@ -28,7 +29,7 @@ let reconnectionTimeout: NodeJS.Timeout | undefined;
 let lastSCPState = Constants.ConnectionState.closed;
 let secretariumCoreVersion: string | undefined;
 let secretariumWasmVersion: string | undefined;
-let secretariumBackendVersions: any;
+let secretariumBackendVersions: BackendVersion['version'] | undefined;
 let secretariumVersionUpdateTimer: NodeJS.Timeout | undefined;
 
 const planReconnection = async () => {
@@ -50,7 +51,7 @@ const getBackendVersions = async () => {
         const previousSecretariumWasmVersion = secretariumWasmVersion;
         const previousSecretariumCoreBuild = secretariumBackendVersions?.core_version?.build_number;
         const previousSecretariumWasmBuild = secretariumBackendVersions?.wasm_version?.build_number;
-        const version: any = await client.newTx('wasm-manager', 'version', 'version', '').send().catch((e) => {
+        const version = await client.newTx<BackendVersion>('wasm-manager', 'version', 'version', '').send().catch((e) => {
             console.error(e);
         });
         secretariumBackendVersions = version?.version;
