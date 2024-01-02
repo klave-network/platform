@@ -47,7 +47,8 @@ export const LoginQR: FC = () => {
                     credentials: 'include'
                 })
                     .then(async res => res.json())
-                    .then(udata => login(udata))
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    .then(udata => login(udata as any))
                     .catch(() => { return; });
                 break;
         }
