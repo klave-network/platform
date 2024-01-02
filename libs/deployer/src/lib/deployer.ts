@@ -13,8 +13,7 @@ import { Utils } from '@secretarium/connector';
 import { RepoFs } from './repoFs';
 import GithubFs from './githubFs';
 import { dummyMap } from './dummyVmFs';
-import { RepoConfigSchemaLatest } from '@klave/api';
-import { getFinalParseConfig } from '@klave/constants';
+import { RepoConfigSchemaLatest, getFinalParseConfig } from '@klave/constants';
 
 type Octokit = ProbotContext['octokit'];
 
