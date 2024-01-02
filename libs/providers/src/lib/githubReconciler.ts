@@ -66,7 +66,9 @@ export const githubOps = {
                             }
                         );
 
-                        const repos: typeof reposData['repositories'] = [];
+                        // TODO - this is a hack to get around the fact that the type definition for the above call is wrong
+                        // See bug report at https://github.com/octokit/plugin-paginate-rest.js/issues/350
+                        const repos = Array.isArray(reposData) ? reposData as typeof reposData['repositories'] : [];
                         if (reposData.repositories)
                             repos.push(...reposData.repositories);
 
