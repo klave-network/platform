@@ -149,8 +149,8 @@ export const LoginSecKey: FC = () => {
                         return;
                     }
                     if (res?.error) {
-                        setCredentials(credentials.filter(c => c !== email));
-                        setIsRequestingWebauthnInput(false);
+                        // setCredentials(credentials.filter(c => c !== email));
+                        // setIsRequestingWebauthnInput(false);
                         setError(`${res.error}. Please try again.`);
                         return;
                     }
