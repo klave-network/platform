@@ -108,6 +108,7 @@ const LimitEditor: FC<LimitEditorProps> = ({ kredits, application: { id } }) => 
     const setLimits = () => {
         (async () => {
             await mutateAsync({
+                withSlug: false,
                 applicationId: id,
                 limits: {
                     transactionCallSpend: BigInt(currentValue)
@@ -178,6 +179,7 @@ export const AppSettings: FC = () => {
 
     const handleGitSignRequired: ChangeEventHandler<HTMLInputElement> = (e) => {
         mutation.mutateAsync({
+            withSlug: false,
             appId: application.id || '', data: {
                 gitSignRequired: e.currentTarget.checked
             }
@@ -190,7 +192,11 @@ export const AppSettings: FC = () => {
         <form
             onSubmit={() => {
                 methods.handleSubmit(async (data) => {
-                    await mutation.mutateAsync({ appId: application.id || '', data });
+                    await mutation.mutateAsync({
+                        withSlug: false,
+                        appId: application.id || '',
+                        data
+                    });
                     methods.reset();
                 })()
                     .catch(() => { return; });
