@@ -12,6 +12,8 @@ type DeploymentContextProps = {
 
 export const DeploymentPromotion: FC<DeploymentContextProps> = ({ deployment: { id } }) => {
 
+    const navigate = useNavigate();
+    const { orgSlug, appSlug } = useParams();
     const utils = api.useUtils().v0.deployments;
     const mutation = api.v0.deployments.release.useMutation({
         onSuccess: async () => {
@@ -23,12 +25,13 @@ export const DeploymentPromotion: FC<DeploymentContextProps> = ({ deployment: { 
     const promoteDeployment = (deploymentId: Deployment['id']) => {
         (async () => {
             await mutation.mutateAsync({ deploymentId });
+            navigate(`/${orgSlug}/${appSlug}/deployments`);
         })().catch(() => { return; });
     };
 
     return <AlertDialog.Root>
         <AlertDialog.Trigger asChild onClick={e => e.stopPropagation()}>
-            <button className="btn btn-sm h-8 inline-flex items-center justify-center font-normal text-gray-400 ml-auto">
+            <button className="btn btn-sm h-8 inline-flex items-center justify-center font-normal ml-auto">
                 Release
             </button>
         </AlertDialog.Trigger>

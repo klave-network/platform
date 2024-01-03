@@ -210,7 +210,6 @@ model Deployment {
     status               DeploymentStatus   @default(created)
     life                 DeploymentLifespan @default(short)
     sealed               Boolean            @default(false)
-    released             Boolean            @default(false)
     tags                 String[]           @default([])
     expiresOn            DateTime
     createdAt            DateTime           @default(now())

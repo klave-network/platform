@@ -26,7 +26,6 @@ export const applicationRouter = createTRPCRouter({
                             version: true,
                             build: true,
                             status: true,
-                            released: true,
                             life: true,
                             sealed: true
                         }
@@ -94,7 +93,6 @@ export const applicationRouter = createTRPCRouter({
                             version: true,
                             build: true,
                             status: true,
-                            released: true,
                             life: true,
                             sealed: true
                         }
