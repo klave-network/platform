@@ -8,7 +8,8 @@ export const probotMiddleware: RequestHandler = (req, res, next) => {
 
     if (!middlewareReference && !(probot as Probot & { uninitialized?: boolean }).uninitialized)
         middlewareReference = createNodeMiddleware(probotApp, {
-            probot
+            probot,
+            webhooksPath: '/'
         });
 
     if (middlewareReference)
