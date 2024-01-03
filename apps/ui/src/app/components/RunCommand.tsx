@@ -12,7 +12,15 @@ export const RunCommand: FC<RunCommandProps> = ({ address, functions = [] }) => 
 
     const [route, setRoute] = useState(functions[0] ?? '');
     const [args, setArgs] = useState('');
-    const { data, isLoading, errors, refetch } = useSecretariumQuery({ app: address, route, args, live: false }, [address]);
+    let passedArgs = args;
+
+    try {
+        JSON.parse(args);
+    } catch (e) {
+        passedArgs = JSON.stringify(args);
+    }
+
+    const { data, isLoading, errors, refetch } = useSecretariumQuery({ app: address, route, args: passedArgs, live: false }, [address]);
 
     return <>
         <h2 className='font-bold mb-3'>Command runner</h2>
