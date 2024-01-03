@@ -58,7 +58,7 @@ const Header: FC = () => {
                             </li>
                             */}
                             <li>
-                                {data?.me
+                                {data?.me && !pathname.startsWith('/system')
                                     ? <Link to="/deploy" className="font-medium btn btn-sm text-white dark:text-black dark:bg-gradient-to-r dark:from-klave-cyan dark:to-klave-light-blue bg-black dark:hover:bg-gradient-to-l hover:bg-gray-800 ml-3">
                                         <span>Deploy now</span>
                                     </Link>

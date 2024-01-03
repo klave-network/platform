@@ -70,6 +70,7 @@ model User {
     emails                    String[]            @default([])
     createdAt                 DateTime            @default(now())
     updatedAt                 DateTime            @updatedAt
+    globalAdmin               Boolean?            @default(false)
     webs                      Web[]
     webauthCredentials        WebauthCredential[]
     permissionGrants          PermissionGrant[]

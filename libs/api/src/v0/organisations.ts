@@ -340,6 +340,48 @@ export const organisationRouter = createTRPCRouter({
                         .catch(reject);
                 });
             });
+        }),
+
+    infiniteOrganisations: publicProcedure
+        .input(
+            z.object({
+                limit: z.number().min(1).max(100).nullish(),
+                cursor: z.string().nullish() // <-- "cursor" needs to exist, but can be any type
+            })
+        )
+        .query(async ({ ctx: { session, prisma }, input }) => {
+
+            if (!session.user?.globalAdmin) {
+                throw new Error('Not authenticated');
+            }
+
+            const organisationCount = await prisma.organisation.count();
+            const { cursor } = input;
+            const limit = input.limit ?? 50;
+            const organisations = await prisma.organisation.findMany({
+                take: limit + 1, // get an extra item at the end which we'll use as next cursor
+                cursor: cursor ? {
+                    id: cursor
+                } : undefined,
+                orderBy: {
+                    id: 'asc'
+                },
+                include: {
+                    applications: true
+                }
+            });
+            let nextCursor: typeof cursor | undefined = undefined;
+            if (organisations.length > limit) {
+                const nextItem = organisations.pop();
+                nextCursor = nextItem!.id;
+            }
+            return {
+                data: organisations,
+                meta: {
+                    totalRowCount: organisationCount
+                },
+                nextCursor
+            };
         })
 });
 

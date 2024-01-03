@@ -88,7 +88,8 @@ export const authRouter = createTRPCRouter({
                         user: {
                             id: user.id,
                             slug: user.slug,
-                            personalOrganisationId: personalOrg.id
+                            personalOrganisationId: personalOrg.id,
+                            globalAdmin: user.globalAdmin
                         }
                     }, (err) => {
                         if (err)
@@ -252,6 +253,7 @@ export const authRouter = createTRPCRouter({
                     slug: true,
                     loginCode: true,
                     loginCodeCreatedAt: true,
+                    globalAdmin: true,
                     createdOrganisations: {
                         where: {
                             personal: {
@@ -290,8 +292,9 @@ export const authRouter = createTRPCRouter({
                             ...session,
                             user: {
                                 id: user.id,
+                                slug: user.slug,
                                 personalOrganisationId: user.createdOrganisations[0]?.id,
-                                slug: user.slug
+                                globalAdmin: user.globalAdmin
                             }
                         }, (err) => {
                             if (err)
@@ -337,11 +340,11 @@ export const authRouter = createTRPCRouter({
             if (!rpID)
                 setWebauthnPrimitives();
 
-            const existingCreds = await prisma.webauthCredential.findMany({
-                where: {
-                    userId: user.id
-                }
-            });
+            // const existingCreds = await prisma.webauthCredential.findMany({
+            //     where: {
+            //         userId: user.id
+            //     }
+            // });
 
             const options = await generateAuthenticationOptions({
                 timeout: 60000,
@@ -350,10 +353,10 @@ export const authRouter = createTRPCRouter({
                 //     type: 'public-key' as const,
                 //     transports: dev.transports
                 // })),
-                allowCredentials: existingCreds.map(cred => ({
-                    id: Buffer.from(cred.credentialID),
-                    type: 'public-key' as const
-                })),
+                // allowCredentials: existingCreds.map(cred => ({
+                //     id: Buffer.from(cred.credentialID),
+                //     type: 'public-key' as const
+                // })),
                 userVerification: 'required' as const,
                 rpID
             });
@@ -395,6 +398,7 @@ export const authRouter = createTRPCRouter({
                     slug: true,
                     webauthChallenge: true,
                     webauthCredentials: true,
+                    globalAdmin: true,
                     createdOrganisations: {
                         where: {
                             personal: {
@@ -476,8 +480,9 @@ export const authRouter = createTRPCRouter({
                         ...session,
                         user: {
                             id: user.id,
+                            slug: user.slug,
                             personalOrganisationId: user.createdOrganisations[0]?.id,
-                            slug: user.slug
+                            globalAdmin: user.globalAdmin
                         }
                     }, (err) => {
                         if (err)
@@ -580,6 +585,7 @@ export const authRouter = createTRPCRouter({
                     id: true,
                     slug: true,
                     webauthChallenge: true,
+                    globalAdmin: true,
                     createdOrganisations: {
                         where: {
                             personal: {
@@ -647,7 +653,8 @@ export const authRouter = createTRPCRouter({
                             user: {
                                 id: user.id,
                                 slug: user.slug,
-                                personalOrganisationId: user.createdOrganisations[0]?.id
+                                personalOrganisationId: user.createdOrganisations[0]?.id,
+                                globalAdmin: user.globalAdmin
                             }
                         }, (err) => {
                             if (err)

@@ -6,6 +6,7 @@ import api from '../utils/api';
 
 const Footer: FC = () => {
 
+    const { data: session } = api.v0.auth.getSession.useQuery();
     const { data: versions } = api.v0.system.version.useQuery();
 
     return (
@@ -54,6 +55,9 @@ const Footer: FC = () => {
                             <li className="mb-2">
                                 <a href="https://klave.com/docs" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 transition duration-150 ease-in-out">Documentation</a>
                             </li>
+                            {session?.me?.globalAdmin ? <li className="mb-2">
+                                <Link to="/system" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 transition duration-150 ease-in-out">System Management</Link>
+                            </li> : null}
                             {/* <li className="mb-2">
                                 <Link to="#" className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out">Tutorials & Guides</Link>
                             </li>
