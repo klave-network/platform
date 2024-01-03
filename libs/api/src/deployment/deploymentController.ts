@@ -577,37 +577,40 @@ export const sendToSecretarium = async ({
                 }).send().catch(() => {
                     // Swallow this error
                 });
-        } else if (deployment.deploymentAddress?.fqdn) {
-            logger.debug(`Releasing smart contract: ${deployment.deploymentAddress.fqdn} as ${target}`);
-            await scp.newTx('wasm-manager', 'clone_instance', `klave-release-${deployment.id}`, {
-                app_id: deployment.applicationId,
-                fqdn: target,
-                source_fqdn: deployment.deploymentAddress.fqdn
-            })
-                .onExecuted(() => {
-                    (async () => {
-                        await handleSuccess();
-                    })().catch(() => { return; });
-                })
-                .onError((error) => {
-                    (async () => {
-                        await rollback();
-                        await prisma.deployment.update({
-                            where: {
-                                id: deployment.id
-                            },
-                            data: {
-                                status: 'errored',
-                                buildOutputStdErr: error?.toString()
-                            }
-                        });
-                        logger.debug(`Error while releasing smart contract ${target}: ${error}`);
-                    })().catch(() => { return; });
+            // } else if (previousDeployment?.deploymentAddress?.fqdn && deployment?.deploymentAddress?.fqdn) {
+            //     logger.debug(`Releasing smart contract: ${deployment.deploymentAddress.fqdn} as ${target}`);
+            //     await scp.newTx('wasm-manager', 'clone_instance', `klave-release-${deployment.id}`, {
+            //         app_id: deployment.applicationId,
+            //         fqdn: target,
+            //         source_fqdn: previousDeployment.deploymentAddress.fqdn
+            //     })
+            //         .onResult((result) => {
+            //             console.log('OOPSSSS', result);
+            //         })
+            //         .onExecuted(() => {
+            //             (async () => {
+            //                 await handleSuccess();
+            //             })().catch(() => { return; });
+            //         })
+            //         .onError((error) => {
+            //             (async () => {
+            //                 await rollback();
+            //                 await prisma.deployment.update({
+            //                     where: {
+            //                         id: deployment.id
+            //                     },
+            //                     data: {
+            //                         status: 'errored',
+            //                         buildOutputStdErr: error?.toString()
+            //                     }
+            //                 });
+            //                 logger.debug(`Error while releasing smart contract ${target}: ${error}`);
+            //             })().catch(() => { return; });
 
-                }).send().catch(() => {
-                    // Swallow this error
-                });
-        } else {
+            //         }).send().catch(() => {
+            //             // Swallow this error
+            //         });
+            // } else {
             logger.debug(`No wasm to deploy for ${target}`);
         }
     });

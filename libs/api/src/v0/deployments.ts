@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { v4 as uuid } from 'uuid';
 import * as Sentry from '@sentry/node';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import { logger, scp } from '@klave/providers';
@@ -223,17 +222,7 @@ export const deploymentRouter = createTRPCRouter({
             if (!user)
                 return;
 
-            // await prisma.deployment.update({
-            //     where: {
-            //         id: deploymentId
-            //     },
-            //     data: {
-            //         released: true,
-            //         life: 'long'
-            //     }
-            // });
-
-            const existing = await prisma.deployment.findUnique({
+            const referenceDeployment = await prisma.deployment.findUnique({
                 where: {
                     id: deploymentId,
                     application: {
@@ -250,40 +239,81 @@ export const deploymentRouter = createTRPCRouter({
                             }
                         }
                     }
+                },
+                include: {
+                    deploymentAddress: true
                 }
             });
 
-            if (!existing?.buildOutputWASM)
+            if (!referenceDeployment?.buildOutputWASM)
+                return null;
+
+            const parentApplication = await prisma.application.findUnique({
+                where: {
+                    id: referenceDeployment.applicationId
+                }
+            });
+
+            if (!parentApplication)
                 return null;
 
             const domains = await prisma.domain.findMany({
                 where: {
-                    applicationId: existing.applicationId,
+                    applicationId: referenceDeployment.applicationId,
                     verified: true
                 }
             });
 
             const targets = domains
-                .map(domain => `${existing.applicationId.split('-').shift()}.${domain.fqdn}`)
-                .concat(`${existing.applicationId.split('-').shift()}.sta.klave.network`);
-
+                .flatMap(domain => [
+                    `${parentApplication.slug}.${domain.fqdn}`,
+                    `${parentApplication.id.split('-').shift()}.${domain.fqdn}`
+                ])
+                .concat(`${parentApplication.slug}.sta.klave.network`, `${parentApplication.id.split('-').shift()}.sta.klave.network`);
 
             targets.forEach(target => {
 
                 (async () => {
 
+                    if (!referenceDeployment)
+                        return;
+
+                    const previousDeployment = await prisma.deployment.findFirst({
+                        where: {
+                            deploymentAddress: {
+                                fqdn: target
+                            },
+                            status: {
+                                not: 'errored'
+                            }
+                        },
+                        include: {
+                            deploymentAddress: true
+                        }
+                    });
+
+                    if (previousDeployment)
+                        await prisma.deployment.update({
+                            where: {
+                                id: previousDeployment.id
+                            },
+                            data: {
+                                status: 'updating'
+                            }
+                        });
+
                     const deployment = await prisma.deployment.create({
                         data: {
-                            ...existing,
+                            ...referenceDeployment,
                             id: undefined,
-                            set: uuid(),
+                            set: referenceDeployment.set,
                             expiresOn: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
                             createdAt: undefined,
                             updatedAt: undefined,
                             applicationId: undefined,
                             application: {
                                 connect: {
-                                    id: existing.applicationId
+                                    id: referenceDeployment.applicationId
                                 }
                             },
                             deploymentAddress: {
@@ -291,7 +321,8 @@ export const deploymentRouter = createTRPCRouter({
                                     fqdn: target
                                 }
                             },
-                            life: 'long'
+                            life: 'long',
+                            status: 'deploying'
                         },
                         include: {
                             deploymentAddress: true
@@ -300,6 +331,8 @@ export const deploymentRouter = createTRPCRouter({
 
                     await sendToSecretarium({
                         deployment,
+                        wasmB64: referenceDeployment?.buildOutputWASM ?? undefined,
+                        previousDeployment,
                         target
                     });
                 })()
