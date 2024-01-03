@@ -41,9 +41,6 @@
             "@klave/db": [
                 "libs/db/src/index.ts"
             ],
-            "@klave/deployer": [
-                "libs/deployer/src/index.ts"
-            ],
             "@klave/providers": [
                 "libs/providers/src/index.ts"
             ],
