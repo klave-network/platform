@@ -30,7 +30,7 @@ Sentry.init({
         }),
         new SecretariumInstruments.Sentry.ConnectorTracing({
             connector: scpClient,
-            domains: ['.sta.klave.network']
+            domains: ['.klave.network']
         }),
         new Sentry.Replay()
     ],
