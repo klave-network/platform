@@ -27,6 +27,10 @@ import OrgActivity from './routes/orgs/activity';
 import OrgSettings from './routes/orgs/settings';
 import OrgCredits from './routes/orgs/credits';
 import RedeemCreditCoupon from './routes/redeem/coupon';
+import SysDashboard from './routes/system/dashboard';
+import SysMonitoring from './routes/system/monitoring';
+import SysUsers from './routes/system/users';
+import SysOrganisations from './routes/system/organisations';
 import Providers from './Providers';
 import { httpApi } from './utils/api';
 
@@ -80,6 +84,11 @@ const router = sentryCreateBrowserRouter(
             />
             <Route path='home' element={<Landing />} />
             <Route element={<ProtectedLayout />}>
+                <Route path="system/*" element={<SysDashboard />}>
+                    <Route path="monitoring" element={<SysMonitoring />} />
+                    <Route path="browse/users" element={<SysUsers />} />
+                    <Route path="browse/organisations" element={<SysOrganisations />} />
+                </Route>
                 <Route element={<Dashboard />} >
                     <Route index element={<Welcome />} />
                     <Route
