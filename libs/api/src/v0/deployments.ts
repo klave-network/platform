@@ -248,13 +248,16 @@ export const deploymentRouter = createTRPCRouter({
             if (!referenceDeployment?.buildOutputWASM)
                 return null;
 
-            const parentApplication = await prisma.application.findUnique({
+            const application = await prisma.application.findUnique({
                 where: {
                     id: referenceDeployment.applicationId
+                },
+                include: {
+                    organisation: true
                 }
             });
 
-            if (!parentApplication)
+            if (!application)
                 return null;
 
             const domains = await prisma.domain.findMany({
@@ -265,11 +268,8 @@ export const deploymentRouter = createTRPCRouter({
             });
 
             const targets = domains
-                .flatMap(domain => [
-                    `${parentApplication.slug}.${domain.fqdn}`,
-                    `${parentApplication.id.split('-').shift()}.${domain.fqdn}`
-                ])
-                .concat(`${parentApplication.slug}.sta.klave.network`, `${parentApplication.id.split('-').shift()}.sta.klave.network`);
+                .map(domain => `${application.slug}.${domain.fqdn}`)
+                .concat(`${application.slug}.${application.organisation.slug.replace('~$~', '')}.klave.network`);
 
             targets.forEach(target => {
 

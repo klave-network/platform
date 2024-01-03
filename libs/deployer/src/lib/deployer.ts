@@ -234,7 +234,7 @@ class Deployer {
                 return;
 
             // Compose target
-            const target = `${application.slug.toLocaleLowerCase().replace(/\s/g, '-')}.sta.klave.network`;
+            const target = `${application.slug.toLocaleLowerCase().replace(/\s/g, '-')}.klave.network`;
 
             // Fetch the latest non-errored deployment for this target
             const previousDeployment = await prisma.deployment.findFirst({
@@ -386,7 +386,7 @@ class Deployer {
                 // Send the wasm to the secretarium node
                 return await scp.newTx('wasm-manager', 'deploy_instance', `klave-deployment-${deployment.id}`, {
                     app_id: deployment.applicationId,
-                    fqdn: `${deployment.id.split('-').pop()}.sta.klave.network`,
+                    fqdn: `${deployment.id.split('-').pop()}.klave.network`,
                     wasm_bytes_b64: Utils.toBase64(wasm)
                     // own_enclave: true,
                 }).onExecuted(() => {

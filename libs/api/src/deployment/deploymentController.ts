@@ -86,7 +86,11 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
 
     const repo = await prisma.repo.findUnique({
         include: {
-            applications: true
+            applications: {
+                include: {
+                    organisation: true
+                }
+            }
         },
         where: {
             source_owner_name: {
@@ -218,10 +222,9 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                 });
 
                 const deploymentSet = uuid();
-                const applicationId = application.id.split('-').shift();
                 const targets = domains
-                    .map(domain => `${branchName}.${domain.fqdn}`)
-                    .concat(`${branchName}.${applicationId}.sta.klave.network`, `${buildId}.${applicationId}.sta.klave.network`);
+                    .map(domain => `${branchName}.${application.slug}.${domain.fqdn}`)
+                    .concat(`${branchName}.${application.slug}.${application.organisation.slug.replace('~$~', '')}.klave.network`, `${buildId}.${application.slug}.${application.organisation.slug.replace('~$~', '')}.klave.network`);
 
                 targets.forEach(target => {
 
@@ -610,7 +613,7 @@ export const sendToSecretarium = async ({
             //         }).send().catch(() => {
             //             // Swallow this error
             //         });
-            // } else {
+        } else {
             logger.debug(`No wasm to deploy for ${target}`);
         }
     });
