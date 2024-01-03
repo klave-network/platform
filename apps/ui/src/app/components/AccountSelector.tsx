@@ -9,8 +9,8 @@ const AccountSelector: FC<{ className?: string; }> = ({ className }) => {
     const navigate = useNavigate();
     const { orgSlug } = useParams();
     const { data: organisations } = api.v0.organisations.getAll.useQuery();
-    const personals = useMemo(() => organisations?.filter(Boolean).filter(o => o.personal) ?? [], [organisations]);
-    const other = useMemo(() => organisations?.filter(Boolean).filter(o => o.personal === false) ?? [], [organisations]);
+    const personals = useMemo(() => organisations?.filter(o => o?.personal) ?? [], [organisations]);
+    const other = useMemo(() => organisations?.filter(o => o?.personal === false) ?? [], [organisations]);
 
     const changeValue = (value: string) => {
         if (value === '~$NEW$~')
