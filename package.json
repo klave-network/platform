@@ -96,7 +96,7 @@
         "multer": "1.4.5-lts.1",
         "node-fetch": "^3.3.2",
         "nodemailer": "6.9.8",
-        "ora": "^7.0.1",
+        "ora": "^8.0.1",
         "passport": "0.7.0",
         "passport-local": "1.0.0",
         "path-complete-extname": "1.0.0",
