@@ -12,7 +12,6 @@
             "options": {
                 "outputPath": "dist/libs/sdk",
                 "tsConfig": "libs/sdk/tsconfig.lib.json",
-                "packageJson": "libs/sdk/package.json",
                 "main": "libs/sdk/src/index.ts",
                 "assets": [
                     "libs/sdk/bin/*",

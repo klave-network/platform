@@ -1,0 +1,38 @@
+{
+    "jsc": {
+        "target": "es2021",
+        "parser": {
+            "syntax": "typescript",
+            "decorators": true,
+            "dynamicImport": true,
+            "exportDefaultFrom": false
+        },
+        "transform": {
+            "decoratorMetadata": true,
+            "legacyDecorator": true
+        },
+        "minify": {
+            "format": {
+                "comments": false
+            }
+        },
+        "keepClassNames": true,
+        "externalHelpers": true,
+        "loose": true
+    },
+    "module": {
+        "type": "commonjs",
+        "strict": true,
+        "lazy": false,
+        "noInterop": true
+    },
+    "sourceMaps": true,
+    "exclude": [
+        "jest.config.ts",
+        ".*\\.spec.tsx?$",
+        ".*\\.test.tsx?$",
+        "./src/jest-setup.ts$",
+        "./**/jest-setup.ts$",
+        ".*.js$"
+    ]
+}
