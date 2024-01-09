@@ -268,8 +268,8 @@ export const deploymentRouter = createTRPCRouter({
             });
 
             const targets = domains
-                .map(domain => `${application.slug}.${application.id.split('-')}.${domain.fqdn}`)
-                .concat(`${application.slug}.${application.id.split('-')}.${application.organisation.slug.replace('~$~', '')}.klave.network`);
+                .map(domain => `${application.slug}.${application.id.split('-')[0]}.${domain.fqdn}`)
+                .concat(`${application.slug}.${application.id.split('-')[0]}.${application.organisation.slug.replace('~$~', '')}.klave.network`);
 
             targets.forEach(target => {
 
