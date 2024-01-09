@@ -229,7 +229,7 @@ export const RepoAppSelect: FC = () => {
                                             <Select.Separator className="text-xs text-slate-400 p-1" />
                                             <Select.Group>
                                                 <Select.Label className="text-xs text-slate-400 px-3 py-1">Organisations</Select.Label>
-                                                {other.map(o => <SelectItem key={o.id} value={o.id} className='px-3 py-2 hover:text-klave-cyan hover:cursor-pointer overflow-hidden'>{o.slug}</SelectItem>)}
+                                                {other.map(o => <SelectItem key={o.id} value={o.id} className='px-3 py-2 hover:text-klave-cyan hover:cursor-pointer overflow-hidden'>{o.slug.replace('~$~', '')}</SelectItem>)}
                                             </Select.Group>
                                         </> : null}
                                 </Select.Viewport>
