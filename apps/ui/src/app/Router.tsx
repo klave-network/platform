@@ -30,6 +30,7 @@ import RedeemCreditCoupon from './routes/redeem/coupon';
 import SysDashboard from './routes/system/dashboard';
 import SysMonitoring from './routes/system/monitoring';
 import SysUsers from './routes/system/users';
+import SysApplications from './routes/system/applications';
 import SysOrganisations from './routes/system/organisations';
 import Providers from './Providers';
 import { httpApi } from './utils/api';
@@ -87,6 +88,7 @@ const router = sentryCreateBrowserRouter(
                 <Route path="system/*" element={<SysDashboard />}>
                     <Route path="monitoring" element={<SysMonitoring />} />
                     <Route path="browse/users" element={<SysUsers />} />
+                    <Route path="browse/applications" element={<SysApplications />} />
                     <Route path="browse/organisations" element={<SysOrganisations />} />
                 </Route>
                 <Route element={<Dashboard />} >

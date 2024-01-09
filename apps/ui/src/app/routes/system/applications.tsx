@@ -20,35 +20,33 @@ function Organisations() {
     const [sorting, setSorting] = useState<SortingState>([]);
 
     //react-query has an useInfiniteQuery hook just for this situation!
-    const { data, fetchNextPage, isFetching, isLoading } = api.v0.organisations.infiniteOrganisations.useInfiniteQuery({
+    const { data, fetchNextPage, isFetching, isLoading } = api.v0.applications.infiniteApplications.useInfiniteQuery({
         limit: 50
     }, {
         getNextPageParam: (lastPage) => lastPage.nextCursor
     });
 
-    type OrgResult = NonNullable<typeof data>['pages'][number]['data'][number];
-    const columns = useMemo<ColumnDef<OrgResult>[]>(
+    type AppResult = NonNullable<typeof data>['pages'][number]['data'][number];
+    const columns = useMemo<ColumnDef<AppResult>[]>(
         () => [
             {
                 accessorKey: 'slug',
-                header: 'Slug',
-                cell: info => <span>{info.getValue<string>().replace('~$~', '')}</span>
+                header: 'Slug'
             },
             {
-                accessorKey: 'creator',
-                header: 'Owner',
+                accessorKey: 'organisation',
+                header: 'Organisation',
                 cell: info => {
-                    const creator = info.getValue<OrgResult['creator']>();
-                    if (!creator) return null;
-                    return <span title={creator.emails[0]}>{creator.slug}</span>;
+                    const organisation = info.getValue<AppResult['organisation']>();
+                    return <span title={organisation.id}>{organisation.slug}</span>;
                 }
             },
             {
-                accessorKey: 'applications',
-                header: 'Applications',
+                accessorKey: 'deployments',
+                header: 'Deployments',
                 cell: info => {
-                    const applications = info.getValue<OrgResult['applications']>();
-                    return <span>{applications.length}</span>;
+                    const deployments = info.getValue<AppResult['deployments']>();
+                    return <span>{deployments.length}</span>;
                 }
             },
             {
@@ -138,7 +136,7 @@ function Organisations() {
             <div className="sm:px-7 sm:pt-7 px-4 py-4 flex flex-col w-full border-b border-gray-200 bg-white dark:bg-gray-900 dark:text-white dark:border-gray-800 sticky top-0">
                 <div className="flex w-full items-center">
                     <div className="font-medium flex items-center text-3xl text-gray-900 dark:text-white">
-                        Organisations
+                        Applications
                     </div>
                 </div>
             </div>
@@ -154,7 +152,7 @@ function Organisations() {
         <div className="sm:px-7 sm:pt-7 px-4 py-4 flex flex-col w-full border-b border-gray-200 bg-white dark:bg-gray-900 dark:text-white dark:border-gray-800 sticky top-0">
             <div className="flex w-full items-center">
                 <div className="font-medium flex items-center text-3xl text-gray-900 dark:text-white">
-                    Organisations ({data?.pages?.[0]?.meta?.totalRowCount ?? 0})
+                    Applications ({data?.pages?.[0]?.meta?.totalRowCount ?? 0})
                 </div>
             </div>
         </div>
@@ -209,7 +207,7 @@ function Organisations() {
                                 </tr>
                             )}
                             {virtualRows.map(virtualRow => {
-                                const row = rows[virtualRow.index] as Row<OrgResult>;
+                                const row = rows[virtualRow.index] as Row<AppResult>;
                                 return (
                                     <tr key={row.id} className='hover:bg-slate-50'>
                                         {row.getVisibleCells().map(cell => {

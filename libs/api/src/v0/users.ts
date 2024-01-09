@@ -25,6 +25,9 @@ export const userRouter = createTRPCRouter({
                 } : undefined,
                 orderBy: {
                     id: 'asc'
+                },
+                include: {
+                    createdOrganisations: true
                 }
             });
             let nextCursor: typeof cursor | undefined = undefined;
