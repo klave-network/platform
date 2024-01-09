@@ -68,7 +68,8 @@ export const Login: FC = () => {
                             <br />
                             <br />
                             <form
-                                onSubmit={() => {
+                                onSubmit={(e) => {
+                                    e.preventDefault();
                                     methods.handleSubmit(async (data) => {
                                         await updateSlug(data, {
                                             onSuccess(data) {

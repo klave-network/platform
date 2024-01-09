@@ -9,9 +9,9 @@ import { useDebounce } from 'usehooks-ts';
 export const OrgNew: FC = () => {
 
     const navigate = useNavigate();
-    const [orgName, setOrgName] = useState('');
-    const orgSlug = orgName.replaceAll(/\W/g, '-').toLocaleLowerCase();
-    const debouncedOrgSlug = useDebounce(orgSlug, 500);
+    const [orgSlug, setOrgSlug] = useState('');
+    const sanitizedOrgSlug = orgSlug.replaceAll(/\W/g, '-').toLocaleLowerCase();
+    const debouncedOrgSlug = useDebounce(sanitizedOrgSlug, 500);
     const { data: alreadyExists, isLoading: isOrgLoading } = api.v0.organisations.exists.useQuery({
         orgSlug: debouncedOrgSlug
     });
@@ -28,11 +28,9 @@ export const OrgNew: FC = () => {
 
     const methods = useZodForm({
         schema: z.object({
-            name: z.string().optional(),
             slug: z.string()
         }),
         values: {
-            name: orgName,
             slug: orgSlug.replaceAll(/\W/g, '-').trim()
         }
     });
@@ -48,7 +46,8 @@ export const OrgNew: FC = () => {
         </div>
         <div className="sm:p-7 p-4">
             <form
-                onSubmit={() => {
+                onSubmit={(e) => {
+                    e.preventDefault();
                     methods.handleSubmit(async (data) => {
                         await mutation.mutateAsync({ slug: orgSlug || '', data });
                         methods.reset();
@@ -61,7 +60,7 @@ export const OrgNew: FC = () => {
                     <label>
                         Organization name
                         <br />
-                        <input {...methods.register('name')} onChange={e => setOrgName(e.target.value.trim())} className="input input-bordered border w-2/3" /><br />
+                        <input {...methods.register('slug')} onChange={e => setOrgSlug(e.target.value.trim())} className="input input-bordered border w-2/3" /><br />
                         {isOrgLoading
                             ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-full' /><br />&nbsp;</span>
                             : alreadyExists
@@ -71,9 +70,9 @@ export const OrgNew: FC = () => {
                                     : <span className="block mt-1 text-xs leading-tight">&nbsp;<br />&nbsp;</span>}
                     </label>
 
-                    {methods.formState.errors.name?.message && (
+                    {methods.formState.errors.slug?.message && (
                         <p className="text-red-700">
-                            {methods.formState.errors.name?.message}
+                            {methods.formState.errors.slug?.message}
                         </p>
                     )}
                 </div>
