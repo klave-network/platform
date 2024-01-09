@@ -11,7 +11,6 @@ import {
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { UilSpinner } from '@iconscout/react-unicons';
-import { User } from '@klave/db';
 import api from '../../utils/api';
 
 function Users() {
@@ -19,12 +18,28 @@ function Users() {
     const tableContainerRef = useRef<HTMLDivElement>(null);
     const [sorting, setSorting] = useState<SortingState>([]);
 
-    const columns = useMemo<ColumnDef<User>[]>(
+    //react-query has an useInfiniteQuery hook just for this situation!
+    const { data, fetchNextPage, isFetching, isLoading } = api.v0.users.infiniteUsers.useInfiniteQuery({
+        limit: 50
+    }, {
+        getNextPageParam: (lastPage) => lastPage.nextCursor
+    });
+
+    type UserResult = NonNullable<typeof data>['pages'][number]['data'][number];
+    const columns = useMemo<ColumnDef<UserResult>[]>(
         () => [
             {
                 accessorKey: 'slug',
                 header: 'Slug',
                 cell: info => <span>{info.getValue<string>().replace('~$~', '')}</span>
+            },
+            {
+                accessorKey: 'createdOrganisations',
+                header: 'Organisations',
+                cell: info => {
+                    const organisations = info.getValue<UserResult['createdOrganisations']>();
+                    return <span>{organisations.length}</span>;
+                }
             },
             {
                 accessorKey: 'id',
@@ -39,13 +54,6 @@ function Users() {
         ],
         []
     );
-
-    //react-query has an useInfiniteQuery hook just for this situation!
-    const { data, fetchNextPage, isFetching, isLoading } = api.v0.users.infiniteUsers.useInfiniteQuery({
-        limit: 50
-    }, {
-        getNextPageParam: (lastPage) => lastPage.nextCursor
-    });
 
     //we must flatten the array of arrays from the useInfiniteQuery hook
     const flatData = useMemo(
@@ -131,7 +139,7 @@ function Users() {
         <div className="sm:px-7 sm:pt-7 px-4 py-4 flex flex-col w-full border-b border-gray-200 bg-white dark:bg-gray-900 dark:text-white dark:border-gray-800 sticky top-0">
             <div className="flex w-full items-center">
                 <div className="font-medium flex items-center text-3xl text-gray-900 dark:text-white">
-                    Users
+                    Users ({data?.pages?.[0]?.meta?.totalRowCount ?? 0})
                 </div>
             </div>
         </div>
@@ -186,7 +194,7 @@ function Users() {
                                 </tr>
                             )}
                             {virtualRows.map(virtualRow => {
-                                const row = rows[virtualRow.index] as Row<User>;
+                                const row = rows[virtualRow.index] as Row<UserResult>;
                                 return (
                                     <tr key={row.id} className='hover:bg-slate-50'>
                                         {row.getVisibleCells().map(cell => {

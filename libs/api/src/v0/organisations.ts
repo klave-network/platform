@@ -341,7 +341,6 @@ export const organisationRouter = createTRPCRouter({
                 });
             });
         }),
-
     infiniteOrganisations: publicProcedure
         .input(
             z.object({
@@ -367,6 +366,7 @@ export const organisationRouter = createTRPCRouter({
                     id: 'asc'
                 },
                 include: {
+                    creator: true,
                     applications: true
                 }
             });

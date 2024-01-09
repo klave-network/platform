@@ -33,6 +33,11 @@ export const SysDashboard: FC = () => {
                             <UilUsersAlt className='inline-block text-slate-500 h-5' /><span>Platform Users</span>
                         </div >
                     </Link>
+                    <Link to={'/system/browse/applications'}>
+                        <div className="flex p-2 rounded-md gap-1 text-black items-center justify-start align-middle bg-slate-100 hover:bg-slate-200">
+                            <UilBookOpen className='inline-block text-slate-500 h-5' /><span>Registered Applications</span>
+                        </div >
+                    </Link>
                     <Link to={'/system/browse/organisations'}>
                         <div className="flex p-2 rounded-md gap-1 text-black items-center justify-start align-middle bg-slate-100 hover:bg-slate-200">
                             <UilBookOpen className='inline-block text-slate-500 h-5' /><span>Registered Organisations</span>

@@ -395,6 +395,48 @@ export const applicationRouter = createTRPCRouter({
                 }
             });
         }),
+    infiniteApplications: publicProcedure
+        .input(
+            z.object({
+                limit: z.number().min(1).max(100).nullish(),
+                cursor: z.string().nullish()
+            })
+        )
+        .query(async ({ ctx: { session, prisma }, input }) => {
+
+            if (!session.user?.globalAdmin) {
+                throw new Error('Not authenticated');
+            }
+
+            const applicationCount = await prisma.application.count();
+            const { cursor } = input;
+            const limit = input.limit ?? 50;
+            const applications = await prisma.application.findMany({
+                take: limit + 1, // get an extra item at the end which we'll use as next cursor
+                cursor: cursor ? {
+                    id: cursor
+                } : undefined,
+                orderBy: {
+                    id: 'asc'
+                },
+                include: {
+                    organisation: true,
+                    deployments: true
+                }
+            });
+            let nextCursor: typeof cursor | undefined = undefined;
+            if (applications.length > limit) {
+                const nextItem = applications.pop();
+                nextCursor = nextItem!.id;
+            }
+            return {
+                data: applications,
+                meta: {
+                    totalRowCount: applicationCount
+                },
+                nextCursor
+            };
+        }),
     canRegister: publicProcedure
         .input(z.object({
             applications: z.array(z.string()),
