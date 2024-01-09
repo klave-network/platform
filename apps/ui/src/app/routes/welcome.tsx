@@ -13,7 +13,7 @@ function Welcome() {
             Get started by creating a new application in a GitHub repository and connecting it to Klave.<br /><br />
             <span className='block h-8 w-8 -ml-1 mt-3 mb-3 border rounded-full font-bold text-center'>1</span>
             <h2 className='mt-0'>Check you have Node installed</h2>
-            You will need Node version 16 or greater for the best experience.<br />
+            You will need Node version 20 or greater for the best experience.<br />
             Get info on how to install Node at <a href='https://nodejs.org' target='_blank'>https://nodejs.org</a><br />
             <pre>
                 &gt; node -v<br />
