@@ -108,7 +108,8 @@ export const OrganisationSettings: FC = () => {
 
     return <div className="flex flex-col gap-10 w-full justify-start mb-7">
         <form
-            onSubmit={() => {
+            onSubmit={(e) => {
+                e.preventDefault();
                 methods.handleSubmit(async (data) => {
                     await mutation.mutateAsync({ orgSlug: orgSlug || '', data });
                     methods.reset();

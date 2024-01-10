@@ -164,7 +164,9 @@ const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
         </div>;
 
     return <form
-        onSubmit={() => {
+        onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
             methods.handleSubmit((data) => {
                 (async () => {
                     await createMutation.mutateAsync({
