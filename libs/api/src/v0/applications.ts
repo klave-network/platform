@@ -828,7 +828,7 @@ export const applicationRouter = createTRPCRouter({
 
                     scp.newTx('wasm-manager', 'set_allowed_kredit_per_transaction', `klave-app-set-transaction-limit-${app.id}`, {
                         app_id: app.id,
-                        kredit: combinedLimits.transactionCallSpend
+                        kredit: Number(combinedLimits.transactionCallSpend)
                     }).onResult(result => {
                         resolve(result);
                     }).onExecuted(result => {
