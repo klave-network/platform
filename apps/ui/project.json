@@ -93,7 +93,7 @@
             "dependsOn": [
                 "build"
             ],
-            "command": "docker build -f apps/ui/Dockerfile . -t ui:latest"
+            "command": "docker build --platform linux/amd64 -f apps/ui/Dockerfile . -t ui:latest"
         }
     },
     "tags": []
