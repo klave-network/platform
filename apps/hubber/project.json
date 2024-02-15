@@ -90,7 +90,7 @@
             "dependsOn": [
                 "build"
             ],
-            "command": "docker build -f apps/hubber/Dockerfile . -t hubber"
+            "command": "docker build --platform linux/amd64 -f apps/hubber/Dockerfile . -t hubber"
         }
     },
     "tags": []

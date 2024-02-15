@@ -188,7 +188,7 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
 
                 dataCache.current[cacheKey] = [];
                 errorsCache.current[cacheKey] = [];
-                await client.newTx<ResultType, ErrorType>(app, route, `klave-deployment-${Math.random().toString().replaceAll('.', '')}`, args)
+                await client.newTx<ResultType, ErrorType>(app, route, `klave-deployment-${Math.random().toString().replaceAll('.', '')}`, args ?? {})
                     .onResult((result) => {
 
                         if (!dataCache.current[cacheKey])
