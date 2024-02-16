@@ -5,7 +5,6 @@ import git from 'git-rev-sync';
 import { version } from './package.json';
 
 export default defineViteConfig({
-
     cacheDir: '../../node_modules/.vite/ui',
 
     build: {
@@ -40,6 +39,7 @@ export default defineViteConfig({
     },
 
     test: {
+        reporters: ['default'],
         globals: true,
         cache: {
             dir: '../../node_modules/.vitest'
