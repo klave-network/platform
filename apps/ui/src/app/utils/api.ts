@@ -10,10 +10,10 @@ if (!emphemeralKlaveTag)
 
 export const apiClientOptions = {
     // TODO: To be replaced by import from `@klave/api`
-    transformer: superjson,
     links: [
         httpBatchLink({
             url: `${import.meta.env['VITE_KLAVE_API_URL']}/trpc`,
+            transformer: superjson,
             fetch: async (url, options) => {
                 return fetch(url, {
                     ...options,

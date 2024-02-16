@@ -32,5 +32,6 @@ export { router } from './router';
 
 export type { Context } from './context';
 export { createContext } from './context';
+export { createCallerFactory } from './trpc';
 
 export * from './deployment/deploymentController';
