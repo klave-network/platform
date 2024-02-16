@@ -1,6 +1,6 @@
 import { trace } from '@sentry/core';
 import { prisma } from '@klave/db';
-import { Context, router } from '@klave/api';
+import { Context, createCallerFactory, router } from '@klave/api';
 import { logger, scp, scpOps } from '@klave/providers';
 import { KlaveGetCreditResult } from '@klave/constants';
 
@@ -62,12 +62,13 @@ async function cleanDisconnectedDeployments() {
             if (deploymentsList.length > 1) {
                 const sortedDeployments = deploymentsList.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
                 await Promise.allSettled(sortedDeployments.map(async (deployment) => {
-                    const caller = router.v0.deployments.createCaller({
+                    const createCaller = createCallerFactory(router);
+                    const caller = createCaller({
                         prisma,
                         session: {},
                         override: '__system_pruner_cleaner'
                     } as unknown as Context);
-                    return caller.delete({
+                    return caller.v0.deployments.delete({
                         deploymentId: deployment.id
                     });
                 })).catch((e) => {
@@ -92,16 +93,17 @@ async function terminateExpiredDeployments() {
         }
     });
     return Promise.allSettled(expiredDeploymentList.map(async (deployment) => {
-        const caller = router.v0.deployments.createCaller({
+        const createCaller = createCallerFactory(router);
+        const caller = createCaller({
             prisma,
             session: {},
             override: '__system_pruner_terminator'
         } as unknown as Context);
         if (deployment.status === 'deployed')
-            return caller.terminateDeployment({
+            return caller.v0.deployments.terminateDeployment({
                 deploymentId: deployment.id
             });
-        return caller.delete({
+        return caller.v0.deployments.delete({
             deploymentId: deployment.id
         });
     })).catch((e) => {

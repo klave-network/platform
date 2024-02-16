@@ -10,6 +10,7 @@ import BuildMiniVM, { DeploymentContext } from './buildMiniVm';
 import { router } from '../router';
 import { Context } from '../context';
 import { getFinalParseConfig } from '@klave/constants';
+import { createCallerFactory } from '../trpc';
 
 export const deployToSubstrate = async (deploymentContext: DeploymentContext<DeploymentPushPayload>, options?: { onlyApp?: string }) => {
 
@@ -520,12 +521,13 @@ export const sendToSecretarium = async ({
         });
         if (previousDeployment) {
             logger.debug(`Deleting previous deployment ${previousDeployment.id} for ${target}`);
-            const caller = router.v0.deployments.createCaller({
+            const createCaller = createCallerFactory(router);
+            const caller = createCaller({
                 prisma,
                 session: {},
                 override: '__system_post_deploy'
             } as unknown as Context);
-            caller.delete({
+            caller.v0.deployments.delete({
                 deploymentId: previousDeployment.id
             }).catch((error) => {
                 logger.debug(`Failure while deleting previous deployment ${previousDeployment.id} for ${target}:, ${error}`);

@@ -48,6 +48,8 @@ const sentryMiddleware = t.middleware(async (opts) => {
  * a lot in the /src/server/api/routers folder
  */
 
+export const createCallerFactory = t.createCallerFactory;
+
 /**
  * This is how you create new routers and subrouters in your tRPC API
  * @see https://trpc.io/docs/router
