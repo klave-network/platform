@@ -11,8 +11,12 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType>({
     user: null,
-    login: () => { },
-    logout: () => { }
+    login: () => {
+        return;
+    },
+    logout: () => {
+        return;
+    }
 });
 
 type AuthProviderProps = PropsWithChildren & {
