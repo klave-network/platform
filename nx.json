@@ -18,9 +18,6 @@
             ],
             "cache": true
         },
-        "build-upstream": {
-            "cache": true
-        },
         "compile": {
             "inputs": [
                 "production",
@@ -32,13 +29,6 @@
             "inputs": [
                 "default",
                 "^production"
-            ],
-            "cache": true
-        },
-        "lint": {
-            "inputs": [
-                "default",
-                "{workspaceRoot}/.eslintrc.json"
             ],
             "cache": true
         },
@@ -71,6 +61,13 @@
                     "codeCoverage": true
                 }
             }
+        },
+        "@nx/eslint:lint": {
+            "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+            ],
+            "cache": true
         }
     },
     "namedInputs": {
