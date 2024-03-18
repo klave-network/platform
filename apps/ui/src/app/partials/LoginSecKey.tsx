@@ -3,7 +3,7 @@ import { platformAuthenticatorIsAvailable, browserSupportsWebAuthn, startAuthent
 import api from '../utils/api';
 import { UilSpinner } from '@iconscout/react-unicons';
 import { useLocalForage } from '../useLocalStorage';
-import { useDebounce } from 'usehooks-ts';
+import { useDebounceValue } from 'usehooks-ts';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 export const LoginSecKey: FC = () => {
@@ -19,7 +19,7 @@ export const LoginSecKey: FC = () => {
     const [performedEmailCheck, setPerformedEmailCheck] = useState(false);
     const [error, setError] = useState<string>();
     const [screen, setScreen] = useState<'start' | 'code' | 'key'>('start');
-    const debouncedEmail = useDebounce<string>(email, 200);
+    const [debouncedEmail] = useDebounceValue<string>(email, 200);
     const { mutate: emailCodeMutation, isPending: emailCodeLoading } = api.v0.auth.getEmailCode.useMutation();
     const { mutate: verifyEmailCodeMutation, isPending: verifyEmailCodeLoading } = api.v0.auth.verifyEmailCode.useMutation();
     const { mutate: validateWebauthnMutation, isPending: validateWebauthnLoading } = api.v0.auth.validateWebauthn.useMutation();

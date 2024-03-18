@@ -4,14 +4,14 @@ import api from '../../utils/api';
 import { useZodForm } from '../../utils/useZodForm';
 import { UilSpinner } from '@iconscout/react-unicons';
 import { useNavigate } from 'react-router-dom';
-import { useDebounce } from 'usehooks-ts';
+import { useDebounceValue } from 'usehooks-ts';
 
 export const OrgNew: FC = () => {
 
     const navigate = useNavigate();
     const [orgSlug, setOrgSlug] = useState('');
     const sanitizedOrgSlug = orgSlug.replaceAll(/\W/g, '-').toLocaleLowerCase();
-    const debouncedOrgSlug = useDebounce(sanitizedOrgSlug, 500);
+    const [debouncedOrgSlug] = useDebounceValue(sanitizedOrgSlug, 500);
     const { data: alreadyExists, isLoading: isOrgLoading } = api.v0.organisations.exists.useQuery({
         orgSlug: debouncedOrgSlug
     });
