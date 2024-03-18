@@ -1,10 +1,10 @@
 import { FastifyInstance } from 'fastify';
-import type { SocketStream } from '@fastify/websocket';
+import type { WebSocket } from 'ws';
 import { v4 as uuid } from 'uuid';
 
 const definitions = process.env.KLAVE_DISPATCH_ENDPOINTS?.split(',') ?? [];
 const endpoints = definitions.map(def => def.split('#') as [string, string]).filter(def => def.length === 2);
-const connectionPool = new Map<string, SocketStream>();
+const connectionPool = new Map<string, WebSocket>();
 
 /* eslint-disable-next-line */
 export interface AppOptions { }
@@ -66,7 +66,7 @@ export async function app(fastify: FastifyInstance) {
             responseRegister.push(new Promise(resolve => {
                 fastify.log.debug(undefined, `Dispatching to socket ${id}`);
                 try {
-                    connection.socket.send(JSON.stringify({
+                    connection.send(JSON.stringify({
                         headers: newHeaders,
                         body: Array.from(rawContent)
                     }), (err) => {

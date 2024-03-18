@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef, useState } from 'react';
-import { useToggle, useEventListener, useDebounce } from 'usehooks-ts';
+import { useToggle, useEventListener, useDebounceValue } from 'usehooks-ts';
 import { z } from 'zod';
 import LoginSecKey from '../partials/LoginSecKey';
 import LoginQR from '../partials/LoginQR';
@@ -17,7 +17,7 @@ export const Login: FC = () => {
     const { mutateAsync: updateSlug, isPending: isChangingSlug } = api.v0.auth.updateSlug.useMutation();
     const [slug, setSlug] = useState('');
     const [skipAskName, setSkipAskName] = useState(false);
-    const debouncedSlug = useDebounce(slug, 500);
+    const [debouncedSlug] = useDebounceValue(slug, 500);
     const { data: alreadyExists, isLoading: isCheckingIfExists } = api.v0.organisations.exists.useQuery({ orgSlug: debouncedSlug });
 
     const methods = useZodForm({
