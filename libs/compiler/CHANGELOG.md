@@ -1,4 +1,11 @@
 # Changelog
+## [0.2.8](https://github.com/klave-network/platform/compare/compiler@0.2.7...compiler@0.2.8) (2024-03-19)
+
+
+### Bug Fixes
+
+* **compiler:** Switch back `esInterop` TS config ([76dc44a](https://github.com/klave-network/platform/commit/76dc44a1fe17f847b2fa1fa84ffc21ea6d6f4e01))
+
 ## [0.2.7](https://github.com/klave-network/platform/compare/compiler@0.2.6...compiler@0.2.7) (2023-12-12)
 
 ## [0.2.6](https://github.com/klave-network/platform/compare/compiler@0.2.5...compiler@0.2.6) (2023-12-08)
