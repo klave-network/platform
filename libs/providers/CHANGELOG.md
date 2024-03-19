@@ -1,4 +1,15 @@
 # Changelog
+## [0.1.1](https://github.com/klave-network/platform/compare/providers@0.1.0...providers@0.1.1) (2024-03-19)
+
+### Dependency Updates
+
+* `db` updated to version `0.1.0`
+* `constants` updated to version `0.1.0`
+
+### Bug Fixes
+
+* **providers:** Repos were never synced because of unreached code due to wrong Octokit types ([bf2e2f4](https://github.com/klave-network/platform/commit/bf2e2f45d467ce6d0b3c0284cf2947990399dbf9))
+
 ## [0.1.0](https://github.com/klave-network/platform/compare/providers@0.0.1...providers@0.1.0) (2023-12-19)
 
 ### Dependency Updates
