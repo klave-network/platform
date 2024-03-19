@@ -32,6 +32,7 @@ import SysMonitoring from './routes/system/monitoring';
 import SysUsers from './routes/system/users';
 import SysApplications from './routes/system/applications';
 import SysOrganisations from './routes/system/organisations';
+import TemplateDeploy from './routes/template/github';
 import Providers from './Providers';
 import { httpApi } from './utils/api';
 
@@ -84,6 +85,7 @@ const router = sentryCreateBrowserRouter(
                 element={<SetupCallback />}
             />
             <Route path='home' element={<Landing />} />
+            <Route path="template/github/*" element={<TemplateDeploy />} />
             <Route element={<ProtectedLayout />}>
                 <Route path="system/*" element={<SysDashboard />}>
                     <Route path="monitoring" element={<SysMonitoring />} />
