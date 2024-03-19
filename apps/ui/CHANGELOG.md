@@ -1,4 +1,29 @@
 # Changelog
+## [0.6.0](https://github.com/klave-network/platform/compare/ui@0.5.0...ui@0.6.0) (2024-03-19)
+
+### Dependency Updates
+
+* `constants` updated to version `0.5.0`
+* `db` updated to version `0.5.0`
+* `api` updated to version `0.5.0`
+
+### Features
+
+* **api,ui:** Add new application listing page for admin + Supplement existing dashboard ([8540fd5](https://github.com/klave-network/platform/commit/8540fd563644e39547b9a9732bed9dc9017d9072))
+* **api,ui:** Add view for current running configuration ([c971c65](https://github.com/klave-network/platform/commit/c971c654f858fe249d154e516fc1218fee9efea4))
+* **constants,db,api,ui:** Add system dashboard for users and organisations listing ([e3c118f](https://github.com/klave-network/platform/commit/e3c118f1b59b88f5293b4904e704c6e88cbd665a))
+
+
+### Bug Fixes
+
+* **api,ui:** Parse config from repo scan not returning the correct result ([d0eac7f](https://github.com/klave-network/platform/commit/d0eac7f79e038d50508d87570d960cf45601995e))
+* **ui:** Correct application registration issue ([a4919bf](https://github.com/klave-network/platform/commit/a4919bf9e89f492800a0905897a9dc33a8d30ee4))
+* **ui:** Disable form default submit for slug updates + Remove extraneous variable tripping Prisma ([218fd2e](https://github.com/klave-network/platform/commit/218fd2e1969412697e894b2662f107568c57757d))
+* **ui:** Ensure form are prevented from HTML submitting ([be6a1aa](https://github.com/klave-network/platform/commit/be6a1aafacbf002a6457b14b5441a8c88eef8f34))
+* **ui:** Prevent high-level errors from killing saved addresses ([a4d4078](https://github.com/klave-network/platform/commit/a4d4078b8e0e8f1eed4ebc8796b705e7d0bbac66))
+* **ui:** Send empty object if args are empty ([c22d70f](https://github.com/klave-network/platform/commit/c22d70f33a4b624bcc6252b1b5eb530a44be247b))
+* **ui:** Using `styled-components` v6 for GitHub Primer requires configuration ([62330b3](https://github.com/klave-network/platform/commit/62330b31fcff4d5554ba287c811f6c68d283c800))
+
 ## [0.5.0](https://github.com/klave-network/platform/compare/ui@0.4.0...ui@0.5.0) (2023-12-19)
 
 ### Dependency Updates
