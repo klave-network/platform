@@ -10,14 +10,16 @@ type LoaderResult = {
 
 export const loader: LoaderFunction = async ({ request }) => {
     const { host, search, pathname } = new URL(request.url);
-    const { code, state } = qs.parse(search);
+    const { state } = qs.parse(search);
     const parsedState = typeof state === 'string' ? JSON.parse(state) as {
         referer: string;
         source: string;
         redirectUri: string;
     } : null;
 
-    if (typeof code !== 'string' || typeof state !== 'string')
+    console.log('OULA ?', typeof state, parsedState);
+
+    if (typeof state !== 'string')
         return null;
     if (!parsedState)
         return null;
@@ -30,13 +32,7 @@ export const loader: LoaderFunction = async ({ request }) => {
             window.location.replace(refererUrl.toString());
             return null;
         }
-        let data = null;
-        if (code) {
-            data = await httpApi.v0.repos.registerGitHubCredentials.query({
-                code: code as string
-            });
-        }
-        return { data, state };
+        return { state };
     } catch (e) {
         return null;
     }

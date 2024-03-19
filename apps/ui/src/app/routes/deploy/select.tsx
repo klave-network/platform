@@ -3,10 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { UilGithub, UilSpinner } from '@iconscout/react-unicons';
 import api from '../../utils/api';
 import { getFinalParseConfig } from '@klave/constants';
+import qs from 'query-string';
 
 export const Select: FC = () => {
 
     const navigate = useNavigate();
+    const { postInstall } = qs.parse(window.location.search);
+    const [isPostInstall, setIsPostInstall] = useState<boolean>(postInstall === 'true');
     const [shouldRefresh, setShouldRefresh] = useState(false);
     const { invalidate } = api.useUtils().v0.auth.getSession;
     const { data: deployables, isLoading, isFetching, isRefetching, isError, refetch, error } = api.v0.repos.deployables.useQuery({
@@ -24,6 +27,14 @@ export const Select: FC = () => {
             invalidate().then(() => navigate('/deploy')).catch(() => { return; });
 
     }, [error, invalidate, navigate]);
+
+    useEffect(() => {
+        if (isPostInstall) {
+            setIsPostInstall(false);
+            setShouldRefresh(true);
+            navigate('/deploy/select');
+        }
+    }, [navigate, postInstall]);
 
     const rescanRepos = () => {
         if (shouldRefresh)
@@ -62,6 +73,15 @@ export const Select: FC = () => {
         </>;
     }
 
+    const state = JSON.stringify({
+        referer: window.location.origin,
+        source: 'github',
+        redirectUri: '/deploy/select?postInstall=true'
+    });
+
+    const githubAppInstall = new URL('https://github.com/apps/klave-network/installations/new');
+    githubAppInstall.searchParams.append('state', state);
+
     return <>
         <div className='pb-5'>
             <h1 className='text-xl font-bold'>{deployables?.length ? 'We found some gems' : 'Nothing to see'}</h1>
@@ -93,6 +113,11 @@ export const Select: FC = () => {
                     })}
                 </div>
                 <br />
+                <br />
+                <br />
+                Is your repository private ?<br />
+                You will need to allow Klave to see it first by installing it on your repo.<br /> <br />
+                <a href={githubAppInstall.toString()} className='btn btn-sm bg-blue-600 text-white hover:bg-blue-500 rounded-md disabled:text-gray-300'>Install Klave now</a>
                 <br />
                 <br />
                 Not finding what you are looking for ?<br />
