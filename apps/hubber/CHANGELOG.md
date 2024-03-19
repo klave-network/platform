@@ -1,4 +1,10 @@
 # Changelog
+## [0.2.2](https://github.com/klave-network/platform/compare/hubber@0.2.1...hubber@0.2.2) (2024-03-19)
+
+### Dependency Updates
+
+* `api` updated to version `0.2.1`
+* `pruner` updated to version `0.2.1`
 ## [0.2.1](https://github.com/klave-network/platform/compare/hubber@0.2.0...hubber@0.2.1) (2024-03-19)
 
 ### Dependency Updates
