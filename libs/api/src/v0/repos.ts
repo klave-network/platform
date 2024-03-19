@@ -382,7 +382,9 @@ export const reposRouter = createTRPCRouter({
                     config
                 };
 
-                await prisma.deployableRepo.delete({
+                await prisma.deployableRepo.upsert({
+                    create: repo,
+                    update: repo,
                     where: {
                         creatorAuthToken_owner_name: {
                             creatorAuthToken: web.githubToken?.accessToken,
@@ -390,9 +392,6 @@ export const reposRouter = createTRPCRouter({
                             name: result.data.name
                         }
                     }
-                });
-                await prisma.deployableRepo.create({
-                    data: repo
                 });
 
                 return repo;
