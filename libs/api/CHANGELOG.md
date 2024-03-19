@@ -1,4 +1,27 @@
 # Changelog
+## [0.7.0](https://github.com/klave-network/platform/compare/api@0.6.0...api@0.7.0) (2024-03-19)
+
+### Dependency Updates
+
+* `db` updated to version `0.6.0`
+* `compiler` updated to version `0.6.0`
+* `providers` updated to version `0.6.0`
+* `constants` updated to version `0.6.0`
+
+### Features
+
+* **api,ui:** Add new application listing page for admin + Supplement existing dashboard ([8540fd5](https://github.com/klave-network/platform/commit/8540fd563644e39547b9a9732bed9dc9017d9072))
+* **api,ui:** Add view for current running configuration ([c971c65](https://github.com/klave-network/platform/commit/c971c654f858fe249d154e516fc1218fee9efea4))
+* **constants,db,api,ui:** Add system dashboard for users and organisations listing ([e3c118f](https://github.com/klave-network/platform/commit/e3c118f1b59b88f5293b4904e704c6e88cbd665a))
+
+
+### Bug Fixes
+
+* **api,ui:** Parse config from repo scan not returning the correct result ([d0eac7f](https://github.com/klave-network/platform/commit/d0eac7f79e038d50508d87570d960cf45601995e))
+* **api:** App configuration incorrectly derived + Add deployment filtering ([46fff53](https://github.com/klave-network/platform/commit/46fff5348e00c1fa1a2e22a7c0cd85a05b82459d))
+* **api:** Re-insert randomness in FQDN to avoid backend naming conflict ([b627b11](https://github.com/klave-network/platform/commit/b627b1111fa74f7aed8fab98bd15b5767ff5e41b))
+* **ui:** FQDN naming would not select first element from UUID split ([d236358](https://github.com/klave-network/platform/commit/d23635830d4f392da87085d2a5dadc3d69998462))
+
 ## [0.6.0](https://github.com/klave-network/platform/compare/api@0.5.0...api@0.6.0) (2023-12-19)
 
 ### Dependency Updates
