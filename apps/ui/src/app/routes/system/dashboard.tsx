@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Link, useOutlet } from 'react-router-dom';
-import { UilBookOpen, UilUsersAlt, UilMonitorHeartRate } from '@iconscout/react-unicons';
+import { UilBookOpen, UilUsersAlt, UilMonitorHeartRate, UilSetting } from '@iconscout/react-unicons';
 // import AppSidebar from '../apps/list';
 
 export const SysDashboard: FC = () => {
@@ -41,6 +41,11 @@ export const SysDashboard: FC = () => {
                     <Link to={'/system/browse/organisations'}>
                         <div className="flex p-2 rounded-md gap-1 text-black items-center justify-start align-middle bg-slate-100 hover:bg-slate-200">
                             <UilBookOpen className='inline-block text-slate-500 h-5' /><span>Registered Organisations</span>
+                        </div >
+                    </Link>
+                    <Link to={'/system/browse/configuration'}>
+                        <div className="flex p-2 rounded-md gap-1 text-black items-center justify-start align-middle bg-slate-100 hover:bg-slate-200">
+                            <UilSetting className='inline-block text-slate-500 h-5' /><span>Running Configuration</span>
                         </div >
                     </Link>
                 </div>

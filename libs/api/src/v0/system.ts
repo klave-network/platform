@@ -12,6 +12,12 @@ export const systemRouter = createTRPCRouter({
         .query(async () => {
             return process.env['KLAVE_SECRETARIUM_NODE'];
         }),
+    getRunningConfiguration: publicProcedure
+        .query(async ({ ctx: { session: { user } } }) => {
+            if (user?.globalAdmin !== true)
+                return {};
+            return { ...process.env } as Record<string, string>;
+        }),
     version: publicProcedure
         .query(async () => {
             return {

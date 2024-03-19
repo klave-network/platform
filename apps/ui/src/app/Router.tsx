@@ -32,6 +32,7 @@ import SysMonitoring from './routes/system/monitoring';
 import SysUsers from './routes/system/users';
 import SysApplications from './routes/system/applications';
 import SysOrganisations from './routes/system/organisations';
+import SysConfiguration from './routes/system/configuration';
 import TemplateDeploy from './routes/template/github';
 import Providers from './Providers';
 import { httpApi } from './utils/api';
@@ -92,6 +93,7 @@ const router = sentryCreateBrowserRouter(
                     <Route path="browse/users" element={<SysUsers />} />
                     <Route path="browse/applications" element={<SysApplications />} />
                     <Route path="browse/organisations" element={<SysOrganisations />} />
+                    <Route path="browse/configuration" element={<SysConfiguration />} />
                 </Route>
                 <Route element={<Dashboard />} >
                     <Route index element={<Welcome />} />
