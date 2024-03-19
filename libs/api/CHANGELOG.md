@@ -1,4 +1,11 @@
 # Changelog
+## [0.7.1](https://github.com/klave-network/platform/compare/api@0.7.0...api@0.7.1) (2024-03-19)
+
+
+### Bug Fixes
+
+* **api:** Deleting non-existing object crashes Prisma ([eaa87a0](https://github.com/klave-network/platform/commit/eaa87a0acefa7639b59fb389d61414550c27038a))
+
 ## [0.7.0](https://github.com/klave-network/platform/compare/api@0.6.0...api@0.7.0) (2024-03-19)
 
 ### Dependency Updates
