@@ -51,7 +51,7 @@
                 "{projectRoot}/src/prisma/schema.prisma"
             ],
             "options": {
-                "command": "prisma generate --schema src/prisma/schema.prisma",
+                "command": "npx prisma generate --schema src/prisma/schema.prisma",
                 "cwd": "libs/db"
             }
         },
