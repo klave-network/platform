@@ -6,6 +6,7 @@ import { objectToCamel } from 'ts-case-convert';
 import { isTruthy } from '../utils/isTruthy';
 import type { DeployableRepo, GitHubToken } from '@klave/db';
 import { getFinalParseConfig } from '@klave/constants';
+import { probot } from '@klave/providers';
 
 export const reposRouter = createTRPCRouter({
     deployables: publicProcedure
@@ -129,6 +130,80 @@ export const reposRouter = createTRPCRouter({
                 },
                 (response) => response.data.filter((r) => !r.archived)
             );
+
+            const currentInstallForRepo = await octokit.apps.listInstallationsForAuthenticatedUser({
+                per_page: 100
+            });
+
+            const installationsData = currentInstallForRepo.data.installations;
+
+            for (const installation of installationsData) {
+                await prisma.installation.upsert({
+                    where: {
+                        source_remoteId_account: {
+                            source: 'github',
+                            remoteId: `${installation.id}`,
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            account: installation.account?.name ?? (installation.account as any)?.login ?? 'unknown' // TODO - is this right?
+                        }
+                    },
+                    create: {
+                        source: 'github',
+                        remoteId: `${installation.id}`,
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        account: installation.account?.name ?? (installation.account as any)?.login ?? 'unknown', // TODO - is this right?
+                        accountType: 'unknown', // TODO - is this right?
+                        hookPayload: installation
+                    },
+                    update: {
+                        hookPayload: installation
+                    }
+                });
+
+                const installationOctokit = await probot.auth(installation.id);
+                const reposData = await installationOctokit.paginate(
+                    installationOctokit.apps.listReposAccessibleToInstallation,
+                    {
+                        per_page: 100
+                    }
+                );
+
+                // TODO - this is a hack to get around the fact that the type definition for the above call is wrong
+                // See bug report at https://github.com/octokit/plugin-paginate-rest.js/issues/350
+                const repos = Array.isArray(reposData) ? reposData as typeof reposData['repositories'] : [];
+                if (reposData.repositories)
+                    repos.push(...reposData.repositories);
+
+                for (const repo of repos) {
+                    await prisma.repository.upsert({
+                        where: {
+                            source_remoteId_installationRemoteId: {
+                                source: 'github',
+                                remoteId: `${repo.id}`,
+                                installationRemoteId: `${installation.id}`
+                            }
+                        },
+                        create: {
+                            source: 'github',
+                            remoteId: `${repo.id}`,
+                            installationRemoteId: `${installation.id}`,
+                            name: repo.name,
+                            owner: repo.owner.login,
+                            fullName: repo.full_name,
+                            defaultBranch: repo.default_branch,
+                            private: repo.private,
+                            installationPayload: repo
+                        },
+                        update: {
+                            name: repo.name,
+                            owner: repo.owner.login,
+                            fullName: repo.full_name,
+                            private: repo.private,
+                            installationPayload: repo
+                        }
+                    });
+                }
+            }
 
             const repos = reposData.map(repo => ({
                 webId: web.id,
