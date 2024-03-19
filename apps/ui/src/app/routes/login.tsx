@@ -31,8 +31,10 @@ export const Login: FC = () => {
 
     useEffect(() => {
         if (data?.me) {
-            if (!data.me.slug.startsWith('~$~') || skipAskName)
-                navigate('/');
+            if (!data.me.slug.startsWith('~$~') || skipAskName) {
+                if (window.location.pathname === '/login' || window.location.pathname === '/login/')
+                    navigate('/');
+            }
         }
     }, [data, navigate, skipAskName]);
 
@@ -138,7 +140,7 @@ export const Login: FC = () => {
 
         const secretariumAuth = new URL(`${import.meta.env['VITE_SECRETARIUM_ID_URL']}/login/oauth/authorize'}`);
         secretariumAuth.searchParams.append('client_id', import.meta.env['VITE_KLAVE_SELF_CLIENT_ID'] ?? '');
-        secretariumAuth.searchParams.append('scope', 'read:user,read:gpg_key,read:public_key');
+        secretariumAuth.searchParams.append('scope', 'read:user,read:gpg_key,read:public_key,repo,metadata:read,administration:write,contents:read');
         secretariumAuth.searchParams.append('state', state);
         secretariumAuth.searchParams.append('post_messaging', 'true');
         secretariumAuth.searchParams.append('redirc', 'true');

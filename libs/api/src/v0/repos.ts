@@ -4,7 +4,7 @@ import { createTRPCRouter, publicProcedure } from '../trpc';
 import { z } from 'zod';
 import { objectToCamel } from 'ts-case-convert';
 import { isTruthy } from '../utils/isTruthy';
-import type { DeployableRepo, GitHubToken } from '@klave/db';
+import type { DeployableRepo, GitHubToken, PrismaClient } from '@klave/db';
 import { getFinalParseConfig } from '@klave/constants';
 import { probot } from '@klave/providers';
 
@@ -74,6 +74,8 @@ export const reposRouter = createTRPCRouter({
                             refreshToken
                         })
                     });
+
+
                     const data = {
                         ...objectToCamel(await result.json() as object),
                         createdAt: Date.now()
@@ -131,79 +133,7 @@ export const reposRouter = createTRPCRouter({
                 (response) => response.data.filter((r) => !r.archived)
             );
 
-            const currentInstallForRepo = await octokit.apps.listInstallationsForAuthenticatedUser({
-                per_page: 100
-            });
-
-            const installationsData = currentInstallForRepo.data.installations;
-
-            for (const installation of installationsData) {
-                await prisma.installation.upsert({
-                    where: {
-                        source_remoteId_account: {
-                            source: 'github',
-                            remoteId: `${installation.id}`,
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            account: installation.account?.name ?? (installation.account as any)?.login ?? 'unknown' // TODO - is this right?
-                        }
-                    },
-                    create: {
-                        source: 'github',
-                        remoteId: `${installation.id}`,
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        account: installation.account?.name ?? (installation.account as any)?.login ?? 'unknown', // TODO - is this right?
-                        accountType: 'unknown', // TODO - is this right?
-                        hookPayload: installation
-                    },
-                    update: {
-                        hookPayload: installation
-                    }
-                });
-
-                const installationOctokit = await probot.auth(installation.id);
-                const reposData = await installationOctokit.paginate(
-                    installationOctokit.apps.listReposAccessibleToInstallation,
-                    {
-                        per_page: 100
-                    }
-                );
-
-                // TODO - this is a hack to get around the fact that the type definition for the above call is wrong
-                // See bug report at https://github.com/octokit/plugin-paginate-rest.js/issues/350
-                const repos = Array.isArray(reposData) ? reposData as typeof reposData['repositories'] : [];
-                if (reposData.repositories)
-                    repos.push(...reposData.repositories);
-
-                for (const repo of repos) {
-                    await prisma.repository.upsert({
-                        where: {
-                            source_remoteId_installationRemoteId: {
-                                source: 'github',
-                                remoteId: `${repo.id}`,
-                                installationRemoteId: `${installation.id}`
-                            }
-                        },
-                        create: {
-                            source: 'github',
-                            remoteId: `${repo.id}`,
-                            installationRemoteId: `${installation.id}`,
-                            name: repo.name,
-                            owner: repo.owner.login,
-                            fullName: repo.full_name,
-                            defaultBranch: repo.default_branch,
-                            private: repo.private,
-                            installationPayload: repo
-                        },
-                        update: {
-                            name: repo.name,
-                            owner: repo.owner.login,
-                            fullName: repo.full_name,
-                            private: repo.private,
-                            installationPayload: repo
-                        }
-                    });
-                }
-            }
+            await updateInstalledRepos(prisma, octokit);
 
             const repos = reposData.map(repo => ({
                 webId: web.id,
@@ -342,6 +272,11 @@ export const reposRouter = createTRPCRouter({
                 createdAt: new Date()
             } as unknown as GitHubToken & { error?: string; errorDescription?: string; };
 
+            const tyty = new Octokit({ auth: data.accessToken });
+            const { data: userData } = await tyty.users.getAuthenticated();
+
+            console.log(data.accessToken, userData);
+
             if (!data.error) {
                 await prisma.web.update({
                     where: { id: webId },
@@ -360,7 +295,194 @@ export const reposRouter = createTRPCRouter({
                 });
             }
             return data;
+        }),
+    forking: publicProcedure
+        .input(z.object({
+            owner: z.string(),
+            name: z.string()
+        }))
+        .mutation(async ({ ctx: { web, prisma, session: { user } }, input: { owner, name } }) => {
+
+            if (!user)
+                throw new Error('You must be logged in to do this');
+
+            if (!web.githubToken)
+                throw new Error('GitHub credentials required');
+
+            try {
+                const octokit = new Octokit({ auth: web.githubToken?.accessToken });
+                const result = await octokit.repos.createFork({
+                    owner,
+                    repo: name
+                });
+
+                let kConfRetry = 0;
+                await new Promise<void>((resolve, reject) => {
+                    const waitForRepo = async () => {
+                        try {
+                            kConfRetry++;
+                            if (kConfRetry > 10)
+                                return reject();
+                            await octokit.repos.getContent({
+                                owner: result.data.owner.login,
+                                repo: result.data.name,
+                                path: 'klave.json',
+                                mediaType: {
+                                    format: 'raw+json'
+                                }
+                            });
+                            resolve();
+                        } catch (e) {
+                            setTimeout(() => {
+                                waitForRepo().catch(() => {
+                                    // ;
+                                });
+                            }, 1000);
+                        }
+                    };
+                    waitForRepo().catch(() => {
+                        // ;
+                    });
+                });
+
+                await updateInstalledRepos(prisma, octokit);
+
+                const refInstalledRepo = await prisma.repository.findFirst({
+                    select: {
+                        installationRemoteId: true,
+                        fullName: true,
+                        id: true
+                    },
+                    where: {
+                        source: 'github',
+                        fullName: result.data.full_name
+                    }
+                });
+
+                const handle = await octokit.repos.getContent({
+                    owner: result.data.owner.login,
+                    repo: result.data.name,
+                    path: 'klave.json',
+                    mediaType: {
+                        format: 'raw+json'
+                    }
+                });
+
+                const parsedConfig = getFinalParseConfig(handle.data.toString());
+                const config = parsedConfig.success ? JSON.stringify(parsedConfig.data) : null;
+
+                const repo = {
+                    webId: web.id,
+                    creatorAuthToken: web.githubToken?.accessToken,
+                    owner: result.data.owner.login,
+                    fullName: result.data.full_name,
+                    name: result.data.name,
+                    defaultBranch: result.data.default_branch,
+                    installationRemoteId: refInstalledRepo?.installationRemoteId ?? '',
+                    config
+                };
+
+                await prisma.deployableRepo.delete({
+                    where: {
+                        creatorAuthToken_owner_name: {
+                            creatorAuthToken: web.githubToken?.accessToken,
+                            owner: result.data.owner.login,
+                            name: result.data.name
+                        }
+                    }
+                });
+                await prisma.deployableRepo.create({
+                    data: repo
+                });
+
+                return repo;
+            } catch (e: unknown) {
+                console.error(e);
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                throw new Error(`There was an error forking the repository: ${(e as any).message}`);
+            }
+
         })
 });
+
+const updateInstalledRepos = async (prisma: PrismaClient, octokit: Octokit) => {
+
+    const allRepos = [];
+    const currentInstallForRepo = await octokit.apps.listInstallationsForAuthenticatedUser({
+        per_page: 100
+    });
+
+    const installationsData = currentInstallForRepo.data.installations;
+
+    for (const installation of installationsData) {
+        await prisma.installation.upsert({
+            where: {
+                source_remoteId_account: {
+                    source: 'github',
+                    remoteId: `${installation.id}`,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    account: installation.account?.name ?? (installation.account as any)?.login ?? 'unknown' // TODO - is this right?
+                }
+            },
+            create: {
+                source: 'github',
+                remoteId: `${installation.id}`,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                account: installation.account?.name ?? (installation.account as any)?.login ?? 'unknown', // TODO - is this right?
+                accountType: 'unknown', // TODO - is this right?
+                hookPayload: installation
+            },
+            update: {
+                hookPayload: installation
+            }
+        });
+
+        const installationOctokit = await probot.auth(installation.id);
+        const reposData = await installationOctokit.paginate(
+            installationOctokit.apps.listReposAccessibleToInstallation,
+            {
+                per_page: 100
+            }
+        );
+
+        // TODO - this is a hack to get around the fact that the type definition for the above call is wrong
+        // See bug report at https://github.com/octokit/plugin-paginate-rest.js/issues/350
+        const repos = Array.isArray(reposData) ? reposData as typeof reposData['repositories'] : [];
+        if (reposData.repositories)
+            repos.push(...reposData.repositories);
+
+        for (const repo of repos) {
+            await prisma.repository.upsert({
+                where: {
+                    source_remoteId_installationRemoteId: {
+                        source: 'github',
+                        remoteId: `${repo.id}`,
+                        installationRemoteId: `${installation.id}`
+                    }
+                },
+                create: {
+                    source: 'github',
+                    remoteId: `${repo.id}`,
+                    installationRemoteId: `${installation.id}`,
+                    name: repo.name,
+                    owner: repo.owner.login,
+                    fullName: repo.full_name,
+                    defaultBranch: repo.default_branch,
+                    private: repo.private,
+                    installationPayload: repo
+                },
+                update: {
+                    name: repo.name,
+                    owner: repo.owner.login,
+                    fullName: repo.full_name,
+                    private: repo.private,
+                    installationPayload: repo
+                }
+            });
+        }
+        allRepos.push(...repos);
+    }
+    return allRepos;
+};
 
 export default reposRouter;
