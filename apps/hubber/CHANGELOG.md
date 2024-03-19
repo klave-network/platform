@@ -1,4 +1,18 @@
 # Changelog
+## [0.2.1](https://github.com/klave-network/platform/compare/hubber@0.2.0...hubber@0.2.1) (2024-03-19)
+
+### Dependency Updates
+
+* `db` updated to version `0.2.0`
+* `providers` updated to version `0.2.0`
+* `constants` updated to version `0.2.0`
+* `api` updated to version `0.2.0`
+* `pruner` updated to version `0.2.0`
+
+### Bug Fixes
+
+* **hubber:** Updated Probot defaults requires override ([cf06205](https://github.com/klave-network/platform/commit/cf062053de89df446d79a98d2657badc366f5bc0))
+
 ## [0.2.0](https://github.com/klave-network/platform/compare/hubber@0.1.5...hubber@0.2.0) (2023-12-19)
 
 ### Dependency Updates
