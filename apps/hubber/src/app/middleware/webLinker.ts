@@ -72,7 +72,7 @@ export const webLinkerMiddlware: RequestHandler = (req, __unusedRes, next) => {
                 const setOfEphemeralId = new Set<string>(ephemeralTag ? [ephemeralTag] : []);
                 const setOfDeployableRepos = new Set<string>();
                 const setOfApplications = new Set<string>();
-                let githubToken: typeof webs[number]['githubToken'] = null;
+                // let githubToken: typeof webs[number]['githubToken'] = null;
                 let userId: typeof webs[number]['userId'] | undefined = undefined;
 
                 webs.forEach(web => {
@@ -81,8 +81,8 @@ export const webLinkerMiddlware: RequestHandler = (req, __unusedRes, next) => {
                     web.ephemerals.forEach(e => setOfEphemeralId.add(e));
                     web.deployableRepos.map(d => d.id).forEach(d => setOfDeployableRepos.add(d));
                     web.applications.map(a => a.id).forEach(a => setOfApplications.add(a));
-                    if (web.githubToken && (!githubToken || githubToken.createdAt.getTime() < web.githubToken.createdAt.getTime()))
-                        githubToken = web.githubToken;
+                    // if (web.githubToken && (!githubToken || githubToken.createdAt.getTime() < web.githubToken.createdAt.getTime()))
+                    //     githubToken = web.githubToken;
                     if (web.userId)
                         userId = web.userId;
                 });
@@ -114,8 +114,8 @@ export const webLinkerMiddlware: RequestHandler = (req, __unusedRes, next) => {
                         },
                         applications: {
                             connect: Array.from(setOfApplications).map(aid => ({ id: aid }))
-                        },
-                        githubToken
+                        }
+                        // githubToken
                     }
                 });
 
