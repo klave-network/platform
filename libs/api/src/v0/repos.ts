@@ -272,11 +272,6 @@ export const reposRouter = createTRPCRouter({
                 createdAt: new Date()
             } as unknown as GitHubToken & { error?: string; errorDescription?: string; };
 
-            const tyty = new Octokit({ auth: data.accessToken });
-            const { data: userData } = await tyty.users.getAuthenticated();
-
-            console.log(data.accessToken, userData);
-
             if (!data.error) {
                 await prisma.web.update({
                     where: { id: webId },
@@ -301,13 +296,33 @@ export const reposRouter = createTRPCRouter({
             owner: z.string(),
             name: z.string()
         }))
-        .mutation(async ({ ctx: { web, prisma, session: { user } }, input: { owner, name } }) => {
+        .mutation(async ({ ctx: { web, prisma, session, sessionStore, sessionID }, input: { owner, name } }) => {
 
-            if (!user)
+            if (!session.user)
                 throw new Error('You must be logged in to do this');
 
-            if (!web.githubToken)
-                throw new Error('GitHub credentials required');
+            if (!web.githubToken) {
+                await prisma.web.update({
+                    where: {
+                        id: web.id
+                    },
+                    data: {
+                        githubToken: null
+                    }
+                });
+                await new Promise<void>((resolve, reject) => {
+                    session.githubToken = undefined;
+                    sessionStore.set(sessionID, {
+                        ...session,
+                        githubToken: undefined
+                    }, (err) => {
+                        if (err)
+                            return reject(err);
+                        return resolve();
+                    });
+                });
+                throw new Error('Credentials refresh required');
+            }
 
             try {
                 const octokit = new Octokit({ auth: web.githubToken?.accessToken });
@@ -396,6 +411,26 @@ export const reposRouter = createTRPCRouter({
 
                 return repo;
             } catch (e: unknown) {
+
+                await prisma.web.update({
+                    where: {
+                        id: web.id
+                    },
+                    data: {
+                        githubToken: null
+                    }
+                });
+                await new Promise<void>((resolve, reject) => {
+                    session.githubToken = undefined;
+                    sessionStore.set(sessionID, {
+                        ...session,
+                        githubToken: undefined
+                    }, (err) => {
+                        if (err)
+                            return reject(err);
+                        return resolve();
+                    });
+                });
                 console.error(e);
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 throw new Error(`There was an error forking the repository: ${(e as any).message}`);

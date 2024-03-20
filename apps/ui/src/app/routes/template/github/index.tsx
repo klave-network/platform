@@ -1,37 +1,50 @@
 import { FC, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UilGithub, UilGitlab, UilSpinner } from '@iconscout/react-unicons';
+import qs from 'query-string';
 import api from '../../../utils/api';
 import Login from '../../login';
 
 export const Index: FC = () => {
 
     const navigate = useNavigate();
+    const { postConnect } = qs.parse(window.location.search);
+    const [isPostConnect] = useState<boolean>(postConnect === 'true');
+    const [needsGHToken, setNeedsGHToken] = useState(true);
     const [hasRedirected, setHasRedirected] = useState(false);
     const { data: sessionData } = api.v0.auth.getSession.useQuery();
-    const { data: forkingData, mutate, isPending: pendingFork, error: forkingError } = api.v0.repos.forking.useMutation();
+    const { data: forkingData, mutate, error: forkingError } = api.v0.repos.forking.useMutation();
 
     useEffect(() => {
-        if (pendingFork)
-            return;
-        if (!hasRedirected && sessionData?.hasGithubToken) {
+        if (sessionData?.me && isPostConnect)
+            setNeedsGHToken(false);
+    }, [sessionData]);
+
+    useEffect(() => {
+        if (!hasRedirected && !needsGHToken) {
             setHasRedirected(true);
             const [owner, repo] = window.location.pathname.split('/template/github')[1]?.split('/')?.slice(-2) ?? [];
-            if (owner && repo)
+            if (owner && repo) {
                 mutate({
                     owner,
                     name: repo
                 });
+            }
             else
                 console.error('No owner or repo');
         }
-    }, [hasRedirected, navigate, sessionData?.hasGithubToken]);
+    }, [hasRedirected, navigate, needsGHToken]);
 
     useEffect(() => {
         if (forkingData) {
             navigate(`/deploy/repo/${forkingData.fullName}`);
         }
     }, [forkingData, navigate]);
+
+    useEffect(() => {
+        if (forkingError?.message === 'Credentials refresh required')
+            setHasRedirected(false);
+    }, [forkingError]);
 
     if (!sessionData?.me)
         return <div className="w-full flex flex-col min-h-screen overflow-hidden dark:bg-gray-900 dark:text-white">
@@ -45,7 +58,7 @@ export const Index: FC = () => {
     const state = JSON.stringify({
         referer: window.location.origin,
         source: 'github',
-        redirectUri: window.location.pathname
+        redirectUri: `${window.location.pathname}?postConnect=true`
     });
 
     const githubAuth = new URL('https://github.com/login/oauth/authorize');
@@ -65,7 +78,6 @@ export const Index: FC = () => {
     githubAppInstall.searchParams.append('state', state);
 
     if (forkingError) {
-        console.error('forkingError', forkingError);
         return <div className="w-full flex flex-col min-h-screen overflow-hidden dark:bg-gray-900 dark:text-white">
             <main className="flex flex-grow pt-24">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -88,43 +100,42 @@ export const Index: FC = () => {
         </div>;
     }
 
-    if (hasRedirected) {
+    if (needsGHToken)
         return <div className="w-full flex flex-col min-h-screen overflow-hidden dark:bg-gray-900 dark:text-white">
             <main className="flex flex-grow pt-24">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6">
                     <div className="pt-12 pb-12 md:pt-20 md:pb-20">
                         <div className="text-center pb-12 md:pb-16">
-                            <div className='pb-5' >
-                                <h1 className='text-xl font-bold'>We're getting things ready for you...</h1>
+
+                            <div className='pb-5'>
+                                <h1 className='text-xl font-bold'>Lets connect you to GitHub</h1>
+                                <p>To deploy a new Project, we will create a new repository for you</p>
                             </div>
-                            <div className='relative'>
-                                We are creating a new repository in your GitHub account.<br />
-                                We will populated with your app shortly.<br />
-                                It will only take a moment...
-                                <br />
-                                <br />
-                                <UilSpinner className='inline-block animate-spin' />
+                            <div className='relative h-[300px]'>
+                                <a href={githubAuth.toString()} className='btn btn-sm mb-3 rounded-full bg-black hover:bg-gray-900 text-white'><UilGithub color='white' />&nbsp;Connect to GitHub</a><br />
+                                <a href={gitlabAuth.toString()} className='btn btn-sm rounded-full bg-[#db7130] hover:bg-[#bb472d] text-white hidden'><UilGitlab color='white' />&nbsp;Connect to GitLab</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </main>
         </div>;
-    }
 
     return <div className="w-full flex flex-col min-h-screen overflow-hidden dark:bg-gray-900 dark:text-white">
         <main className="flex flex-grow pt-24">
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="pt-12 pb-12 md:pt-20 md:pb-20">
                     <div className="text-center pb-12 md:pb-16">
-
-                        <div className='pb-5'>
-                            <h1 className='text-xl font-bold'>Lets connect you to GitHub</h1>
-                            <p>To deploy a new Project, we will create a new repository for you</p>
+                        <div className='pb-5' >
+                            <h1 className='text-xl font-bold'>We're getting things ready for you...</h1>
                         </div>
-                        <div className='relative h-[300px]'>
-                            <a href={githubAuth.toString()} className='btn btn-sm mb-3 rounded-full bg-black hover:bg-gray-900 text-white'><UilGithub color='white' />&nbsp;Connect to GitHub</a><br />
-                            <a href={gitlabAuth.toString()} className='btn btn-sm rounded-full bg-[#db7130] hover:bg-[#bb472d] text-white hidden'><UilGitlab color='white' />&nbsp;Connect to GitLab</a>
+                        <div className='relative'>
+                            We are creating a new repository in your GitHub account.<br />
+                            We will populated with your app shortly.<br />
+                            It will only take a moment...
+                            <br />
+                            <br />
+                            <UilSpinner className='inline-block animate-spin' />
                         </div>
                     </div>
                 </div>
