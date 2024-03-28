@@ -204,11 +204,10 @@ export const RepoAppSelect: FC = () => {
         <div className='relative'>
             {/* There is one more thing.<br /> */}
             Let us know which organisation you want to create this application in.<br />
-            <br />
             {areOrganisationsLoading
                 ? <UilSpinner className='inline-block animate-spin' />
                 : <>
-                    <Select.Root value={selectedOrgId} defaultValue={selectedOrgId} onValueChange={setSelectedOrgId}>
+                    <Select.Root value={selectedOrgId} defaultValue={personals[0]?.id ?? organisations?.[0]?.id} onValueChange={setSelectedOrgId}>
                         <Select.Trigger className={'select select-bordered inline-flex justify-between flex-grow w-full items-center text-klave-light-blue bg-white data-[placeholder]:text-klave-light-blue mt-3 mb-5'}>
                             <Select.Value placeholder="Select an account" />
                         </Select.Trigger>
@@ -239,19 +238,40 @@ export const RepoAppSelect: FC = () => {
                             </Select.Content>
                         </Select.Portal>
                     </Select.Root>
-                    <br />
-                    {Object.values(canRegisterData ?? {}).includes(false) ? <>
-                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mx-auto" role="alert">
-                            We cannot register all the applications in the selected organisation.<br />
-                            {Object.entries(canRegisterData ?? {}).filter(([, canRegister]) => !canRegister).map(([name]) => `"${name}"`).join(', ')} already exist in this organisation.<br />
-                        </div>
-                        <br />
-                    </> : null}
-                    {/* <button type="button" onClick={() => setSelectedApplications([])} className='btn btn-sm mr-5 disabled:text-gray-300 hover:text-gray-500'>Go Back</button> */}
-                    <Link to="/deploy/select" className='mr-5 disabled:text-gray-300 hover:text-gray-500'>Go back</Link>
-                    <button onClick={registerApplications} disabled={!selectedApplications.length || !selectedOrgId || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave || Object.values(canRegisterData ?? {}).includes(false)} className='btn btn-sm disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Deploy</button>
                 </>
             }
+            <br />
+            This will be deployed in the following Location:<br />
+            <Select.Root value='ch' disabled={true}>
+                <Select.Trigger className={'select select-bordered inline-flex justify-between flex-grow w-full items-center text-gray-400 bg-white data-[placeholder]:text-gray-400 mt-3 mb-5'}>
+                    <Select.Value placeholder="Select an account" />
+                </Select.Trigger>
+                <Select.Portal>
+                    <Select.Content className="border overflow-hidden bg-white shadow-outline rounded-lg w-full z-[1000]">
+                        <Select.ScrollUpButton>
+                            <ChevronUpIcon />
+                        </Select.ScrollUpButton>
+                        <Select.Viewport>
+                            <SelectItem value='ch' className="px-3 py-2 text-gray-400 hover:cursor-pointer">Switzerland</SelectItem>
+                        </Select.Viewport>
+                        <Select.ScrollDownButton>
+                            <ChevronDownIcon />
+                        </Select.ScrollDownButton>
+                    </Select.Content>
+                </Select.Portal>
+            </Select.Root>
+            <br />
+            <br />
+            {Object.values(canRegisterData ?? {}).includes(false) ? <>
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mx-auto" role="alert">
+                    We cannot register all the applications in the selected organisation.<br />
+                    {Object.entries(canRegisterData ?? {}).filter(([, canRegister]) => !canRegister).map(([name]) => `"${name}"`).join(', ')} already exist in this organisation.<br />
+                </div>
+                <br />
+            </> : null}
+            {/* <button type="button" onClick={() => setSelectedApplications([])} className='btn btn-sm mr-5 disabled:text-gray-300 hover:text-gray-500'>Go Back</button> */}
+            <Link to="/deploy/select" className='mr-5 disabled:text-gray-300 hover:text-gray-500'>Go back</Link>
+            <button onClick={registerApplications} disabled={!selectedApplications.length || !selectedOrgId || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave || Object.values(canRegisterData ?? {}).includes(false)} className='btn btn-sm disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Deploy</button>
         </div>
     </>;
 
