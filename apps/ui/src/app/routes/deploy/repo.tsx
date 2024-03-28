@@ -28,7 +28,8 @@ export const RepoAppSelect: FC = () => {
             const org = organisations?.find(o => o.id === selectedOrgId);
             if (!org)
                 return;
-            navigate(`/${org.slug}`);
+            const [slug] = selectedApplications;
+            navigate(`/${org.slug}/${slug}`);
         }
     });
 
@@ -50,6 +51,10 @@ export const RepoAppSelect: FC = () => {
         retry: false,
         enabled: false
     });
+
+    useEffect(() => {
+        setSelectedOrgId(personals[0]?.id ?? organisations?.[0]?.id);
+    }, [personals[0]?.id, organisations?.[0]?.id]);
 
     useEffect(() => {
         if (isCanRegisterLoading)
@@ -207,7 +212,7 @@ export const RepoAppSelect: FC = () => {
             {areOrganisationsLoading
                 ? <UilSpinner className='inline-block animate-spin' />
                 : <>
-                    <Select.Root value={selectedOrgId} defaultValue={personals[0]?.id ?? organisations?.[0]?.id} onValueChange={setSelectedOrgId}>
+                    <Select.Root value={selectedOrgId} defaultValue={selectedOrgId} onValueChange={setSelectedOrgId}>
                         <Select.Trigger className={'select select-bordered inline-flex justify-between flex-grow w-full items-center text-klave-light-blue bg-white data-[placeholder]:text-klave-light-blue mt-3 mb-5'}>
                             <Select.Value placeholder="Select an account" />
                         </Select.Trigger>
