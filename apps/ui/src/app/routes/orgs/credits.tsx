@@ -5,7 +5,7 @@ import { UilSpinner, Uil0Plus, UilEdit, UilCheck } from '@iconscout/react-unicon
 import { loadStripe } from '@stripe/stripe-js';
 import { Application } from '@klave/db';
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
-import api from '../../utils/api';
+import api, { httpApi } from '../../utils/api';
 import { useToggle } from 'usehooks-ts';
 import CreditDisplay from '../../components/CreditDisplay';
 
@@ -15,8 +15,12 @@ import CreditDisplay from '../../components/CreditDisplay';
 let stripePromise: ReturnType<typeof loadStripe>;
 
 const initialiseStripe = async () => {
-    if (stripePromise === undefined)
-        stripePromise = loadStripe(import.meta.env['VITE_KLAVE_STRIPE_KEY'] ?? '');
+    if (stripePromise === undefined) {
+        const stripeKey = await httpApi.v0.system.getStripeKey.query();
+        if (!stripeKey)
+            throw new Error('Stripe key not found');
+        stripePromise = loadStripe(stripeKey);
+    }
     return stripePromise;
 };
 

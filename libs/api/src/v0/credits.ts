@@ -7,7 +7,7 @@ let stripe: Stripe | undefined;
 
 const checkStripeInit = () => {
     if (!stripe)
-        stripe = new Stripe(process.env['KLAVE_STRIPE_KEY'] ?? '');
+        stripe = new Stripe(process.env['KLAVE_STRIPE_SRV_KEY'] ?? '');
 };
 
 export const creditsRouter = createTRPCRouter({
