@@ -5,7 +5,7 @@ import { publicProcedure, createTRPCRouter } from '../trpc';
 import { webcrypto } from 'node:crypto';
 import { createTransport } from 'nodemailer';
 import FakeMailGuard from 'fakemail-guard';
-import { generateAuthenticationOptions, generateRegistrationOptions, verifyAuthenticationResponse, verifyRegistrationResponse } from '@simplewebauthn/server';
+import { GenerateRegistrationOptionsOpts, generateAuthenticationOptions, generateRegistrationOptions, verifyAuthenticationResponse, verifyRegistrationResponse } from '@simplewebauthn/server';
 import { type startRegistration, type startAuthentication } from '@simplewebauthn/browser';
 import { Utils } from '@secretarium/connector';
 // import * as passport from 'passport';
@@ -346,7 +346,7 @@ export const authRouter = createTRPCRouter({
             //     }
             // });
 
-            const options = await generateAuthenticationOptions({
+            const generateAuthenticationOptionsInput = {
                 timeout: 60000,
                 // allowCredentials: user.devices.map(dev => ({
                 //     id: Buffer.from(dev.credentialID),
@@ -359,7 +359,9 @@ export const authRouter = createTRPCRouter({
                 // })),
                 userVerification: 'required' as const,
                 rpID
-            });
+            };
+
+            const options = await generateAuthenticationOptions(generateAuthenticationOptionsInput);
 
             await prisma.user.update({
                 where: {
@@ -433,7 +435,7 @@ export const authRouter = createTRPCRouter({
             if (!rpID)
                 setWebauthnPrimitives();
 
-            const { verified, authenticationInfo } = await verifyAuthenticationResponse({
+            const verifyAuthenticationResponseInput = {
                 response: data,
                 expectedChallenge: `${user.webauthChallenge}`,
                 expectedOrigin: origin,
@@ -443,7 +445,10 @@ export const authRouter = createTRPCRouter({
                     credentialID: Utils.fromBase64(authenticator.credentialID),
                     counter: authenticator.counter
                 }
-            });
+            };
+
+            const authResp = await verifyAuthenticationResponse(verifyAuthenticationResponseInput);
+            const { verified, authenticationInfo } = authResp;
 
             if (!verified) {
                 logger.debug('wan: Authentication response could not be verified');
@@ -526,13 +531,14 @@ export const authRouter = createTRPCRouter({
             if (!rpID)
                 setWebauthnPrimitives();
 
-            const options = await generateRegistrationOptions({
+            const generateRegistrationOptionsInput: GenerateRegistrationOptionsOpts = {
                 rpName: 'Klave',
                 rpID,
                 // We pretend we found a user with this email address
                 // TODO - Ensure we compute a fake UUID not based on email to avoid revealing registration status
                 userID: user?.id ?? String(await webcrypto.subtle.digest('SHA-256', Buffer.from(email))),
                 userName: email,
+                userDisplayName: `${email} | ${process.env['KLAVE_WEBAUTHN_ORIGIN_NAME']}`,
                 timeout: 60000,
                 // Don't prompt users for additional information about the authenticator
                 // (Recommended for smoother UX)
@@ -553,7 +559,9 @@ export const authRouter = createTRPCRouter({
                 },
                 // Support the two most common algorithms: ES256, and RS256
                 supportedAlgorithmIDs: [-7, -257]
-            });
+            };
+
+            const options = await generateRegistrationOptions(generateRegistrationOptionsInput);
 
             if (user)
                 await prisma.user.update({
@@ -602,13 +610,15 @@ export const authRouter = createTRPCRouter({
             if (!rpID)
                 setWebauthnPrimitives();
 
-            const { verified, registrationInfo } = await verifyRegistrationResponse({
+            const verifyRegistrationResponseInput = {
                 response: data,
                 expectedChallenge: `${user?.webauthChallenge}`,
                 expectedOrigin: origin,
                 expectedRPID: rpID
-            });
+            };
 
+            const regResp = await verifyRegistrationResponse(verifyRegistrationResponseInput);
+            const { verified, registrationInfo } = regResp;
 
             if (!verified || !registrationInfo)
                 return {
