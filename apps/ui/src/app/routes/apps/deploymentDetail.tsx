@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import * as Tabs from '@radix-ui/react-tabs';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { UilLock, UilLockSlash, UilSpinner } from '@iconscout/react-unicons';
 import { Utils } from '@secretarium/crypto';
 import api from '../../utils/api';
@@ -68,6 +69,31 @@ export const AppDeploymentDetail: FC = () => {
                     <div className="sm:flex hidden flex-col">
                         <span className='block'>{version ?? '-'}</span>
                         {build ? <span className={'block text-xs text-slate-500'}>{build}</span> : null}
+                    </div>
+                </div>
+            </div>
+            <div className='mb-10'>
+                <h2 className='font-bold mb-3'>Location</h2>
+                <div className="flex items-center">
+                    <div className="sm:flex hidden flex-col">
+                        <span className='block' title={createdAt.toDateString()}>Switzerland (CH)</span>
+                        <Tooltip.Provider delayDuration={100}>
+                            <Tooltip.Root>
+                                <Tooltip.Trigger asChild >
+                                    <span className={'block text-xs text-slate-500 hover:cursor-pointer'}>3 nodes</span>
+                                </Tooltip.Trigger>
+                                <Tooltip.Portal>
+                                    <Tooltip.Content className="text-sm bg-slate-100 p-2 border shadow border-gray-200" align='start' side="bottom">
+                                        <ul>
+                                            <li>gandalt-3.ch-gre.int.klave.network</li>
+                                            <li>gimil-3.ch-gre.int.klave.network</li>
+                                            <li>thranduil-3.ch-tin.int.klave.network</li>
+                                        </ul>
+                                        <Tooltip.Arrow className="fill-slate-100 border border-gray-200 rotate-45" width={10} height={10} />
+                                    </Tooltip.Content>
+                                </Tooltip.Portal>
+                            </Tooltip.Root>
+                        </Tooltip.Provider>
                     </div>
                 </div>
             </div>
