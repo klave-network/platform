@@ -224,8 +224,8 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
 
                 const deploymentSet = uuid();
                 const targets = domains
-                    .map(domain => `${branchName}.${application.slug}.${application.id.split('-')[0]}.${domain.fqdn}`)
-                    .concat(`${branchName}.${application.slug}.${application.id.split('-')[0]}.${application.organisation.slug.replace('~$~', '')}.klave.network`, `${buildId}.${application.slug}.${application.organisation.slug.replace('~$~', '')}.klave.network`);
+                    .map(domain => `${branchName}.${application.id.split('-')[0]}.${application.slug}.${domain.fqdn}`)
+                    .concat(`${branchName}.${application.id.split('-')[0]}.${application.slug}.${application.organisation.slug.replace('~$~', '')}.klave.network`, `${buildId}.${application.id.split('-')[0]}.${application.slug}.${application.organisation.slug.replace('~$~', '')}.klave.network`);
 
                 targets.forEach(target => {
 
