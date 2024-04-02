@@ -77,6 +77,9 @@ declare function start_recording(): i32;
 // @ts-ignore: decorator
 @external("env", "stop_recording")
 declare function stop_recording(): i32;
+// @ts-ignore: decorator
+@external("env", "cancel_transaction")
+declare function cancel_transaction(): i32;
 
 
 
@@ -185,6 +188,13 @@ export class Subscription {
 
     static setReplayStop(): i32 {
         return stop_recording();
+    }
+}
+
+export class Transaction
+{
+    static cancel(): i32 {
+        return cancel_transaction();
     }
 }
 
