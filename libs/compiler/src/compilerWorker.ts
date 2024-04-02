@@ -154,7 +154,16 @@ export class CompilerHost {
                                         normalizedEntryFile += `${node.getFullText().trim()}\n`;
                                     }
                                 } else {
-                                    normalizedEntryFile += `${node.getFullText().trim()}\n`;
+                                    const mangledName = `${deferredMarker}${node.name.text}`;
+                                    normalizedEntryFile += `${node.getFullText()
+                                        // TODO - Understand if we should keep the export keyword
+                                        // .replace('export function', 'function')
+                                        .replace(node.name.text, mangledName)
+                                        .trim()}\n`;
+                                    normalizedEntryFile += `
+                                        export function ${node.name.text}(_no_args_: i32): void {
+                                            return ${mangledName}();
+                                        }`;
                                 }
                             } else {
                                 normalizedEntryFile += `${node.getFullText().trim()}\n`;
