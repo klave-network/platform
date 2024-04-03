@@ -41,9 +41,7 @@ export default defineViteConfig({
     test: {
         reporters: ['default'],
         globals: true,
-        cache: {
-            dir: '../../node_modules/.vitest'
-        },
+        passWithNoTests: true,
         environment: 'jsdom',
         include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
         includeSource: ['src/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}']
