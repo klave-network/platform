@@ -3,6 +3,7 @@
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "sourceRoot": "apps/hubber/src",
     "projectType": "application",
+    "tags": [],
     "targets": {
         "build": {
             "executor": "@nx/esbuild:esbuild",
@@ -92,6 +93,5 @@
             ],
             "command": "docker build --platform linux/amd64 -f apps/hubber/Dockerfile . -t hubber"
         }
-    },
-    "tags": []
+    }
 }

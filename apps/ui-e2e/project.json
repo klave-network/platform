@@ -3,6 +3,9 @@
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "projectType": "application",
     "sourceRoot": "apps/ui-e2e/src",
+    "implicitDependencies": [
+        "ui"
+    ],
     "targets": {
         "e2e": {
             "executor": "@nx/playwright:playwright",
@@ -19,8 +22,5 @@
                 "{options.outputFile}"
             ]
         }
-    },
-    "implicitDependencies": [
-        "ui"
-    ]
+    }
 }
