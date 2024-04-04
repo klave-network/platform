@@ -34,6 +34,8 @@ node_modules
 npm-debug.log
 yarn-error.log
 testem.log
+/target
+/crates/*/target
 /typings
 /.swc
 *.jks

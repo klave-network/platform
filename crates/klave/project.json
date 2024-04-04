@@ -1,0 +1,16 @@
+{
+    "name": "crate",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "tags": [
+        "crate"
+    ],
+    "targets": {
+        "build": {
+            "command": "cargo build -p klave --target-dir crates/klave/target --release",
+            "cache": true,
+            "outputs": [
+                "{projectRoot}/target"
+            ]
+        }
+    }
+}
