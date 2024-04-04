@@ -3,6 +3,7 @@
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "sourceRoot": "apps/ui/src",
     "projectType": "application",
+    "tags": [],
     "targets": {
         "build": {
             "executor": "@nx/vite:build",
@@ -95,6 +96,5 @@
             ],
             "command": "docker build --platform linux/amd64 -f apps/ui/Dockerfile . -t ui:latest"
         }
-    },
-    "tags": []
+    }
 }
