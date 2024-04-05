@@ -1,4 +1,15 @@
 # Changelog
+## [0.9.0](https://github.com/klave-network/platform/compare/sdk@0.8.3...sdk@0.9.0) (2024-04-05)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.8.3`
+* `constants` updated to version `0.8.3`
+
+### Features
+
+* **sdk:** Add abort_transaction() method in SDK ([ea26482](https://github.com/klave-network/platform/commit/ea264823c8f4f7e91d5f9648bc59650df6efa6e7))
+
 ## [0.8.3](https://github.com/klave-network/platform/compare/sdk@0.8.2...sdk@0.8.3) (2023-12-12)
 
 ### Dependency Updates
