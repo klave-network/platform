@@ -1,4 +1,6 @@
 # Changelog
+## [0.5.1](https://github.com/klave-network/platform/compare/db@0.5.0...db@0.5.1) (2024-04-05)
+
 ## [0.5.0](https://github.com/klave-network/platform/compare/db@0.4.0...db@0.5.0) (2024-03-19)
 
 
