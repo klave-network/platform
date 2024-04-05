@@ -1,4 +1,23 @@
 # Changelog
+## [0.7.0](https://github.com/klave-network/platform/compare/ui@0.6.0...ui@0.7.0) (2024-04-05)
+
+### Dependency Updates
+
+* `constants` updated to version `0.6.0`
+* `db` updated to version `0.6.0`
+* `api` updated to version `0.6.0`
+
+### Features
+
+* **ui:** Add location information ([898b83d](https://github.com/klave-network/platform/commit/898b83d33ebade8296b0d03f9bcc246fef0d08ba))
+* **ui:** Adding run-command key basic management ([a3d2414](https://github.com/klave-network/platform/commit/a3d24145b096f27f7dc9c9dc22d329b5aa79b9b4))
+
+
+### Bug Fixes
+
+* **api,ui:** Githup Tokens need stronger nudge to be recreated ([ae47b8a](https://github.com/klave-network/platform/commit/ae47b8a92a4d0713e2472433d2151ac426e86a2e))
+* **ui:** Redirect to the first app page upon creation ([c24eb9c](https://github.com/klave-network/platform/commit/c24eb9c638a7a46f346c9343d4e56d492dc864ae))
+
 ## [0.6.0](https://github.com/klave-network/platform/compare/ui@0.5.0...ui@0.6.0) (2024-03-19)
 
 ### Dependency Updates
