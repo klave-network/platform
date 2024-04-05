@@ -1,4 +1,18 @@
 # Changelog
+## [0.7.2](https://github.com/klave-network/platform/compare/api@0.7.1...api@0.7.2) (2024-04-05)
+
+### Dependency Updates
+
+* `db` updated to version `0.7.1`
+* `compiler` updated to version `0.7.1`
+* `providers` updated to version `0.7.1`
+* `constants` updated to version `0.7.1`
+
+### Bug Fixes
+
+* **api,ui:** Githup Tokens need stronger nudge to be recreated ([ae47b8a](https://github.com/klave-network/platform/commit/ae47b8a92a4d0713e2472433d2151ac426e86a2e))
+* **api:** Issue with existing FQDN on registration ([0f59ea4](https://github.com/klave-network/platform/commit/0f59ea4013b02b0e7e598c18b0e6e3cafeeceada))
+
 ## [0.7.1](https://github.com/klave-network/platform/compare/api@0.7.0...api@0.7.1) (2024-03-19)
 
 
