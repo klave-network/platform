@@ -13,7 +13,8 @@
                 }
             ],
             "outputs": [
-                "{options.outputPath}"
+                "{options.outputPath}",
+                "{workspaceRoot}/node_modules/.prisma/client"
             ],
             "options": {
                 "outputPath": "dist/libs/db",
