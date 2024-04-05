@@ -1,4 +1,11 @@
 # Changelog
+## [0.3.0](https://github.com/klave-network/platform/compare/compiler@0.2.8...compiler@0.3.0) (2024-04-05)
+
+
+### Features
+
+* **compiler:** Enable parameter-less user defined methods with non-interpreted wasm runtime ([d5869ae](https://github.com/klave-network/platform/commit/d5869aeb17cd9356f7b2466391d1227a78a43b6e))
+
 ## [0.2.8](https://github.com/klave-network/platform/compare/compiler@0.2.7...compiler@0.2.8) (2024-03-19)
 
 
