@@ -27,6 +27,7 @@ setInterval(() => {
 
 interface State<ResultType, ErrorType> {
     isLoading: boolean;
+    indentity?: Key;
     data?: Array<ResultType>
     errors?: Array<Error | ErrorType>;
     refetch: () => void;
@@ -44,6 +45,7 @@ type Action<ResultType, ErrorType> =
 type SecretariumQueryOptions = {
     app: string;
     route: string;
+    key?: Key;
     args?: string | Record<string, unknown>;
     live?: boolean;
 }
@@ -52,7 +54,7 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
 
     const [count, setCount] = useState(0);
     const [opts, setOpts] = useState<SecretariumQueryOptions>();
-    const { app, route, args } = opts ?? {};
+    const { app, route, args, key } = opts ?? {};
     const argDigest = useMemo(() => {
         if (typeof args === 'undefined' || args === null)
             return '';
@@ -72,6 +74,7 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
 
     const initialState: State<ResultType, ErrorType> = {
         isLoading: false,
+        indentity: undefined,
         errors: undefined,
         data: undefined,
         refetch: () => {
@@ -84,13 +87,13 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
         switch (action.type) {
             case 'reset':
                 setOpts(options);
-                return { ...initialState };
+                return { ...initialState, indentity: connectionKey };
             case 'loading':
-                return { ...initialState, isLoading: true };
+                return { ...initialState, isLoading: true, indentity: connectionKey };
             case 'fetched':
-                return { ...initialState, data: action.payload, isLoading: false };
+                return { ...initialState, data: action.payload, isLoading: false, indentity: connectionKey };
             case 'error':
-                return { ...initialState, errors: action.payload.length ? action.payload : undefined, isLoading: false };
+                return { ...initialState, errors: action.payload.length ? action.payload : undefined, isLoading: false, indentity: connectionKey };
             default:
                 return state;
         }
@@ -140,10 +143,35 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
                 if (!connectionInfo)
                     await syncNodeInfo();
 
+                if (connectionKey && key && await connectionKey.getRawPublicKeyHex() !== await key.getRawPublicKeyHex()) {
+                    console.debug('Renewing Secretarium key...');
+                    client.close();
+                    await new Promise((resolve, reject) => {
+                        const bail = setTimeout(() => {
+                            clearInterval(timer);
+                            reject(new Error('Timeout'));
+                        }, 30000);
+                        const timer = setInterval(() => {
+                            if (!client.isConnected() && client.state === Constants.ConnectionState.closed) {
+                                clearTimeout(bail);
+                                clearInterval(timer);
+                                resolve(true);
+                            }
+                        }, 100);
+                    });
+                    connectionKeyStarted = false;
+                    connectionKey = key;
+                }
+
                 if (!connectionKey && !connectionKeyStarted) {
-                    console.debug('Generating a new Secretarium key...');
+                    if (key) {
+                        console.debug('Using provided Secretarium key...');
+                        connectionKey = key;
+                    } else {
+                        console.debug('Generating a new Secretarium key...');
+                        connectionKey = await Key.createKey();
+                    }
                     connectionKeyStarted = true;
-                    connectionKey = await Key.createKey();
                 }
 
                 if (!connectionKey) {
@@ -167,6 +195,7 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
                     dispatch({ type: 'error', payload: [new Error('Missing Secretarium node or trust key')] });
                     return;
                 }
+
                 if (client.state === Constants.ConnectionState.closed) {
                     console.debug('Connecting to Secretarium...');
                     await client.connect(node, connectionKey!, trustKey);
