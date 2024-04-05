@@ -59,10 +59,11 @@ const compile = () => {
                                 if (message.contents)
                                     fs.writeFileSync(`${path.join(CWD, '.klave', `${index.toString()}-${app.slug.toLocaleLowerCase().replace(/\s/g, '-')}`)}${ext}`, message.contents);
                             } else if (message.type === 'diagnostic') {
-                                console.log(message.diagnostics);
+                                if (process.env['DEBUG'] === 'true')
+                                    console.debug(message.diagnostics);
                             } else if (message.type === 'errored') {
                                 compiler.terminate().finally(() => {
-                                    reject(message.error);
+                                    reject(message);
                                 }).catch(reject);
                             } else if (message.type === 'done') {
                                 resolve();
@@ -73,7 +74,7 @@ const compile = () => {
                 .then((results) => {
                     const erroredList = results.filter((result): result is PromiseRejectedResult => result.status === 'rejected');
                     if (erroredList.length > 0) {
-                        erroredList.forEach(result => console.error(result.reason));
+                        erroredList.forEach(result => console.error(chalk.red(result.reason.stderr ?? result.reason.error?.message ?? 'Unknown error')));
                         process.exit(1);
                     } else
                         process.exit(0);
