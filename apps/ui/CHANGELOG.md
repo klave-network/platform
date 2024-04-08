@@ -1,4 +1,22 @@
 # Changelog
+## [0.8.0](https://github.com/klave-network/platform/compare/ui@0.7.0...ui@0.8.0) (2024-04-08)
+
+### Dependency Updates
+
+* `constants` updated to version `0.7.0`
+* `db` updated to version `0.7.0`
+* `api` updated to version `0.7.0`
+
+### Features
+
+* **ui:** Add ability to release from a terminated contract ([28276fe](https://github.com/klave-network/platform/commit/28276fed3c22cf5edadc16f756536a8498380fdc))
+* **ui:** Add link to deploy from template on landing page ([dd9ba31](https://github.com/klave-network/platform/commit/dd9ba31ffcf80fbc418f9e1505a750ec4bf685e4))
+
+
+### Bug Fixes
+
+* **ui:** Typo in expiry timestamps ([389aea6](https://github.com/klave-network/platform/commit/389aea60c947ef0e6dd056927844116a84d3350c))
+
 ## [0.7.0](https://github.com/klave-network/platform/compare/ui@0.6.0...ui@0.7.0) (2024-04-05)
 
 ### Dependency Updates
