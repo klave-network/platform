@@ -120,7 +120,7 @@ export const AppDeploymentDetail: FC = () => {
             <div className='mb-10'>
                 <h2 className='font-bold mb-3'>Actions</h2>
                 <div className='flex flex-row items-center'>
-                    {status === 'deployed' && life !== 'long' ? <>
+                    {status === 'deployed' || status === 'terminated' && life !== 'long' ? <>
                         <DeploymentPromotion deployment={deployment} />
                         &nbsp;&nbsp;
                     </> : null}
