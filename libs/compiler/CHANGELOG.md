@@ -1,4 +1,11 @@
 # Changelog
+## [0.3.2](https://github.com/klave-network/platform/compare/compiler@0.3.1...compiler@0.3.2) (2024-04-08)
+
+
+### Bug Fixes
+
+* **compiler:** ESM clash in Node 20 environments ([dbbc23d](https://github.com/klave-network/platform/commit/dbbc23d56bd2a097b65c493262ecc3d264de3548))
+
 ## [0.3.1](https://github.com/klave-network/platform/compare/compiler@0.3.0...compiler@0.3.1) (2024-04-05)
 
 ## [0.3.0](https://github.com/klave-network/platform/compare/compiler@0.2.8...compiler@0.3.0) (2024-04-05)
