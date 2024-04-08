@@ -39,6 +39,7 @@ export const AppDeploymentDetail: FC = () => {
         </>;
 
     const { deploymentAddress, createdAt, expiresOn, life, status, version, build, branch, commit } = deployment;
+    const hasExpired = new Date().getTime() > expiresOn.getTime();
 
     if (!deploymentAddress)
         return <>
@@ -102,7 +103,7 @@ export const AppDeploymentDetail: FC = () => {
                 <div className="flex items-center">
                     <div className="sm:flex hidden flex-col">
                         <span className='block' title={createdAt.toDateString()}>{formatTimeAgo(createdAt)}</span>
-                        {life === 'short' ? <span className={'block text-xs text-slate-500'}>Expires {formatTimeAgo(new Date(expiresOn.getTime()))}</span> : <span></span>}
+                        {life === 'short' ? <span className={'block text-xs text-slate-500'}>{hasExpired ? 'Expired' : 'Expires'} {formatTimeAgo(expiresOn)}</span> : <span></span>}
                     </div>
                 </div>
             </div>
