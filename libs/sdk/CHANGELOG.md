@@ -1,4 +1,14 @@
 # Changelog
+## [0.9.2](https://github.com/klave-network/platform/compare/sdk@0.9.1...sdk@0.9.2) (2024-04-08)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.9.1`
+
+### Bug Fixes
+
+* **sdk:** Embed SWC helpers ([88cb152](https://github.com/klave-network/platform/commit/88cb152e696b3ee97bc5ec7b57adafdc463618ee))
+
 ## [0.9.1](https://github.com/klave-network/platform/compare/sdk@0.9.0...sdk@0.9.1) (2024-04-08)
 
 
