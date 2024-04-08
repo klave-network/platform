@@ -1,4 +1,11 @@
 # Changelog
+## [0.9.1](https://github.com/klave-network/platform/compare/sdk@0.9.0...sdk@0.9.1) (2024-04-08)
+
+
+### Bug Fixes
+
+* **sdk:** Treating constants package as internal ([82c26a1](https://github.com/klave-network/platform/commit/82c26a1c5e2ecbc538bcc4191fd43829eaf2e642))
+
 ## [0.9.0](https://github.com/klave-network/platform/compare/sdk@0.8.3...sdk@0.9.0) (2024-04-05)
 
 ### Dependency Updates
