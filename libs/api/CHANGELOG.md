@@ -1,4 +1,12 @@
 # Changelog
+## [0.7.3](https://github.com/klave-network/platform/compare/api@0.7.2...api@0.7.3) (2024-04-08)
+
+### Dependency Updates
+
+* `db` updated to version `0.7.2`
+* `compiler` updated to version `0.7.2`
+* `providers` updated to version `0.7.2`
+* `constants` updated to version `0.7.2`
 ## [0.7.2](https://github.com/klave-network/platform/compare/api@0.7.1...api@0.7.2) (2024-04-05)
 
 ### Dependency Updates
