@@ -201,8 +201,9 @@ export class CompilerHost {
 
 export const createCompiler = async () => {
 
-    const workerCode = compilerModuleFunction.toString();
-    const worker = new Worker(workerCode.substring(workerCode.indexOf('=>') + 2), {
+    const workerCodeBase = compilerModuleFunction.toString();
+    const workerCode = workerCodeBase.substring(workerCodeBase.indexOf('=>') + 2).replaceAll('_interop_require_wildcard(require', '(import');
+    const worker = new Worker(workerCode, {
         eval: true,
         name: 'Klave WASM Compiler',
         env: {},
