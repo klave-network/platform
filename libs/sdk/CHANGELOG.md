@@ -1,4 +1,11 @@
 # Changelog
+## [0.9.3](https://github.com/klave-network/platform/compare/sdk@0.9.2...sdk@0.9.3) (2024-04-08)
+
+
+### Reverts
+
+* Revert "fix(sdk): Embed SWC helpers" ([75196d2](https://github.com/klave-network/platform/commit/75196d24dc09d384359d61ab371a15ae6664a466))
+
 ## [0.9.2](https://github.com/klave-network/platform/compare/sdk@0.9.1...sdk@0.9.2) (2024-04-08)
 
 ### Dependency Updates
