@@ -39,36 +39,6 @@ declare function runtime_unload_lightgbm_model(name: ArrayBuffer): i32;
 @external("env", "infer_from_lightgbm_model")
 declare function runtime_infer_from_lightgbm_model(name: ArrayBuffer, data: ArrayBuffer, data_size: i32, result: ArrayBuffer, result_size: i32): i32;
 // @ts-ignore: decorator
-@external("env", "key_exists")
-declare function key_exists(key_name: ArrayBuffer): boolean;
-// @ts-ignore: decorator
-@external("env", "generate_encryption_key")
-declare function generate_encryption_key(key_name: ArrayBuffer): i32;
-// @ts-ignore: decorator
-@external("env", "encrypt")
-declare function encrypt_raw(key_name: ArrayBuffer, clear_text: ArrayBuffer, clear_text_size: i32, cipher_text: ArrayBuffer, cipher_text_size: i32): i32;
-// @ts-ignore: decorator
-@external("env", "decrypt")
-declare function decrypt_raw(key_name: ArrayBuffer, cipher_text: ArrayBuffer, cipher_text_size: i32, clear_text: ArrayBuffer, clear_text_size: i32): i32;
-// @ts-ignore: decorator
-@external("env", "generate_signing_key")
-declare function generate_signing_key(key_name: ArrayBuffer): i32;
-// @ts-ignore: decorator
-@external("env", "get_public_key")
-declare function get_public_key_raw(key_name: ArrayBuffer, result: ArrayBuffer, result_size: i32): i32;
-// @ts-ignore: decorator
-@external("env", "sign")
-declare function sign_raw(key_name: ArrayBuffer, clear_text: ArrayBuffer, clear_text_size: i32, cipher_text: ArrayBuffer, cipher_text_size: i32): i32;
-// @ts-ignore: decorator
-@external("env", "verify")
-declare function verify_raw(key_name: ArrayBuffer, cipher_text: ArrayBuffer, cipher_text_size: i32, clear_text: ArrayBuffer, clear_text_size: i32): i32;
-// @ts-ignore: decorator
-@external("env", "digest")
-declare function digest_raw(text: ArrayBuffer, text_size: i32, digest: ArrayBuffer, digest_size: i32): i32;
-// @ts-ignore: decorator
-@external("env", "get_random_bytes")
-declare function get_random_bytes_raw(bytes: ArrayBuffer, size: i32): i32;
-// @ts-ignore: decorator
 @external("env", "https_query")
 declare function https_query_raw(query: ArrayBuffer, result: ArrayBuffer, result_size: i32): i32;
 // @ts-ignore: decorator
@@ -191,8 +161,7 @@ export class Subscription {
     }
 }
 
-export class Transaction
-{
+export class Transaction {
     static abort(): i32 {
         return abort_transaction();
     }
