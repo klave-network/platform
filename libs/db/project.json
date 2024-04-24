@@ -6,6 +6,7 @@
     "tags": [],
     "targets": {
         "build": {
+            "cache": true,
             "executor": "@nx/js:swc",
             "dependsOn": [
                 {
@@ -48,9 +49,13 @@
             }
         },
         "compile": {
+            "cache": true,
             "executor": "nx:run-commands",
             "inputs": [
                 "{projectRoot}/src/prisma/schema.prisma"
+            ],
+            "outputs": [
+                "{workspaceRoot}/node_modules/.prisma/client"
             ],
             "options": {
                 "command": "npx prisma generate --schema src/prisma/schema.prisma",
