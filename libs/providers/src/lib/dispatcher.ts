@@ -20,10 +20,18 @@ const planReconnection = async () => {
 export const dispatchOps = {
     initialize: async () => {
         try {
-            const hookSocket = new WebSocket(process.env['KLAVE_DISPATCH_WS']!);
+            const dispatcherWs = process.env['KLAVE_DISPATCH_WS'] || 'ws://localhost:3334';
+            const dispatcherSecret = process.env['KLAVE_DISPATCH_SECRET'];
+
+            if (!dispatcherSecret) {
+                logger.error('Dispatcher secret is not set');
+                return;
+            }
+
+            const hookSocket = new WebSocket(dispatcherWs);
             hookSocket.addEventListener('open', () => {
-                hookSocket.send(process.env['KLAVE_DISPATCH_SECRET']!);
-                logger.info(`Connected to dispatcher ${process.env['KLAVE_DISPATCH_WS']}`);
+                hookSocket.send(dispatcherSecret);
+                logger.info(`Connected to dispatcher ${dispatcherWs}`);
                 reconnectAttempt = 0;
                 pingInterval = setInterval(() => {
                     hookSocket.ping();
