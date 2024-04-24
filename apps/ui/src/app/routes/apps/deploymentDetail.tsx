@@ -1,15 +1,20 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import * as Tabs from '@radix-ui/react-tabs';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { UilLock, UilLockSlash, UilSpinner } from '@iconscout/react-unicons';
 import { Utils } from '@secretarium/crypto';
+import * as NivoGeo from '@nivo/geo';
 import api from '../../utils/api';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
 import { DeploymentPromotion, DeploymentDeletion } from './deployments';
 import RunCommand from '../../components/RunCommand';
 import AttestationChecker from '../../components/AttestationChecker';
 import { commitVerificationReasons } from '@klave/constants';
+import geoFeatures from '../../geojson/ne_110m_admin_0_countries.json';
+
+const { ResponsiveGeoMap } = NivoGeo;
+const defaultNivoGeoProps = ((NivoGeo as unknown as Record<string, Record<string, unknown>>)?.GeoMapDefaultProps ?? {});
 
 export const AppDeploymentDetail: FC = () => {
 
@@ -29,6 +34,75 @@ export const AppDeploymentDetail: FC = () => {
         }).catch(() => { return; });
 
     }, [deployment?.buildOutputWASM]);
+
+    const datacentreMarkers = [{
+        type: 'Feature',
+        properties: {
+            name: 'gandalf-3.ch-gre.int.klave.network',
+            node: 'gandalf-3.ch-gre.int.klave.network',
+            datacentre: 'Green Datacenter Lupig Zurich West 1 + 2',
+            host: 'Green AG',
+            plusCode: 'C6W6+QP Lupfig, Switzerland',
+            country: 'Switzerland'
+        },
+        geometry: {
+            type: 'Point',
+            title: 'Green Datacenter Lupig Zurich West 1 + 2',
+            coordinates: [
+                8.211877948702393,
+                47.44698358541104
+            ]
+        }
+    }, {
+        type: 'Feature',
+        properties: {
+            node: 'gimli-3.ch-gre.int.klave.network',
+            datacentre: 'Green Datacenter Glattbrugg',
+            host: 'Green AG',
+            plusCode: '9FVV+5M Zürich, Switzerland',
+            country: 'Switzerland'
+        },
+        geometry: {
+            type: 'Point',
+            coordinates: [
+                8.559103756702704,
+                47.43348161472324
+            ]
+        }
+    }, {
+        type: 'Feature',
+        properties: {
+            node: 'thranduil-3.ch-tin.int.klave.network',
+            datacentre: 'DC-1 Tessin',
+            host: 'Swisscolocation',
+            plusCode: 'R2X7+7R Morbio Inferiore, Switzerland',
+            country: 'Switzerland'
+        },
+        geometry: {
+            type: 'Point',
+            coordinates: [
+                8.494152658580399,
+                47.392958202883534
+            ]
+        }
+    }];
+
+    const centroid = datacentreMarkers.reduce((acc, f) => {
+        if (f.geometry.type === 'Point')
+            return [(f.geometry.coordinates[0] ?? 0) + (acc[0] ?? 0), (f.geometry.coordinates[1] ?? 0) + (acc[1] ?? 0), 0];
+        return acc;
+    }, [0, 0, 0]).map(v => -(v / datacentreMarkers.length)) as [number, number, number];
+
+    const mapFeatures = useMemo(() => [...geoFeatures.features, ...datacentreMarkers].map((f, i) => {
+        return {
+            ...f,
+            id: `f${i}`,
+            properties: {
+                ...f.properties,
+                id: `f${i}`
+            }
+        };
+    }), [geoFeatures.features, datacentreMarkers]);
 
     if (isLoadingDeployments || !deployment)
         return <>
@@ -55,7 +129,6 @@ export const AppDeploymentDetail: FC = () => {
             ? <div className="badge badge-xs py-2 text-slate-400 border-slate-500"><UilLockSlash className='h-3 w-3 mr-1' />{commitVerificationReasons[reason ?? 'unknown']}</div>
             : <div className="badge badge-xs py-2 text-red-400 border-red-400"><UilLockSlash className='h-3 w-3 mr-1' />{commitVerificationReasons[reason ?? 'unknown']}</div>;
 
-
     return <div className="flex flex-col w-full mb-7">
         <div className="flex w-full justify-between">
             <div className='mb-10'>
@@ -64,33 +137,55 @@ export const AppDeploymentDetail: FC = () => {
                 <span className={`rounded inline-block text-xs px-1 py-0 mr-2 text-white ${life === 'long' ? 'bg-green-600' : 'bg-slate-500'}`}>{life === 'long' ? 'Production' : 'Preview'}</span>
                 <span className={`rounded inline-block text-xs px-1 py-0 text-white ${status === 'errored' ? 'bg-red-700' : status === 'deployed' ? 'bg-blue-500' : 'bg-stone-300'}`}>{status}</span>
             </div>
-            <div className='mb-10'>
+            <div className='mb-10 sm:block hidden'>
                 <h2 className='font-bold mb-3'>Version</h2>
                 <div className="flex items-center">
-                    <div className="sm:flex hidden flex-col">
+                    <div className="flex-col">
                         <span className='block'>{version ?? '-'}</span>
                         {build ? <span className={'block text-xs text-slate-500'}>{build}</span> : null}
                     </div>
                 </div>
             </div>
-            <div className='mb-10'>
+            <div className='mb-10 sm:block hidden'>
                 <h2 className='font-bold mb-3'>Location</h2>
                 <div className="flex items-center">
-                    <div className="sm:flex hidden flex-col">
+                    <div className="flex flex-col">
                         <span className='block' title={createdAt.toDateString()}>Switzerland (CH)</span>
                         <Tooltip.Provider delayDuration={100}>
                             <Tooltip.Root>
-                                <Tooltip.Trigger asChild >
+                                <Tooltip.Trigger asChild>
                                     <span className={'block text-xs text-slate-500 hover:cursor-pointer'}>3 nodes</span>
                                 </Tooltip.Trigger>
                                 <Tooltip.Portal>
-                                    <Tooltip.Content className="text-sm bg-slate-100 p-2 border shadow border-gray-200" align='start' side="bottom">
+                                    <Tooltip.Content className="text-sm bg-slate-100 p-2 shadow" align='start' side="bottom">
                                         <ul>
-                                            <li>gandalt-3.ch-gre.int.klave.network</li>
-                                            <li>gimil-3.ch-gre.int.klave.network</li>
-                                            <li>thranduil-3.ch-tin.int.klave.network</li>
+                                            <li></li>
+                                            <li></li>
+                                            <li></li>
                                         </ul>
-                                        <Tooltip.Arrow className="fill-slate-100 border border-gray-200 rotate-45" width={10} height={10} />
+                                        <div className='w-96 h-60 bg-white'>
+                                            <ResponsiveGeoMap
+                                                {...defaultNivoGeoProps}
+                                                features={mapFeatures}
+                                                projectionRotation={centroid}
+                                                projectionScale={6000}
+                                                borderWidth={(feature) => {
+                                                    if (feature.geometry?.type === 'Point')
+                                                        return 0;
+                                                    return 0.5;
+                                                }}
+                                                borderColor='#AAA'
+                                                fillColor={(feature) => {
+                                                    if (feature.geometry?.type === 'Point')
+                                                        return '#F00';
+                                                    return '#EEE';
+                                                }}
+                                                graticuleLineColor='#DDD'
+                                                enableGraticule={true}
+                                                isInteractive={true}
+                                            />
+                                        </div>
+                                        <Tooltip.Arrow className="fill-slate-100" width={10} height={10} />
                                     </Tooltip.Content>
                                 </Tooltip.Portal>
                             </Tooltip.Root>
@@ -101,7 +196,7 @@ export const AppDeploymentDetail: FC = () => {
             <div className='mb-10'>
                 <h2 className='font-bold mb-3'>Creation time</h2>
                 <div className="flex items-center">
-                    <div className="sm:flex hidden flex-col">
+                    <div className="flex-col">
                         <span className='block' title={createdAt.toDateString()}>{formatTimeAgo(createdAt)}</span>
                         {life === 'short' ? <span className={'block text-xs text-slate-500'}>{hasExpired ? 'Expired' : 'Expires'} {formatTimeAgo(expiresOn)}</span> : <span></span>}
                     </div>
