@@ -52,6 +52,9 @@ jobs:
       - name: Install repo dependencies
         run: yarn install --network-timeout 1000000 --forzen-lockfile
 
+      - name: Install Playwright system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libwoff-dev && sudo apt-get clean
+
       - name: Get installed Playwright version
         id: playwright-version
         run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('@playwright/test/package.json').version)")" >> $GITHUB_ENV
