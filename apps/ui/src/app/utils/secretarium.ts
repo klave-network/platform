@@ -6,9 +6,9 @@ export const client = new SCP({
     logger: process.env.NODE_ENV === 'development' ? console : undefined
 });
 
-let connectionKey: Key | undefined;
+let connectionKey: Key;
 let connectionKeyStarted = false;
-let connectionInfo: Array<string> | undefined;
+let connectionInfo: Array<string>;
 
 const syncNodeInfo = async () => {
     return await httpApi.v0.system.getSecretariumNode.query().then(node => {
@@ -134,7 +134,7 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
 
             // If a cache exists for this url, return it
             if (dataCache.current[cacheKey]?.length) {
-                dispatch({ type: 'fetched', payload: dataCache.current[cacheKey]! });
+                dispatch({ type: 'fetched', payload: dataCache.current[cacheKey] ?? [] });
                 return;
             }
 
@@ -190,6 +190,11 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
                     });
                 }
 
+                if (!connectionKey) {
+                    dispatch({ type: 'error', payload: [new Error('Missing Secretarium key')] });
+                    return;
+                }
+
                 const [node, trustKey] = connectionInfo ?? [];
                 if (!node || !trustKey) {
                     dispatch({ type: 'error', payload: [new Error('Missing Secretarium node or trust key')] });
@@ -198,7 +203,7 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
 
                 if (client.state === Constants.ConnectionState.closed) {
                     console.debug('Connecting to Secretarium...');
-                    await client.connect(node, connectionKey!, trustKey);
+                    await client.connect(node, connectionKey, trustKey);
                 }
 
                 await new Promise((resolve, reject) => {
@@ -227,7 +232,7 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
                             return;
 
                         dataCache.current[cacheKey]?.push(result);
-                        dispatch({ type: 'fetched', payload: dataCache.current[cacheKey]! });
+                        dispatch({ type: 'fetched', payload: dataCache.current[cacheKey] ?? [] });
 
                     }).onError((error) => {
 
@@ -237,10 +242,10 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
                         if (cancelRequest.current)
                             return;
 
-                        if (error?.toString() !== '[UNKNOWN ERROR]' || errorsCache.current[cacheKey]!.length === 0)
-                            errorsCache.current[cacheKey]!.push(error);
+                        if (error?.toString() !== '[UNKNOWN ERROR]' || errorsCache.current[cacheKey]?.length === 0)
+                            errorsCache.current[cacheKey]?.push(error);
 
-                        dispatch({ type: 'error', payload: errorsCache.current[cacheKey]! });
+                        dispatch({ type: 'error', payload: errorsCache.current[cacheKey] ?? [] });
 
                     }).send();
 
