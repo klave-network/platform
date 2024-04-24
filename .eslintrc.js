@@ -12,6 +12,19 @@ const jsonRules = {
 
 const javascriptRules = {
     ...jsonRules,
+    '@nx/enforce-module-boundaries': [
+        'error',
+        {
+            enforceBuildableLibDependency: true,
+            allow: [],
+            depConstraints: [
+                {
+                    sourceTag: '*',
+                    onlyDependOnLibsWithTags: ['*']
+                }
+            ]
+        }
+    ],
     'react/style-prop-object': 'off',
     'quotes': ['error', 'single'],
     'quote-props': ['error', 'consistent-as-needed'],
@@ -29,6 +42,7 @@ const typescriptRules = {
     ...javascriptRules,
     'no-unused-vars': 'off',
     '@typescript-eslint/no-explicit-any': 'error',
+    '@typescript-eslint/no-non-null-assertion': 'error',
     '@typescript-eslint/no-unused-vars': [
         'error',
         { args: 'after-used', varsIgnorePattern: '^__unused' }
