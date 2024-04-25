@@ -373,7 +373,7 @@ export const organisationRouter = createTRPCRouter({
             let nextCursor: typeof cursor | undefined = undefined;
             if (organisations.length > limit) {
                 const nextItem = organisations.pop();
-                nextCursor = nextItem!.id;
+                nextCursor = nextItem?.id;
             }
             return {
                 data: organisations,
