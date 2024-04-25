@@ -1,4 +1,16 @@
 # Changelog
+## [0.6.0](https://github.com/klave-network/platform/compare/db@0.5.2...db@0.6.0) (2024-04-25)
+
+
+### Features
+
+* **db,api,ui:** Add support for deploying pre-compiled WASM binaries ([47b7f6f](https://github.com/klave-network/platform/commit/47b7f6f738561f4f1c588452c25b3a6a23141cba))
+
+
+### Bug Fixes
+
+* **db:** Explicit cache of compilation output ([abdefcd](https://github.com/klave-network/platform/commit/abdefcd32cc0c7975fca769d6c799d11583a3b7c))
+
 ## [0.5.2](https://github.com/klave-network/platform/compare/db@0.5.1...db@0.5.2) (2024-04-05)
 
 ## [0.5.1](https://github.com/klave-network/platform/compare/db@0.5.0...db@0.5.1) (2024-04-05)
