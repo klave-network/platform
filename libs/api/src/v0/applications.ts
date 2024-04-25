@@ -427,7 +427,7 @@ export const applicationRouter = createTRPCRouter({
             let nextCursor: typeof cursor | undefined = undefined;
             if (applications.length > limit) {
                 const nextItem = applications.pop();
-                nextCursor = nextItem!.id;
+                nextCursor = nextItem?.id;
             }
             return {
                 data: applications,
@@ -456,8 +456,6 @@ export const applicationRouter = createTRPCRouter({
                             slug: appSlug
                         }
                     });
-
-                    console.log('existingApp ', appSlug, existingApp);
                     return !existingApp;
                 })()
                     .catch((error) => { throw error; })
