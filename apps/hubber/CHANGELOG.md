@@ -1,4 +1,13 @@
 # Changelog
+## [0.2.3](https://github.com/klave-network/platform/compare/hubber@0.2.2...hubber@0.2.3) (2024-04-25)
+
+### Dependency Updates
+
+* `db` updated to version `0.2.2`
+* `providers` updated to version `0.2.2`
+* `constants` updated to version `0.2.2`
+* `api` updated to version `0.2.2`
+* `pruner` updated to version `0.2.2`
 ## [0.2.2](https://github.com/klave-network/platform/compare/hubber@0.2.1...hubber@0.2.2) (2024-03-19)
 
 ### Dependency Updates
