@@ -1,4 +1,12 @@
 # Changelog
+## [0.1.3](https://github.com/klave-network/platform/compare/pruner@0.1.2...pruner@0.1.3) (2024-04-25)
+
+### Dependency Updates
+
+* `db` updated to version `0.1.2`
+* `api` updated to version `0.1.2`
+* `providers` updated to version `0.1.2`
+* `constants` updated to version `0.1.2`
 ## [0.1.2](https://github.com/klave-network/platform/compare/pruner@0.1.1...pruner@0.1.2) (2024-03-19)
 
 ### Dependency Updates
