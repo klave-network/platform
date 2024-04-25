@@ -220,6 +220,7 @@ model Deployment {
     buildOutputDTS       String?
     buildOutputWAT       String?
     buildOutputWASM      String?
+    buildOutputRoutes    String[]           @default([])
     buildOutputStdOut    String?
     buildOutputStdErr    String?
     buildOutputErrorObj  Json?

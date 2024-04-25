@@ -14,6 +14,8 @@ import { Repo } from '@klave/db';
 import { dummyMap } from './dummyVmFs';
 import { logger } from '@klave/providers';
 import { RepoConfigSchemaLatest } from '@klave/constants';
+import { Worker } from 'node:worker_threads';
+import { watExtractorModuleFunction } from './watExtractorModule';
 
 type BuildDependenciesManifest = Record<string, {
     version: string;
@@ -27,10 +29,11 @@ type BuildOutput = {
 } & ({
     success: true;
     result: {
-        stats: Stats;
+        stats?: Stats;
         wasm: Uint8Array;
         wat?: string;
         dts?: string;
+        routes: string[];
         signature?: sigstore.Bundle;
     };
 } | {
@@ -38,16 +41,12 @@ type BuildOutput = {
     error?: Error | ErrorObject;
 })
 
-// type BuildMiniVMEvent = 'start' | 'emit' | 'diagnostic' | 'error' | 'done'
-// type BuildMiniVMEventHandler = (result?: BuildOutput) => void;
-
 export type DeploymentContext<Type> = {
     octokit: Context['octokit']
 } & Type;
 
 export class BuildMiniVM {
 
-    // private eventHanlders: Partial<Record<BuildMiniVMEvent, BuildMiniVMEventHandler[]>> = {};
     private proxyAgent: HttpsProxyAgent<string> | undefined;
     private usedDependencies: BuildDependenciesManifest = {};
 
@@ -71,10 +70,10 @@ export class BuildMiniVM {
     async getContent(path?: string): Promise<Awaited<ReturnType<Context['octokit']['repos']['getContent']>> | { data: string | null }> {
 
         const { context: { octokit, ...context }, repo } = this.options;
-        const normalisedPath = path?.split(/[\\/]/).filter((s, i) => !(i === 0 && s === '.')).join(nodePath.posix.sep);
+        const normalisedPath = path === '.' ? '' : path?.split(/[\\/]/).filter((s, i) => !(i === 0 && s === '.')).join(nodePath.posix.sep);
         const errorAcc: string[] = [];
 
-        if (!normalisedPath)
+        if (normalisedPath === undefined)
             return { data: null };
 
         if (!normalisedPath.includes('node_modules')) {
@@ -148,12 +147,12 @@ export class BuildMiniVM {
                 }
 
                 if (data !== '') {
-                    if (!this.usedDependencies[packageName])
-                        this.usedDependencies[packageName] = {
-                            version,
-                            digests: {}
-                        };
-                    this.usedDependencies[packageName]!.digests[filePath] = Utils.toHex(await Utils.hash(new TextEncoder().encode(data)));
+                    const depHandle = this.usedDependencies[packageName] ?? {
+                        version,
+                        digests: {}
+                    };
+                    depHandle.digests[filePath] = Utils.toHex(await Utils.hash(new TextEncoder().encode(data)));
+                    this.usedDependencies[packageName] = depHandle;
                     return { data };
                 }
             } catch (e) {
@@ -184,114 +183,228 @@ export class BuildMiniVM {
         return { data: null };
     }
 
-    async getRootContent() {
+    async getRawContent(url: string): Promise<{ data: ArrayBuffer | null }> {
+
+        const errorAcc: string[] = [];
         try {
-            const content = await this.getContent();
-            if (typeof content.data === 'object' && Array.isArray(content.data)) {
-                const compilableFiles = content.data.find(file => ['index.ts'].includes(file.name));
-                return await this.getContent(`${compilableFiles?.name}`);
-            } else
-                return content;
+            const response = await fetch(url, {
+                agent: this.proxyAgent
+            });
+            if (response.ok)
+                return { data: await response.arrayBuffer() };
+            else
+                errorAcc.push(`Error downloading raw content: ${response.statusText}`);
         } catch (e) {
-            logger.debug(`Error getting root content: ${e}`, {
+            errorAcc.push(`Error downloading raw content: ${e?.toString()}`);
+        }
+
+        if (errorAcc.length > 0)
+            logger.debug(errorAcc.join('\n'), {
                 parent: 'bmv'
             });
-            return { data: null };
+        else
+            logger.debug(`Couldn't resolve raw content for '${url}'`, {
+                parent: 'bmv'
+            });
+
+        return { data: null };
+    }
+
+    async getRootList() {
+        try {
+            const content = await this.getContent('.');
+            if (Array.isArray(content.data))
+                return content.data.filter(c => c.type === 'file');
+            else if (typeof content.data === 'object' && content.data?.type === 'file')
+                return [content.data];
+            else
+                return [];
+        } catch (e) {
+            logger.debug(`Error getting root content list: ${e}`, {
+                parent: 'bmv'
+            });
+            return [];
         }
     }
 
-    // on(event: BuildMiniVMEvent, callback: BuildMiniVMEventHandler) {
-    //     this.eventHanlders[event] = [
-    //         ...(this.eventHanlders[event] ?? []),
-    //         callback
-    //     ];
-    // }
-
     async build(): Promise<BuildOutput> {
 
-        const rootContent = await this.getRootContent();
-        dummyMap['..ts'] = typeof rootContent?.data === 'string' ? rootContent.data : null;
+        const rootContentList = await this.getRootList();
+        const selectedEntryPoint = rootContentList.find(f => ['index.ts', 'index.wasm'].includes(f.name));
 
-        let compiledBinary = new Uint8Array(0);
-        let compiledWAT: string | undefined;
-        let compiledDTS: string | undefined;
-        try {
-            const compiler = await createCompiler();
-            return new Promise<BuildOutput>((resolve) => {
-                compiler.on('message', (message) => {
-                    if (message.type === 'start') {
-                        //
-                    } else if (message.type === 'read') {
-                        this.getContent(message.filename).then(response => {
-                            compiler.postMessage({
-                                type: 'read',
-                                id: message.id,
-                                contents: typeof response.data === 'string' ? response.data : null
-                            });
-                        }).catch(() => { return; });
-                    } else if (message.type === 'write') {
-                        if ((message.filename).endsWith('.wasm'))
-                            compiledBinary = message.contents ? Uint8Array.from(Buffer.from(message.contents)) : new Uint8Array(0);
-                        if ((message.filename).endsWith('.wat'))
-                            compiledWAT = message.contents ?? undefined;
-                        if ((message.filename).endsWith('.d.ts'))
-                            compiledDTS = message.contents ?? undefined;
-                    } else if (message.type === 'diagnostic') {
-                        //
-                    } else if (message.type === 'errored') {
-                        logger.debug(`Compiler errored: ${message.error?.message ?? message.error ?? 'Unknown'}`, {
+        if (selectedEntryPoint?.name === 'index.wasm' && selectedEntryPoint.download_url) {
+            const wasmContent = (await this.getRawContent(selectedEntryPoint.download_url)).data ?? new ArrayBuffer(0);
+            const wasmBuffer = Buffer.from(wasmContent);
+
+            if (wasmBuffer.length) {
+
+                this.usedDependencies = {
+                    'index.wasm': {
+                        version: this.options.application?.version ?? '0.0.0',
+                        digests: {
+                            'index.wasm': Utils.toHex(await Utils.hash(wasmBuffer))
+                        }
+                    }
+                };
+
+                try {
+                    const workerCodeBase = watExtractorModuleFunction.toString();
+                    const workerCode = workerCodeBase.substring(workerCodeBase.indexOf('=>') + 2).replaceAll('__toESM(require_wabt())', 'import("wabt")');
+                    const worker = new Worker(workerCode, {
+                        eval: true,
+                        name: 'Klave WAT Extractor',
+                        env: {},
+                        argv: []
+                    });
+
+                    const wat = await new Promise<string | undefined>((resolve, reject) => {
+                        worker.on('message', (message) => {
+                            if (message.type === 'done')
+                                resolve(message.wat);
+                            reject(new Error('Wat extractor service failure'));
+                        });
+                        worker.postMessage({
+                            type: 'start',
+                            data: wasmContent
+                        });
+                    }).catch((error) => {
+                        logger.debug('General failure: ' + error, {
                             parent: 'bmv'
                         });
-                        compiler.terminate().finally(() => {
-                            resolve({
-                                success: false,
-                                error: message.error,
-                                dependenciesManifest: this.usedDependencies,
-                                stdout: message.stdout ?? '',
-                                stderr: message.stderr ?? ''
+                    });
+
+                    // TODO: There is no support for WASM components in wasm2wat
+                    // https://github.com/WebAssembly/wabt/issues/2405
+                    logger.debug('Support for WASM components in wasm2wat: ' + wat, {
+                        parent: 'bmv'
+                    });
+
+                    return {
+                        success: true,
+                        result: {
+                            wasm: wasmBuffer,
+                            routes: []
+                        },
+                        dependenciesManifest: this.usedDependencies,
+                        stdout: '',
+                        stderr: ''
+                    };
+                } catch (error) {
+                    logger.debug('General failure: ' + error, {
+                        parent: 'bmv'
+                    });
+                    return {
+                        success: false,
+                        error: serializeError(error as Error | ErrorObject),
+                        dependenciesManifest: this.usedDependencies,
+                        stdout: '',
+                        stderr: ''
+                    };
+                }
+
+            }
+
+        } else if (selectedEntryPoint?.name === 'index.ts') {
+
+            const rootContent = await this.getContent(selectedEntryPoint.path);
+            dummyMap['..ts'] = typeof rootContent?.data === 'string' ? rootContent.data : null;
+
+            let compiledBinary = new Uint8Array(0);
+            let compiledWAT: string | undefined;
+            let compiledDTS: string | undefined;
+            try {
+                const compiler = await createCompiler();
+                return new Promise<BuildOutput>((resolve) => {
+                    compiler.on('message', (message) => {
+                        if (message.type === 'start') {
+                            //
+                        } else if (message.type === 'read') {
+                            this.getContent(message.filename).then(response => {
+                                compiler.postMessage({
+                                    type: 'read',
+                                    id: message.id,
+                                    contents: typeof response.data === 'string' ? response.data : null
+                                });
+                            }).catch(() => { return; });
+                        } else if (message.type === 'write') {
+                            if ((message.filename).endsWith('.wasm'))
+                                compiledBinary = message.contents ? Uint8Array.from(Buffer.from(message.contents)) : new Uint8Array(0);
+                            if ((message.filename).endsWith('.wat'))
+                                compiledWAT = message.contents ?? undefined;
+                            if ((message.filename).endsWith('.d.ts'))
+                                compiledDTS = message.contents ?? undefined;
+                        } else if (message.type === 'diagnostic') {
+                            //
+                        } else if (message.type === 'errored') {
+                            logger.debug(`Compiler errored: ${message.error?.message ?? message.error ?? 'Unknown'}`, {
+                                parent: 'bmv'
                             });
-                        }).catch(() => { return; });
-                    } else if (message.type === 'done') {
-                        let signature: sigstore.Bundle;
-                        // TODO Add OIDC token
-                        sigstore.sign(Buffer.from(compiledBinary), { identityToken: '' })
-                            .then(bundle => {
-                                signature = bundle;
-                            })
-                            .catch(() => { return; })
-                            .finally(() => {
-                                const output: BuildOutput = {
-                                    success: true,
-                                    result: {
-                                        stats: message.stats,
-                                        wasm: compiledBinary,
-                                        wat: compiledWAT,
-                                        dts: compiledDTS,
-                                        signature
-                                    },
+                            compiler.terminate().finally(() => {
+                                resolve({
+                                    success: false,
+                                    error: message.error,
                                     dependenciesManifest: this.usedDependencies,
                                     stdout: message.stdout ?? '',
                                     stderr: message.stderr ?? ''
-                                };
-                                compiler.terminate().finally(() => {
-                                    resolve(output);
-                                }).catch(() => { return; });
-                            });
-                    }
+                                });
+                            }).catch(() => { return; });
+                        } else if (message.type === 'done') {
+                            let signature: sigstore.Bundle;
+                            // TODO Add OIDC token
+                            sigstore.sign(Buffer.from(compiledBinary), { identityToken: '' })
+                                .then(bundle => {
+                                    signature = bundle;
+                                })
+                                .catch(() => { return; })
+                                .finally(() => {
+
+                                    const matches = compiledDTS ? Array.from(compiledDTS.matchAll(/^export declare function (.*)\(/gm)) : [];
+                                    const validRoutes = matches
+                                        .map(match => match[1])
+                                        .filter(Boolean)
+                                        .filter(match => !['__new', '__pin', '__unpin', '__collect', 'register_routes'].includes(match));
+
+                                    const output: BuildOutput = {
+                                        success: true,
+                                        result: {
+                                            stats: message.stats,
+                                            wasm: compiledBinary,
+                                            routes: validRoutes,
+                                            wat: compiledWAT,
+                                            dts: compiledDTS,
+                                            signature
+                                        },
+                                        dependenciesManifest: this.usedDependencies,
+                                        stdout: message.stdout ?? '',
+                                        stderr: message.stderr ?? ''
+                                    };
+                                    compiler.terminate().finally(() => {
+                                        resolve(output);
+                                    }).catch(() => { return; });
+                                });
+                        }
+                    });
                 });
-            });
-        } catch (error) {
-            logger.debug('General failure: ' + error, {
-                parent: 'bmv'
-            });
-            return {
-                success: false,
-                error: serializeError(error as Error | ErrorObject),
-                dependenciesManifest: this.usedDependencies,
-                stdout: '',
-                stderr: ''
-            };
+            } catch (error) {
+                logger.debug('General failure: ' + error, {
+                    parent: 'bmv'
+                });
+                return {
+                    success: false,
+                    error: serializeError(error as Error | ErrorObject),
+                    dependenciesManifest: this.usedDependencies,
+                    stdout: '',
+                    stderr: ''
+                };
+            }
         }
+        return {
+            success: false,
+            error: new Error('No entry point found'),
+            dependenciesManifest: this.usedDependencies,
+            stdout: '',
+            stderr: ''
+        };
     }
 }
 
