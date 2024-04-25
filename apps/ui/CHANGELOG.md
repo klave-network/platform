@@ -1,4 +1,17 @@
 # Changelog
+## [0.9.0](https://github.com/klave-network/platform/compare/ui@0.8.0...ui@0.9.0) (2024-04-25)
+
+### Dependency Updates
+
+* `constants` updated to version `0.8.0`
+* `db` updated to version `0.8.0`
+* `api` updated to version `0.8.0`
+
+### Features
+
+* **db,api,ui:** Add support for deploying pre-compiled WASM binaries ([47b7f6f](https://github.com/klave-network/platform/commit/47b7f6f738561f4f1c588452c25b3a6a23141cba))
+* **ui:** Add preview map for deployment locations ([153dbcf](https://github.com/klave-network/platform/commit/153dbcf1da9408c0255155b64e2b97374337e748))
+
 ## [0.8.0](https://github.com/klave-network/platform/compare/ui@0.7.0...ui@0.8.0) (2024-04-08)
 
 ### Dependency Updates
