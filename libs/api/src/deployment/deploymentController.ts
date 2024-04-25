@@ -355,11 +355,13 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 parent: 'dpl'
                             });
 
+                            const applicationObject = availableApplicationsConfig[application.slug];
+
                             const buildVm = new BuildMiniVM({
                                 type: 'github',
                                 context: deploymentContext,
                                 repo,
-                                application: availableApplicationsConfig[application.slug],
+                                application: applicationObject,
                                 dependencies: {
                                     ...(packageJson?.optionalDependencies ?? {}),
                                     ...(packageJson?.peerDependencies ?? {}),
@@ -399,7 +401,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 return;
                             }
 
-                            const { result: { wasm, wat, dts } } = buildResult;
+                            const { result: { wasm, wat, dts, routes } } = buildResult;
                             const wasmB64 = Utils.toBase64(wasm);
 
                             logger.debug(`Compilation was successful ${deployment.id} (${prettyBytes(wasmB64.length)})`, {
@@ -431,22 +433,18 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                     status: 'compiled',
                                     buildOutputWASM: wasmB64,
                                     buildOutputWAT: wat,
-                                    buildOutputDTS: dts
+                                    buildOutputDTS: dts,
+                                    buildOutputRoutes: routes
                                 }
                             });
 
-                            if (dts) {
-                                const matches = Array.from(dts.matchAll(/^export declare function (.*)\(/gm));
-                                const validMatches = matches
-                                    .map(match => match[1])
-                                    .filter(Boolean)
-                                    .filter(match => !['__new', '__pin', '__unpin', '__collect', 'register_routes'].includes(match));
+                            if (routes.length) {
                                 await prisma.deployment.update({
                                     where: {
                                         id: deployment.id
                                     },
                                     data: {
-                                        contractFunctions: validMatches
+                                        contractFunctions: routes
                                     }
                                 });
                             }
@@ -458,8 +456,15 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 previousDeployment
                             });
 
-                        } catch (error) {
-                            logger.debug(`Deployment failure for ${target}: ${error}`);
+                        } catch (errorIn) {
+                            let error = errorIn;
+                            logger.debug(`Deployment failure for ${target}: ${errorIn}`);
+                            if (error instanceof Error) {
+                                error = {
+                                    message: error.message,
+                                    stack: process.env['NODE_ENV'] === 'development' ? error.stack : undefined
+                                };
+                            }
                             try {
                                 if (contextualDeploymentId)
                                     await prisma.deployment.update({
@@ -468,7 +473,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                         },
                                         data: {
                                             status: 'errored',
-                                            buildOutputErrorObj: error ?? null
+                                            buildOutputErrorObj: error ?? ((error as unknown)?.toString ? { message: `${error}` } : null)
                                         }
                                     });
                             } catch (error) {

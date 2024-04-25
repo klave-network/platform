@@ -136,6 +136,7 @@
         "uuid": "^9.0.1",
         "validate-npm-package-name": "5.0.0",
         "visitor-as": "^0.11.4",
+        "wabt": "1.0.32",
         "winston": "3.13.0",
         "ws": "8.16.0",
         "zod": "^3.22.4"
