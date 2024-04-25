@@ -1,4 +1,16 @@
 # Changelog
+## [0.8.0](https://github.com/klave-network/platform/compare/api@0.7.3...api@0.8.0) (2024-04-25)
+
+### Dependency Updates
+
+* `db` updated to version `0.7.3`
+* `providers` updated to version `0.7.3`
+* `constants` updated to version `0.7.3`
+
+### Features
+
+* **db,api,ui:** Add support for deploying pre-compiled WASM binaries ([47b7f6f](https://github.com/klave-network/platform/commit/47b7f6f738561f4f1c588452c25b3a6a23141cba))
+
 ## [0.7.3](https://github.com/klave-network/platform/compare/api@0.7.2...api@0.7.3) (2024-04-08)
 
 ### Dependency Updates
