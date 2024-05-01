@@ -21,6 +21,9 @@
         "prepare": "is-ci || husky"
     },
     "private": true,
+    "engines": {
+        "node": "^22"
+    },
     "dependencies": {
         "@expo/spawn-async": "1.7.2",
         "@fastify/autoload": "~5.10.0",
