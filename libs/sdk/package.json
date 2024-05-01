@@ -36,16 +36,16 @@
     "dependencies": {
         "@klave/as-json": "^0.5.67-fix.0",
         "@klave/compiler": "*",
-        "@swc/helpers": "0.5.8",
+        "@swc/helpers": "0.5.11",
         "@total-typescript/ts-reset": "^0.5.1",
         "as-base64": "0.2.0",
-        "assemblyscript": "^0.27.26",
+        "assemblyscript": "^0.27.27",
         "chalk": "^4.1.2",
         "fs-extra": "^11.2.0",
         "path-complete-extname": "1.0.0",
         "serialize-error": "8.1.0",
         "uuid": "^9.0.1",
-        "zod": "^3.22.4"
+        "zod": "^3.23.5"
     },
     "devDependencies": {
         "@types/fs-extra": "^11.0.4"
