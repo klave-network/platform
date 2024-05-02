@@ -11,7 +11,7 @@ export const LoginQR: FC = () => {
     const [uuidLocator, setUuidLocator] = useState<string>();
     const [uuidBeacon, setUuidBeacon] = useState<string>();
     const [addressDestination, setAddressDestination] = useState<string>();
-    const socketAddress = new URL(import.meta.env['VITE_KLAVE_API_URL']);
+    const socketAddress = new URL(window.klaveFrontConfig.KLAVE_API__);
     socketAddress.protocol = socketAddress.protocol === 'https:' ? 'wss:' : 'ws:';
     const [socketUrl] = useState(`${socketAddress.origin}/bridge`);
     const codeValue = `cryptx_check#${addressDestination}#${uuidBeacon}#${uuidLocator}`;
@@ -43,7 +43,7 @@ export const LoginQR: FC = () => {
                 setAddressDestination(address);
                 break;
             case 'confirmed':
-                fetch(`${import.meta.env['VITE_KLAVE_API_URL']}/login/print`, {
+                fetch(`${window.klaveFrontConfig.KLAVE_API__}/login/print`, {
                     credentials: 'include'
                 })
                     .then(async res => res.json())

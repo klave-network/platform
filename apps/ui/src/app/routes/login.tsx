@@ -138,7 +138,7 @@ export const Login: FC = () => {
             source: 'klave'
         });
 
-        const secretariumAuth = new URL(`${import.meta.env['VITE_SECRETARIUM_ID_URL']}/login/oauth/authorize'}`);
+        const secretariumAuth = new URL(`${window.klaveFrontConfig.SECRETARIUM_ID__}/login/oauth/authorize'}`);
         secretariumAuth.searchParams.append('client_id', import.meta.env['VITE_KLAVE_SELF_CLIENT_ID'] ?? '');
         secretariumAuth.searchParams.append('scope', 'read:user,read:gpg_key,read:public_key,repo,metadata:read,administration:write,contents:read');
         secretariumAuth.searchParams.append('state', state);

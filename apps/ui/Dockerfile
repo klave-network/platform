@@ -14,9 +14,10 @@ WORKDIR /app
 RUN addgroup --system ui && \
     adduser --system -G ui ui
 
+COPY apps/ui/tools/kube_inject.sh .
 COPY dist/apps/ui ui
 RUN chown -R ui:ui .
 
 RUN yarn add serve
 
-CMD [ "npx", "-y", "serve", "ui" ]
+CMD [ "sh", "./kube_inject.sh" ]

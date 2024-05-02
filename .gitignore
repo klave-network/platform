@@ -52,4 +52,5 @@ logs
 Thumbs.db
 
 # Locally scoped env
-.env*local
+.env*.local
+*.env
