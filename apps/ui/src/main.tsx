@@ -1,4 +1,5 @@
 // import './wdyr';
+import './app/utils/globalVariables';
 import './app/utils/sentry';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';

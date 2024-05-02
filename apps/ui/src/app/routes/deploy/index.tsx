@@ -26,14 +26,14 @@ export const Index: FC = () => {
     githubAuth.searchParams.append('client_id', 'Iv1.6ff39dee83590f91');
     githubAuth.searchParams.append('scope', 'read:user,read:gpg_key,read:public_key,repo,metadata:read,administration:write,contents:read');
     githubAuth.searchParams.append('state', state);
-    githubAuth.searchParams.append('redirect_uri', encodeURI(import.meta.env['VITE_KLAVE_AUTHSTATE_URL'] ?? `${window.location.origin}/auth`));
+    githubAuth.searchParams.append('redirect_uri', encodeURI(window.klaveFrontConfig.KLAVE_AUTH__));
 
     const gitlabAuth = new URL('https://gitlab.com/oauth/authorize');
     gitlabAuth.searchParams.append('client_id', 'Iv1.6ff39dee83590f91');
     gitlabAuth.searchParams.append('response_type', 'code');
     gitlabAuth.searchParams.append('scope', 'read:user,read:gpg_key,read:public_key,repo,metadata:read,administration:write,contents:read');
     gitlabAuth.searchParams.append('state', state);
-    gitlabAuth.searchParams.append('redirect_uri', encodeURI(import.meta.env['VITE_KLAVE_AUTHSTATE_URL'] ?? `${window.location.origin}/auth`));
+    gitlabAuth.searchParams.append('redirect_uri', encodeURI(window.klaveFrontConfig.KLAVE_AUTH__));
 
     return <>
         <div className='pb-5'>
