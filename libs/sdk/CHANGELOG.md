@@ -1,4 +1,15 @@
 # Changelog
+## [0.10.0](https://github.com/klave-network/platform/compare/sdk@0.9.3...sdk@0.10.0) (2024-05-02)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.9.3`
+* `constants` updated to version `0.9.3`
+
+### Features
+
+* **sdk:** Add `import_key` function to the crypto SDK ([0a7190c](https://github.com/klave-network/platform/commit/0a7190cb7240864bcb08fc49c004765615582f43))
+
 ## [0.9.3](https://github.com/klave-network/platform/compare/sdk@0.9.2...sdk@0.9.3) (2024-04-08)
 
 
