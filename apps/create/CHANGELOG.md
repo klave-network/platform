@@ -1,4 +1,9 @@
 # Changelog
+## [0.3.20](https://github.com/klave-network/platform/compare/create@0.3.19...create@0.3.20) (2024-05-02)
+
+### Dependency Updates
+
+* `sdk` updated to version `0.3.19`
 ## [0.3.19](https://github.com/klave-network/platform/compare/create@0.3.18...create@0.3.19) (2024-04-08)
 
 ### Dependency Updates
