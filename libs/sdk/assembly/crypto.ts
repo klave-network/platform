@@ -17,7 +17,7 @@ declare function encrypt_raw(key_name: ArrayBuffer, clear_text: ArrayBuffer, cle
 declare function decrypt_raw(key_name: ArrayBuffer, cipher_text: ArrayBuffer, cipher_text_size: i32, clear_text: ArrayBuffer, clear_text_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "generate_key")
-declare function generate_key(key_name: ArrayBuffer, algorithm: i32, extractable: boolean, usages: ArrayBuffer): i32;
+declare function generate_key(key_name: ArrayBuffer, algorithm: i32, extractable: boolean, usages: ArrayBuffer, usages_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "import_key")
 declare function import_key_raw(key_name: ArrayBuffer, key_format: i32, key_data: ArrayBuffer, key_data_size: i32, algorithm: i32, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
@@ -164,7 +164,7 @@ class CryptoAES {
         usages[0] = 0; // decrypt
         usages[1] = 1; // encrypt
 
-        generate_key(nameBuf, 1 /* AES-GCM */, extractable, usages.buffer)
+        generate_key(nameBuf, 1 /* AES-GCM */, extractable, usages.buffer, usages.byteLength)
         return key;
     }
 
@@ -283,7 +283,7 @@ class CryptoECDSA {
         usages[0] = 3; // sign
         usages[1] = 5; // derive_key
 
-        generate_key(nameBuf, 0 /* ECDSA */, extractable, usages.buffer)
+        generate_key(nameBuf, 0 /* ECDSA */, extractable, usages.buffer, usages.byteLength)
         return key;
     }
 
