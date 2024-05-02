@@ -1,4 +1,9 @@
 # Changelog
+## [0.8.1](https://github.com/klave-network/platform/compare/api@0.8.0...api@0.8.1) (2024-05-02)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.8.0`
 ## [0.8.0](https://github.com/klave-network/platform/compare/api@0.7.3...api@0.8.0) (2024-04-25)
 
 ### Dependency Updates
