@@ -12,7 +12,7 @@ export const apiClientOptions = {
     // TODO: To be replaced by import from `@klave/api`
     links: [
         httpBatchLink({
-            url: `${import.meta.env['VITE_KLAVE_API_URL']}/trpc`,
+            url: `${window.klaveFrontConfig.KLAVE_API__}/trpc`,
             transformer: superjson,
             fetch: async (url, options) => {
                 return fetch(url, {

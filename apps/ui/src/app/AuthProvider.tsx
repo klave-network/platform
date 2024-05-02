@@ -36,7 +36,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children, userData }) => {
 
     // call this function to sign out logged in user
     const logout = useCallback(() => {
-        fetch(`${import.meta.env['VITE_KLAVE_API_URL']}/logout`, {
+        fetch(`${window.klaveFrontConfig.KLAVE_API__}/logout`, {
             credentials: 'include'
         }).then(async res => res.json()).then(() => {
             setUser(null);
