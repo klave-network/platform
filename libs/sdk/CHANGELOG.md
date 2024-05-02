@@ -1,4 +1,11 @@
 # Changelog
+## [0.10.1](https://github.com/klave-network/platform/compare/sdk@0.10.0...sdk@0.10.1) (2024-05-02)
+
+
+### Bug Fixes
+
+* **sdk:** Missing usage parameter length for `generate_key` calls ([016b67e](https://github.com/klave-network/platform/commit/016b67e6083631055d5aa1abd7c2e52e60d83c86))
+
 ## [0.10.0](https://github.com/klave-network/platform/compare/sdk@0.9.3...sdk@0.10.0) (2024-05-02)
 
 ### Dependency Updates
