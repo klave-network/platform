@@ -1,7 +1,7 @@
 {
     "name": "create-on-klave",
     "description": "The tool to bootstrap trustless apps on Klave",
-    "version": "0.3.19",
+    "version": "0.3.20",
     "license": "MIT",
     "private": false,
     "author": {
