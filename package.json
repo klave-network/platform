@@ -31,7 +31,7 @@
         "@hookform/resolvers": "3.3.4",
         "@iconscout/react-unicons": "2.0.2",
         "@ideafast/idgen": "0.1.1",
-        "@klave/as-json": "^0.5.67-fix.0",
+        "@klave/as-json": "^0.8.2",
         "@monaco-editor/react": "4.6.0",
         "@nivo/geo": "0.86.0",
         "@octokit/rest": "^20.1.0",
