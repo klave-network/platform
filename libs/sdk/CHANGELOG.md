@@ -1,4 +1,14 @@
 # Changelog
+## [0.10.2](https://github.com/klave-network/platform/compare/sdk@0.10.1...sdk@0.10.2) (2024-05-08)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.10.1`
+
+### Bug Fixes
+
+* **compiler:** Update `@klave/as-json` to solve private member issue ([4483859](https://github.com/klave-network/platform/commit/4483859f96de8174041e23856f0078282589d11d))
+
 ## [0.10.1](https://github.com/klave-network/platform/compare/sdk@0.10.0...sdk@0.10.1) (2024-05-02)
 
 
