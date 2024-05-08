@@ -4,6 +4,7 @@ import { v4 as uuid } from 'uuid';
 import type { Stats } from 'assemblyscript/dist/asc';
 import { formatter } from './languageService';
 import { compilerModuleFunction } from './compilerModule';
+import localPackageJson from '../package.json';
 
 const deferredMarker = '__klave_deferred__';
 
@@ -44,6 +45,7 @@ type CompilerMessage = {
     stderr?: string;
 } | {
     type: 'start';
+    version: string;
 } | {
     type: 'compile';
 }
@@ -51,6 +53,8 @@ type CompilerMessage = {
 export class CompilerHost {
 
     id = uuid();
+    version = localPackageJson.version;
+    ascVersion = 'unknown';
     entryFile = -1;
 
     constructor(private worker: Worker) { }
@@ -58,6 +62,9 @@ export class CompilerHost {
     on(event: 'message', listener: (value: CompilerMessage) => void): this {
         if (event === 'message') {
             this.worker.on('message', (message: CompilerMessage) => {
+                if (message.type === 'start') {
+                    this.ascVersion = message.version;
+                }
                 if (message.type === 'write') {
                     if (message.filename === 'out.d.ts' && message.contents) {
                         let filteredDTS = '';

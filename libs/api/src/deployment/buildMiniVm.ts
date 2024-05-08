@@ -347,7 +347,16 @@ export class BuildMiniVM {
                 return new Promise<BuildOutput>((resolve) => {
                     compiler.on('message', (message) => {
                         if (message.type === 'start') {
-                            //
+                            this.usedDependencies['@klave/compiler'] = {
+                                version: compiler.version,
+                                digests: {
+                                    ['git:*']: process.env['GIT_REPO_COMMIT'] ?? 'unknown'
+                                }
+                            };
+                            this.usedDependencies['assemblyscript'] = {
+                                version: compiler.ascVersion ?? message.version ?? 'unknown',
+                                digests: {}
+                            };
                         } else if (message.type === 'read') {
                             this.getContent(message.filename).then(response => {
                                 compiler.postMessage({
