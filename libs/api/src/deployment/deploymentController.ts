@@ -105,37 +105,6 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
     if (!repo)
         return;
 
-    const packageJsonResponse = await octokit.repos.getContent({
-        owner: repo.owner,
-        repo: repo.name,
-        ref: context.commit.ref,
-        path: 'package.json',
-        mediaType: {
-            format: 'raw+json'
-        }
-    });
-
-    const packageJsonData = Array.isArray(packageJsonResponse.data) ? packageJsonResponse.data[0] : packageJsonResponse.data;
-
-    if (!packageJsonData)
-        return;
-
-    let packageJson: {
-        optionalDependencies?: Record<string, string>;
-        peerDependencies?: Record<string, string>;
-        dependencies?: Record<string, string>;
-        devDependencies?: Record<string, string>;
-    } | undefined;
-    try {
-        packageJson = JSON.parse(packageJsonData.toString()) as typeof packageJson;
-    } catch (e) {
-        logger.error('Error while parsing package.json', e);
-        return;
-    }
-
-    if (!packageJson)
-        return;
-
     const klaveConfigurationResponse = await octokit.repos.getContent({
         owner: repo.owner,
         repo: repo.name,
@@ -361,13 +330,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 type: 'github',
                                 context: deploymentContext,
                                 repo,
-                                application: applicationObject,
-                                dependencies: {
-                                    ...(packageJson?.optionalDependencies ?? {}),
-                                    ...(packageJson?.peerDependencies ?? {}),
-                                    ...(packageJson?.dependencies ?? {}),
-                                    ...(packageJson?.devDependencies ?? {})
-                                }
+                                application: applicationObject
                             });
 
                             const buildResult = await buildVm.build();
