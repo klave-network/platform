@@ -47,6 +47,12 @@
                 "jestConfig": "libs/sdk/jest.config.ts"
             }
         },
+        "sync-deps": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "node tools/scripts/syncDepVersion.mjs"
+            }
+        },
         "version": {
             "executor": "@jscutlery/semver:version",
             "options": {
