@@ -35,7 +35,7 @@
     },
     "dependencies": {
         "@klave/as-json": "^0.8.2",
-        "@klave/compiler": "0.3.4",
+        "@klave/compiler": "0.4.0",
         "@swc/helpers": "0.5.11",
         "@total-typescript/ts-reset": "^0.5.1",
         "as-base64": "0.2.0",

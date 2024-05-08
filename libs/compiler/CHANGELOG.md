@@ -1,4 +1,11 @@
 # Changelog
+## [0.4.0](https://github.com/klave-network/platform/compare/compiler@0.3.4...compiler@0.4.0) (2024-05-08)
+
+
+### Features
+
+* **compiler,sdk,api:** Bring ASC and compiler versions forward ([520ae67](https://github.com/klave-network/platform/commit/520ae67a6ae630e9c2d9c75d05ea13a175bf7273))
+
 ## [0.3.4](https://github.com/klave-network/platform/compare/compiler@0.3.3...compiler@0.3.4) (2024-05-07)
 
 
