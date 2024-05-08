@@ -49,6 +49,7 @@ export class BuildMiniVM {
 
     private proxyAgent: HttpsProxyAgent<string> | undefined;
     private usedDependencies: BuildDependenciesManifest = {};
+    private dependencies: Record<string, string> = {};
 
     constructor(private options: {
         type: 'github';
@@ -56,7 +57,7 @@ export class BuildMiniVM {
         repo: Repo;
         // TODO Reenable the KlaveRcConfiguration[...] type
         application: NonNullable<RepoConfigSchemaLatest['applications']>[number] | undefined;
-        dependencies: Record<string, string>;
+        // dependencies: Record<string, string>;
     }) {
         if (process.env['KLAVE_SQUID_URL'])
             this.proxyAgent = new HttpsProxyAgent(process.env['KLAVE_SQUID_URL']);
@@ -67,7 +68,7 @@ export class BuildMiniVM {
         return dummyMap[normalisedPath] ?? null;
     }
 
-    async getContent(path?: string): Promise<Awaited<ReturnType<Context['octokit']['repos']['getContent']>> | { data: string | null }> {
+    async getContent(path?: string, atAbsoluteRoot = false): Promise<Awaited<ReturnType<Context['octokit']['repos']['getContent']>> | { data: string | null }> {
 
         const { context: { octokit, ...context }, repo } = this.options;
         const normalisedPath = path === '.' ? '' : path?.split(/[\\/]/).filter((s, i) => !(i === 0 && s === '.')).join(nodePath.posix.sep);
@@ -81,11 +82,12 @@ export class BuildMiniVM {
                 parent: 'bmv'
             });
             try {
+                const fetchRoot = (atAbsoluteRoot ? '' : this.options.application?.rootDir ?? '').replace(/\/*$/g, '');
                 return await octokit.repos.getContent({
                     owner: repo.owner,
                     repo: repo.name,
                     ref: context.commit.ref,
-                    path: `${this.options.application?.rootDir ?? ''}${normalisedPath ? `/${normalisedPath}` : ''}`,
+                    path: `${fetchRoot}${normalisedPath ? `/${normalisedPath}` : ''}`,
                     mediaType: {
                         format: 'raw+json'
                     }
@@ -104,7 +106,7 @@ export class BuildMiniVM {
             try {
                 const comps = lastComponent.substring(1).split('/');
                 packageName = comps[0]?.startsWith('@') ? `${comps.shift()}/${comps.shift()}` : comps.shift() ?? '';
-                packageVersion = packageName ? this.options.dependencies?.[packageName] : undefined;
+                packageVersion = packageName ? this.dependencies?.[packageName] : undefined;
                 const filePath = comps.join('/');
                 let version = packageVersion ?? '';
                 let data = '';
@@ -227,6 +229,31 @@ export class BuildMiniVM {
         }
     }
 
+    async getTSDependencies() {
+
+        const packageJsonResponse = await this.getContent('package.json', true);
+        const packageJsonData = Array.isArray(packageJsonResponse.data) ? packageJsonResponse.data[0] : packageJsonResponse.data;
+
+        if (!packageJsonData)
+            throw new Error('No package.json found');
+
+        let packageJson: {
+            optionalDependencies?: Record<string, string>;
+            peerDependencies?: Record<string, string>;
+            dependencies?: Record<string, string>;
+            devDependencies?: Record<string, string>;
+        } | undefined;
+        try {
+            packageJson = JSON.parse(packageJsonData.toString()) as typeof packageJson;
+        } catch (e) {
+            logger.error('Error while parsing package.json', e);
+            throw new Error('Error while parsing package.json');
+        }
+
+        if (!packageJson)
+            throw new Error('No package.json found');
+    }
+
     async build(): Promise<BuildOutput> {
 
         const rootContentList = await this.getRootList();
@@ -305,6 +332,9 @@ export class BuildMiniVM {
             }
 
         } else if (selectedEntryPoint?.name === 'index.ts') {
+
+            // We first need to fetch dependencies from package.json
+            await this.getTSDependencies();
 
             const rootContent = await this.getContent(selectedEntryPoint.path);
             dummyMap['..ts'] = typeof rootContent?.data === 'string' ? rootContent.data : null;
