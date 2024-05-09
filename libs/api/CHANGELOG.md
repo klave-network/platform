@@ -1,4 +1,24 @@
 # Changelog
+## [0.9.0](https://github.com/klave-network/platform/compare/api@0.8.2...api@0.9.0) (2024-05-08)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.8.2`
+
+### Features
+
+* **compiler,sdk,api:** Bring ASC and compiler versions forward ([520ae67](https://github.com/klave-network/platform/commit/520ae67a6ae630e9c2d9c75d05ea13a175bf7273))
+
+
+### Bug Fixes
+
+* **api:** We should not require `package.json` for WASM only deployment ([abdfbaf](https://github.com/klave-network/platform/commit/abdfbaf1929d5e62f77a21afa215713ea5f13519))
+
+## [0.8.2](https://github.com/klave-network/platform/compare/api@0.8.1...api@0.8.2) (2024-05-08)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.8.1`
 ## [0.8.1](https://github.com/klave-network/platform/compare/api@0.8.0...api@0.8.1) (2024-05-02)
 
 ### Dependency Updates

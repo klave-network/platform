@@ -33,9 +33,9 @@ const compile = () => {
 
                     createCompiler().then((compiler: CompilerHost) => {
                         compiler.on('message', (message) => {
-                            // if (message.type === 'start') {
-                            //     ...
-                            // }
+                            if (message.type === 'start') {
+                                console.log(`Using Klave compiler v${compiler.version}\nAssemblyScript v${compiler.ascVersion ?? message.version}`);
+                            }
                             if (message.type === 'read') {
                                 if (process.env['DEBUG'] === 'true')
                                     console.debug('file_read_try:' + path.resolve(appPathRoot, message.filename));

@@ -1,4 +1,18 @@
 # Changelog
+## [0.4.0](https://github.com/klave-network/platform/compare/compiler@0.3.4...compiler@0.4.0) (2024-05-08)
+
+
+### Features
+
+* **compiler,sdk,api:** Bring ASC and compiler versions forward ([520ae67](https://github.com/klave-network/platform/commit/520ae67a6ae630e9c2d9c75d05ea13a175bf7273))
+
+## [0.3.4](https://github.com/klave-network/platform/compare/compiler@0.3.3...compiler@0.3.4) (2024-05-07)
+
+
+### Bug Fixes
+
+* **compiler:** Update `@klave/as-json` to solve private member issue ([4483859](https://github.com/klave-network/platform/commit/4483859f96de8174041e23856f0078282589d11d))
+
 ## [0.3.3](https://github.com/klave-network/platform/compare/compiler@0.3.2...compiler@0.3.3) (2024-05-02)
 
 ## [0.3.2](https://github.com/klave-network/platform/compare/compiler@0.3.1...compiler@0.3.2) (2024-04-08)
