@@ -1,4 +1,14 @@
 # Changelog
+## [0.11.0](https://github.com/klave-network/platform/compare/sdk@0.10.2...sdk@0.11.0) (2024-05-08)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.10.2`
+
+### Features
+
+* **compiler,sdk,api:** Bring ASC and compiler versions forward ([520ae67](https://github.com/klave-network/platform/commit/520ae67a6ae630e9c2d9c75d05ea13a175bf7273))
+
 ## [0.10.2](https://github.com/klave-network/platform/compare/sdk@0.10.1...sdk@0.10.2) (2024-05-08)
 
 ### Dependency Updates
