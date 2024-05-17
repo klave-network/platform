@@ -315,10 +315,10 @@ class CryptoECDSA {
         if (iFormat === 1) // spki
             return null;
 
-        const usages = new Uint8Array(2);
+        const usages = new Uint8Array(1);
         usages[0] = keyPair.privateKey ? 2 : 3
 
-        const result = import_key_raw(nameBuf, iFormat, rawData.buffer, rawData.byteLength, 0 /* ECDSA */, extractable ? 1 : 0, usages.buffer, usages.length);
+        const result = import_key_raw(nameBuf, iFormat, rawData.buffer, rawData.byteLength, 0 /* ECDSA */, extractable ? 1 : 0, usages.buffer, usages.byteLength);
         if (result < 0)
             return null;
 
