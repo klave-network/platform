@@ -194,7 +194,10 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                 const deploymentSet = uuid();
                 const targets = domains
                     .map(domain => `${branchName}.${application.id.split('-')[0]}.${application.slug}.${domain.fqdn}`)
-                    .concat(`${branchName}.${application.id.split('-')[0]}.${application.slug}.${application.organisation.slug.replace('~$~', '')}.klave.network`, `${buildId}.${application.id.split('-')[0]}.${application.slug}.${application.organisation.slug.replace('~$~', '')}.klave.network`);
+                    .concat(...[
+                        `${branchName}.${application.id.split('-')[0]}.${application.slug}.${application.organisation.slug.replace('~$~', '')}.klave.network`,
+                        `${buildId}.${application.id.split('-')[0]}.${application.slug}.${application.organisation.slug.replace('~$~', '')}.klave.network`
+                    ]);
 
                 targets.forEach(target => {
 
@@ -330,7 +333,8 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 type: 'github',
                                 context: deploymentContext,
                                 repo,
-                                application: applicationObject
+                                application: applicationObject,
+                                deployment
                             });
 
                             const buildResult = await buildVm.build();
@@ -394,6 +398,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 },
                                 data: {
                                     status: 'compiled',
+                                    buildOutputs: buildResult.buildOutputs,
                                     buildOutputWASM: wasmB64,
                                     buildOutputWAT: wat,
                                     buildOutputDTS: dts,

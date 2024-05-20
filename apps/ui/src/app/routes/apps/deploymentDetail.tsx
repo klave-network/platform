@@ -5,12 +5,13 @@ import * as Tooltip from '@radix-ui/react-tooltip';
 import { UilLock, UilLockSlash, UilSpinner } from '@iconscout/react-unicons';
 import { Utils } from '@secretarium/crypto';
 import * as NivoGeo from '@nivo/geo';
+import Ansi from 'ansi-to-react';
 import api from '../../utils/api';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
 import { DeploymentPromotion, DeploymentDeletion } from './deployments';
 import RunCommand from '../../components/RunCommand';
 import AttestationChecker from '../../components/AttestationChecker';
-import { commitVerificationReasons } from '@klave/constants';
+import { StagedOutputGroups, commitVerificationReasons } from '@klave/constants';
 import geoFeatures from '../../geojson/ne_110m_admin_0_countries.json';
 
 const { ResponsiveGeoMap } = NivoGeo;
@@ -21,7 +22,7 @@ export const AppDeploymentDetail: FC = () => {
     const { deploymentId } = useParams();
     const [WASMFingerprint, setWASMFingerprint] = useState<string>();
     const { data: deployment, isLoading: isLoadingDeployments } = api.v0.deployments.getById.useQuery({ deploymentId: deploymentId || '' }, {
-        refetchInterval: 5000
+        refetchInterval: (s) => ['errored', 'terminated', 'deployed'].includes(s.state.data?.status ?? '') ? 5000 : 500
     });
 
     useEffect(() => {
@@ -129,6 +130,13 @@ export const AppDeploymentDetail: FC = () => {
             ? <div className="badge badge-xs py-2 text-slate-400 border-slate-500"><UilLockSlash className='h-3 w-3 mr-1' />{commitVerificationReasons[reason ?? 'unknown']}</div>
             : <div className="badge badge-xs py-2 text-red-400 border-red-400"><UilLockSlash className='h-3 w-3 mr-1' />{commitVerificationReasons[reason ?? 'unknown']}</div>;
 
+    const buildOutputs = deployment.buildOutputs as StagedOutputGroups ?? {
+        clone: [],
+        fetch: [],
+        install: [],
+        build: []
+    };
+
     return <div className="flex flex-col w-full mb-7">
         <div className="flex w-full justify-between">
             <div className='mb-10'>
@@ -228,7 +236,7 @@ export const AppDeploymentDetail: FC = () => {
             ? <Tabs.Root defaultValue="inspect" className='flex flex-col w-full'>
                 <Tabs.List className='flex flex-shrink-0 border-b'>
                     <Tabs.Trigger value="inspect" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Inspect</Tabs.Trigger>
-                    <Tabs.Trigger value="dependencies" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Dependencies</Tabs.Trigger>
+                    <Tabs.Trigger value="build" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Build and Dependencies</Tabs.Trigger>
                     <Tabs.Trigger value="attest" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Attest</Tabs.Trigger>
                 </Tabs.List>
                 <Tabs.Content value="inspect">
@@ -250,7 +258,40 @@ export const AppDeploymentDetail: FC = () => {
                         </pre>
                     </div>
                 </Tabs.Content>
-                <Tabs.Content value="dependencies">
+                <Tabs.Content value="build">
+                    <div className='mt-10'>
+                        <h2 className='font-bold mb-3'>Build stages</h2>
+                        {Object.entries(buildOutputs).map(([stage, outputs]) => {
+                            const isSettled = deployment.status === 'errored' || deployment.status === 'deployed' || deployment.status === 'terminated';
+                            const hasPassed = (stage === 'clone' && buildOutputs.fetch.length > 0)
+                                || (stage === 'fetch' && buildOutputs.install.length > 0)
+                                || (stage === 'install' && buildOutputs.build.length > 0);
+                            let lineNumber = 0;
+                            return <div key={stage} className='mt-5'>
+                                <h3 className='bg-slate-100 p-2 rounded-t border-gray-200 border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-4' />}</h3>
+                                <pre className='overflow-auto w-full max-w-full bg-gray-800'>{outputs.length > 0 ? outputs.map((output, i) => {
+                                    if (isSettled) {
+                                        if (!output.full)
+                                            return null;
+                                    } else {
+                                        if (output.full)
+                                            return null;
+                                    }
+                                    return output.data.split(/[\n]/).map((line, j) => {
+                                        lineNumber++;
+                                        const subLines = line.split(/[\r]/);
+                                        const finalLine = subLines.pop() ?? '';
+                                        if (finalLine?.trim() === '')
+                                            return null;
+                                        subLines.forEach(() => { lineNumber++; });
+                                        return <span key={`${i}-${j}`} className={`${output.type === 'stderr' ? 'text-slate-400' : 'text-slate-200'} block p-0`}>
+                                            <span title={output.time} className='w-10 h-full px-2 inline-block text-slate-500 bg-slate-900 mr-2'>{lineNumber}</span><Ansi>{finalLine}</Ansi>
+                                        </span>;
+                                    });
+                                }) : null}</pre>
+                            </div>;
+                        })}
+                    </div>
                     <div className='mt-10'>
                         <h2 className='font-bold mb-3'>List of external dependencies and digests</h2>
                         <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 p-3'>
@@ -268,7 +309,7 @@ export const AppDeploymentDetail: FC = () => {
                 ? <Tabs.Root defaultValue="inspect" className='flex flex-col w-full'>
                     <Tabs.List className='flex flex-shrink-0 border-b'>
                         <Tabs.Trigger value="inspect" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Inspect</Tabs.Trigger>
-                        <Tabs.Trigger value="dependencies" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Dependencies</Tabs.Trigger>
+                        <Tabs.Trigger value="build" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Build and Dependencies</Tabs.Trigger>
                     </Tabs.List>
                     <Tabs.Content value="inspect">
                         <div className='mt-10'>
@@ -279,7 +320,40 @@ export const AppDeploymentDetail: FC = () => {
                             </pre>
                         </div>
                     </Tabs.Content>
-                    <Tabs.Content value="dependencies">
+                    <Tabs.Content value="build">
+                        <div className='mt-10'>
+                            <h2 className='font-bold mb-3'>Build stages</h2>
+                            {Object.entries(buildOutputs).map(([stage, outputs]) => {
+                                const isSettled = deployment.status === 'errored' || deployment.status === 'deployed' || deployment.status === 'terminated';
+                                const hasPassed = (stage === 'clone' && buildOutputs.fetch.length > 0)
+                                    || (stage === 'fetch' && buildOutputs.install.length > 0)
+                                    || (stage === 'install' && buildOutputs.build.length > 0);
+                                let lineNumber = 0;
+                                return <div key={stage} className='mt-5'>
+                                    <h3 className='bg-slate-100 p-2 rounded-t border-gray-200 border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-4' />}</h3>
+                                    <pre className='overflow-auto w-full max-w-full bg-gray-800'>{outputs.length > 0 ? outputs.map((output, i) => {
+                                        if (isSettled) {
+                                            if (!output.full)
+                                                return null;
+                                        } else {
+                                            if (output.full)
+                                                return null;
+                                        }
+                                        return output.data.split(/[\n]/).map((line, j) => {
+                                            lineNumber++;
+                                            const subLines = line.split(/[\r]/);
+                                            const finalLine = subLines.pop() ?? '';
+                                            if (finalLine?.trim() === '')
+                                                return null;
+                                            subLines.forEach(() => { lineNumber++; });
+                                            return <span key={`${i}-${j}`} className={`${output.type === 'stderr' ? 'text-slate-400' : 'text-slate-200'} block p-0`}>
+                                                <span title={output.time} className='w-10 h-full px-2 inline-block text-slate-500 bg-slate-900 mr-2'>{lineNumber}</span><Ansi>{finalLine}</Ansi>
+                                            </span>;
+                                        });
+                                    }) : null}</pre>
+                                </div>;
+                            })}
+                        </div>
                         <div className='mt-10'>
                             <h2 className='font-bold mb-3'>List of external dependencies and digests</h2>
                             <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 p-3'>
@@ -288,7 +362,49 @@ export const AppDeploymentDetail: FC = () => {
                         </div>
                     </Tabs.Content>
                 </Tabs.Root>
-                : null}
+                : <Tabs.Root defaultValue="build" className='flex flex-col w-full'>
+                    <Tabs.List className='flex flex-shrink-0 border-b'>
+                        <Tabs.Trigger value="build" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Build and Dependencies</Tabs.Trigger>
+                    </Tabs.List>
+                    <Tabs.Content value="build">
+                        <div className='mt-10'>
+                            <h2 className='font-bold mb-3'>Build stages</h2>
+                            {Object.entries(buildOutputs).map(([stage, outputs]) => {
+                                const isSettled = deployment.status === 'errored' || deployment.status === 'deployed' || deployment.status === 'terminated';
+                                const hasPassed = (stage === 'clone' && buildOutputs.fetch.length > 0)
+                                    || (stage === 'fetch' && buildOutputs.install.length > 0)
+                                    || (stage === 'install' && buildOutputs.build.length > 0);
+                                let lineNumber = 0;
+                                return <div key={stage} className='mt-5'>
+                                    <h3 className='bg-slate-100 p-2 rounded-t border-gray-200 border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-4' />}</h3>
+                                    <pre className='overflow-auto w-full max-w-full bg-gray-800'>{outputs.length > 0 ? outputs.map((output, i) => {
+                                        if (isSettled) {
+                                            if (!output.full)
+                                                return null;
+                                        } else {
+                                            if (output.full)
+                                                return null;
+                                        }
+                                        return output.data.split(/[\n\r]/).map((line, j) => {
+                                            lineNumber++;
+                                            if (line?.trim() === '')
+                                                return null;
+                                            return <span key={`${i}-${j}`} className={`${output.type === 'stderr' ? 'text-slate-400' : 'text-slate-200'} block p-0`}>
+                                                <span title={output.time} className='w-10 h-full px-2 inline-block text-slate-500 bg-slate-900 mr-2'>{lineNumber}</span><Ansi>{line}</Ansi>
+                                            </span>;
+                                        });
+                                    }) : null}</pre>
+                                </div>;
+                            })}
+                        </div>
+                        <div className='mt-10'>
+                            <h2 className='font-bold mb-3'>List of external dependencies and digests</h2>
+                            <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 p-3'>
+                                {JSON.stringify(deployment.dependenciesManifest, null, 4)}
+                            </pre>
+                        </div>
+                    </Tabs.Content>
+                </Tabs.Root>}
     </div >;
 };
 

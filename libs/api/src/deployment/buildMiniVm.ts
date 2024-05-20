@@ -10,10 +10,10 @@ import { Utils } from '@secretarium/connector';
 import type { Context } from 'probot';
 import type { InstallationAccessTokenAuthentication } from '@octokit/auth-app';
 import { DeploymentPushPayload } from '../types';
-import { Repo } from '@klave/db';
+import { Deployment, Repo, prisma } from '@klave/db';
 import { dummyMap } from './dummyVmFs';
 import { logger } from '@klave/providers';
-import { RepoConfigSchemaLatest } from '@klave/constants';
+import { RepoConfigSchemaLatest, StagedOutputGroups } from '@klave/constants';
 import { Worker } from 'node:worker_threads';
 import { watExtractorModuleFunction } from './watExtractorModule';
 import { createBuildHost } from './buildHost';
@@ -29,6 +29,7 @@ type BuildOutput = {
     dependenciesManifest: BuildDependenciesManifest;
 } & ({
     success: true;
+    buildOutputs: StagedOutputGroups;
     result: {
         stats?: Stats;
         wasm: Uint8Array;
@@ -52,6 +53,7 @@ export type BuildMiniVMOptions = {
     repo: Repo;
     // TODO Reenable the KlaveRcConfiguration[...] type
     application: NonNullable<RepoConfigSchemaLatest['applications']>[number] | undefined;
+    deployment: Deployment;
     // dependencies: Record<string, string>;
 }
 
@@ -330,6 +332,12 @@ export class BuildMiniVM {
                             routes: []
                         },
                         dependenciesManifest: this.usedDependencies,
+                        buildOutputs: {
+                            clone: [],
+                            fetch: [],
+                            install: [],
+                            build: []
+                        },
                         stdout: '',
                         stderr: ''
                     };
@@ -357,6 +365,12 @@ export class BuildMiniVM {
                 dummyMap['..ts'] = typeof rootContent?.data === 'string' ? rootContent.data : null;
             }
 
+            const outputProgress: StagedOutputGroups = {
+                clone: [],
+                fetch: [],
+                install: [],
+                build: []
+            };
             let compiledBinary = new Uint8Array(0);
             let compiledWAT: string | undefined;
             let compiledDTS: string | undefined;
@@ -387,15 +401,21 @@ export class BuildMiniVM {
                             } if ((message.filename).endsWith('.d.ts'))
                                 compiledDTS = message.contents?.toLocaleString() ?? undefined;
                         } else if (message.type === 'progress') {
-                            if (message.output.full)
-                                return;
-                            const isError = message.output.type === 'stderr';
-                            message.output.data.split('\n').forEach(line => {
-                                const cleanLine = line.trim().replace(/\r/g, '');
-                                if (cleanLine.length === 0)
-                                    return;
-                                console.log(`${message.output.time} compiler-${message.stage} > [${isError ? 'E' : 'O'}] ${cleanLine}`);
+                            outputProgress[message.stage] = outputProgress[message.stage] ?? [];
+                            outputProgress[message.stage].push({
+                                type: message.output.type,
+                                full: message.output.full,
+                                time: message.output.time,
+                                data: message.output.data
                             });
+                            prisma.deployment.update({
+                                where: {
+                                    id: this.options.deployment.id
+                                },
+                                data: {
+                                    buildOutputs: outputProgress
+                                }
+                            }).catch(() => { return; });
                         } else if (message.type === 'diagnostic') {
                             //
                         } else if (message.type === 'errored') {
@@ -443,6 +463,7 @@ export class BuildMiniVM {
                                             signature
                                         },
                                         dependenciesManifest: this.usedDependencies,
+                                        buildOutputs: outputProgress,
                                         stdout: message.stdout ?? '',
                                         stderr: message.stderr ?? ''
                                     };
