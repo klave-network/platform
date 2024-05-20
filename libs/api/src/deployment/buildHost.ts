@@ -2,6 +2,7 @@ import { exec, ExecException } from 'node:child_process';
 import path from 'node:path';
 import fs from 'node:fs';
 import { v4 as uuid } from 'uuid';
+import TOML from 'toml';
 import { getFinalParseConfig } from '@klave/constants';
 import { BuildDependenciesManifest, BuildMiniVMOptions } from './buildMiniVm';
 
@@ -71,6 +72,7 @@ export class BuildHost {
     ascVersion = 'unknown';
     entryFile = -1;
     listeners: Record<string, Array<(value: BuildHostMessage) => void>> = {};
+    usedDependencies: BuildDependenciesManifest = {};
 
     constructor(private options: BuildHostOptions) { }
 
@@ -86,10 +88,11 @@ export class BuildHost {
             try {
 
                 const { token, workingDirectory, repo, context: { commit: { after } } } = this.options;
-                type PackageManager = 'yarn' | 'npm';
+                type PackageManager = 'yarn' | 'npm' | 'cargo';
                 const packageManagerCommands: Record<PackageManager, [string, string]> = {
                     yarn: ['yarn install', 'yarn build'],
-                    npm: ['npm install', 'npm run build']
+                    npm: ['npm install', 'npm run build'],
+                    cargo: ['cargo check', 'cargo build --target wasm32-unknown-unknown --release']
                 };
                 let packageManager: keyof typeof packageManagerCommands = 'yarn';
 
@@ -123,10 +126,12 @@ export class BuildHost {
                     });
                 })).then(async () => {
 
-                    if (fs.existsSync(path.resolve(workingDirectory, 'yarn.lock')))
+                    if (fs.existsSync(path.join(workingDirectory, 'yarn.lock')))
                         packageManager = 'yarn';
-                    else if (fs.existsSync(path.resolve(workingDirectory, 'package-lock.json')))
+                    else if (fs.existsSync(path.join(workingDirectory, 'package-lock.json')))
                         packageManager = 'npm';
+                    else if (fs.existsSync(path.join(workingDirectory, 'Cargo.lock')) || fs.existsSync(path.join(workingDirectory, 'Cargo.toml')))
+                        packageManager = 'cargo';
 
                     return new Promise<void>((resolve, reject) => {
                         const hook = exec(packageManagerCommands[packageManager][0], {
@@ -147,6 +152,7 @@ export class BuildHost {
                     const hook = exec(packageManagerCommands[packageManager][1], {
                         cwd: workingDirectory,
                         env: {
+                            ...process.env,
                             INIT_CWD: workingDirectory
                         }
                     }, (error, stdout, stderr) => {
@@ -162,7 +168,7 @@ export class BuildHost {
                     });
                 })).then(async () => new Promise<void>((resolve, reject) => {
 
-                    const klaveConfig = getFinalParseConfig(fs.readFileSync(path.resolve(workingDirectory, 'klave.json'), 'utf-8'));
+                    const klaveConfig = getFinalParseConfig(fs.readFileSync(path.join(workingDirectory, 'klave.json'), 'utf-8'));
                     if (klaveConfig.error)
                         return reject(klaveConfig.error);
 
@@ -170,20 +176,44 @@ export class BuildHost {
                     if (appIndex === undefined || appIndex === -1)
                         return reject(new Error('Application not found'));
 
-                    const appCompiledPath = path.resolve(workingDirectory, '.klave');
-                    fs.readdirSync(appCompiledPath).forEach(file => {
-                        if (file.split('-').shift() === `${appIndex}`)
-                            this.listeners['message']?.forEach(listener => listener({
-                                type: 'write',
-                                contents: fs.readFileSync(path.resolve(appCompiledPath, file), null),
-                                filename: path.basename(file)
-                            }));
-                    });
+                    if (packageManager === 'yarn' || packageManager === 'npm') {
+                        const appCompiledPath = path.join(workingDirectory, '.klave');
+                        fs.readdirSync(appCompiledPath).forEach(file => {
+                            if (file.split('-').shift() === `${appIndex}`)
+                                this.listeners['message']?.forEach(listener => listener({
+                                    type: 'write',
+                                    contents: fs.readFileSync(path.join(appCompiledPath, file), null),
+                                    filename: path.basename(file)
+                                }));
+                        });
+                    } else if (packageManager === 'cargo') {
+
+                        const appPath = klaveConfig.data.applications?.[appIndex]?.rootDir ?? '.';
+                        const tomlConf = TOML.parse(fs.readFileSync(path.join(workingDirectory, appPath, 'Cargo.toml'), 'utf-8'));
+
+                        Object.entries(tomlConf.dependencies ?? {})?.forEach(([name, version]) => {
+                            this.usedDependencies[name] = {
+                                version: (typeof version === 'string' ? version : (version as { version: string }).version) ?? 'unknown',
+                                digests: {}
+                            };
+                        });
+
+                        const appCompiledPath = path.join(workingDirectory, 'target', 'wasm32-unknown-unknown', 'release');
+                        fs.readdirSync(appCompiledPath).forEach(file => {
+                            const filename = file.split('.').shift();
+                            if (filename === tomlConf.package?.name || filename === tomlConf.package?.name?.replaceAll('-', '_'))
+                                this.listeners['message']?.forEach(listener => listener({
+                                    type: 'write',
+                                    contents: fs.readFileSync(path.join(appCompiledPath, file), null),
+                                    filename: file
+                                }));
+                        });
+                    }
 
                     resolve();
 
                 })).then(async () => {
-                    this.listeners['message']?.forEach(listener => listener({ type: 'done', stats: {} }));
+                    this.listeners['message']?.forEach(listener => listener({ type: 'done', stats: {}, dependencies: this.usedDependencies }));
                 }).catch(async (error) => {
                     this.listeners['message']?.forEach(listener => listener({ type: 'errored', error }));
                 });
@@ -208,7 +238,7 @@ export class BuildHost {
 export const createBuildHost = async (options: BuildHostCreatorOptions) => {
 
     const compilationId = uuid();
-    const workingDirectory = path.resolve(process.env['NODE_ENV'] === 'development' ? process.cwd() : '/', 'tmp', '.klave', 'buildHost', compilationId);
+    const workingDirectory = path.join(process.env['NODE_ENV'] === 'development' ? process.cwd() : '/', 'tmp', '.klave', 'buildHost', compilationId);
 
     if (!fs.existsSync(workingDirectory))
         fs.mkdirSync(workingDirectory, { recursive: true });
