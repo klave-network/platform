@@ -7,8 +7,8 @@ import { HttpsProxyAgent } from 'https-proxy-agent';
 import { ErrorObject, serializeError } from 'serialize-error';
 import type { Stats } from 'assemblyscript/dist/asc';
 import { Utils } from '@secretarium/connector';
-import { createCompiler } from '@klave/compiler';
 import type { Context } from 'probot';
+import type { InstallationAccessTokenAuthentication } from '@octokit/auth-app';
 import { DeploymentPushPayload } from '../types';
 import { Repo } from '@klave/db';
 import { dummyMap } from './dummyVmFs';
@@ -16,8 +16,9 @@ import { logger } from '@klave/providers';
 import { RepoConfigSchemaLatest } from '@klave/constants';
 import { Worker } from 'node:worker_threads';
 import { watExtractorModuleFunction } from './watExtractorModule';
+import { createBuildHost } from './buildHost';
 
-type BuildDependenciesManifest = Record<string, {
+export type BuildDependenciesManifest = Record<string, {
     version: string;
     digests: Record<string, string>
 }>;
@@ -45,20 +46,22 @@ export type DeploymentContext<Type> = {
     octokit: Context['octokit']
 } & Type;
 
+export type BuildMiniVMOptions = {
+    type: 'github';
+    context: DeploymentContext<DeploymentPushPayload>;
+    repo: Repo;
+    // TODO Reenable the KlaveRcConfiguration[...] type
+    application: NonNullable<RepoConfigSchemaLatest['applications']>[number] | undefined;
+    // dependencies: Record<string, string>;
+}
+
 export class BuildMiniVM {
 
     private proxyAgent: HttpsProxyAgent<string> | undefined;
     private usedDependencies: BuildDependenciesManifest = {};
     private dependencies: Record<string, string> = {};
 
-    constructor(private options: {
-        type: 'github';
-        context: DeploymentContext<DeploymentPushPayload>;
-        repo: Repo;
-        // TODO Reenable the KlaveRcConfiguration[...] type
-        application: NonNullable<RepoConfigSchemaLatest['applications']>[number] | undefined;
-        // dependencies: Record<string, string>;
-    }) {
+    constructor(private options: BuildMiniVMOptions) {
         if (process.env['KLAVE_SQUID_URL'])
             this.proxyAgent = new HttpsProxyAgent(process.env['KLAVE_SQUID_URL']);
     }
@@ -114,7 +117,7 @@ export class BuildMiniVM {
                 const unpkgDomain = 'https://www.unpkg.com/';
                 const url = `${unpkgDomain}${packageName}${packageVersion ? `@${packageVersion}` : ''}/${filePath}`;
                 const urlHash = Utils.toHex(new Uint8Array(await webcrypto.subtle.digest('SHA-256', new TextEncoder().encode(url))));
-                const assetLocation = nodePath.resolve(`./.cache/klave/compiler/assets/${urlHash}`);
+                const assetLocation = nodePath.resolve(`./.cache/klave/buildHost/assets/${urlHash}`);
 
                 if (fs.existsSync(assetLocation)) {
 
@@ -252,6 +255,20 @@ export class BuildMiniVM {
 
         if (!packageJson)
             throw new Error('No package.json found');
+
+        const dependencies = {
+            ...packageJson.optionalDependencies,
+            ...packageJson.peerDependencies,
+            ...packageJson.devDependencies,
+            ...packageJson.dependencies
+        };
+
+        Object.entries(dependencies).forEach(([key, value]) => {
+            this.usedDependencies[key] = {
+                version: value,
+                digests: {}
+            };
+        });
     }
 
     async build(): Promise<BuildOutput> {
@@ -343,42 +360,48 @@ export class BuildMiniVM {
             let compiledWAT: string | undefined;
             let compiledDTS: string | undefined;
             try {
-                const compiler = await createCompiler();
+                const authStruct = await this.options.context.octokit.auth({ type: 'installation' }) as InstallationAccessTokenAuthentication;
+                const buildHost = await createBuildHost({
+                    token: authStruct.token,
+                    ...this.options
+                });
                 return new Promise<BuildOutput>((resolve) => {
-                    compiler.on('message', (message) => {
+                    buildHost.on('message', (message) => {
                         if (message.type === 'start') {
                             this.usedDependencies['@klave/compiler'] = {
-                                version: compiler.version,
+                                version: '*',
                                 digests: {
                                     ['git:*']: process.env['GIT_REPO_COMMIT'] ?? 'unknown'
                                 }
                             };
                             this.usedDependencies['assemblyscript'] = {
-                                version: compiler.ascVersion ?? message.version ?? 'unknown',
+                                version: buildHost.ascVersion ?? message.version ?? 'unknown',
                                 digests: {}
                             };
-                        } else if (message.type === 'read') {
-                            this.getContent(message.filename).then(response => {
-                                compiler.postMessage({
-                                    type: 'read',
-                                    id: message.id,
-                                    contents: typeof response.data === 'string' ? response.data : null
-                                });
-                            }).catch(() => { return; });
                         } else if (message.type === 'write') {
                             if ((message.filename).endsWith('.wasm'))
                                 compiledBinary = message.contents ? Uint8Array.from(Buffer.from(message.contents)) : new Uint8Array(0);
-                            if ((message.filename).endsWith('.wat'))
-                                compiledWAT = message.contents ?? undefined;
-                            if ((message.filename).endsWith('.d.ts'))
-                                compiledDTS = message.contents ?? undefined;
+                            if ((message.filename).endsWith('.wat')) {
+                                compiledWAT = message.contents?.toLocaleString() ?? undefined;
+                            } if ((message.filename).endsWith('.d.ts'))
+                                compiledDTS = message.contents?.toLocaleString() ?? undefined;
+                        } else if (message.type === 'progress') {
+                            if (message.output.full)
+                                return;
+                            const isError = message.output.type === 'stderr';
+                            message.output.data.split('\n').forEach(line => {
+                                const cleanLine = line.trim().replace(/\r/g, '');
+                                if (cleanLine.length === 0)
+                                    return;
+                                console.log(`${message.output.time} compiler-${message.stage} > [${isError ? 'E' : 'O'}] ${cleanLine}`);
+                            });
                         } else if (message.type === 'diagnostic') {
                             //
                         } else if (message.type === 'errored') {
-                            logger.debug(`Compiler errored: ${message.error?.message ?? message.error ?? 'Unknown'}`, {
+                            logger.debug(`Build Host errored: ${message.error?.message ?? message.error ?? 'Unknown'}`, {
                                 parent: 'bmv'
                             });
-                            compiler.terminate().finally(() => {
+                            buildHost.terminate().finally(() => {
                                 resolve({
                                     success: false,
                                     error: message.error,
@@ -388,6 +411,11 @@ export class BuildMiniVM {
                                 });
                             }).catch(() => { return; });
                         } else if (message.type === 'done') {
+                            if (message.dependencies)
+                                this.usedDependencies = {
+                                    ...this.usedDependencies,
+                                    ...message.dependencies
+                                };
                             let signature: sigstore.Bundle;
                             // TODO Add OIDC token
                             sigstore.sign(Buffer.from(compiledBinary), { identityToken: '' })
@@ -406,7 +434,7 @@ export class BuildMiniVM {
                                     const output: BuildOutput = {
                                         success: true,
                                         result: {
-                                            stats: message.stats,
+                                            // stats: message.stats,
                                             wasm: compiledBinary,
                                             routes: validRoutes,
                                             wat: compiledWAT,
@@ -417,7 +445,7 @@ export class BuildMiniVM {
                                         stdout: message.stdout ?? '',
                                         stderr: message.stderr ?? ''
                                     };
-                                    compiler.terminate().finally(() => {
+                                    buildHost.terminate().finally(() => {
                                         resolve(output);
                                     }).catch(() => { return; });
                                 });
