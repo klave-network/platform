@@ -29,7 +29,7 @@ type CompilerMessage = {
 } | {
     type: 'write';
     filename: string;
-    contents: string | null;
+    contents: string | Uint8Array | null;
 } | {
     type: 'diagnostic';
     diagnostics: string;
@@ -71,7 +71,7 @@ export class CompilerHost {
                         // parse the d.ts file
                         const sourceFile = ts.createSourceFile(
                             `${this.id}.d.ts`,
-                            message.contents,
+                            message.contents.toLocaleString(),
                             ts.ScriptTarget.Latest,
                             true
                         );

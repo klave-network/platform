@@ -24,7 +24,13 @@ WORKDIR /app
 RUN cd hubber && yarn add prisma
 RUN cd hubber && yarn run prisma generate
 
-FROM docker.io/node:20-alpine AS final
+FROM docker.io/node:20-alpine AS base
+
+RUN apk update
+RUN apk upgrade --no-cache
+RUN apk add --no-cache git
+
+FROM base AS final
 
 ENV HOST=0.0.0.0
 ENV PORT=3333
