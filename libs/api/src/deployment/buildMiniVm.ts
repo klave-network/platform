@@ -257,10 +257,10 @@ export class BuildMiniVM {
             throw new Error('No package.json found');
 
         const dependencies = {
-            ...packageJson.optionalDependencies,
-            ...packageJson.peerDependencies,
-            ...packageJson.devDependencies,
-            ...packageJson.dependencies
+            ...packageJson.optionalDependencies ?? {},
+            ...packageJson.peerDependencies ?? {},
+            ...packageJson.devDependencies ?? {},
+            ...packageJson.dependencies ?? {}
         };
 
         Object.entries(dependencies).forEach(([key, value]) => {
@@ -348,13 +348,14 @@ export class BuildMiniVM {
 
             }
 
-        } else if (selectedEntryPoint?.name === 'index.ts') {
+        } else {
 
-            // We first need to fetch dependencies from package.json
-            await this.getTSDependencies();
-
-            const rootContent = await this.getContent(selectedEntryPoint.path);
-            dummyMap['..ts'] = typeof rootContent?.data === 'string' ? rootContent.data : null;
+            // We first need to fetch dependencies from package.json if this is TS
+            if (selectedEntryPoint?.name === 'index.ts') {
+                await this.getTSDependencies();
+                const rootContent = await this.getContent(selectedEntryPoint.path);
+                dummyMap['..ts'] = typeof rootContent?.data === 'string' ? rootContent.data : null;
+            }
 
             let compiledBinary = new Uint8Array(0);
             let compiledWAT: string | undefined;

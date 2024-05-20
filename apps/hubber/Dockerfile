@@ -28,7 +28,8 @@ FROM docker.io/node:20-alpine AS base
 
 RUN apk update
 RUN apk upgrade --no-cache
-RUN apk add --no-cache git
+RUN apk add --no-cache rust cargo git
+RUN rustup target add wasm32-unknown-unknown
 
 FROM base AS final
 
