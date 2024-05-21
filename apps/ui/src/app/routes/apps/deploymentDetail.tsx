@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import * as Tabs from '@radix-ui/react-tabs';
 import * as Tooltip from '@radix-ui/react-tooltip';
@@ -20,9 +20,10 @@ const defaultNivoGeoProps = ((NivoGeo as unknown as Record<string, Record<string
 export const AppDeploymentDetail: FC = () => {
 
     const { deploymentId } = useParams();
+    const scrollPointRef = useRef<HTMLDivElement>(null);
     const [WASMFingerprint, setWASMFingerprint] = useState<string>();
     const { data: deployment, isLoading: isLoadingDeployments } = api.v0.deployments.getById.useQuery({ deploymentId: deploymentId || '' }, {
-        refetchInterval: (s) => ['errored', 'terminated', 'deployed'].includes(s.state.data?.status ?? '') ? 5000 : 500
+        refetchInterval: (s) => ['errored', 'terminated', 'deployed'].includes(s.state.data?.status ?? '') ? (Date.now() - (s.state.data?.createdAt.getTime() ?? 0) < 60000 ? 5000 : 60000) : 500
     });
 
     useEffect(() => {
@@ -35,6 +36,16 @@ export const AppDeploymentDetail: FC = () => {
         }).catch(() => { return; });
 
     }, [deployment?.buildOutputWASM]);
+
+    useEffect(() => {
+        if (!deployment)
+            return;
+        const isSettled = deployment.status === 'errored' || deployment.status === 'deployed' || deployment.status === 'terminated';
+        if (isSettled)
+            return;
+        if (scrollPointRef.current)
+            scrollPointRef.current.scrollIntoView({ behavior: 'smooth' });
+    }, [deployment]);
 
     const datacentreMarkers = [{
         type: 'Feature',
@@ -136,7 +147,6 @@ export const AppDeploymentDetail: FC = () => {
         install: [],
         build: []
     };
-
     return <div className="flex flex-col w-full mb-7">
         <div className="flex w-full justify-between">
             <div className='mb-10'>
@@ -295,7 +305,7 @@ export const AppDeploymentDetail: FC = () => {
                     <div className='mt-10'>
                         <h2 className='font-bold mb-3'>List of external dependencies and digests</h2>
                         <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 p-3'>
-                            {JSON.stringify(deployment.dependenciesManifest, null, 4)}
+                            {JSON.stringify(deployment.dependenciesManifest ?? '', null, 4)}
                         </pre>
                     </div>
                 </Tabs.Content>
@@ -357,7 +367,7 @@ export const AppDeploymentDetail: FC = () => {
                         <div className='mt-10'>
                             <h2 className='font-bold mb-3'>List of external dependencies and digests</h2>
                             <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 p-3'>
-                                {JSON.stringify(deployment.dependenciesManifest, null, 4)}
+                                {JSON.stringify(deployment.dependenciesManifest ?? '', null, 4)}
                             </pre>
                         </div>
                     </Tabs.Content>
@@ -385,22 +395,26 @@ export const AppDeploymentDetail: FC = () => {
                                             if (output.full)
                                                 return null;
                                         }
-                                        return output.data.split(/[\n\r]/).map((line, j) => {
+                                        return output.data.split(/[\n]/).map((line, j) => {
                                             lineNumber++;
-                                            if (line?.trim() === '')
+                                            const subLines = line.split(/[\r]/);
+                                            const finalLine = subLines.pop() ?? '';
+                                            if (finalLine?.trim() === '')
                                                 return null;
+                                            subLines.forEach(() => { lineNumber++; });
                                             return <span key={`${i}-${j}`} className={`${output.type === 'stderr' ? 'text-slate-400' : 'text-slate-200'} block p-0`}>
-                                                <span title={output.time} className='w-10 h-full px-2 inline-block text-slate-500 bg-slate-900 mr-2'>{lineNumber}</span><Ansi>{line}</Ansi>
+                                                <span title={output.time} className='w-10 h-full px-2 inline-block text-slate-500 bg-slate-900 mr-2'>{lineNumber}</span><Ansi>{finalLine}</Ansi>
                                             </span>;
                                         });
                                     }) : null}</pre>
                                 </div>;
                             })}
                         </div>
+                        <div ref={scrollPointRef} />
                         <div className='mt-10'>
                             <h2 className='font-bold mb-3'>List of external dependencies and digests</h2>
                             <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 p-3'>
-                                {JSON.stringify(deployment.dependenciesManifest, null, 4)}
+                                {JSON.stringify(deployment.dependenciesManifest ?? '', null, 4)}
                             </pre>
                         </div>
                     </Tabs.Content>
