@@ -35,9 +35,11 @@ type BuildHostMessage = {
     type: 'progress';
     stage: keyof StagedOutputGroups;
     output: StagedOutputGroups[keyof StagedOutputGroups][number];
+    sourceType?: string;
 } | {
     type: 'errored';
     error: Error;
+    sourceType: string;
     dependencies?: BuildDependenciesManifest
     output?: StagedOutputGroups;
     stdout?: string;
@@ -45,6 +47,7 @@ type BuildHostMessage = {
 } | {
     type: 'done';
     stats: unknown;
+    sourceType: string;
     dependencies?: BuildDependenciesManifest
     output: StagedOutputGroups;
     stdout?: string;
@@ -156,6 +159,8 @@ export class BuildHost {
                     else if (fs.existsSync(path.join(workingDirectory, 'Cargo.lock')) || fs.existsSync(path.join(workingDirectory, 'Cargo.toml')))
                         packageManager = 'cargo';
 
+                    this.listeners['message']?.forEach(listener => listener({ type: 'progress', sourceType: packageManager === 'cargo' ? 'rust-component' : 'assemblyscript', stage: 'install', output: { type: 'stdout', full: false, time: new Date().toISOString(), data: `Using ${packageManager} as package manager\r` } }));
+
                     return new Promise<void>((resolve, reject) => {
                         const command = packageManagerCommands[packageManager][0];
                         this.consolePrint('install', { type: 'stdout', full: true, data: `$> ${command}` });
@@ -209,7 +214,7 @@ export class BuildHost {
                     hook.stderr?.on('data', (data) => {
                         this.consolePrint('build', { type: 'stderr', full: false, data });
                     });
-                })).then(async () => new Promise<void>((resolve, reject) => {
+                })).then(async () => new Promise<PackageManager>((resolve, reject) => {
 
                     const klaveConfig = getFinalParseConfig(fs.readFileSync(path.join(workingDirectory, 'klave.json'), 'utf-8'));
                     if (klaveConfig.error)
@@ -253,14 +258,14 @@ export class BuildHost {
                         });
                     }
 
-                    resolve();
+                    resolve(packageManager);
 
-                })).then(async () => {
-                    this.listeners['message']?.forEach(listener => listener({ type: 'done', stats: {}, output: this.outputProgress, dependencies: this.usedDependencies }));
+                })).then(async (packageManager) => {
+                    this.listeners['message']?.forEach(listener => listener({ type: 'done', stats: {}, sourceType: packageManager === 'cargo' ? 'rust-component' : 'assemblyscript', output: this.outputProgress, dependencies: this.usedDependencies }));
                 }).catch(async (error) => {
                     // Leave a bit of time for the last buffered process message to be committed
                     setTimeout(() => {
-                        this.listeners['message']?.forEach(listener => listener({ type: 'errored', error, output: this.outputProgress }));
+                        this.listeners['message']?.forEach(listener => listener({ type: 'errored', error, sourceType: packageManager === 'cargo' ? 'rust-component' : 'assemblyscript', output: this.outputProgress }));
                     }, 5000);
                 });
             }

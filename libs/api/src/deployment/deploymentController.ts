@@ -346,6 +346,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 },
                                 data: {
                                     dependenciesManifest,
+                                    sourceType: buildResult.sourceType,
                                     buildOutputStdOut: stdout,
                                     buildOutputStdErr: stderr
                                 }
@@ -362,6 +363,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                     },
                                     data: {
                                         status: 'errored',
+                                        buildOutputs: buildResult.buildOutputs,
                                         buildOutputErrorObj: buildResult.error as NonNullable<object> ?? null
                                     }
                                 });
@@ -386,6 +388,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                     },
                                     data: {
                                         status: 'errored',
+                                        buildOutputs: buildResult.buildOutputs,
                                         buildOutputErrorObj: { message: 'Empty wasm' }
                                     }
                                 });

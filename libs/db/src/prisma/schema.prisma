@@ -217,6 +217,7 @@ model Deployment {
     updatedAt            DateTime           @updatedAt
     application          Application        @relation(fields: [applicationId], references: [id], onDelete: Cascade)
     applicationId        String
+    sourceType           String?
     buildOutputs         Json?
     buildOutputDTS       String?
     buildOutputWAT       String?

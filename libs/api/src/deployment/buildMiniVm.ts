@@ -28,6 +28,7 @@ type BuildOutput = {
     stderr: string;
     dependenciesManifest: BuildDependenciesManifest;
     buildOutputs: StagedOutputGroups;
+    sourceType: string;
 } & ({
     success: true;
     result: {
@@ -331,6 +332,7 @@ export class BuildMiniVM {
                             wasm: wasmBuffer,
                             routes: []
                         },
+                        sourceType: 'wasm',
                         dependenciesManifest: this.usedDependencies,
                         buildOutputs: {
                             clone: [],
@@ -348,6 +350,7 @@ export class BuildMiniVM {
                     return {
                         success: false,
                         error: serializeError(error as Error | ErrorObject),
+                        sourceType: 'wasm',
                         dependenciesManifest: this.usedDependencies,
                         buildOutputs: {
                             clone: [],
@@ -419,7 +422,8 @@ export class BuildMiniVM {
                                     id: this.options.deployment.id
                                 },
                                 data: {
-                                    buildOutputs: outputProgress
+                                    buildOutputs: outputProgress,
+                                    sourceType: message.sourceType
                                 }
                             }).catch(() => { return; });
                         } else if (message.type === 'diagnostic') {
@@ -437,6 +441,7 @@ export class BuildMiniVM {
                                 resolve({
                                     success: false,
                                     error: message.error,
+                                    sourceType: message.sourceType,
                                     dependenciesManifest: this.usedDependencies,
                                     buildOutputs: message.output ?? outputProgress,
                                     stdout: message.stdout ?? '',
@@ -473,6 +478,7 @@ export class BuildMiniVM {
                                             dts: compiledDTS,
                                             signature
                                         },
+                                        sourceType: message.sourceType,
                                         dependenciesManifest: this.usedDependencies,
                                         buildOutputs: message.output ?? outputProgress,
                                         stdout: message.stdout ?? '',
@@ -493,6 +499,7 @@ export class BuildMiniVM {
                 return {
                     success: false,
                     error: serializeError(error as Error | ErrorObject),
+                    sourceType: 'ts',
                     dependenciesManifest: this.usedDependencies,
                     buildOutputs: {
                         clone: [],
@@ -509,6 +516,7 @@ export class BuildMiniVM {
             success: false,
             error: new Error('No entry point found'),
             dependenciesManifest: this.usedDependencies,
+            sourceType: 'unknown',
             buildOutputs: {
                 clone: [],
                 fetch: [],
