@@ -168,7 +168,7 @@ export const AppSettings: FC = () => {
     });
 
     const gitSignRequired = useMemo(() => application?.gitSignRequired ?? false, [application]);
-    const deployCommitLedgers = useMemo(() => application?.gitSignRequired ?? false, [application]);
+    const deployCommitLedgers = useMemo(() => application?.deployCommitLedgers ?? false, [application]);
 
     if (isLoading || !application)
         return <>
