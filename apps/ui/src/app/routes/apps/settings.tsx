@@ -168,6 +168,7 @@ export const AppSettings: FC = () => {
     });
 
     const gitSignRequired = useMemo(() => application?.gitSignRequired ?? false, [application]);
+    const deployCommitLedgers = useMemo(() => application?.gitSignRequired ?? false, [application]);
 
     if (isLoading || !application)
         return <>
@@ -182,6 +183,17 @@ export const AppSettings: FC = () => {
             withSlug: false,
             appId: application.id || '', data: {
                 gitSignRequired: e.currentTarget.checked
+            }
+        })
+            .then(async () => utils.getBySlug.invalidate())
+            .catch(() => { return; });
+    };
+
+    const handleDeployCommitLedgers: ChangeEventHandler<HTMLInputElement> = (e) => {
+        mutation.mutateAsync({
+            withSlug: false,
+            appId: application.id || '', data: {
+                deployCommitLedgers: e.currentTarget.checked
             }
         })
             .then(async () => utils.getBySlug.invalidate())
@@ -265,6 +277,12 @@ export const AppSettings: FC = () => {
             <p>
                 Balance: <b><CreditDisplay kredits={application.kredits} /></b><br />
                 <Link to={`/organisation/${orgSlug}/credits`} className='text-klave-light-blue hover:underline'>Manage credit allocations</Link>
+            </p>
+        </div>
+        <div>
+            <h1 className='font-bold text-xl mb-5'>Deployment</h1>
+            <p>
+                <label className='flex items-center'><input type="checkbox" className="toggle toggle-sm mr-2" checked={deployCommitLedgers} onChange={handleDeployCommitLedgers} /><span className='pb-1'>Create an out-of-branch deployment for every commit push</span> {mutation.isPending ? <UilSpinner className='inline-block animate-spin' /> : null}</label>
             </p>
         </div>
         <div>

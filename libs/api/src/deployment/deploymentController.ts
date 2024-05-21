@@ -196,8 +196,8 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                     .map(domain => `${branchName}.${application.id.split('-')[0]}.${application.slug}.${domain.fqdn}`)
                     .concat(...[
                         `${branchName}.${application.id.split('-')[0]}.${application.slug}.${application.organisation.slug.replace('~$~', '')}.klave.network`,
-                        `${buildId}.${application.id.split('-')[0]}.${application.slug}.${application.organisation.slug.replace('~$~', '')}.klave.network`
-                    ]);
+                        application.deployCommitLedgers ? `${buildId}.${application.id.split('-')[0]}.${application.slug}.${application.organisation.slug.replace('~$~', '')}.klave.network` : undefined
+                    ].filter(Boolean));
 
                 targets.forEach(target => {
 
@@ -238,7 +238,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                         }
                                     },
                                     commit,
-                                    expiresOn: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
+                                    expiresOn: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
                                     version: availableApplicationsConfig[application.slug]?.version,
                                     set: deploymentSet,
                                     build: context.commit.after.substring(0, 8),
