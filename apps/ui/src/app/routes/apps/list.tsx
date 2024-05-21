@@ -17,7 +17,7 @@ export const AppSidebar: FC = () => {
     const { data: applicationsList, isLoading: isAppsLoading } = api.v0.applications.getByOrganisation.useQuery({
         orgSlug: orgSlug ?? ''
     }, {
-        refetchInterval: 60000
+        refetchInterval: (s) => s.state.data?.find(a => a.deployments.find(d => !['errored', 'terminated', 'deployed'].includes(d.status ?? ''))) === undefined ? 60000 : 500
     });
 
     const isCreatingNewOrg = useMemo(() => lastMatch?.pathname === '/organisation/new' || orgSlug === 'new', [lastMatch, orgSlug]);
