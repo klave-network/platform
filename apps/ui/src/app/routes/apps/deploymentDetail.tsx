@@ -2,7 +2,7 @@ import { FC, useEffect, useMemo, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import * as Tabs from '@radix-ui/react-tabs';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import { UilLock, UilLockSlash, UilSpinner } from '@iconscout/react-unicons';
+import { UilExclamationTriangle, UilLock, UilLockSlash, UilSpinner } from '@iconscout/react-unicons';
 import { Utils } from '@secretarium/crypto';
 import * as NivoGeo from '@nivo/geo';
 import Ansi from 'ansi-to-react';
@@ -260,6 +260,12 @@ export const AppDeploymentDetail: FC = () => {
                             {deployment.buildOutputDTS}
                         </pre>
                         <h3 className='mt-5 mb-3'>WASM</h3>
+                        {deployment.sourceType?.includes('rust')
+                            ? <pre className={'overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-yellow-100 dark:bg-gray-800 p-3 mb-2'}>
+                                <UilExclamationTriangle className='w-8 h-10 p-0 -ml-1 mb-2' />
+                                Rust builds are non-deterministic accross environements. Please bare in mind that the following hash is only valid for the current build environment or similar. See dependencies for more information.
+                            </pre>
+                            : null}
                         <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-slate-100 dark:bg-gray-800 p-3'>
                             SHA256:{WASMFingerprint}
                         </pre>
