@@ -38,12 +38,15 @@ type BuildHostMessage = {
 } | {
     type: 'errored';
     error: Error;
+    dependencies?: BuildDependenciesManifest
+    output?: StagedOutputGroups;
     stdout?: string;
     stderr?: string;
 } | {
     type: 'done';
     stats: unknown;
     dependencies?: BuildDependenciesManifest
+    output: StagedOutputGroups;
     stdout?: string;
     stderr?: string;
 } | {
@@ -68,6 +71,12 @@ export class BuildHost {
     entryFile = -1;
     listeners: Record<string, Array<(value: BuildHostMessage) => void>> = {};
     usedDependencies: BuildDependenciesManifest = {};
+    outputProgress: StagedOutputGroups = {
+        clone: [],
+        fetch: [],
+        install: [],
+        build: []
+    };
 
     constructor(private options: BuildHostOptions) { }
 
@@ -76,6 +85,16 @@ export class BuildHost {
             this.listeners[event] = [];
         this.listeners[event]?.push(listener);
         return this;
+    }
+
+    consolePrint(stage: keyof StagedOutputGroups, output: Partial<StagedOutputGroups[keyof StagedOutputGroups][number]>) {
+        const timedOutput = { ...output, time: new Date().toISOString() } as StagedOutputGroups[keyof StagedOutputGroups][number];
+        this.outputProgress[stage].push(timedOutput);
+        this.listeners['message']?.forEach(listener => listener({
+            type: 'progress',
+            stage,
+            output: timedOutput
+        }));
     }
 
     postMessage(message: ParentMessage) {
@@ -87,49 +106,46 @@ export class BuildHost {
                 const packageManagerCommands: Record<PackageManager, [string, string]> = {
                     yarn: ['yarn install', 'yarn build'],
                     npm: ['npm install', 'npm run build'],
-                    cargo: ['cargo check --color always', 'cargo build --color always --target wasm32-unknown-unknown --release']
+                    cargo: ['cargo check', 'cargo component build --target wasm32-unknown-unknown --release']
                 };
                 let packageManager: keyof typeof packageManagerCommands = 'yarn';
 
                 new Promise<void>((resolve, reject) => {
-                    const command = `git clone --progress --depth=1 https://git:${token}@github.com/${repo.owner}/${repo.name} .`;
-                    this.listeners['message']?.forEach(listener => listener({ type: 'progress', stage: 'clone', output: { type: 'stdout', full: true, time: new Date().toISOString(), data: `$> ${command}` } }));
-                    this.listeners['message']?.forEach(listener => listener({ type: 'progress', stage: 'clone', output: { type: 'stdout', full: false, time: new Date().toISOString(), data: `$> ${command}` } }));
+                    let command = `git clone --progress --depth=1 https://git:***@github.com/${repo.owner}/${repo.name} .`;
+                    this.consolePrint('clone', { type: 'stdout', full: true, data: `$> ${command}` });
+                    this.consolePrint('clone', { type: 'stdout', full: false, data: `$> ${command}` });
+                    command = command.replaceAll('***', token);
                     const hook = exec(command, {
                         cwd: workingDirectory
                     }, (error, stdout, stderr) => {
                         if (error) return reject(error);
-                        this.listeners['message']?.forEach(listener => {
-                            listener({ type: 'progress', stage: 'clone', output: { type: 'stdout', full: true, time: new Date().toISOString(), data: stdout } });
-                            listener({ type: 'progress', stage: 'clone', output: { type: 'stderr', full: true, time: new Date().toISOString(), data: stderr } });
-                        });
+                        this.consolePrint('clone', { type: 'stdout', full: true, data: stdout });
+                        this.consolePrint('clone', { type: 'stderr', full: true, data: stderr });
                         resolve();
                     });
                     hook.stdout?.on('data', (data) => {
-                        this.listeners['message']?.forEach(listener => listener({ type: 'progress', stage: 'clone', output: { type: 'stdout', full: false, time: new Date().toISOString(), data } }));
+                        this.consolePrint('clone', { type: 'stdout', full: false, data });
                     });
                     hook.stderr?.on('data', (data) => {
-                        this.listeners['message']?.forEach(listener => listener({ type: 'progress', stage: 'clone', output: { type: 'stderr', full: false, time: new Date().toISOString(), data } }));
+                        this.consolePrint('clone', { type: 'stderr', full: false, data });
                     });
                 }).then(async () => new Promise<void>((resolve, reject) => {
                     const command = `git reset --hard ${after}`;
-                    this.listeners['message']?.forEach(listener => listener({ type: 'progress', stage: 'fetch', output: { type: 'stdout', full: true, time: new Date().toISOString(), data: `$> ${command}` } }));
-                    this.listeners['message']?.forEach(listener => listener({ type: 'progress', stage: 'fetch', output: { type: 'stdout', full: false, time: new Date().toISOString(), data: `$> ${command}` } }));
+                    this.consolePrint('fetch', { type: 'stdout', full: true, data: `$> ${command}` });
+                    this.consolePrint('fetch', { type: 'stdout', full: false, data: `$> ${command}` });
                     const hook = exec(command, {
                         cwd: workingDirectory
                     }, (error, stdout, stderr) => {
                         if (error) return reject(error);
-                        this.listeners['message']?.forEach(listener => {
-                            listener({ type: 'progress', stage: 'fetch', output: { type: 'stdout', full: true, time: new Date().toISOString(), data: stdout } });
-                            listener({ type: 'progress', stage: 'fetch', output: { type: 'stderr', full: true, time: new Date().toISOString(), data: stderr } });
-                        });
+                        this.consolePrint('fetch', { type: 'stdout', full: true, data: stdout });
+                        this.consolePrint('fetch', { type: 'stderr', full: true, data: stderr });
                         resolve();
                     });
                     hook.stdout?.on('data', (data) => {
-                        this.listeners['message']?.forEach(listener => listener({ type: 'progress', stage: 'fetch', output: { type: 'stdout', full: false, time: new Date().toISOString(), data } }));
+                        this.consolePrint('fetch', { type: 'stdout', full: false, data });
                     });
                     hook.stderr?.on('data', (data) => {
-                        this.listeners['message']?.forEach(listener => listener({ type: 'progress', stage: 'fetch', output: { type: 'stderr', full: false, time: new Date().toISOString(), data } }));
+                        this.consolePrint('fetch', { type: 'stderr', full: false, data });
                     });
                 })).then(async () => {
 
@@ -141,47 +157,57 @@ export class BuildHost {
                         packageManager = 'cargo';
 
                     return new Promise<void>((resolve, reject) => {
-                        this.listeners['message']?.forEach(listener => listener({ type: 'progress', stage: 'install', output: { type: 'stdout', full: true, time: new Date().toISOString(), data: `$> ${packageManagerCommands[packageManager][0]}` } }));
-                        this.listeners['message']?.forEach(listener => listener({ type: 'progress', stage: 'install', output: { type: 'stdout', full: false, time: new Date().toISOString(), data: `$> ${packageManagerCommands[packageManager][0]}` } }));
-                        const hook = exec(packageManagerCommands[packageManager][0], {
+                        const command = packageManagerCommands[packageManager][0];
+                        this.consolePrint('install', { type: 'stdout', full: true, data: `$> ${command}` });
+                        this.consolePrint('install', { type: 'stdout', full: false, data: `$> ${command}` });
+                        const hook = exec(command, {
                             cwd: workingDirectory
                         }, (error, stdout, stderr) => {
                             if (error) return reject(error);
-                            this.listeners['message']?.forEach(listener => {
-                                listener({ type: 'progress', stage: 'install', output: { type: 'stdout', full: true, time: new Date().toISOString(), data: stdout } });
-                                listener({ type: 'progress', stage: 'install', output: { type: 'stderr', full: true, time: new Date().toISOString(), data: stderr } });
-                            });
+                            this.consolePrint('install', { type: 'stdout', full: true, data: stdout });
+                            this.consolePrint('install', { type: 'stderr', full: true, data: stderr });
                             resolve();
                         });
                         hook.stdout?.on('data', (data) => {
-                            this.listeners['message']?.forEach(listener => listener({ type: 'progress', stage: 'install', output: { type: 'stdout', full: false, time: new Date().toISOString(), data } }));
+                            this.consolePrint('install', { type: 'stdout', full: false, data });
                         });
                         hook.stderr?.on('data', (data) => {
-                            this.listeners['message']?.forEach(listener => listener({ type: 'progress', stage: 'install', output: { type: 'stderr', full: false, time: new Date().toISOString(), data } }));
+                            this.consolePrint('install', { type: 'stderr', full: false, data });
                         });
                     });
                 }).then(async () => new Promise<void>((resolve, reject) => {
-                    this.listeners['message']?.forEach(listener => listener({ type: 'progress', stage: 'build', output: { type: 'stdout', full: true, time: new Date().toISOString(), data: `$> ${packageManagerCommands[packageManager][1]}` } }));
-                    this.listeners['message']?.forEach(listener => listener({ type: 'progress', stage: 'build', output: { type: 'stdout', full: false, time: new Date().toISOString(), data: `$> ${packageManagerCommands[packageManager][1]}` } }));
-                    const hook = exec(packageManagerCommands[packageManager][1], {
+                    const command = packageManagerCommands[packageManager][1];
+                    this.consolePrint('build', { type: 'stdout', full: true, data: `$> ${command}` });
+                    this.consolePrint('build', { type: 'stdout', full: false, data: `$> ${command}` });
+                    const hook = exec(command, {
                         cwd: workingDirectory,
                         env: {
                             ...process.env,
-                            INIT_CWD: workingDirectory
+                            INIT_CWD: workingDirectory,
+                            PATH: process.env['PATH'],
+                            PATHEXT: process.env['PATHEXT'],
+                            HOMEPATH: process.env['HOMEPATH'],
+                            HOME: process.env['HOME'],
+                            RUSTUP_HOME: process.env['RUSTUP_HOME'],
+                            RUSTUP_TOOLCHAIN: process.env['RUSTUP_TOOLCHAIN'],
+                            CARGO_HOME: process.env['CARGO_HOME'],
+                            CARGO_TARGET_DIR: process.env['CARGO_TARGET_DIR'],
+                            RUSTFLAGS: `${process.env['RUSTFLAGS'] ?? ''} \
+                            --remap-path-prefix ${workingDirectory}=/klave \
+                            --remap-path-prefix ${process.env['CARGO_HOME']}=/klave/.cargo
+                            --remap-path-prefix ${process.env['RUSTUP_HOME']}=/klave/.rustup`
                         }
                     }, (error, stdout, stderr) => {
                         if (error) return reject(error);
-                        this.listeners['message']?.forEach(listener => {
-                            listener({ type: 'progress', stage: 'build', output: { type: 'stdout', full: true, time: new Date().toISOString(), data: stdout } });
-                            listener({ type: 'progress', stage: 'build', output: { type: 'stderr', full: true, time: new Date().toISOString(), data: stderr } });
-                        });
+                        this.consolePrint('build', { type: 'stdout', full: true, data: stdout });
+                        this.consolePrint('build', { type: 'stderr', full: true, data: stderr });
                         resolve();
                     });
                     hook.stdout?.on('data', (data) => {
-                        this.listeners['message']?.forEach(listener => listener({ type: 'progress', stage: 'build', output: { type: 'stdout', full: false, time: new Date().toISOString(), data } }));
+                        this.consolePrint('build', { type: 'stdout', full: false, data });
                     });
                     hook.stderr?.on('data', (data) => {
-                        this.listeners['message']?.forEach(listener => listener({ type: 'progress', stage: 'build', output: { type: 'stderr', full: false, time: new Date().toISOString(), data } }));
+                        this.consolePrint('build', { type: 'stderr', full: false, data });
                     });
                 })).then(async () => new Promise<void>((resolve, reject) => {
 
@@ -230,9 +256,12 @@ export class BuildHost {
                     resolve();
 
                 })).then(async () => {
-                    this.listeners['message']?.forEach(listener => listener({ type: 'done', stats: {}, dependencies: this.usedDependencies }));
+                    this.listeners['message']?.forEach(listener => listener({ type: 'done', stats: {}, output: this.outputProgress, dependencies: this.usedDependencies }));
                 }).catch(async (error) => {
-                    this.listeners['message']?.forEach(listener => listener({ type: 'errored', error }));
+                    // Leave a bit of time for the last buffered process message to be committed
+                    setTimeout(() => {
+                        this.listeners['message']?.forEach(listener => listener({ type: 'errored', error, output: this.outputProgress }));
+                    }, 5000);
                 });
             }
 
@@ -270,8 +299,6 @@ export const createBuildHost = async (options: BuildHostCreatorOptions) => {
             fs.rmSync(workingDirectory, { recursive: true });
         }
     });
-
-    buildHost.postMessage({ type: 'compile' });
 
     return buildHost;
 };
