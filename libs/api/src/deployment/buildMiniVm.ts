@@ -27,9 +27,9 @@ type BuildOutput = {
     stdout: string;
     stderr: string;
     dependenciesManifest: BuildDependenciesManifest;
+    buildOutputs: StagedOutputGroups;
 } & ({
     success: true;
-    buildOutputs: StagedOutputGroups;
     result: {
         stats?: Stats;
         wasm: Uint8Array;
@@ -349,6 +349,12 @@ export class BuildMiniVM {
                         success: false,
                         error: serializeError(error as Error | ErrorObject),
                         dependenciesManifest: this.usedDependencies,
+                        buildOutputs: {
+                            clone: [],
+                            fetch: [],
+                            install: [],
+                            build: []
+                        },
                         stdout: '',
                         stderr: ''
                     };
@@ -422,11 +428,17 @@ export class BuildMiniVM {
                             logger.debug(`Build Host errored: ${message.error?.message ?? message.error ?? 'Unknown'}`, {
                                 parent: 'bmv'
                             });
+                            if (message.dependencies)
+                                this.usedDependencies = {
+                                    ...this.usedDependencies,
+                                    ...message.dependencies
+                                };
                             buildHost.terminate().finally(() => {
                                 resolve({
                                     success: false,
                                     error: message.error,
                                     dependenciesManifest: this.usedDependencies,
+                                    buildOutputs: message.output ?? outputProgress,
                                     stdout: message.stdout ?? '',
                                     stderr: message.stderr ?? ''
                                 });
@@ -451,7 +463,6 @@ export class BuildMiniVM {
                                         .map(match => match[1])
                                         .filter(Boolean)
                                         .filter(match => !['__new', '__pin', '__unpin', '__collect', 'register_routes'].includes(match));
-
                                     const output: BuildOutput = {
                                         success: true,
                                         result: {
@@ -463,7 +474,7 @@ export class BuildMiniVM {
                                             signature
                                         },
                                         dependenciesManifest: this.usedDependencies,
-                                        buildOutputs: outputProgress,
+                                        buildOutputs: message.output ?? outputProgress,
                                         stdout: message.stdout ?? '',
                                         stderr: message.stderr ?? ''
                                     };
@@ -473,6 +484,7 @@ export class BuildMiniVM {
                                 });
                         }
                     });
+                    buildHost.postMessage({ type: 'compile' });
                 });
             } catch (error) {
                 logger.debug('General failure: ' + error, {
@@ -482,6 +494,12 @@ export class BuildMiniVM {
                     success: false,
                     error: serializeError(error as Error | ErrorObject),
                     dependenciesManifest: this.usedDependencies,
+                    buildOutputs: {
+                        clone: [],
+                        fetch: [],
+                        install: [],
+                        build: []
+                    },
                     stdout: '',
                     stderr: ''
                 };
@@ -491,6 +509,12 @@ export class BuildMiniVM {
             success: false,
             error: new Error('No entry point found'),
             dependenciesManifest: this.usedDependencies,
+            buildOutputs: {
+                clone: [],
+                fetch: [],
+                install: [],
+                build: []
+            },
             stdout: '',
             stderr: ''
         };
