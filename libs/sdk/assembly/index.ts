@@ -233,12 +233,12 @@ export class ML {
     static inferLightGBMModel(name: string, data: Float64Array): Float64Array {
         let nameBuf = String.UTF8.encode(name, true);
         let value = new Float64Array(1);
-        let result = runtime_infer_from_lightgbm_model(nameBuf, data, data.byteLength, value, value.byteLength);
+        let result = runtime_infer_from_lightgbm_model(nameBuf, data.buffer, data.byteLength, value.buffer, value.byteLength);
         if (result < 0)
             return new Float64Array(0); //TODO: Report error (or not found ?)
         if (result > value.byteLength) {
             value = new Float64Array(result);
-            result = runtime_infer_from_lightgbm_model(nameBuf, data, data.byteLength, value, value.byteLength);
+            result = runtime_infer_from_lightgbm_model(nameBuf, data.buffer, data.byteLength, value.buffer, value.byteLength);
             if (result < 0)
                 return new Float64Array(0); //TODO: Report errors
         }
