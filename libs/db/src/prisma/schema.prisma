@@ -217,6 +217,7 @@ model Deployment {
     updatedAt            DateTime           @updatedAt
     application          Application        @relation(fields: [applicationId], references: [id], onDelete: Cascade)
     applicationId        String
+    buildOutputs         Json?
     buildOutputDTS       String?
     buildOutputWAT       String?
     buildOutputWASM      String?
@@ -276,29 +277,30 @@ type Limits {
 }
 
 model Application {
-    id               String            @id @default(uuid()) @map("_id")
-    web              Web               @relation(fields: [webId], references: [id])
-    webId            String
-    slug             String
-    domains          Domain[]
-    license          String?
-    description      String?
-    webhook          String?
-    homepage         String?
-    gitSignRequired  Boolean           @default(false)
-    limits           Limits
-    kredits          BigInt            @default(0)
-    catogories       String[]          @default([])
-    tags             String[]          @default([])
-    repo             Repo              @relation(fields: [repoId], references: [id])
-    repoId           String
-    deployments      Deployment[]
-    createdAt        DateTime          @default(now())
-    updatedAt        DateTime          @updatedAt
-    activityLog      ActivityLog[]
-    permissionGrants PermissionGrant[]
-    organisation     Organisation      @relation(fields: [organisationId], references: [id])
-    organisationId   String
+    id                  String            @id @default(uuid()) @map("_id")
+    web                 Web               @relation(fields: [webId], references: [id])
+    webId               String
+    slug                String
+    domains             Domain[]
+    license             String?
+    description         String?
+    webhook             String?
+    homepage            String?
+    gitSignRequired     Boolean           @default(false)
+    deployCommitLedgers Boolean           @default(false)
+    limits              Limits
+    kredits             BigInt            @default(0)
+    catogories          String[]          @default([])
+    tags                String[]          @default([])
+    repo                Repo              @relation(fields: [repoId], references: [id])
+    repoId              String
+    deployments         Deployment[]
+    createdAt           DateTime          @default(now())
+    updatedAt           DateTime          @updatedAt
+    activityLog         ActivityLog[]
+    permissionGrants    PermissionGrant[]
+    organisation        Organisation      @relation(fields: [organisationId], references: [id])
+    organisationId      String
 
     @@unique([organisationId, slug])
 }
