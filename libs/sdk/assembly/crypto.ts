@@ -343,9 +343,19 @@ class CryptoAES {
         return true;
     }
 
-    static importKey(keyName: string, keyData: string, format: string = 'raw', extractable: boolean = false): KeyAES | null {
+    static isValidAlgorithm(format: string): bool {
+        if (format != "aes128gcm")
+            return false;
+        return true;
+    }
+
+    static importKey(keyName: string, keyData: string, algorithm: string = 'aes128gcm', format: string = 'raw', extractable: boolean = false): KeyAES | null {
         let iFormat = SubtleCrypto.format(format);
         if (iFormat < 0 && !this.isValidFormat(format))
+            return null;
+
+        let iAlgorithm = SubtleCrypto.algorithm(algorithm);
+        if (iAlgorithm < 0 && !this.isValidAlgorithm(algorithm))
             return null;
 
         const key = new KeyAES(keyName);
@@ -356,11 +366,15 @@ class CryptoAES {
 
         //Crypto SDK currently only supports import of algorithm "aes128gcm" in a "raw" format.
         //JWK will eventually be added
-        const result = SubtleCrypto.import_key(key.name, SubtleCrypto.format(format), keyData, SubtleCrypto.algorithm("aes128gcm"), extractable ? 1 : 0, usages);
+        const result = SubtleCrypto.import_key(key.name, iFormat, keyData, iAlgorithm, extractable ? 1 : 0, usages);
         if (!result)
             return null;
 
         return key;
+    }
+
+    static importKey_deprecated(keyName: string, keyData: string, format: string = 'raw', extractable: boolean = false): KeyAES | null {
+        return this.importKey(keyName, keyData, 'aes128gcm', format, extractable);
     }
 
     static export_key(key_name: string, format: i32): u8[]
@@ -450,7 +464,7 @@ class CryptoECDSA {
         usages[0] = SubtleCrypto.usage("sign");
         usages[1] = SubtleCrypto.usage("derive_key");
 
-        const key = SubtleCrypto.generate_key(keyName, "aes128gcm", extractable, usages);
+        const key = SubtleCrypto.generate_key(keyName, iAlgorithm, extractable, usages);
         if (!key) {
             return null;
         }
@@ -497,7 +511,7 @@ class CryptoECDSA {
             usages[1] = SubtleCrypto.usage("derive_key");
         }
 
-        const result = SubtleCrypto.import_key(key.name, SubtleCrypto.format(format), keyData, SubtleCrypto.algorithm("aes128gcm"), extractable ? 1 : 0, usages);
+        const result = SubtleCrypto.import_key(key.name, iFormat, keyData, iAlgorithm, extractable ? 1 : 0, usages);
         if (!result)
             return null;
 
