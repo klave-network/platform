@@ -5,6 +5,7 @@
 
 import { decode, encode as b64encode } from 'as-base64/assembly';
 import uuid from './uuid'
+import { console } from 'assemblyscript/std/assembly/bindings/dom';
 
 // @ts-ignore: decorator
 @external("env", "key_exists")
@@ -175,23 +176,17 @@ class SubtleCrypto {
         return key;
     }
 
-    static deriveKey(derived_key_name: string, algorithm: string, original_key_name: string, extractable: boolean, usages: string[]): Key | null
-    {
-        let iAlgorithm = SubtleCrypto.algorithm(algorithm);
-        if (iAlgorithm < 0)
-            return null;
-
-        const local_usages = new Uint8Array(usages.length);
-        for(let i = 0; i < usages.length; i++)
-        {
-            local_usages[i] = this.usage(usages[i]);
-        }
+    static derivePublicKey(public_key_name: string, private_key_name: string, extractable: boolean): Key | null
+    {        
+        const UNUSED_ALGORITHM = 0; 
+        const local_usages = new Uint8Array(1);
+        local_usages[0] = this.usage("verify");
     
-        const key = new Key(derived_key_name);
+        const key = new Key(public_key_name);
 
         let result = derive_key(
-            String.UTF8.encode(key.name, true), iAlgorithm, 
-            String.UTF8.encode(original_key_name, true), extractable, local_usages.buffer, local_usages.length);
+            String.UTF8.encode(key.name, true), UNUSED_ALGORITHM, 
+            String.UTF8.encode(private_key_name, true), extractable, local_usages.buffer, local_usages.length);
         if (result < 0)
             return null;
 
