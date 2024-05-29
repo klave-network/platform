@@ -17,7 +17,6 @@
                 "format": [
                     "esm"
                 ],
-                "bundle": true,
                 "main": "apps/hubber/src/main.ts",
                 "tsConfig": "apps/hubber/tsconfig.app.json",
                 "assets": [
@@ -38,8 +37,7 @@
                 },
                 "production": {
                     "optimization": true,
-                    "minify": true,
-                    "bundle": true
+                    "minify": true
                 }
             }
         },
