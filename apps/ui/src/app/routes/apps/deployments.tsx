@@ -7,7 +7,7 @@ import { Deployment } from '@klave/db';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
 
 type DeploymentContextProps = {
-    deployment: Deployment
+    deployment: Omit<Deployment, 'buildOutputDTS' | 'buildOutputWASM' | 'buildOutputWAT' | 'buildOutputs'>
 }
 
 export const DeploymentPromotion: FC<DeploymentContextProps> = ({ deployment: { id } }) => {
