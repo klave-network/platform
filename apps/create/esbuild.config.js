@@ -3,7 +3,7 @@ const { version } = require('./package.json');
 
 /** @type {import('esbuild').BuildOptions} */
 module.exports = {
-    sourcemap: process.env.NODE_ENV === 'development' ? true : false,
+    sourcemap: process.env.NODE_ENV === 'development' ? 'inline' : 'external',
     outExtension: {
         '.js': '.js'
     },
