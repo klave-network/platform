@@ -18,7 +18,7 @@ declare function encrypt_raw(key_name: ArrayBuffer, clear_text: ArrayBuffer, cle
 declare function decrypt_raw(key_name: ArrayBuffer, cipher_text: ArrayBuffer, cipher_text_size: i32, clear_text: ArrayBuffer, clear_text_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "generate_key")
-declare function generate_key(key_name: ArrayBuffer, algorithm: i32, extractable: boolean, usages: ArrayBuffer, usages_size: i32): i32;
+declare function generate_key(key_name: ArrayBuffer, algorithm: i32, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "import_key")
 declare function import_key_raw(key_name: ArrayBuffer, key_format: i32, key_data: ArrayBuffer, key_data_size: i32, algorithm: i32, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
@@ -29,8 +29,8 @@ declare function export_key_raw(key_name: ArrayBuffer, key_format: i32, key: Arr
 @external("env", "get_public_key")
 declare function get_public_key_raw(key_name: ArrayBuffer, result: ArrayBuffer, result_size: i32): i32;
 // @ts-ignore: decorator
-@external("env", "derive_key")
-declare function derive_key(derived_key_name: ArrayBuffer, algorithm: i32, original_key_name: ArrayBuffer, extractable: boolean, usages: ArrayBuffer, usages_size: i32): i32;
+@external("env", "derive_public_key")
+declare function derive_public_key(derived_key_name: ArrayBuffer, original_key_name: ArrayBuffer, extractable: i32): i32;
 // @ts-ignore: decorator
 @external("env", "sign")
 declare function sign_raw(key_name: ArrayBuffer, clear_text: ArrayBuffer, clear_text_size: i32, cipher_text: ArrayBuffer, cipher_text_size: i32): i32;
@@ -169,7 +169,7 @@ class SubtleCrypto {
         const key = new Key(key_name);
 
         let result = generate_key(
-            String.UTF8.encode(key.name, true), iAlgorithm, extractable, local_usages.buffer, local_usages.length);
+            String.UTF8.encode(key.name, true), iAlgorithm, extractable?1:0, local_usages.buffer, local_usages.length);
         if (result < 0)
             return null;
 
@@ -177,16 +177,12 @@ class SubtleCrypto {
     }
 
     static derivePublicKey(public_key_name: string, private_key_name: string, extractable: boolean): Key | null
-    {        
-        const UNUSED_ALGORITHM = 0; 
-        const local_usages = new Uint8Array(1);
-        local_usages[0] = this.usage("verify");
-    
+    {            
         const key = new Key(public_key_name);
 
-        let result = derive_key(
-            String.UTF8.encode(key.name, true), UNUSED_ALGORITHM, 
-            String.UTF8.encode(private_key_name, true), extractable, local_usages.buffer, local_usages.length);
+        let result = derive_public_key(
+            String.UTF8.encode(key.name, true), 
+            String.UTF8.encode(private_key_name, true), extractable?1:0);
         if (result < 0)
             return null;
 
@@ -483,7 +479,7 @@ class CryptoECDSA {
             return null;
 
         //It will only generate a Private Key that can be derived into a Public Key of the same algorithm
-        const key = SubtleCrypto.generateKey(keyName, algorithm, extractable, ["sign", "derive_key"]);
+        const key = SubtleCrypto.generateKey(keyName, algorithm, extractable, ["sign"]);
         if (!key) {
             return null;
         }
@@ -519,7 +515,7 @@ class CryptoECDSA {
         const result = SubtleCrypto.importKey(key.name, format, keyData, algorithm, extractable, 
             (format === "spki") ? 
                 ["verify"] :                //Public Key
-                ["sign", "derive_key"]);   //Private Key
+                ["sign"]);                  //Private Key
 
         if (!result)
             return null;
