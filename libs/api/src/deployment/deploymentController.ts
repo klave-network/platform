@@ -285,6 +285,10 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 const currentState = await prisma.deployment.findUnique({
                                     where: {
                                         id: deployment.id
+                                    },
+                                    select: {
+                                        id: true,
+                                        status: true
                                     }
                                 });
                                 if (currentState?.status !== 'deployed' && currentState?.status !== 'errored') {

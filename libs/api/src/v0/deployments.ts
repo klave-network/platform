@@ -37,7 +37,29 @@ export const deploymentRouter = createTRPCRouter({
                         }
                     }
                 },
-                include: {
+                select: {
+                    commit: true,
+                    id: true,
+                    set: true,
+                    branch: true,
+                    version: true,
+                    build: true,
+                    locations: true,
+                    status: true,
+                    life: true,
+                    sealed: true,
+                    tags: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    expiresOn: true,
+                    sourceType: true,
+                    applicationId: true,
+                    contractFunctions: true,
+                    dependenciesManifest: true,
+                    buildOutputErrorObj: true,
+                    buildOutputStdErr: true,
+                    buildOutputStdOut: true,
+                    buildOutputRoutes: true,
                     deploymentAddress: {
                         select: {
                             fqdn: true
@@ -80,7 +102,32 @@ export const deploymentRouter = createTRPCRouter({
                         }
                     }
                 },
-                include: {
+                select: {
+                    commit: true,
+                    id: true,
+                    set: true,
+                    branch: true,
+                    version: true,
+                    build: true,
+                    locations: true,
+                    status: true,
+                    life: true,
+                    sealed: true,
+                    tags: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    expiresOn: true,
+                    sourceType: true,
+                    applicationId: true,
+                    contractFunctions: true,
+                    dependenciesManifest: true,
+                    buildOutputErrorObj: true,
+                    buildOutputStdErr: true,
+                    buildOutputStdOut: true,
+                    buildOutputRoutes: true,
+                    buildOutputWASM: true,
+                    buildOutputDTS: true,
+                    buildOutputs: true,
                     deploymentAddress: {
                         select: {
                             fqdn: true
@@ -117,6 +164,35 @@ export const deploymentRouter = createTRPCRouter({
                         }
                     }
                 },
+                select: {
+                    commit: true,
+                    id: true,
+                    set: true,
+                    branch: true,
+                    version: true,
+                    build: true,
+                    locations: true,
+                    status: true,
+                    life: true,
+                    sealed: true,
+                    tags: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    expiresOn: true,
+                    sourceType: true,
+                    applicationId: true,
+                    contractFunctions: true,
+                    dependenciesManifest: true,
+                    buildOutputErrorObj: true,
+                    buildOutputStdErr: true,
+                    buildOutputStdOut: true,
+                    buildOutputRoutes: true,
+                    deploymentAddress: {
+                        select: {
+                            fqdn: true
+                        }
+                    }
+                },
                 orderBy: {
                     createdAt: 'desc'
                 },
@@ -124,6 +200,44 @@ export const deploymentRouter = createTRPCRouter({
             });
 
             return deploymentList;
+        }),
+    getDeploymentOutputs: publicProcedure
+        .input(z.object({
+            deploymentId: z.string().uuid()
+        }))
+        .query(async ({ ctx: { prisma, session: { user } },
+            input: { deploymentId } }) => {
+
+            if (!user)
+                return;
+
+            const deployment = await prisma.deployment.findUnique({
+                where: {
+                    id: deploymentId,
+                    application: {
+                        permissionGrants: {
+                            some: {
+                                userId: user.id,
+                                AND: {
+                                    OR: [{
+                                        read: true
+                                    }, {
+                                        write: true
+                                    }, {
+                                        admin: true
+                                    }]
+                                }
+                            }
+                        }
+                    }
+                },
+                select: {
+                    buildOutputDTS: true,
+                    buildOutputWASM: true
+                }
+            });
+
+            return deployment;
         }),
     delete: publicProcedure
         .input(z.object({
@@ -240,7 +354,10 @@ export const deploymentRouter = createTRPCRouter({
                         }
                     }
                 },
-                include: {
+                select: {
+                    buildOutputWASM: true,
+                    applicationId: true,
+                    set: true,
                     deploymentAddress: true
                 }
             });
