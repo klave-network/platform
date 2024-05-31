@@ -1,4 +1,14 @@
 # Changelog
+## [0.3.0](https://github.com/klave-network/platform/compare/constants@0.2.3...constants@0.3.0) (2024-05-31)
+
+### Dependency Updates
+
+* `db` updated to version `0.2.3`
+
+### Features
+
+* **db,constants,api,ui:** Provide full build tracing in UI ([6e6cc10](https://github.com/klave-network/platform/commit/6e6cc10fa13c8c266d78b99697687d8ca1622b8a))
+
 ## [0.2.3](https://github.com/klave-network/platform/compare/constants@0.2.2...constants@0.2.3) (2024-04-25)
 
 ### Dependency Updates
