@@ -1,4 +1,26 @@
 # Changelog
+## [0.10.0](https://github.com/klave-network/platform/compare/api@0.9.0...api@0.10.0) (2024-05-31)
+
+### Dependency Updates
+
+* `db` updated to version `0.9.0`
+* `constants` updated to version `0.9.0`
+* `providers` updated to version `0.9.0`
+
+### Features
+
+* **api,compiler,hubber:** Do compilation over full repo clone ([d68d7dd](https://github.com/klave-network/platform/commit/d68d7ddc26815900489d529b502f30495546f0b5))
+* **api,hubber:** Add Rust compilation support ([66b2a1d](https://github.com/klave-network/platform/commit/66b2a1de8ca5f660c09086c4c163fb4994638f4d))
+* **db,api,ui:** Add source type/language logo indicator ([d07a296](https://github.com/klave-network/platform/commit/d07a296d29aae51e1d8645786aba736a04aa69b0))
+* **db,api,ui:** Provide application options to deploy every commit ([f2e5ac3](https://github.com/klave-network/platform/commit/f2e5ac33fe7fc302c8c25d590c83508b7b05e906))
+* **db,constants,api,ui:** Provide full build tracing in UI ([6e6cc10](https://github.com/klave-network/platform/commit/6e6cc10fa13c8c266d78b99697687d8ca1622b8a))
+
+
+### Bug Fixes
+
+* **api,hubber:** Message streaming and Dockerfile Rust setup ([a66676f](https://github.com/klave-network/platform/commit/a66676fdc66a92002e5b8f6e02a15eba946e64b9))
+* **api,ui:** Setting button for out-of-branch commit deployment has wrong target ([523dc27](https://github.com/klave-network/platform/commit/523dc276a543333537d3c49ec36d35b323a4529a))
+
 ## [0.9.0](https://github.com/klave-network/platform/compare/api@0.8.2...api@0.9.0) (2024-05-08)
 
 ### Dependency Updates
