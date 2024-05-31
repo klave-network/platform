@@ -16,7 +16,7 @@ module.exports = {
             authToken: process.env.KLAVE_SENTRY_AUTH_TOKEN,
             release: `klave@${JSON.stringify(version)}`
         }) : undefined
-    ],
+    ].filter(Boolean),
     outExtension: {
         '.js': '.js'
     },
