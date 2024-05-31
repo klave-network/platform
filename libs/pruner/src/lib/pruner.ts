@@ -90,6 +90,11 @@ async function terminateExpiredDeployments() {
             expiresOn: {
                 lt: new Date()
             }
+        },
+        select: {
+            id: true,
+            status: true,
+            createdAt: true
         }
     });
     return Promise.allSettled(expiredDeploymentList.map(async (deployment) => {
@@ -121,6 +126,9 @@ async function cancelUpdatingDeployments() {
             updatedAt: {
                 lt: new Date(Date.now() - 1000 * 60 * 10)
             }
+        },
+        select: {
+            id: true
         }
     });
     return Promise.allSettled(expiredDeploymentList.map(async (deployment) => {

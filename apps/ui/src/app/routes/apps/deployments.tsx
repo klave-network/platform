@@ -7,7 +7,7 @@ import { Deployment } from '@klave/db';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
 
 type DeploymentContextProps = {
-    deployment: Deployment
+    deployment: Omit<Deployment, 'buildOutputDTS' | 'buildOutputWASM' | 'buildOutputWAT' | 'buildOutputs'>
 }
 
 export const DeploymentPromotion: FC<DeploymentContextProps> = ({ deployment: { id } }) => {
@@ -108,7 +108,7 @@ export const Deployments: FC = () => {
     const { appSlug, orgSlug } = useParams();
     const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug || '', orgSlug: orgSlug || '' });
     const { data: deploymentList, isLoading: isLoadingDeployments } = api.v0.deployments.getByApplication.useQuery({ appId: application?.id || '' }, {
-        refetchInterval: 5000
+        refetchInterval: (s) => s.state.data?.find(d => !['errored', 'terminated', 'deployed'].includes(d.status ?? '')) === undefined ? 5000 : 500
     });
 
     // const deployments = useMemo(() => {

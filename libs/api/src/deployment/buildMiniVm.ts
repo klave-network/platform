@@ -7,17 +7,18 @@ import { HttpsProxyAgent } from 'https-proxy-agent';
 import { ErrorObject, serializeError } from 'serialize-error';
 import type { Stats } from 'assemblyscript/dist/asc';
 import { Utils } from '@secretarium/connector';
-import { createCompiler } from '@klave/compiler';
 import type { Context } from 'probot';
+import type { InstallationAccessTokenAuthentication } from '@octokit/auth-app';
 import { DeploymentPushPayload } from '../types';
-import { Repo } from '@klave/db';
+import { Deployment, Repo, prisma } from '@klave/db';
 import { dummyMap } from './dummyVmFs';
 import { logger } from '@klave/providers';
-import { RepoConfigSchemaLatest } from '@klave/constants';
+import { RepoConfigSchemaLatest, StagedOutputGroups } from '@klave/constants';
 import { Worker } from 'node:worker_threads';
 import { watExtractorModuleFunction } from './watExtractorModule';
+import { createBuildHost } from './buildHost';
 
-type BuildDependenciesManifest = Record<string, {
+export type BuildDependenciesManifest = Record<string, {
     version: string;
     digests: Record<string, string>
 }>;
@@ -26,6 +27,8 @@ type BuildOutput = {
     stdout: string;
     stderr: string;
     dependenciesManifest: BuildDependenciesManifest;
+    buildOutputs: StagedOutputGroups;
+    sourceType: string;
 } & ({
     success: true;
     result: {
@@ -45,20 +48,23 @@ export type DeploymentContext<Type> = {
     octokit: Context['octokit']
 } & Type;
 
+export type BuildMiniVMOptions = {
+    type: 'github';
+    context: DeploymentContext<DeploymentPushPayload>;
+    repo: Repo;
+    // TODO Reenable the KlaveRcConfiguration[...] type
+    application: NonNullable<RepoConfigSchemaLatest['applications']>[number] | undefined;
+    deployment: Deployment;
+    // dependencies: Record<string, string>;
+}
+
 export class BuildMiniVM {
 
     private proxyAgent: HttpsProxyAgent<string> | undefined;
     private usedDependencies: BuildDependenciesManifest = {};
     private dependencies: Record<string, string> = {};
 
-    constructor(private options: {
-        type: 'github';
-        context: DeploymentContext<DeploymentPushPayload>;
-        repo: Repo;
-        // TODO Reenable the KlaveRcConfiguration[...] type
-        application: NonNullable<RepoConfigSchemaLatest['applications']>[number] | undefined;
-        // dependencies: Record<string, string>;
-    }) {
+    constructor(private options: BuildMiniVMOptions) {
         if (process.env['KLAVE_SQUID_URL'])
             this.proxyAgent = new HttpsProxyAgent(process.env['KLAVE_SQUID_URL']);
     }
@@ -114,7 +120,7 @@ export class BuildMiniVM {
                 const unpkgDomain = 'https://www.unpkg.com/';
                 const url = `${unpkgDomain}${packageName}${packageVersion ? `@${packageVersion}` : ''}/${filePath}`;
                 const urlHash = Utils.toHex(new Uint8Array(await webcrypto.subtle.digest('SHA-256', new TextEncoder().encode(url))));
-                const assetLocation = nodePath.resolve(`./.cache/klave/compiler/assets/${urlHash}`);
+                const assetLocation = nodePath.resolve(`./.cache/klave/buildHost/assets/${urlHash}`);
 
                 if (fs.existsSync(assetLocation)) {
 
@@ -252,6 +258,20 @@ export class BuildMiniVM {
 
         if (!packageJson)
             throw new Error('No package.json found');
+
+        const dependencies = {
+            ...packageJson.optionalDependencies ?? {},
+            ...packageJson.peerDependencies ?? {},
+            ...packageJson.devDependencies ?? {},
+            ...packageJson.dependencies ?? {}
+        };
+
+        Object.entries(dependencies).forEach(([key, value]) => {
+            this.usedDependencies[key] = {
+                version: value,
+                digests: {}
+            };
+        });
     }
 
     async build(): Promise<BuildOutput> {
@@ -312,7 +332,14 @@ export class BuildMiniVM {
                             wasm: wasmBuffer,
                             routes: []
                         },
+                        sourceType: 'wasm',
                         dependenciesManifest: this.usedDependencies,
+                        buildOutputs: {
+                            clone: [],
+                            fetch: [],
+                            install: [],
+                            build: []
+                        },
                         stdout: '',
                         stderr: ''
                     };
@@ -323,7 +350,14 @@ export class BuildMiniVM {
                     return {
                         success: false,
                         error: serializeError(error as Error | ErrorObject),
+                        sourceType: 'wasm',
                         dependenciesManifest: this.usedDependencies,
+                        buildOutputs: {
+                            clone: [],
+                            fetch: [],
+                            install: [],
+                            build: []
+                        },
                         stdout: '',
                         stderr: ''
                     };
@@ -331,63 +365,95 @@ export class BuildMiniVM {
 
             }
 
-        } else if (selectedEntryPoint?.name === 'index.ts') {
+        } else {
 
-            // We first need to fetch dependencies from package.json
-            await this.getTSDependencies();
+            // We first need to fetch dependencies from package.json if this is TS
+            if (selectedEntryPoint?.name === 'index.ts') {
+                await this.getTSDependencies();
+                const rootContent = await this.getContent(selectedEntryPoint.path);
+                dummyMap['..ts'] = typeof rootContent?.data === 'string' ? rootContent.data : null;
+            }
 
-            const rootContent = await this.getContent(selectedEntryPoint.path);
-            dummyMap['..ts'] = typeof rootContent?.data === 'string' ? rootContent.data : null;
-
+            const outputProgress: StagedOutputGroups = {
+                clone: [],
+                fetch: [],
+                install: [],
+                build: []
+            };
             let compiledBinary = new Uint8Array(0);
             let compiledWAT: string | undefined;
             let compiledDTS: string | undefined;
             try {
-                const compiler = await createCompiler();
+                const authStruct = await this.options.context.octokit.auth({ type: 'installation' }) as InstallationAccessTokenAuthentication;
+                const buildHost = await createBuildHost({
+                    token: authStruct.token,
+                    ...this.options
+                });
                 return new Promise<BuildOutput>((resolve) => {
-                    compiler.on('message', (message) => {
+                    buildHost.on('message', (message) => {
                         if (message.type === 'start') {
                             this.usedDependencies['@klave/compiler'] = {
-                                version: compiler.version,
+                                version: '*',
                                 digests: {
                                     ['git:*']: process.env['GIT_REPO_COMMIT'] ?? 'unknown'
                                 }
                             };
                             this.usedDependencies['assemblyscript'] = {
-                                version: compiler.ascVersion ?? message.version ?? 'unknown',
+                                version: buildHost.ascVersion ?? message.version ?? 'unknown',
                                 digests: {}
                             };
-                        } else if (message.type === 'read') {
-                            this.getContent(message.filename).then(response => {
-                                compiler.postMessage({
-                                    type: 'read',
-                                    id: message.id,
-                                    contents: typeof response.data === 'string' ? response.data : null
-                                });
-                            }).catch(() => { return; });
                         } else if (message.type === 'write') {
                             if ((message.filename).endsWith('.wasm'))
                                 compiledBinary = message.contents ? Uint8Array.from(Buffer.from(message.contents)) : new Uint8Array(0);
-                            if ((message.filename).endsWith('.wat'))
-                                compiledWAT = message.contents ?? undefined;
-                            if ((message.filename).endsWith('.d.ts'))
-                                compiledDTS = message.contents ?? undefined;
+                            if ((message.filename).endsWith('.wat')) {
+                                compiledWAT = message.contents?.toLocaleString() ?? undefined;
+                            } if ((message.filename).endsWith('.d.ts'))
+                                compiledDTS = message.contents?.toLocaleString() ?? undefined;
+                        } else if (message.type === 'progress') {
+                            outputProgress[message.stage] = outputProgress[message.stage] ?? [];
+                            outputProgress[message.stage].push({
+                                type: message.output.type,
+                                full: message.output.full,
+                                time: message.output.time,
+                                data: message.output.data
+                            });
+                            prisma.deployment.update({
+                                where: {
+                                    id: this.options.deployment.id
+                                },
+                                data: {
+                                    buildOutputs: outputProgress,
+                                    sourceType: message.sourceType
+                                }
+                            }).catch(() => { return; });
                         } else if (message.type === 'diagnostic') {
                             //
                         } else if (message.type === 'errored') {
-                            logger.debug(`Compiler errored: ${message.error?.message ?? message.error ?? 'Unknown'}`, {
+                            logger.debug(`Build Host errored: ${message.error?.message ?? message.error ?? 'Unknown'}`, {
                                 parent: 'bmv'
                             });
-                            compiler.terminate().finally(() => {
+                            if (message.dependencies)
+                                this.usedDependencies = {
+                                    ...this.usedDependencies,
+                                    ...message.dependencies
+                                };
+                            buildHost.terminate().finally(() => {
                                 resolve({
                                     success: false,
                                     error: message.error,
+                                    sourceType: message.sourceType,
                                     dependenciesManifest: this.usedDependencies,
+                                    buildOutputs: message.output ?? outputProgress,
                                     stdout: message.stdout ?? '',
                                     stderr: message.stderr ?? ''
                                 });
                             }).catch(() => { return; });
                         } else if (message.type === 'done') {
+                            if (message.dependencies)
+                                this.usedDependencies = {
+                                    ...this.usedDependencies,
+                                    ...message.dependencies
+                                };
                             let signature: sigstore.Bundle;
                             // TODO Add OIDC token
                             sigstore.sign(Buffer.from(compiledBinary), { identityToken: '' })
@@ -402,27 +468,29 @@ export class BuildMiniVM {
                                         .map(match => match[1])
                                         .filter(Boolean)
                                         .filter(match => !['__new', '__pin', '__unpin', '__collect', 'register_routes'].includes(match));
-
                                     const output: BuildOutput = {
                                         success: true,
                                         result: {
-                                            stats: message.stats,
+                                            // stats: message.stats,
                                             wasm: compiledBinary,
                                             routes: validRoutes,
                                             wat: compiledWAT,
                                             dts: compiledDTS,
                                             signature
                                         },
+                                        sourceType: message.sourceType,
                                         dependenciesManifest: this.usedDependencies,
+                                        buildOutputs: message.output ?? outputProgress,
                                         stdout: message.stdout ?? '',
                                         stderr: message.stderr ?? ''
                                     };
-                                    compiler.terminate().finally(() => {
+                                    buildHost.terminate().finally(() => {
                                         resolve(output);
                                     }).catch(() => { return; });
                                 });
                         }
                     });
+                    buildHost.postMessage({ type: 'compile' });
                 });
             } catch (error) {
                 logger.debug('General failure: ' + error, {
@@ -431,7 +499,14 @@ export class BuildMiniVM {
                 return {
                     success: false,
                     error: serializeError(error as Error | ErrorObject),
+                    sourceType: 'ts',
                     dependenciesManifest: this.usedDependencies,
+                    buildOutputs: {
+                        clone: [],
+                        fetch: [],
+                        install: [],
+                        build: []
+                    },
                     stdout: '',
                     stderr: ''
                 };
@@ -441,6 +516,13 @@ export class BuildMiniVM {
             success: false,
             error: new Error('No entry point found'),
             dependenciesManifest: this.usedDependencies,
+            sourceType: 'unknown',
+            buildOutputs: {
+                clone: [],
+                fetch: [],
+                install: [],
+                build: []
+            },
             stdout: '',
             stderr: ''
         };

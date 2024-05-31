@@ -1,4 +1,25 @@
 # Changelog
+## [0.3.0](https://github.com/klave-network/platform/compare/hubber@0.2.5...hubber@0.3.0) (2024-05-31)
+
+### Dependency Updates
+
+* `db` updated to version `0.2.5`
+* `providers` updated to version `0.2.5`
+* `constants` updated to version `0.2.5`
+* `api` updated to version `0.2.5`
+* `pruner` updated to version `0.2.5`
+
+### Features
+
+* **api,compiler,hubber:** Do compilation over full repo clone ([d68d7dd](https://github.com/klave-network/platform/commit/d68d7ddc26815900489d529b502f30495546f0b5))
+* **api,hubber:** Add Rust compilation support ([66b2a1d](https://github.com/klave-network/platform/commit/66b2a1de8ca5f660c09086c4c163fb4994638f4d))
+
+
+### Bug Fixes
+
+* **api,hubber:** Message streaming and Dockerfile Rust setup ([a66676f](https://github.com/klave-network/platform/commit/a66676fdc66a92002e5b8f6e02a15eba946e64b9))
+* **hubber:** Filter undefined values in ESBuild compilation plugins ([3c34f9b](https://github.com/klave-network/platform/commit/3c34f9bc3b36f8f636d08460d2d46680adb19890))
+
 ## [0.2.6](https://github.com/klave-network/platform/compare/hubber@0.2.5...hubber@0.2.6) (2024-05-08)
 
 ### Dependency Updates

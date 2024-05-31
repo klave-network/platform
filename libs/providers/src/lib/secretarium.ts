@@ -17,9 +17,9 @@ const client = new SCP({
             else
                 logger.debug(message);
         },
-        info: (message: string) => logger.info(message),
-        warn: (message: string) => logger.warn(message),
-        error: (message: string) => logger.error(message)
+        info: (message: string) => logger.info(`SCP> ${message}`),
+        warn: (message: string) => logger.warn(`SCP> ${message}`),
+        error: (message: string) => logger.error(`SCP> ${message}`)
     } : undefined
 });
 

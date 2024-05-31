@@ -38,14 +38,14 @@ export const RepoAppSelect: FC = () => {
     const [isPostInstall, setIsPostInstall] = useState<boolean>(postInstall === 'true');
     const [isPostInstallStuck, setIsPostInstallStuck] = useState(false);
     const [selectedApplications, setSelectedApplications] = useState<string[]>([]);
-    const [selectedOrgId, setSelectedOrgId] = useState<string>();
+    const [selectedOrgId, setSelectedOrgId] = useState('00000000-0000-0000-0000-000000000000');
 
     let appSelectionWatch = watch('applications');
     appSelectionWatch = (Array.isArray(appSelectionWatch) ? appSelectionWatch : [appSelectionWatch]).filter(Boolean);
 
     const { data: canRegisterData, isLoading: isCanRegisterLoading, refetch: refetchCanRegister } = api.v0.applications.canRegister.useQuery({
         applications: appSelectionWatch,
-        organisationId: selectedOrgId ?? ''
+        organisationId: selectedOrgId
     }, {
         // refetchInterval: 100000,
         retry: false,
@@ -53,7 +53,9 @@ export const RepoAppSelect: FC = () => {
     });
 
     useEffect(() => {
-        setSelectedOrgId(personals[0]?.id ?? organisations?.[0]?.id);
+        const refUUID = personals[0]?.id ?? organisations?.[0]?.id;
+        if (refUUID && refUUID.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/))
+            setSelectedOrgId(refUUID);
     }, [personals[0]?.id, organisations?.[0]?.id]);
 
     useEffect(() => {
