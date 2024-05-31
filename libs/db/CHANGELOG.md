@@ -1,4 +1,13 @@
 # Changelog
+## [0.7.0](https://github.com/klave-network/platform/compare/db@0.6.0...db@0.7.0) (2024-05-31)
+
+
+### Features
+
+* **db,api,ui:** Add source type/language logo indicator ([d07a296](https://github.com/klave-network/platform/commit/d07a296d29aae51e1d8645786aba736a04aa69b0))
+* **db,api,ui:** Provide application options to deploy every commit ([f2e5ac3](https://github.com/klave-network/platform/commit/f2e5ac33fe7fc302c8c25d590c83508b7b05e906))
+* **db,constants,api,ui:** Provide full build tracing in UI ([6e6cc10](https://github.com/klave-network/platform/commit/6e6cc10fa13c8c266d78b99697687d8ca1622b8a))
+
 ## [0.6.0](https://github.com/klave-network/platform/compare/db@0.5.2...db@0.6.0) (2024-04-25)
 
 
