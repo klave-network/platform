@@ -1,4 +1,26 @@
 # Changelog
+## [0.10.0](https://github.com/klave-network/platform/compare/ui@0.9.2...ui@0.10.0) (2024-05-31)
+
+### Dependency Updates
+
+* `constants` updated to version `0.9.2`
+* `db` updated to version `0.9.2`
+* `api` updated to version `0.9.2`
+
+### Features
+
+* **db,api,ui:** Add source type/language logo indicator ([d07a296](https://github.com/klave-network/platform/commit/d07a296d29aae51e1d8645786aba736a04aa69b0))
+* **db,api,ui:** Provide application options to deploy every commit ([f2e5ac3](https://github.com/klave-network/platform/commit/f2e5ac33fe7fc302c8c25d590c83508b7b05e906))
+* **db,constants,api,ui:** Provide full build tracing in UI ([6e6cc10](https://github.com/klave-network/platform/commit/6e6cc10fa13c8c266d78b99697687d8ca1622b8a))
+* **ui:** Add Rust non-determinism warning ([76d1417](https://github.com/klave-network/platform/commit/76d14174ebfa387821f8b35603a8a4c2eb3214dc))
+
+
+### Bug Fixes
+
+* **api,ui:** Setting button for out-of-branch commit deployment has wrong target ([523dc27](https://github.com/klave-network/platform/commit/523dc276a543333537d3c49ec36d35b323a4529a))
+* **ui:** Adjust refresh timings for deployment and add auto-scroll for compilations ([f9164e3](https://github.com/klave-network/platform/commit/f9164e363bdc05cbeae01e0900bbded3bbdc86a4))
+* **ui:** Ensure registration checks are done against guaranteed strings ([98578b3](https://github.com/klave-network/platform/commit/98578b37baac35cdf7867d139614bd015f55a701)), closes [#KLAVE-PLATFORM-HUBBER-39](https://github.com/klave-network/platform/issues/KLAVE-PLATFORM-HUBBER-39)
+
 ## [0.9.2](https://github.com/klave-network/platform/compare/ui@0.9.1...ui@0.9.2) (2024-05-03)
 
 ## [0.9.1](https://github.com/klave-network/platform/compare/ui@0.9.0...ui@0.9.1) (2024-05-02)
