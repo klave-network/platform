@@ -117,19 +117,19 @@ class SubtleCrypto {
     }
 
     static algorithm(input: string): i32 {
-        if (input === "secp256r1")
+        if (input === "secp256r1" || input === "ecc256")
             return 0;
-        if (input === "secp384r1")
+        if (input === "secp384r1" || input === "ecc384")
             return 1;
-        if (input === "secp521r1")
+        if (input === "secp521r1" || input === "ecc521")
             return 2;
         if (input === "aes128gcm")
             return 3;
-        if (input === "sha2-256")
+        if (input === "sha2-256" || input === "sha256")
             return 4;
-        if (input === "sha2-384")
+        if (input === "sha2-384" || input === "sha384")
             return 5;
-        if (input === "sha2-512")
+        if (input === "sha2-512" || input === "sha512")
             return 6;
         return -1;
     }
@@ -478,9 +478,9 @@ class CryptoECDSA {
     }
 
     static isValidAlgorithm(algorithm: string): boolean {
-        if (algorithm != "secp256r1" &&
-            algorithm != "secp384r1" &&
-            algorithm != "secp521r1")
+        if (algorithm != "secp256r1" && algorithm != "ecc256" &&
+            algorithm != "secp384r1" && algorithm != "ecc384" &&
+            algorithm != "secp521r1" && algorithm != "ecc521")
             return false;
         return true;
     }
@@ -557,9 +557,9 @@ class CryptoECDSA {
 class CryptoSHA {
 
     static isValidAlgorithm(algorithm: string): boolean {
-        if (algorithm != "sha2-256" &&
-            algorithm != "sha2-384" &&
-            algorithm != "sha2-512")
+        if (algorithm != "sha2-256" && algorithm != "sha256" &&
+            algorithm != "sha2-384" && algorithm != "sha384" &&
+            algorithm != "sha2-512" && algorithm != "sha512")
             return false;
         return true;
     }
@@ -568,8 +568,11 @@ class CryptoSHA {
         switch (algorithm)
         {
         case "sha2-256": return 32;
+        case "sha256": return 32;
         case "sha2-384": return 48;
+        case "sha384": return 48;
         case "sha2-512": return 64;
+        case "sha512": return 64;
         default:            
             break;
         }        
