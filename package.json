@@ -72,7 +72,7 @@
         "axios": "1.6.8",
         "base64url": "3.0.1",
         "chalk": "^4.1.2",
-        "commander": "^7.2.0",
+        "commander": "^12.1.0",
         "connect-mongo": "5.1.0",
         "core-js": "^3.37.0",
         "cors": "2.8.5",
