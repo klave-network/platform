@@ -4,8 +4,7 @@
  */
 
 import { decode, encode as b64encode } from 'as-base64/assembly';
-import uuid from './uuid'
-import { console } from 'assemblyscript/std/assembly/bindings/dom';
+import uuid from './uuid';
 
 // @ts-ignore: decorator
 @external("env", "key_exists")
