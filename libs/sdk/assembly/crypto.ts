@@ -28,9 +28,6 @@ declare function export_key_raw(key_name: ArrayBuffer, key_format: i32, key: Arr
 @external("env", "get_public_key_format")
 declare function get_public_key_format_raw(key_name: ArrayBuffer, key_format: i32, result: ArrayBuffer, result_size: i32): i32;
 // @ts-ignore: decorator
-@external("env", "derive_public_key")
-declare function derive_public_key(derived_key_name: ArrayBuffer, original_key_name: ArrayBuffer, extractable: i32): i32;
-// @ts-ignore: decorator
 @external("env", "sign")
 declare function sign_raw(key_name: ArrayBuffer, clear_text: ArrayBuffer, clear_text_size: i32, cipher_text: ArrayBuffer, cipher_text_size: i32): i32;
 // @ts-ignore: decorator
@@ -168,19 +165,6 @@ class SubtleCrypto {
         const key = new Key(key_name);
         let result = generate_key(
             String.UTF8.encode(key.name, true), iAlgorithm, extractable?1:0, local_usages.buffer, local_usages.length);
-        if (result < 0)
-            return null;
-
-        return key;
-    }
-
-    static derivePublicKey(public_key_name: string, private_key_name: string, extractable: boolean): Key | null
-    {            
-        const key = new Key(public_key_name);
-
-        let result = derive_public_key(
-            String.UTF8.encode(key.name, true), 
-            String.UTF8.encode(private_key_name, true), extractable?1:0);
         if (result < 0)
             return null;
 
