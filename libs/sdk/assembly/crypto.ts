@@ -562,15 +562,16 @@ class CryptoSHA {
         return 0;
     }
 
-    static digest(algorithm: string, data: string): u8[] | null 
+    static digest(algorithm: string, data: string): u8[]
     {        
+        const ret: u8[] = [];
         if (!this.isValidAlgorithm(algorithm))
-            return null;
-
+            return ret;
+ 
         return SubtleCrypto.digest(algorithm, data);
     }
-
-    static digest_deprecated(data: string): u8[] | null {
+ 
+    static digest_deprecated(data: string): u8[] {
         return this.digest('sha2-256', data);
     }
 }
