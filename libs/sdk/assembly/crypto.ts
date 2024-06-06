@@ -4,7 +4,7 @@
  */
 
 import { decode, encode as b64encode } from 'as-base64/assembly';
-import uuid from './uuid'
+import uuid from './uuid';
 
 // @ts-ignore: decorator
 @external("env", "key_exists")
@@ -17,7 +17,7 @@ declare function encrypt_raw(key_name: ArrayBuffer, clear_text: ArrayBuffer, cle
 declare function decrypt_raw(key_name: ArrayBuffer, cipher_text: ArrayBuffer, cipher_text_size: i32, clear_text: ArrayBuffer, clear_text_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "generate_key")
-declare function generate_key(key_name: ArrayBuffer, algorithm: i32, extractable: boolean, usages: ArrayBuffer, usages_size: i32): i32;
+declare function generate_key(key_name: ArrayBuffer, algorithm: i32, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "import_key")
 declare function import_key_raw(key_name: ArrayBuffer, key_format: i32, key_data: ArrayBuffer, key_data_size: i32, algorithm: i32, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
@@ -25,8 +25,8 @@ declare function import_key_raw(key_name: ArrayBuffer, key_format: i32, key_data
 @external("env", "export_key")
 declare function export_key_raw(key_name: ArrayBuffer, key_format: i32, key: ArrayBuffer, key_size: i32): i32;
 // @ts-ignore: decorator
-@external("env", "get_public_key")
-declare function get_public_key_raw(key_name: ArrayBuffer, result: ArrayBuffer, result_size: i32): i32;
+@external("env", "get_formatted_public_key")
+declare function get_formatted_public_key_raw(key_name: ArrayBuffer, key_format: i32, result: ArrayBuffer, result_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "sign")
 declare function sign_raw(key_name: ArrayBuffer, clear_text: ArrayBuffer, clear_text_size: i32, cipher_text: ArrayBuffer, cipher_text_size: i32): i32;
@@ -34,8 +34,8 @@ declare function sign_raw(key_name: ArrayBuffer, clear_text: ArrayBuffer, clear_
 @external("env", "verify")
 declare function verify_raw(key_name: ArrayBuffer, cipher_text: ArrayBuffer, cipher_text_size: i32, clear_text: ArrayBuffer, clear_text_size: i32): i32;
 // @ts-ignore: decorator
-@external("env", "digest")
-declare function digest_raw(text: ArrayBuffer, text_size: i32, digest: ArrayBuffer, digest_size: i32): i32;
+@external("env", "digest_alg")
+declare function digest_alg_raw(algorithm: i32, text: ArrayBuffer, text_size: i32, digest: ArrayBuffer, digest_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "get_random_bytes")
 declare function get_random_bytes_raw(bytes: ArrayBuffer, size: i32): i32;
@@ -49,14 +49,11 @@ class PublicKey {
     }
 
     getPem(): string {
-        // this is the "fixed part" of the public key, including the curve identification (secp256r1)
-        const asn1_header = [48, 89, 48, 19, 6, 7, 42, 134, 72, 206, 61, 2, 1, 6, 8, 42, 134, 72, 206, 61, 3, 1, 7, 3, 66, 0, 4];
-        const buffer = new Uint8Array(asn1_header.length + this.bytes.length);
-        buffer.set(asn1_header);
-        buffer.set(this.bytes, asn1_header.length);
+        const buffer = new Uint8Array(this.bytes.length);        
+        buffer.set(this.bytes);        
         const pem = `-----BEGIN PUBLIC KEY-----
-        ${b64encode(buffer)}
-        -----END PUBLIC KEY-----`;
+${b64encode(buffer)}
+-----END PUBLIC KEY-----`;
         return pem;
     }
 }
@@ -73,8 +70,8 @@ class PrivateKey {
         const buffer = new Uint8Array(this.bytes.length);
         buffer.set(this.bytes);
         const pem = `-----BEGIN PRIVATE KEY-----
-        ${b64encode(buffer)}
-        -----END PRIVATE KEY-----`;
+${b64encode(buffer)}
+-----END PRIVATE KEY-----`;
         return pem;
     }
 }
@@ -108,37 +105,99 @@ class SubtleCrypto {
             return 1;
         if (input === "pkcs8")
             return 2;
+        if (input === "jwk")
+            return 3;
+        if (input === "sec1")
+            return 4;
         return -1;
     }
-}
 
-class KeyAES extends Key {
+    static algorithm(input: string): i32 {
+        if (input === "secp256r1" || input === "ecc256")
+            return 0;
+        if (input === "secp384r1" || input === "ecc384")
+            return 1;
+        if (input === "secp521r1" || input === "ecc521")
+            return 2;
+        if (input === "aes128gcm")
+            return 3;
+        if (input === "sha2-256" || input === "sha256")
+            return 4;
+        if (input === "sha2-384" || input === "sha384")
+            return 5;
+        if (input === "sha2-512" || input === "sha512")
+            return 6;
+        return -1;
+    }
 
-    encrypt(data: string): u8[] {
-        const k = String.UTF8.encode(this.name, true);
-        const t = String.UTF8.encode(data, false);
+    static usage(input: string): i32 {
+        if (input === "encrypt")
+            return 0;
+        if (input === "decrypt")
+            return 1;
+        if (input === "sign")
+            return 2;
+        if (input === "verify")
+            return 3;
+        if (input === "derive_key")
+            return 4;
+        if (input === "derive_bits")
+            return 5;
+        if (input === "wrap_key")
+            return 6;
+        if (input === "unwrap_key")
+            return 7;
+        return -1;
+    }
+
+    static generateKey(key_name: string, algorithm: string, extractable: boolean, usages: string[]): Key | null
+    {
+        let iAlgorithm = SubtleCrypto.algorithm(algorithm);
+        if (iAlgorithm < 0)
+            return null;
+
+        const local_usages = new Uint8Array(usages.length);
+        for(let i = 0; i < usages.length; i++)
+        {
+            local_usages[i] = this.usage(usages[i]);
+        }
+    
+        const key = new Key(key_name);
+        let result = generate_key(
+            String.UTF8.encode(key.name, true), iAlgorithm, extractable?1:0, local_usages.buffer, local_usages.length);
+        if (result < 0)
+            return null;
+
+        return key;
+    }
+
+    static encrypt(key_name: string, clear_text: string): u8[]
+    {
+        let k = String.UTF8.encode(key_name, true);
+        let t = String.UTF8.encode(clear_text, false);
         let value = new Uint8Array(64);
         let result = encrypt_raw(k, t, t.byteLength, value.buffer, value.byteLength);
-        const ret: u8[] = []
+        let ret: u8[] = [];
         if (result < 0)
-            return ret; // todo : report error
+            return ret;
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new Uint8Array(result);
             result = encrypt_raw(k, t, t.byteLength, value.buffer, value.byteLength);
             if (result < 0)
-                return ret; // todo : report error
+                return ret;
         }
         for (let i = 0; i < result; ++i)
             ret[i] = value[i];
         return ret;
     }
-
-    decrypt(cipher: u8[]): string {
-        const k = String.UTF8.encode(this.name, true);
-        const buffer = new Uint8Array(cipher.length);
-        for (let i = 0; i < cipher.length; ++i)
-            buffer[i] = cipher[i];
+    
+    static decrypt(key_name: string, cipher_text: u8[]): string
+    {
+        let k = String.UTF8.encode(key_name, true);
+        let buffer = new Uint8Array(cipher_text.length);
+        for (let i = 0; i < cipher_text.length; ++i)
+            buffer[i] = cipher_text[i];
         let value = new ArrayBuffer(64);
         let result = decrypt_raw(k, buffer.buffer, buffer.byteLength, value, value.byteLength);
         if (result < 0)
@@ -152,59 +211,14 @@ class KeyAES extends Key {
         }
         return String.UTF8.decode(value.slice(0, result), false);
     }
-}
-
-class CryptoAES {
-
-    static generateKey(keyName: string, extractable: boolean = false): KeyAES {
-        const key = new KeyAES(keyName);
-        const nameBuf = String.UTF8.encode(key.name, true);
-
-        const usages = new Uint8Array(2);
-        usages[0] = 0; // decrypt
-        usages[1] = 1; // encrypt
-
-        generate_key(nameBuf, 1 /* AES-GCM */, extractable, usages.buffer, usages.byteLength)
-        return key;
-    }
-
-    static getKey(keyName: string): KeyAES | null {
-        const nameBuf = String.UTF8.encode(keyName, true);
-        if (key_exists(nameBuf))
-            return new KeyAES(keyName);
-        return null
-    }
-
-    static importKey(keyName: string, keyData: string, format: string = 'raw', extractable: boolean = false): KeyAES | null {
-
-        const key = new KeyAES(keyName);
-        const nameBuf = String.UTF8.encode(key.name, true);
-        const rawData = decode(keyData);
-
-        let iFormat = SubtleCrypto.format(format);
-        if (iFormat < 0)
-            return null;
-
-        const usages = new Uint8Array(2);
-        usages[0] = 0; // decrypt
-        usages[1] = 1; // encrypt
-
-        const result = import_key_raw(nameBuf, iFormat, rawData.buffer, rawData.byteLength, 1 /* AES-GCM */, extractable ? 1 : 0, usages.buffer, usages.byteLength);
-        if (result < 0)
-            return null;
-
-        return key;
-    }
-}
-
-class KeyECC extends Key {
-
-    sign(text: string): u8[] {
-        const k = String.UTF8.encode(this.name, true);
-        const t = String.UTF8.encode(text, false);
+    
+    static sign(key_name: string, text: string): u8[]
+    {
+        let k = String.UTF8.encode(key_name, true);
+        let t = String.UTF8.encode(text, false);
         let value = new Uint8Array(64);
         let result = sign_raw(k, t, t.byteLength, value.buffer, value.byteLength);
-        const ret: u8[] = []
+        let ret: u8[] = [];
         if (result < 0)
             return ret; // todo : report error
         if (result > value.byteLength) {
@@ -218,52 +232,217 @@ class KeyECC extends Key {
             ret[i] = value[i];
         return ret;
     }
-
-    verify(data: string, signature: u8[]): boolean {
-        const k = String.UTF8.encode(this.name, true);
-        const t = String.UTF8.encode(data, false);
-        const buffer = new Uint8Array(signature.length);
+    
+    static verify(key_name: string, text: string, signature: u8[]): boolean
+    {
+        let k = String.UTF8.encode(key_name, true);
+        let t = String.UTF8.encode(text, false);
+        let buffer = new Uint8Array(signature.length);
         for (let i = 0; i < signature.length; ++i)
             buffer[i] = signature[i];
         return verify_raw(k, t, t.byteLength, buffer.buffer, buffer.byteLength) != 0;
     }
+    
+    static digest(algorithm: string, text: string): u8[]
+    {
+        let ret: u8[] = [];
+        let iAlgorithm = SubtleCrypto.algorithm(algorithm);
+        if (iAlgorithm < 0)
+            return ret;
 
-    getPublicKey(): PublicKey {
-        const k = String.UTF8.encode(this.name, true);
-        let value = new Uint8Array(64);
-        let result = get_public_key_raw(k, value.buffer, value.byteLength);
-        const ret: u8[] = [];
+        let t = String.UTF8.encode(text, false);
+        let value = new Uint8Array(32);
+        let result = digest_alg_raw(iAlgorithm, t, t.byteLength, value.buffer, value.byteLength);
         if (result < 0)
-            return new PublicKey(ret); // todo : report error
+            return ret; // todo : report error
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new Uint8Array(result);
-            result = get_public_key_raw(k, value.buffer, value.byteLength);
+            result = digest_alg_raw(iAlgorithm, t, t.byteLength, value.buffer, value.byteLength);
             if (result < 0)
-                return new PublicKey(ret); // todo : report error
+                return ret; // todo : report error
         }
         for (let i = 0; i < result; ++i)
             ret[i] = value[i];
-        return new PublicKey(ret);
+        return ret;
+    }    
+    static importKey(key_name: string, format: string, b64Data: string, algorithm: string, extractable: boolean, usages: string[]): Key | null
+    {
+        const key = new Key(key_name);
+
+        let iFormat = SubtleCrypto.format(format);
+        if (iFormat < 0)
+            return null;
+
+        let iAlgorithm = SubtleCrypto.algorithm(algorithm);
+        if (iAlgorithm < 0)
+            return null;
+
+        const local_usages = new Uint8Array(usages.length);
+        for(let i = 0; i < usages.length; i++)
+        {
+            local_usages[i] = this.usage(usages[i]);
+        }
+
+        let rawData = decode(b64Data);
+        let result = import_key_raw(String.UTF8.encode(key.name, true), iFormat, rawData.buffer, rawData.byteLength,
+            iAlgorithm, extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength);
+        
+        if (result < 0)
+            return null;
+    
+        return key;
     }
 
-    getPrivateKey(): PrivateKey {
-        const k = String.UTF8.encode(this.name, true);
-        let value = new Uint8Array(32);
-        let result = export_key_raw(k, 0, value.buffer, value.byteLength);
-        const ret: u8[] = [];
+    static exportKey(key_name: string, format: string): u8[]
+    {
+        let ret: u8[] = [];
+        let iFormat = SubtleCrypto.format(format);
+        if (iFormat < 0)
+            return ret;
+
+        let key = new Uint8Array(32);
+        let result = export_key_raw(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
+    
         if (result < 0)
-            return new PrivateKey(ret); // todo : report error
-        if (result > value.byteLength) {
+            return ret;
+        if (result > key.byteLength) {
             // buffer not big enough, retry with a properly sized one
-            value = new Uint8Array(result);
-            result = export_key_raw(k, 0, value.buffer, value.byteLength);
+            key = new Uint8Array(result);
+            result = export_key_raw(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
             if (result < 0)
-                return new PrivateKey(ret); // todo : report error
+                return ret;
         }
-        for (let i = 0; i < result; ++i)
-            ret[i] = value[i];
-        return new PrivateKey(ret);
+        for (let i = 0; i < key.byteLength; ++i)
+            ret[i] = key[i];
+        return ret;
+    }        
+
+    static getPublicKey(key_name: string, format: string): u8[]
+    {
+        let ret: u8[] = [];
+        let iFormat = SubtleCrypto.format(format);
+        if (iFormat < 0)
+            return ret;
+
+        let key = new Uint8Array(32);
+        let result = get_formatted_public_key_raw(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
+    
+        if (result < 0)
+            return ret;
+        if (result > key.byteLength) {
+            // buffer not big enough, retry with a properly sized one
+            key = new Uint8Array(result);
+            result = get_formatted_public_key_raw(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
+            if (result < 0)
+                return ret;
+        }
+        for (let i = 0; i < key.byteLength; ++i)
+            ret[i] = key[i];
+        return ret;
+    }        
+}
+
+class KeyAES extends Key {
+
+    encrypt(data: string): u8[] {
+        return SubtleCrypto.encrypt(this.name, data);
+    }
+
+    decrypt(cipher: u8[]): string {
+        return SubtleCrypto.decrypt(this.name, cipher);
+    }
+}
+
+class CryptoAES {
+
+    static generateKey(keyName: string, algorithm: string = 'aes128gcm', extractable: boolean = false): KeyAES | null 
+    {
+        const key = SubtleCrypto.generateKey(keyName, algorithm, extractable, ["decrypt", "encrypt"]);
+        if (!key) {
+            return null;
+        }
+
+        const kAES = new KeyAES(key.name);
+        return kAES;
+    }
+
+    static generateKey_deprecated(keyName: string, extractable: boolean = false): KeyAES | null {
+        return this.generateKey(keyName, 'aes128gcm', extractable);
+    }    
+
+    static getKey(keyName: string): KeyAES | null {
+        const nameBuf = String.UTF8.encode(keyName, true);
+        if (key_exists(nameBuf))
+            return new KeyAES(keyName);
+        return null
+    }
+
+    static isValidFormat(format: string): boolean {
+        if (format != "raw")
+            return false;
+        return true;
+    }
+
+    static isValidAlgorithm(format: string): boolean {
+        if (format != "aes128gcm")
+            return false;
+        return true;
+    }
+
+    static importKey(keyName: string, format: string, keyData: string, algorithm: string = 'aes128gcm', extractable: boolean = false): KeyAES | null {
+        
+        //Crypto SDK currently only supports import of algorithm "aes128gcm" in a "raw" format.
+        //JWK will eventually be added
+        if (!this.isValidFormat(format))
+            return null;
+        
+        if (!this.isValidAlgorithm(algorithm))
+            return null;
+
+        const key = new KeyAES(keyName);
+        const result = SubtleCrypto.importKey(key.name, format, keyData, algorithm, extractable, ["decrypt", "encrypt"]);
+        if (!result)
+            return null;
+        return key;
+    }
+
+    static importKey_deprecated(keyName: string, keyData: string, format: string = 'raw', extractable: boolean = false): KeyAES | null {
+        return this.importKey(keyName, keyData, 'aes128gcm', format, extractable);
+    }
+
+    static exportKey(key_name: string, format: string): u8[]
+    {
+        const ret: u8[] = [];
+        if (!this.isValidFormat(format))
+            return ret;
+        return SubtleCrypto.exportKey(key_name, format);
+    }
+}
+
+class KeyECC extends Key {
+
+    sign(text: string): u8[] {
+        return SubtleCrypto.sign(this.name, text);
+    }
+
+    verify(data: string, signature: u8[]): boolean {
+        return SubtleCrypto.verify(this.name, data, signature);
+    }
+
+    getPublicKey(format: string = 'spki'): PublicKey {
+        if (!CryptoECDSA.isValidFormat(format))
+            return new PublicKey([]);
+        let result = SubtleCrypto.getPublicKey(this.name, format);
+        return new PublicKey(result);
+    }
+
+    getPrivateKey(format: string = 'pkcs8'): PrivateKey {        
+        if (!CryptoECDSA.isValidFormat(format))
+            return new PrivateKey([]);
+
+        let result = SubtleCrypto.exportKey(this.name, format);
+        return new PrivateKey(result);
     }
 }
 
@@ -275,17 +454,37 @@ export class SimpleKeyPair {
 
 class CryptoECDSA {
 
-    static generateKey(keyName: string, extractable: boolean = false): KeyECC {
-        const key = new KeyECC(keyName);
-        const nameBuf = String.UTF8.encode(key.name, true);
-
-        const usages = new Uint8Array(2);
-        usages[0] = 3; // sign
-        usages[1] = 5; // derive_key
-
-        generate_key(nameBuf, 0 /* ECDSA */, extractable, usages.buffer, usages.byteLength)
-        return key;
+    static isValidFormat(algorithm: string): boolean {
+        if (algorithm == "jwk")
+            return false;
+        return true;
     }
+
+    static isValidAlgorithm(algorithm: string): boolean {
+        if (algorithm != "secp256r1" && algorithm != "ecc256" &&
+            algorithm != "secp384r1" && algorithm != "ecc384" &&
+            algorithm != "secp521r1" && algorithm != "ecc521")
+            return false;
+        return true;
+    }
+
+    static generateKey(keyName: string, algorithm: string = 'secp256r1', extractable: boolean = false): KeyECC | null {
+        if (!this.isValidAlgorithm(algorithm))
+            return null;
+
+        //It will only generate a Private Key that can be derived into a Public Key of the same algorithm
+        const key = SubtleCrypto.generateKey(keyName, algorithm, extractable, ["sign"]);
+        if (!key) {
+            return null;
+        }
+
+        const kECC = new KeyECC(key.name);
+        return kECC;
+    }
+
+    static generateKey_deprecated(keyName: string, extractable: boolean = false): KeyECC | null {
+        return this.generateKey(keyName, 'secp256r1', extractable);
+    }    
 
     static getKey(keyName: string): KeyECC | null {
         const nameBuf = String.UTF8.encode(keyName, true);
@@ -294,63 +493,93 @@ class CryptoECDSA {
         return null
     }
 
-    static importKey(keyName: string, keyPair: SimpleKeyPair, format: string = 'raw', extractable: boolean = false): KeyECC | null {
+    static importKey(keyName: string, format: string, keyData: string, algorithm: string = 'secp256r1', extractable: boolean = false): KeyECC | null {
 
-        if (keyPair.privateKey && keyPair.publicKey)
-            return null;
-
-        const keyBuff = keyPair.privateKey ? keyPair.privateKey : keyPair.publicKey;
-
-        if (!keyBuff)
+        if (keyData.length === 0)
             return null;
 
         const key = new KeyECC(keyName);
-        const nameBuf = String.UTF8.encode(key.name, true);
-        const rawData = decode(keyBuff);
 
-        let iFormat = SubtleCrypto.format(format);
-        if (iFormat < 0)
+        if (!this.isValidFormat(format))
             return null;
 
-        if (iFormat === 1) // spki
+        if (!this.isValidAlgorithm(algorithm))
             return null;
+        
+        const result = SubtleCrypto.importKey(key.name, format, keyData, algorithm, extractable, 
+            (format === "spki") ? 
+                ["verify"] : //Public Key
+                ["sign"]);   //Private Key
 
-        const usages = new Uint8Array(1);
-        usages[0] = keyPair.privateKey ? 2 : 3
-
-        const result = import_key_raw(nameBuf, iFormat, rawData.buffer, rawData.byteLength, 0 /* ECDSA */, extractable ? 1 : 0, usages.buffer, usages.byteLength);
-        if (result < 0)
+        if (!result)
             return null;
 
         return key;
+    }
+
+    static importKey_deprecated(keyName: string, keyPair: SimpleKeyPair, format: string = 'raw', extractable: boolean = false): KeyECC | null {
+        if (keyPair.privateKey && keyPair.publicKey)
+            return null;
+    
+        const keyBuff = keyPair.privateKey ? keyPair.privateKey : keyPair.publicKey;
+        if (!keyBuff)
+            return null;
+
+        return this.importKey(keyName, keyBuff, 'secp256r1', format, extractable);
+    }
+
+    static exportKey(key_name: string, format: string): u8[]
+    {
+        const ret: u8[] = [];
+        if (!this.isValidFormat(format))
+            return ret;
+        return SubtleCrypto.exportKey(key_name, format);
     }
 }
 
 class CryptoSHA {
 
-    static digest(data: string): u8[] {
-        const t = String.UTF8.encode(data, false);
-        let value = new Uint8Array(32);
-        let result = digest_raw(t, t.byteLength, value.buffer, value.byteLength);
-        const ret: u8[] = []
-        if (result < 0)
-            return ret; // todo : report error
-        if (result > value.byteLength) {
-            // buffer not big enough, retry with a properly sized one
-            value = new Uint8Array(result);
-            result = digest_raw(t, t.byteLength, value.buffer, value.byteLength);
-            if (result < 0)
-                return ret; // todo : report error
-        }
-        for (let i = 0; i < result; ++i)
-            ret[i] = value[i];
-        return ret;
+    static isValidAlgorithm(algorithm: string): boolean {
+        if (algorithm != "sha2-256" && algorithm != "sha256" &&
+            algorithm != "sha2-384" && algorithm != "sha384" &&
+            algorithm != "sha2-512" && algorithm != "sha512")
+            return false;
+        return true;
+    }
+
+    static digestSize(algorithm: string): number {
+        switch (algorithm)
+        {
+        case "sha2-256": return 32;
+        case "sha256": return 32;
+        case "sha2-384": return 48;
+        case "sha384": return 48;
+        case "sha2-512": return 64;
+        case "sha512": return 64;
+        default:            
+            break;
+        }        
+        return 0;
+    }
+
+    static digest(algorithm: string, data: string): u8[]
+    {        
+        const ret: u8[] = [];
+        if (!this.isValidAlgorithm(algorithm))
+            return ret;
+ 
+        return SubtleCrypto.digest(algorithm, data);
+    }
+ 
+    static digest_deprecated(data: string): u8[] {
+        return this.digest('sha2-256', data);
     }
 }
 
 export class AES extends CryptoAES { };
 export class ECDSA extends CryptoECDSA { };
 export class SHA extends CryptoSHA { };
+export class Subtle extends SubtleCrypto { };
 
 export function getKey(keyName: string): Key | null {
     const nameBuf = String.UTF8.encode(keyName, true);
@@ -372,19 +601,21 @@ export function getRandomValues(size: i32): u8[] {
 
 export class Utils {
 
-    static pointerToString(ptr: i32): string {
-        let len = 0;
-        while (load<u8>(ptr + len) != 0)
-            len++;
-        const buf = new ArrayBuffer(len + 1);
-        memory.copy(changetype<usize>(buf), ptr, len + 1);
-        return String.UTF8.decode(buf, true);
+    static convertToU8Array(input: Uint8Array): u8[] {
+        let ret: u8[] = [];
+        for (let i = 0; i < input.length; ++i)
+            ret[i] = input[i];
+    
+        return ret;
     }
-
-    static stringToPointer(str: string): i32 {
-        const buf = String.UTF8.encode(str, true);
-        const ptr = changetype<usize>(buf);
-        return ptr;
+    
+    static convertToUint8Array(input: u8[]): Uint8Array {
+        let value = new Uint8Array(input.length);
+        for (let i = 0; i < input.length; ++i) {
+            value[i] = input[i];
+        }
+    
+        return value;
     }
-
+    
 }
