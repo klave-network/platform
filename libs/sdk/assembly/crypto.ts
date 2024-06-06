@@ -25,8 +25,8 @@ declare function import_key_raw(key_name: ArrayBuffer, key_format: i32, key_data
 @external("env", "export_key")
 declare function export_key_raw(key_name: ArrayBuffer, key_format: i32, key: ArrayBuffer, key_size: i32): i32;
 // @ts-ignore: decorator
-@external("env", "get_public_key_format")
-declare function get_public_key_format_raw(key_name: ArrayBuffer, key_format: i32, result: ArrayBuffer, result_size: i32): i32;
+@external("env", "get_formatted_public_key")
+declare function get_formatted_public_key_raw(key_name: ArrayBuffer, key_format: i32, result: ArrayBuffer, result_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "sign")
 declare function sign_raw(key_name: ArrayBuffer, clear_text: ArrayBuffer, clear_text_size: i32, cipher_text: ArrayBuffer, cipher_text_size: i32): i32;
@@ -326,14 +326,14 @@ class SubtleCrypto {
             return ret;
 
         let key = new Uint8Array(32);
-        let result = get_public_key_format_raw(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
+        let result = get_formatted_public_key_raw(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
     
         if (result < 0)
             return ret;
         if (result > key.byteLength) {
             // buffer not big enough, retry with a properly sized one
             key = new Uint8Array(result);
-            result = get_public_key_format_raw(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
+            result = get_formatted_public_key_raw(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
             if (result < 0)
                 return ret;
         }
