@@ -1,4 +1,30 @@
 # Changelog
+## [0.12.0](https://github.com/klave-network/platform/compare/sdk@0.11.0...sdk@0.12.0) (2024-06-06)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.11.0`
+* `constants` updated to version `0.11.0`
+
+### Features
+
+* **sdk:** Add format to get_public_key and modify formats ([606017d](https://github.com/klave-network/platform/commit/606017d0363f4458843b4d086c18f5e036ee03bd))
+* **sdk:** Adding SubtleCrypto ([628e5e8](https://github.com/klave-network/platform/commit/628e5e8f1c91b763198fe4f1b598e88458923b25))
+* **sdk:** Rename derive_key into derive_public_key ([d06fe72](https://github.com/klave-network/platform/commit/d06fe72daed7fc97e9d09dfac5805c6b49e496fe))
+
+
+### Bug Fixes
+
+* **sdk:** Add backward compatibility for algorithm ([04b0e71](https://github.com/klave-network/platform/commit/04b0e7181e7216969baf77e9b0701d03da88a337))
+* **sdk:** Pass `byteLength` for `importKey` and sort out `usages` buffer size ([1d4c708](https://github.com/klave-network/platform/commit/1d4c708d1978af3607ee403f30b21b63ab9e9790))
+* **sdk:** Refactor using SubtleCrypto ([06273fd](https://github.com/klave-network/platform/commit/06273fdacffe7c4ae12c2683e056efe77840d0db))
+* **sdk:** Remove unnecessary console import ([5080a21](https://github.com/klave-network/platform/commit/5080a2180818439dcbad9f5f65e8782bbef771c6))
+* **sdk:** Remove useless derive_public_key method ([c0c8240](https://github.com/klave-network/platform/commit/c0c8240d94542eba5b3029b002b9ecc4135f5d73))
+* **sdk:** Rename deriveKey in derivePublicKey to match Core SDK current impl ([96225d4](https://github.com/klave-network/platform/commit/96225d41eb45cf26e7936a54ac05125b6c0c4857))
+* **sdk:** Rename get_public_key into get_public_key_format for retrocompatibility ([4a78c62](https://github.com/klave-network/platform/commit/4a78c624da2df1d5515ad53e8cc1da061314e560))
+* **sdk:** Rename get_public_key_format to get_formatted_public_key ([23423d5](https://github.com/klave-network/platform/commit/23423d54ae17a0513c9ee32cc02279bb52346174))
+* **sdk:** Return empty u8[]instead of null in digest method ([bb36ca0](https://github.com/klave-network/platform/commit/bb36ca0be15e0727d2ad71e629a0d3804024b87a))
+
 ## [0.11.0](https://github.com/klave-network/platform/compare/sdk@0.10.2...sdk@0.11.0) (2024-05-08)
 
 ### Dependency Updates

@@ -1,4 +1,11 @@
 # Changelog
+## [0.5.0](https://github.com/klave-network/platform/compare/compiler@0.4.0...compiler@0.5.0) (2024-06-06)
+
+
+### Features
+
+* **api,compiler,hubber:** Do compilation over full repo clone ([d68d7dd](https://github.com/klave-network/platform/commit/d68d7ddc26815900489d529b502f30495546f0b5))
+
 ## [0.4.0](https://github.com/klave-network/platform/compare/compiler@0.3.4...compiler@0.4.0) (2024-05-08)
 
 
