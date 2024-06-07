@@ -1,4 +1,11 @@
 # Changelog
+## [0.10.1](https://github.com/klave-network/platform/compare/ui@0.10.0...ui@0.10.1) (2024-06-07)
+
+### Dependency Updates
+
+* `constants` updated to version `0.10.0`
+* `db` updated to version `0.10.0`
+* `api` updated to version `0.10.0`
 ## [0.10.0](https://github.com/klave-network/platform/compare/ui@0.9.2...ui@0.10.0) (2024-05-31)
 
 ### Dependency Updates
