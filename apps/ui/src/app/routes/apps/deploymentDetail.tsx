@@ -263,7 +263,7 @@ export const AppDeploymentDetail: FC = () => {
                         {deployment.sourceType?.includes('rust')
                             ? <pre className={'overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-yellow-100 dark:bg-gray-800 p-3 mb-2'}>
                                 <UilExclamationTriangle className='w-8 h-10 p-0 -ml-1 mb-2' />
-                                Rust builds are non-deterministic accross environements. Please bare in mind that the following hash is only valid for the current build environment or similar. See dependencies for more information.
+                                Rust builds are non-deterministic accross environments. Please bear in mind that the following hash is only valid for the current build environment or similar. See dependencies for more information.
                             </pre>
                             : null}
                         <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-slate-100 dark:bg-gray-800 p-3'>
