@@ -131,7 +131,7 @@ export const Index: FC = () => {
                         </div>
                         <div className='relative'>
                             We are creating a new repository in your GitHub account.<br />
-                            We will populated with your app shortly.<br />
+                            We will populate it with your app shortly.<br />
                             It will only take a moment...
                             <br />
                             <br />
