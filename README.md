@@ -1,6 +1,6 @@
 # Klave Platform
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%klave-network%2Fplatform.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%klave-network%2Fplatform?ref=badge_shield)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fklave-network%2Fplatform.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fklave-network%2Fplatform?ref=badge_shield&issueType=license)
 
 This repo contains the Klave Platform for Typescript
 
