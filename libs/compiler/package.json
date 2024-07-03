@@ -16,10 +16,10 @@
     "dependencies": {
         "@klave/as-json": "^0.8.2",
         "@total-typescript/ts-reset": "^0.5.1",
-        "assemblyscript": "^0.27.27",
+        "assemblyscript": "^0.27.28",
         "serialize-error": "8.1.0",
-        "typescript": "^5.4.4",
-        "uuid": "^9.0.1",
-        "tslib": "^2.6.2"
+        "typescript": "^5.5.3",
+        "uuid": "^10.0.0",
+        "tslib": "^2.6.3"
     }
 }
