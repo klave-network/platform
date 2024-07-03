@@ -1,4 +1,6 @@
 # Changelog
+## [0.10.2](https://github.com/klave-network/platform/compare/ui@0.10.1...ui@0.10.2) (2024-07-03)
+
 ## [0.10.1](https://github.com/klave-network/platform/compare/ui@0.10.0...ui@0.10.1) (2024-06-07)
 
 ### Dependency Updates
