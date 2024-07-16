@@ -31,22 +31,22 @@ export class SubtleCrypto {
 
     static encrypt(key: CryptoKey, clear_text: string): u8[]
     {
-        return CryptoImpl.encrypt(MemoryType.InMemory, key.name, clear_text);
+        return CryptoImpl.encrypt(key.name, clear_text);
     }
     
     static decrypt(key: CryptoKey, cipher_text: u8[]): string
     {
-        return CryptoImpl.decrypt(MemoryType.InMemory, key.name, cipher_text);
+        return CryptoImpl.decrypt(key.name, cipher_text);
     }
     
     static sign(key: CryptoKey, text: string): u8[]
     {
-        return CryptoImpl.sign(MemoryType.InMemory, key.name, text);
+        return CryptoImpl.sign(key.name, text);
     }
     
     static verify(key: CryptoKey, text: string, signature: u8[]): boolean
     {
-        return CryptoImpl.verify(MemoryType.InMemory, key.name, text, signature);
+        return CryptoImpl.verify(key.name, text, signature);
     }
     
     static digest(algorithm: string, text: string): u8[]
@@ -63,11 +63,11 @@ export class SubtleCrypto {
 
     static exportKey(key: CryptoKey, format: string): u8[]
     {
-        return CryptoImpl.exportKey(MemoryType.InMemory, key.name, format);
+        return CryptoImpl.exportKey(key.name, format);
     }        
 
     static getPublicKey(key: CryptoKey, format: string): u8[]
     {
-        return CryptoImpl.getPublicKey(MemoryType.InMemory, key.name, format);
+        return CryptoImpl.getPublicKey(key.name, format);
     }        
 }

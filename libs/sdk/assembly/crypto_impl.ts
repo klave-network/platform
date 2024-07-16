@@ -39,30 +39,11 @@ declare function get_random_bytes_wasm(bytes: ArrayBuffer, size: i32): i32;
 @external("env", "key_exists_in_memory")
 declare function key_exists_in_memory(key_name: ArrayBuffer): boolean;
 // @ts-ignore: decorator
-@external("env", "encrypt_in_memory")
-declare function encrypt_in_memory(key_name: ArrayBuffer, clear_text: ArrayBuffer, clear_text_size: i32, cipher_text: ArrayBuffer, cipher_text_size: i32): i32;
-// @ts-ignore: decorator
-@external("env", "decrypt_in_memory")
-declare function decrypt_in_memory(key_name: ArrayBuffer, cipher_text: ArrayBuffer, cipher_text_size: i32, clear_text: ArrayBuffer, clear_text_size: i32): i32;
-// @ts-ignore: decorator
 @external("env", "generate_key_in_memory")
 declare function generate_key_in_memory(key_name: ArrayBuffer, algorithm: i32, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "import_key_in_memory")
 declare function import_key_in_memory(key_name: ArrayBuffer, key_format: i32, key_data: ArrayBuffer, key_data_size: i32, algorithm: i32, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
-// @ts-ignore: decorator
-@external("env", "export_key_in_memory")
-declare function export_key_in_memory(key_name: ArrayBuffer, key_format: i32, key: ArrayBuffer, key_size: i32): i32;
-// @ts-ignore: decorator
-@external("env", "get_public_key_in_memory")
-declare function get_public_key_in_memory(key_name: ArrayBuffer, key_format: i32, result: ArrayBuffer, result_size: i32): i32;
-// @ts-ignore: decorator
-@external("env", "sign_in_memory")
-declare function sign_in_memory(key_name: ArrayBuffer, clear_text: ArrayBuffer, clear_text_size: i32, cipher_text: ArrayBuffer, cipher_text_size: i32): i32;
-// @ts-ignore: decorator
-@external("env", "verify_in_memory")
-declare function verify_in_memory(key_name: ArrayBuffer, cipher_text: ArrayBuffer, cipher_text_size: i32, clear_text: ArrayBuffer, clear_text_size: i32): i32;
-
 
 export class Key {
 
@@ -190,30 +171,19 @@ export class CryptoImpl {
         return key;
     }
 
-    static encrypt(in_memory: MemoryType, key_name: string, clear_text: string): u8[]
+    static encrypt(key_name: string, clear_text: string): u8[]
     {
         let k = String.UTF8.encode(key_name, true);
         let t = String.UTF8.encode(clear_text, false);
         let value = new Uint8Array(64);
-        let result = 0;
-        if (in_memory == MemoryType.InMemory) {
-            result = encrypt_in_memory(k, t, t.byteLength, value.buffer, value.byteLength);
-        }
-        else {
-            result = encrypt_wasm(k, t, t.byteLength, value.buffer, value.byteLength);
-        }
+        let result = encrypt_wasm(k, t, t.byteLength, value.buffer, value.byteLength);
         let ret: u8[] = [];
         if (result < 0)
             return ret;
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new Uint8Array(result);
-            if (in_memory == MemoryType.InMemory) {
-                result = encrypt_in_memory(k, t, t.byteLength, value.buffer, value.byteLength);
-            }
-            else {
-                result = encrypt_wasm(k, t, t.byteLength, value.buffer, value.byteLength);
-            }
+            result = encrypt_wasm(k, t, t.byteLength, value.buffer, value.byteLength);
             if (result < 0)
                 return ret;
         }
@@ -222,61 +192,39 @@ export class CryptoImpl {
         return ret;
     }
     
-    static decrypt(in_memory: MemoryType, key_name: string, cipher_text: u8[]): string
+    static decrypt(key_name: string, cipher_text: u8[]): string
     {
         let k = String.UTF8.encode(key_name, true);
         let buffer = new Uint8Array(cipher_text.length);
         for (let i = 0; i < cipher_text.length; ++i)
             buffer[i] = cipher_text[i];
         let value = new ArrayBuffer(64);
-        let result = 0;
-        if (in_memory == MemoryType.InMemory) {
-            result = decrypt_in_memory(k, buffer.buffer, buffer.byteLength, value, value.byteLength);
-        }
-        else {
-            result = decrypt_wasm(k, buffer.buffer, buffer.byteLength, value, value.byteLength);
-        }
+        let result = decrypt_wasm(k, buffer.buffer, buffer.byteLength, value, value.byteLength);
         if (result < 0)
             return ""; // todo : report error
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new ArrayBuffer(result);
-            if (in_memory == MemoryType.InMemory) {
-                result = decrypt_in_memory(k, buffer.buffer, buffer.byteLength, value, value.byteLength);
-            }
-            else {
-                result = decrypt_wasm(k, buffer.buffer, buffer.byteLength, value, value.byteLength);
-            }
+            result = decrypt_wasm(k, buffer.buffer, buffer.byteLength, value, value.byteLength);
             if (result < 0)
                 return ""; // todo : report error
         }
         return String.UTF8.decode(value.slice(0, result), false);
     }
     
-    static sign(in_memory: MemoryType, key_name: string, text: string): u8[]
+    static sign(key_name: string, text: string): u8[]
     {
         let k = String.UTF8.encode(key_name, true);
         let t = String.UTF8.encode(text, false);
         let value = new Uint8Array(64);
-        let result = 0;
-        if (in_memory == MemoryType.InMemory) {
-            result = sign_in_memory(k, t, t.byteLength, value.buffer, value.byteLength);
-        }
-        else {
-            result = sign_wasm(k, t, t.byteLength, value.buffer, value.byteLength);
-        }
+        let result = sign_wasm(k, t, t.byteLength, value.buffer, value.byteLength);
         let ret: u8[] = [];
         if (result < 0)
             return ret; // todo : report error
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new Uint8Array(result);
-            if (in_memory == MemoryType.InMemory) {
-                result = sign_in_memory(k, t, t.byteLength, value.buffer, value.byteLength);
-            }
-            else {
-                result = sign_wasm(k, t, t.byteLength, value.buffer, value.byteLength);
-            }
+            result = sign_wasm(k, t, t.byteLength, value.buffer, value.byteLength);
             if (result < 0)
                 return ret; // todo : report error
         }
@@ -285,16 +233,13 @@ export class CryptoImpl {
         return ret;
     }
     
-    static verify(in_memory: MemoryType, key_name: string, text: string, signature: u8[]): boolean
+    static verify(key_name: string, text: string, signature: u8[]): boolean
     {
         let k = String.UTF8.encode(key_name, true);
         let t = String.UTF8.encode(text, false);
         let buffer = new Uint8Array(signature.length);
         for (let i = 0; i < signature.length; ++i)
             buffer[i] = signature[i];
-        if (in_memory == MemoryType.InMemory) {
-            return verify_in_memory(k, t, t.byteLength, buffer.buffer, buffer.byteLength) != 0;
-        }
         return verify_wasm(k, t, t.byteLength, buffer.buffer, buffer.byteLength) != 0;
     }
     
@@ -357,7 +302,7 @@ export class CryptoImpl {
         return key;
     }
 
-    static exportKey(in_memory: MemoryType, key_name: string, format: string): u8[]
+    static exportKey(key_name: string, format: string): u8[]
     {
         let ret: u8[] = [];
         let iFormat = CryptoImpl.format(format);
@@ -366,25 +311,13 @@ export class CryptoImpl {
 
         let key = new Uint8Array(32);
 
-        let result = 0;
-        if (in_memory == MemoryType.InMemory) {        
-            result = export_key_in_memory(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
-        }
-        else {
-            result = export_key(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
-        }
-
+        let result = export_key(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
         if (result < 0)
             return ret;
         if (result > key.byteLength) {
             // buffer not big enough, retry with a properly sized one
             key = new Uint8Array(result);
-            if (in_memory == MemoryType.InMemory) {        
-                result = export_key_in_memory(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
-            }
-            else {
-                result = export_key(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
-            }
+            result = export_key(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
             if (result < 0)
                 return ret;
         }
@@ -393,7 +326,7 @@ export class CryptoImpl {
         return ret;
     }        
 
-    static getPublicKey(in_memory: MemoryType, key_name: string, format: string): u8[]
+    static getPublicKey(key_name: string, format: string): u8[]
     {
         let ret: u8[] = [];
         let iFormat = CryptoImpl.format(format);
@@ -401,25 +334,13 @@ export class CryptoImpl {
             return ret;
 
         let key = new Uint8Array(32);
-        let result = 0;
-        if (in_memory == MemoryType.InMemory) {        
-            result = get_public_key_in_memory(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
-        }
-        else {
-            result = get_formatted_public_key(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
-        }
-
+        let result = get_formatted_public_key(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
         if (result < 0)
             return ret;
         if (result > key.byteLength) {
             // buffer not big enough, retry with a properly sized one
             key = new Uint8Array(result);
-            if (in_memory == MemoryType.InMemory) {        
-                result = get_public_key_in_memory(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
-            }
-            else {
-                result = get_formatted_public_key(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
-            }
+            result = get_formatted_public_key(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
             if (result < 0)
                 return ret;
         }

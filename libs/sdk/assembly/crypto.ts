@@ -46,11 +46,11 @@ ${b64encode(buffer)}
 class KeyAES extends Key {
 
     encrypt(data: string): u8[] {
-        return CryptoImpl.encrypt(MemoryType.Persistent, this.name, data);
+        return CryptoImpl.encrypt(this.name, data);
     }
 
     decrypt(cipher: u8[]): string {
-        return CryptoImpl.decrypt(MemoryType.Persistent, this.name, cipher);
+        return CryptoImpl.decrypt(this.name, cipher);
     }
 }
 
@@ -115,24 +115,24 @@ class CryptoAES {
         const ret: u8[] = [];
         if (!this.isValidFormat(format))
             return ret;
-        return CryptoImpl.exportKey(MemoryType.Persistent, key_name, format);
+        return CryptoImpl.exportKey(key_name, format);
     }
 }
 
 class KeyECC extends Key {
 
     sign(text: string): u8[] {
-        return CryptoImpl.sign(MemoryType.Persistent, this.name, text);
+        return CryptoImpl.sign(this.name, text);
     }
 
     verify(data: string, signature: u8[]): boolean {
-        return CryptoImpl.verify(MemoryType.Persistent, this.name, data, signature);
+        return CryptoImpl.verify(this.name, data, signature);
     }
 
     getPublicKey(format: string = 'spki'): PublicKey {
         if (!CryptoECDSA.isValidFormat(format))
             return new PublicKey([]);
-        let result = CryptoImpl.getPublicKey(MemoryType.Persistent, this.name, format);
+        let result = CryptoImpl.getPublicKey(this.name, format);
         return new PublicKey(result);
     }
 
@@ -140,7 +140,7 @@ class KeyECC extends Key {
         if (!CryptoECDSA.isValidFormat(format))
             return new PrivateKey([]);
 
-        let result = CryptoImpl.exportKey(MemoryType.Persistent, this.name, format);
+        let result = CryptoImpl.exportKey(this.name, format);
         return new PrivateKey(result);
     }
 }
@@ -217,7 +217,7 @@ class CryptoECDSA {
         const ret: u8[] = [];
         if (!this.isValidFormat(format))
             return ret;
-        return CryptoImpl.exportKey(MemoryType.Persistent, key_name, format);
+        return CryptoImpl.exportKey(key_name, format);
     }
 
     //Deprecated methods
