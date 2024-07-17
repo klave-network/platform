@@ -8,6 +8,7 @@ FROM docker.io/node:20-alpine
 
 ENV HOST=0.0.0.0
 ENV PORT=3000
+ENV HUSKY=0
 
 WORKDIR /app
 
