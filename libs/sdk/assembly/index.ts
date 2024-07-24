@@ -44,6 +44,9 @@ declare function runtime_infer_from_lightgbm_model(name: ArrayBuffer, data: Arra
 @external("env", "https_query")
 declare function https_query_raw(query: ArrayBuffer, result: ArrayBuffer, result_size: i32): i32;
 // @ts-ignore: decorator
+@external("env", "get_ita_token")
+declare function get_ita_token_raw(ta_api_url: ArrayBuffer, ta_base_url: ArrayBuffer, ta_key: ArrayBuffer, request_id: ArrayBuffer, policy_ids_json: ArrayBuffer, token_sign_alg_str: ArrayBuffer, retry_wait_time: i32, retry_max: i32, result: ArrayBuffer, result_size: i32): i32;
+// @ts-ignore: decorator
 @external("env", "start_recording")
 declare function start_recording(): void;
 // @ts-ignore: decorator
@@ -170,6 +173,53 @@ export class Subscription {
 export class Transaction {
     static abort(): void {
         abort_transaction();
+    }
+}
+
+export namespace Attestation {
+    
+    export namespace ITA {
+
+        @JSON
+        export class Config
+        {
+            ta_api_url!: string;
+            ta_base_url!: string;
+            ta_key!: string;
+            request_id: string = "";
+            policy_ids!: string[];
+            token_sign_alg_str!: string;
+            retry_wait_time!: i32;
+            retry_max!: i32;
+        }
+
+        export class Token
+        {
+            static getJWT(ita_config: Config): string {
+                
+                let ta_api_url = String.UTF8.encode(ita_config.ta_api_url, true);
+                let ta_base_url = String.UTF8.encode(ita_config.ta_base_url, true);
+                let ta_key = String.UTF8.encode(ita_config.ta_key, true);
+                let request_id = String.UTF8.encode(ita_config.request_id, true);
+                let policy_ids_json = String.UTF8.encode(JSON.stringify(ita_config.policy_ids), true);
+                let token_sign_alg_str = String.UTF8.encode(ita_config.token_sign_alg_str, true);
+                let retry_wait_time = ita_config.retry_wait_time;
+                let retry_max = ita_config.retry_max;
+
+                let value = new ArrayBuffer(5000);
+                let result = get_ita_token_raw(ta_api_url, ta_base_url, ta_key, request_id, policy_ids_json, token_sign_alg_str, retry_wait_time, retry_max, value, value.byteLength);
+                if (result < 0)
+                    return ''; // todo : report error
+                if (result > value.byteLength) {
+                    // buffer not big enough, retry with a properly sized one
+                    value = new ArrayBuffer(result);
+                    result = get_ita_token_raw(ta_api_url, ta_base_url, ta_key, request_id, policy_ids_json, token_sign_alg_str, retry_wait_time, retry_max, value, value.byteLength);
+                    if (result < 0)
+                        return ''; // todo : report error
+                }
+                return String.UTF8.decode(value, true);
+            }
+        }
     }
 }
 
