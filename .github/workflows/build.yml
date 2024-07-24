@@ -60,3 +60,8 @@ jobs:
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
         run: yarn nx affected --target=build --parallel=1 --base=${{ env.NX_BASE }} --head=${{ env.NX_HEAD }}
+
+      - name: Attest
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: '${{ github.workspace }}/dist/**/*'
