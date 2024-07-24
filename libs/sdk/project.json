@@ -21,9 +21,6 @@
                     "libs/sdk/sdk.json",
                     "libs/sdk/*.md"
                 ],
-                "external": [
-                    "compiler"
-                ],
                 "generateExportsField": true
             },
             "configurations": {
