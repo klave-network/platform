@@ -17,6 +17,7 @@ const repoConfigSchemaV0 = z.object({
 const repoConfigSchemaV1 = z.object({
     schema: z.string().or(z.number()).optional(),
     branches: z.array(z.string()).optional(),
+    targetCluster: z.string().optional(),
     applications: z.array(z.object(
         {
             slug: z.string(),

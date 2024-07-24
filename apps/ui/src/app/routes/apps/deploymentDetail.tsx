@@ -6,12 +6,12 @@ import { UilExclamationTriangle, UilLock, UilLockSlash, UilSpinner } from '@icon
 import { Utils } from '@secretarium/crypto';
 import * as NivoGeo from '@nivo/geo';
 import Ansi from 'ansi-to-react';
-import api from '../../utils/api';
+import api, { httpApi } from '../../utils/api';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
 import { DeploymentPromotion, DeploymentDeletion } from './deployments';
 import RunCommand from '../../components/RunCommand';
 import AttestationChecker from '../../components/AttestationChecker';
-import { StagedOutputGroups, commitVerificationReasons } from '@klave/constants';
+import { getFinalParseConfig, StagedOutputGroups, commitVerificationReasons } from '@klave/constants';
 import geoFeatures from '../../geojson/ne_110m_admin_0_countries.json';
 
 const { ResponsiveGeoMap } = NivoGeo;
@@ -21,6 +21,7 @@ export const AppDeploymentDetail: FC = () => {
 
     const { deploymentId } = useParams();
     const scrollPointRef = useRef<HTMLDivElement>(null);
+    const [effectiveClusterFQDN, setEffectiveClusterFQDN] = useState<string>();
     const [WASMFingerprint, setWASMFingerprint] = useState<string>();
     const { data: deployment, isLoading: isLoadingDeployments } = api.v0.deployments.getById.useQuery({ deploymentId: deploymentId || '' }, {
         refetchInterval: (s) => ['errored', 'terminated', 'deployed'].includes(s.state.data?.status ?? '') ? (Date.now() - (s.state.data?.createdAt.getTime() ?? 0) < 60000 ? 5000 : 60000) : 500
@@ -124,8 +125,15 @@ export const AppDeploymentDetail: FC = () => {
             <UilSpinner className='inline-block animate-spin' />
         </>;
 
-    const { deploymentAddress, createdAt, expiresOn, life, status, version, build, branch, commit } = deployment;
+    const { deploymentAddress, configSnapshot, createdAt, expiresOn, life, status, version, build, branch, commit } = deployment;
     const hasExpired = new Date().getTime() > expiresOn.getTime();
+    const configSnapshotObj = getFinalParseConfig(configSnapshot as object);
+    const { targetCluster } = configSnapshotObj?.data || {};
+    if (targetCluster && !effectiveClusterFQDN) {
+        httpApi.v0.clusters.getAllocationByDeploymentId.query({ deploymentId: deployment.id }).then(([allocation]) => {
+            setEffectiveClusterFQDN(allocation?.cluster?.fdqn);
+        }).catch(() => { return; });
+    }
 
     if (!deploymentAddress)
         return <>
@@ -231,6 +239,16 @@ export const AppDeploymentDetail: FC = () => {
                     </div>
                 </div>
             </div>
+            {effectiveClusterFQDN
+                ? <div className='mb-10'>
+                    <h2 className='font-bold mb-3'>Custom Endpoint</h2>
+                    <div className="flex items-center">
+                        <div className="sm:flex hidden flex-row align-middle gap-2 items-center">
+                            <span className='font-mono inline rounded dark:text-slate-400 dark:bg-slate-800 text-slate-900 bg-slate-100 px-2 py-1 mb-1 whitespace-nowrap' title={effectiveClusterFQDN}>{effectiveClusterFQDN}</span>
+                        </div>
+                    </div>
+                </div>
+                : null}
             <div className='mb-10'>
                 <h2 className='font-bold mb-3'>Actions</h2>
                 <div className='flex flex-row items-center'>
@@ -246,12 +264,13 @@ export const AppDeploymentDetail: FC = () => {
             ? <Tabs.Root defaultValue="inspect" className='flex flex-col w-full'>
                 <Tabs.List className='flex flex-shrink-0 border-b'>
                     <Tabs.Trigger value="inspect" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Inspect</Tabs.Trigger>
+                    <Tabs.Trigger value="configuration" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Configuration</Tabs.Trigger>
                     <Tabs.Trigger value="build" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Build and Dependencies</Tabs.Trigger>
                     <Tabs.Trigger value="attest" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Attest</Tabs.Trigger>
                 </Tabs.List>
                 <Tabs.Content value="inspect">
                     <div className='mt-10'>
-                        <RunCommand address={fqdn} functions={deployment.contractFunctions} />
+                        <RunCommand address={fqdn} cluster={effectiveClusterFQDN} functions={deployment.contractFunctions} />
                     </div>
                     <div className='mt-10'>
                         <h2 className='font-bold mb-3'>Code Explorer</h2>
@@ -271,6 +290,14 @@ export const AppDeploymentDetail: FC = () => {
                         </pre>
                         <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full max-h-[50vh] bg-slate-100 dark:bg-gray-800 p-3 mt-2'>
                             {deployment.buildOutputWASM}
+                        </pre>
+                    </div>
+                </Tabs.Content>
+                <Tabs.Content value="configuration">
+                    <div className='mt-10'>
+                        <h2 className='font-bold mb-3'>Buidl configuration for this deployment</h2>
+                        <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 p-3'>
+                            {JSON.stringify(deployment.configSnapshot ?? '', null, 4)}
                         </pre>
                     </div>
                 </Tabs.Content>
@@ -325,6 +352,7 @@ export const AppDeploymentDetail: FC = () => {
                 ? <Tabs.Root defaultValue="inspect" className='flex flex-col w-full'>
                     <Tabs.List className='flex flex-shrink-0 border-b'>
                         <Tabs.Trigger value="inspect" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Inspect</Tabs.Trigger>
+                        <Tabs.Trigger value="configuration" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Configuration</Tabs.Trigger>
                         <Tabs.Trigger value="build" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Build and Dependencies</Tabs.Trigger>
                     </Tabs.List>
                     <Tabs.Content value="inspect">
@@ -333,6 +361,14 @@ export const AppDeploymentDetail: FC = () => {
                             <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-red-100 p-3'>
                                 {(deployment.buildOutputErrorObj as unknown as Error)?.stack ?? JSON.stringify(deployment.buildOutputErrorObj ?? {}, null, 4)}<br />
                                 {(deployment.buildOutputStdErr)}
+                            </pre>
+                        </div>
+                    </Tabs.Content>
+                    <Tabs.Content value="configuration">
+                        <div className='mt-10'>
+                            <h2 className='font-bold mb-3'>Buidl configuration for this deployment</h2>
+                            <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 p-3'>
+                                {JSON.stringify(deployment.configSnapshot ?? '', null, 4)}
                             </pre>
                         </div>
                     </Tabs.Content>
@@ -381,6 +417,7 @@ export const AppDeploymentDetail: FC = () => {
                 : <Tabs.Root defaultValue="build" className='flex flex-col w-full'>
                     <Tabs.List className='flex flex-shrink-0 border-b'>
                         <Tabs.Trigger value="build" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Build and Dependencies</Tabs.Trigger>
+                        <Tabs.Trigger value="configuration" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Configuration</Tabs.Trigger>
                     </Tabs.List>
                     <Tabs.Content value="build">
                         <div className='mt-10'>
@@ -421,6 +458,14 @@ export const AppDeploymentDetail: FC = () => {
                             <h2 className='font-bold mb-3'>List of external dependencies and digests</h2>
                             <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 p-3'>
                                 {JSON.stringify(deployment.dependenciesManifest ?? '', null, 4)}
+                            </pre>
+                        </div>
+                    </Tabs.Content>
+                    <Tabs.Content value="configuration">
+                        <div className='mt-10'>
+                            <h2 className='font-bold mb-3'>Buidl configuration for this deployment</h2>
+                            <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 p-3'>
+                                {JSON.stringify(deployment.configSnapshot ?? '', null, 4)}
                             </pre>
                         </div>
                     </Tabs.Content>
