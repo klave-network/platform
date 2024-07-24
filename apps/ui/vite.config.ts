@@ -8,7 +8,8 @@ export default defineViteConfig({
     cacheDir: '../../node_modules/.vite/ui',
 
     build: {
-        outDir: '../../dist/apps/ui'
+        outDir: '../../dist/apps/ui',
+        emptyOutDir: true
     },
 
     server: {
