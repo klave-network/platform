@@ -1,4 +1,16 @@
 # Changelog
+## [0.11.0](https://github.com/klave-network/platform/compare/ui@0.10.2...ui@0.11.0) (2024-07-24)
+
+### Dependency Updates
+
+* `constants` updated to version `0.10.2`
+* `db` updated to version `0.10.2`
+* `api` updated to version `0.10.2`
+
+### Features
+
+* **db,api,providers,constants,ui:** Adding custom deployment target cluster configuration ([6829edd](https://github.com/klave-network/platform/commit/6829edd447621c4c479ba0d687ebdc5f1533272c))
+
 ## [0.10.2](https://github.com/klave-network/platform/compare/ui@0.10.1...ui@0.10.2) (2024-07-03)
 
 ## [0.10.1](https://github.com/klave-network/platform/compare/ui@0.10.0...ui@0.10.1) (2024-06-07)
