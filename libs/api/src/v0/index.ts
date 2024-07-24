@@ -6,6 +6,7 @@ import credits from './credits';
 import organisations from './organisations';
 import applications from './applications';
 import deployments from './deployments';
+import clusters from './clusters';
 import activities from './activities';
 import domains from './domains';
 import system from './system';
@@ -18,6 +19,7 @@ export const v0Router = createTRPCRouter({
     organisations,
     applications,
     deployments,
+    clusters,
     activities,
     domains,
     system
