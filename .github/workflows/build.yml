@@ -64,6 +64,10 @@ jobs:
         run: yarn nx affected --target=build --parallel=1 --base=${{ env.NX_BASE }} --head=${{ env.NX_HEAD }}
 
       - name: Attest
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: '${{ github.workspace }}/dist/**/*'
+          subject-path: |
+            - '${{ github.workspace }}/dist/libs/sdk/**/*'
+            - '${{ github.workspace }}/dist/libs/compiler/**/*'
+            - '${{ github.workspace }}/dist/apps/create/**/*'
