@@ -1,4 +1,11 @@
 # Changelog
+## [0.8.0](https://github.com/klave-network/platform/compare/db@0.7.1...db@0.8.0) (2024-07-24)
+
+
+### Features
+
+* **db,api,providers,constants,ui:** Adding custom deployment target cluster configuration ([6829edd](https://github.com/klave-network/platform/commit/6829edd447621c4c479ba0d687ebdc5f1533272c))
+
 ## [0.7.1](https://github.com/klave-network/platform/compare/db@0.7.0...db@0.7.1) (2024-06-06)
 
 ## [0.7.0](https://github.com/klave-network/platform/compare/db@0.6.0...db@0.7.0) (2024-05-31)
