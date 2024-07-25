@@ -192,6 +192,7 @@ export const reposRouter = createTRPCRouter({
                     const handle = await octokit.repos.getContent({
                         owner: repo.owner,
                         repo: repo.name,
+                        ref: repo.defaultBranch || undefined,
                         path: 'klave.json',
                         mediaType: {
                             format: 'raw+json'
@@ -341,6 +342,7 @@ export const reposRouter = createTRPCRouter({
                             await octokit.repos.getContent({
                                 owner: result.data.owner.login,
                                 repo: result.data.name,
+                                ref: result.data.default_branch,
                                 path: 'klave.json',
                                 mediaType: {
                                     format: 'raw+json'
@@ -377,6 +379,7 @@ export const reposRouter = createTRPCRouter({
                 const handle = await octokit.repos.getContent({
                     owner: result.data.owner.login,
                     repo: result.data.name,
+                    ref: result.data.default_branch,
                     path: 'klave.json',
                     mediaType: {
                         format: 'raw+json'
