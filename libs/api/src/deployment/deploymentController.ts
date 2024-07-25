@@ -555,7 +555,7 @@ export const sendToSecretarium = async ({
         });
         if (runningKey && clusterAllocation?.cluster) {
             const sideSCP = new SCP();
-            await sideSCP.connect(clusterAllocation.cluster.fdqn, runningKey);
+            await sideSCP.connect(clusterAllocation.cluster.fqdn, runningKey);
             // Need to extract connection information for this parallel track
             currentSCP = sideSCP;
         }

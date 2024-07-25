@@ -202,7 +202,7 @@ type Commit {
 
 model Cluster {
     id                 String              @id @default(uuid()) @map("_id")
-    fdqn               String
+    fqdn               String
     name               String
     createdAt          DateTime            @default(now())
     updatedAt          DateTime            @updatedAt

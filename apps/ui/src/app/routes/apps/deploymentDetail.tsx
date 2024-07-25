@@ -131,7 +131,7 @@ export const AppDeploymentDetail: FC = () => {
     const { targetCluster } = configSnapshotObj?.data || {};
     if (targetCluster && !effectiveClusterFQDN) {
         httpApi.v0.clusters.getAllocationByDeploymentId.query({ deploymentId: deployment.id }).then(([allocation]) => {
-            setEffectiveClusterFQDN(allocation?.cluster?.fdqn);
+            setEffectiveClusterFQDN(allocation?.cluster?.fqdn);
         }).catch(() => { return; });
     }
 
