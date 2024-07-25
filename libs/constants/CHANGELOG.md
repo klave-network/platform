@@ -1,4 +1,14 @@
 # Changelog
+## [0.4.1](https://github.com/klave-network/platform/compare/constants@0.4.0...constants@0.4.1) (2024-07-25)
+
+### Dependency Updates
+
+* `db` updated to version `0.4.0`
+
+### Bug Fixes
+
+* **constants:** Configuration parsing would not fall back correctly ([62db62b](https://github.com/klave-network/platform/commit/62db62b906ecd3d2c44ea22ccd69e33c233059e3))
+
 ## [0.4.0](https://github.com/klave-network/platform/compare/constants@0.3.1...constants@0.4.0) (2024-07-24)
 
 ### Dependency Updates
