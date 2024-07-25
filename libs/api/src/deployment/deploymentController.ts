@@ -246,7 +246,8 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                     locations: ['FR'],
                                     application: {
                                         connect: { id: application.id }
-                                    }
+                                    },
+                                    configSnapshot: klaveConfiguration.data
                                     // TODO: Make sure we get the push event
                                     // pushEvent
                                 }
@@ -409,8 +410,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                     buildOutputWASM: wasmB64,
                                     buildOutputWAT: wat,
                                     buildOutputDTS: dts,
-                                    buildOutputRoutes: routes,
-                                    configSnapshot: klaveConfiguration.data
+                                    buildOutputRoutes: routes
                                 }
                             });
 
@@ -558,7 +558,7 @@ export const sendToSecretarium = async ({
         });
         if (runningKey && clusterAllocation?.cluster) {
             const sideSCP = new SCP();
-            await sideSCP.connect(clusterAllocation.cluster.fqdn, runningKey);
+            await sideSCP.connect(`wss://${clusterAllocation.cluster.fqdn}`, runningKey);
             // Need to extract connection information for this parallel track
             currentSCP = sideSCP;
         }
