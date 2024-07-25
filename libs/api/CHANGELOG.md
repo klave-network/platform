@@ -1,4 +1,23 @@
 # Changelog
+## [0.12.0](https://github.com/klave-network/platform/compare/api@0.11.0...api@0.12.0) (2024-07-25)
+
+### Dependency Updates
+
+* `db` updated to version `0.11.0`
+* `constants` updated to version `0.11.0`
+* `providers` updated to version `0.11.0`
+
+### Features
+
+* **api,ui:** Add cluster listing in Organisation view ([fbdedfb](https://github.com/klave-network/platform/commit/fbdedfb5162390b242c6a8365a12bf8242dfb702))
+
+
+### Bug Fixes
+
+* **api:** Error code 13548 on Prisma invokation ([90df0bd](https://github.com/klave-network/platform/commit/90df0bd9c755dd0acc244d436b482cf42e8d722c))
+* **api:** Perform config snapshot earlier with deploying ([dfaf562](https://github.com/klave-network/platform/commit/dfaf562b06cc28b10264033ac7d03dfaa6ed516a))
+* **db,api,ui:** Correct typo in cluster structure declaration ([5fe9160](https://github.com/klave-network/platform/commit/5fe91607dec8aee57d9cb367715d10231169b83a))
+
 ## [0.11.0](https://github.com/klave-network/platform/compare/api@0.10.1...api@0.11.0) (2024-07-24)
 
 ### Dependency Updates
