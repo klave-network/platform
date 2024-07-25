@@ -429,6 +429,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 deployment,
                                 wasmB64,
                                 target,
+                                targetCluster: klaveConfiguration.data.targetCluster,
                                 previousDeployment
                             });
 
@@ -533,6 +534,8 @@ export const sendToSecretarium = async ({
 
     let currentSCP = scp;
     if (targetCluster) {
+        logger.debug(`Using out-of-band deployment cluster ${targetCluster} for ${target}`);
+
         const runningKey = scpOps.getRunningKey();
         const contextOrganisation = (await prisma.application.findFirst({
             where: {
