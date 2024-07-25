@@ -11,18 +11,26 @@ export const activityRouter = createTRPCRouter({
             if (!deploymentId)
                 return [];
 
+            const deployment = await prisma.deployment.findUnique({
+                where: {
+                    id: deploymentId
+                },
+                select: {
+                    application: {
+                        select: {
+                            organisationId: true
+                        }
+                    }
+                }
+            });
+
+            if (!deployment)
+                return [];
+
             return await prisma.clusterAllocation.findMany({
                 where: {
                     organisation: {
-                        applications: {
-                            every: {
-                                deployments: {
-                                    some: {
-                                        id: deploymentId
-                                    }
-                                }
-                            }
-                        }
+                        id: deployment.application.organisationId
                     },
                     AND: {
                         OR: [{
