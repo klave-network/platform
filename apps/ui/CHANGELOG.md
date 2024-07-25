@@ -1,4 +1,34 @@
 # Changelog
+## [0.12.0](https://github.com/klave-network/platform/compare/ui@0.11.0...ui@0.12.0) (2024-07-25)
+
+### Dependency Updates
+
+* `constants` updated to version `0.11.0`
+* `db` updated to version `0.11.0`
+* `api` updated to version `0.11.0`
+
+### Features
+
+* **api,ui:** Add cluster listing in Organisation view ([fbdedfb](https://github.com/klave-network/platform/commit/fbdedfb5162390b242c6a8365a12bf8242dfb702))
+
+
+### Bug Fixes
+
+* **db,api,ui:** Correct typo in cluster structure declaration ([5fe9160](https://github.com/klave-network/platform/commit/5fe91607dec8aee57d9cb367715d10231169b83a))
+* **ui:** Ensure the RunCommand component targets the `wss` protocol ([05a1bec](https://github.com/klave-network/platform/commit/05a1bece3839933ab6bab69319c571038648de57))
+
+## [0.11.0](https://github.com/klave-network/platform/compare/ui@0.10.2...ui@0.11.0) (2024-07-24)
+
+### Dependency Updates
+
+* `constants` updated to version `0.10.2`
+* `db` updated to version `0.10.2`
+* `api` updated to version `0.10.2`
+
+### Features
+
+* **db,api,providers,constants,ui:** Adding custom deployment target cluster configuration ([6829edd](https://github.com/klave-network/platform/commit/6829edd447621c4c479ba0d687ebdc5f1533272c))
+
 ## [0.10.2](https://github.com/klave-network/platform/compare/ui@0.10.1...ui@0.10.2) (2024-07-03)
 
 ## [0.10.1](https://github.com/klave-network/platform/compare/ui@0.10.0...ui@0.10.1) (2024-06-07)

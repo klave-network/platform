@@ -4,6 +4,8 @@
 # Run the container with `docker run -p 3000:3000 -t hubber`.
 FROM docker.io/node:20-alpine AS builder
 
+ENV HUSKY=0
+
 WORKDIR /app
 
 RUN addgroup --system hubber && \
@@ -26,6 +28,8 @@ RUN cd hubber && yarn run prisma generate
 
 FROM docker.io/node:20-alpine AS base
 
+ENV HUSKY=0
+
 RUN apk update
 RUN apk upgrade
 RUN apk add alpine-sdk musl-dev openssl-dev openssl-libs-static curl git
@@ -41,6 +45,7 @@ FROM base AS final
 
 ENV HOST=0.0.0.0
 ENV PORT=3333
+ENV HUSKY=0
 ENV FORCE_COLOR=true CARGO_TERM_COLOR=always
 RUN addgroup --system hubber && \
     adduser --system -G hubber hubber

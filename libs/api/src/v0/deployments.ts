@@ -3,6 +3,7 @@ import * as Sentry from '@sentry/node';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import { logger, scp } from '@klave/providers';
 import { sendToSecretarium } from '../deployment/deploymentController';
+import { RepoConfigSchemaLatest } from '@klave/constants';
 
 export const deploymentRouter = createTRPCRouter({
     getByApplication: publicProcedure
@@ -128,6 +129,7 @@ export const deploymentRouter = createTRPCRouter({
                     buildOutputWASM: true,
                     buildOutputDTS: true,
                     buildOutputs: true,
+                    configSnapshot: true,
                     deploymentAddress: {
                         select: {
                             fqdn: true
@@ -450,7 +452,8 @@ export const deploymentRouter = createTRPCRouter({
                         deployment,
                         wasmB64: referenceDeployment?.buildOutputWASM ?? undefined,
                         previousDeployment,
-                        target
+                        target,
+                        targetCluster: (deployment.configSnapshot as RepoConfigSchemaLatest)?.targetCluster
                     });
                 })()
                     .catch(() => { return; });

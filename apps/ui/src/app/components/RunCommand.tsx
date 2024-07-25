@@ -7,6 +7,7 @@ import { useLocalForage } from '../useLocalStorage';
 
 type RunCommandProps = {
     address: string;
+    cluster?: string;
     functions?: string[];
 }
 
@@ -17,7 +18,7 @@ type KeyPointer = {
     };
 }
 
-export const RunCommand: FC<RunCommandProps> = ({ address, functions = [] }) => {
+export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = [] }) => {
 
     const [route, setRoute] = useState(functions[0] ?? '');
     const [args, setArgs] = useState('');
@@ -145,7 +146,14 @@ export const RunCommand: FC<RunCommandProps> = ({ address, functions = [] }) => 
         passedArgs = JSON.stringify(args);
     }
 
-    const { data, isLoading, errors, refetch } = useSecretariumQuery({ app: address, route, args: passedArgs, live: false, key: effectiveKey }, [address]);
+    const { data, isLoading, errors, refetch } = useSecretariumQuery({
+        app: address,
+        route,
+        args: passedArgs,
+        live: false,
+        key: effectiveKey,
+        cluster
+    }, [address]);
 
     const downloadCurrentKey = () => {
         (async () => {

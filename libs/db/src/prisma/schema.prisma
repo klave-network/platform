@@ -36,17 +36,18 @@ type GitHubToken {
 }
 
 model Organisation {
-    id               String            @id @default(uuid()) @map("_id")
-    slug             String            @unique
-    kredits          BigInt            @default(0)
-    personal         Boolean           @default(false)
-    creator          User?             @relation(fields: [creatorId], references: [id])
-    creatorId        String?
-    applications     Application[]
-    permissionGrants PermissionGrant[]
-    creditPurchases  CreditPurchase[]
-    createdAt        DateTime          @default(now())
-    updatedAt        DateTime          @updatedAt
+    id                 String              @id @default(uuid()) @map("_id")
+    slug               String              @unique
+    kredits            BigInt              @default(0)
+    personal           Boolean             @default(false)
+    creator            User?               @relation(fields: [creatorId], references: [id])
+    creatorId          String?
+    applications       Application[]
+    permissionGrants   PermissionGrant[]
+    creditPurchases    CreditPurchase[]
+    createdAt          DateTime            @default(now())
+    updatedAt          DateTime            @updatedAt
+    clusterAllocations ClusterAllocation[]
 }
 
 model CreditPurchase {
@@ -199,6 +200,28 @@ type Commit {
     verification CommitVerification?
 }
 
+model Cluster {
+    id                 String              @id @default(uuid()) @map("_id")
+    fqdn               String
+    name               String
+    createdAt          DateTime            @default(now())
+    updatedAt          DateTime            @updatedAt
+    clusterAllocations ClusterAllocation[]
+}
+
+model ClusterAllocation {
+    id             String        @id @default(uuid()) @map("_id")
+    cluster        Cluster       @relation(fields: [clusterId], references: [id])
+    clusterId      String
+    organisation   Organisation? @relation(fields: [organisationId], references: [id])
+    organisationId String?
+    read           Boolean
+    write          Boolean
+    admin          Boolean
+    createdAt      DateTime      @default(now())
+    updatedAt      DateTime      @updatedAt
+}
+
 model Deployment {
     id                   String             @id @default(uuid()) @map("_id")
     deploymentAddress    DeploymentAddress?
@@ -228,6 +251,7 @@ model Deployment {
     buildOutputErrorObj  Json?
     dependenciesManifest Json?
     contractFunctions    String[]           @default([])
+    configSnapshot       Json?
 }
 
 model DeploymentAddress {

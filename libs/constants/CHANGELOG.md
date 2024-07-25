@@ -1,4 +1,24 @@
 # Changelog
+## [0.4.1](https://github.com/klave-network/platform/compare/constants@0.4.0...constants@0.4.1) (2024-07-25)
+
+### Dependency Updates
+
+* `db` updated to version `0.4.0`
+
+### Bug Fixes
+
+* **constants:** Configuration parsing would not fall back correctly ([62db62b](https://github.com/klave-network/platform/commit/62db62b906ecd3d2c44ea22ccd69e33c233059e3))
+
+## [0.4.0](https://github.com/klave-network/platform/compare/constants@0.3.1...constants@0.4.0) (2024-07-24)
+
+### Dependency Updates
+
+* `db` updated to version `0.3.1`
+
+### Features
+
+* **db,api,providers,constants,ui:** Adding custom deployment target cluster configuration ([6829edd](https://github.com/klave-network/platform/commit/6829edd447621c4c479ba0d687ebdc5f1533272c))
+
 ## [0.3.1](https://github.com/klave-network/platform/compare/constants@0.3.0...constants@0.3.1) (2024-06-06)
 
 ### Dependency Updates

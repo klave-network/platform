@@ -45,6 +45,7 @@ type Action<ResultType, ErrorType> =
 type SecretariumQueryOptions = {
     app: string;
     route: string;
+    cluster?: string;
     key?: Key;
     args?: string | Record<string, unknown>;
     live?: boolean;
@@ -54,7 +55,7 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
 
     const [count, setCount] = useState(0);
     const [opts, setOpts] = useState<SecretariumQueryOptions>();
-    const { app, route, args, key } = opts ?? {};
+    const { app, route, args, key, cluster } = opts ?? {};
     const argDigest = useMemo(() => {
         if (typeof args === 'undefined' || args === null)
             return '';
@@ -195,9 +196,9 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
                     return;
                 }
 
-                const [node, trustKey] = connectionInfo ?? [];
-                if (!node || !trustKey) {
-                    dispatch({ type: 'error', payload: [new Error('Missing Secretarium node or trust key')] });
+                const [node, trustKey] = cluster ? [cluster] : (connectionInfo ?? []);
+                if (!node) {
+                    dispatch({ type: 'error', payload: [new Error('Missing Secretarium node URI')] });
                     return;
                 }
 

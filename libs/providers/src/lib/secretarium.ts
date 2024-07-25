@@ -3,7 +3,7 @@ import { prisma } from '@klave/db';
 import { logger } from './logger';
 import { BackendVersion } from '@klave/constants';
 
-const client = new SCP({
+export const defaultSCPOptions: ConstructorParameters<typeof SCP>[0] = {
     logger: process.env['NODE_ENV'] === 'development' ? {
         debug: (message: string, obj) => {
             if (obj) {
@@ -21,7 +21,9 @@ const client = new SCP({
         warn: (message: string) => logger.warn(`SCP> ${message}`),
         error: (message: string) => logger.error(`SCP> ${message}`)
     } : undefined
-});
+};
+
+const client = new SCP(defaultSCPOptions);
 
 let connectionKey: Key | undefined;
 let reconnectAttempt = 0;
@@ -116,6 +118,7 @@ export const scpOps = {
             await planReconnection();
         }
     },
+    getRunningKey: () => connectionKey,
     isConnected: () => {
         return lastSCPState === Constants.ConnectionState.secure;
     },

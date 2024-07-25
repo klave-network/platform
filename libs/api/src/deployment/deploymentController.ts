@@ -1,9 +1,9 @@
 import { DeploymentPushPayload } from '../types';
 import { v4 as uuid } from 'uuid';
 import * as Sentry from '@sentry/node';
-import { scp, logger } from '@klave/providers';
+import { scp, scpOps, logger } from '@klave/providers';
 import { Deployment, prisma, DeploymentAddress, Commit, CommitVerificationReason } from '@klave/db';
-import { Utils } from '@secretarium/connector';
+import { SCP, Utils } from '@secretarium/connector';
 import * as path from 'node:path';
 import prettyBytes from 'pretty-bytes';
 import BuildMiniVM, { DeploymentContext } from './buildMiniVm';
@@ -246,7 +246,8 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                     locations: ['FR'],
                                     application: {
                                         connect: { id: application.id }
-                                    }
+                                    },
+                                    configSnapshot: klaveConfiguration.data
                                     // TODO: Make sure we get the push event
                                     // pushEvent
                                 }
@@ -428,6 +429,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 deployment,
                                 wasmB64,
                                 target,
+                                targetCluster: klaveConfiguration.data.targetCluster,
                                 previousDeployment
                             });
 
@@ -475,11 +477,13 @@ export const sendToSecretarium = async ({
     deployment,
     wasmB64,
     target,
+    targetCluster,
     previousDeployment
 }: {
     deployment: Deployment & { deploymentAddress?: DeploymentAddress | null };
     wasmB64?: string;
     target: string;
+    targetCluster?: string;
     previousDeployment?: Deployment & { deploymentAddress: DeploymentAddress | null } | null;
 }) => {
 
@@ -527,6 +531,39 @@ export const sendToSecretarium = async ({
             });
         }
     };
+
+    let currentSCP = scp;
+    if (targetCluster) {
+        logger.debug(`Using out-of-band deployment cluster ${targetCluster} for ${target}`);
+
+        const runningKey = scpOps.getRunningKey();
+        const contextOrganisation = (await prisma.application.findFirst({
+            where: {
+                id: deployment.applicationId
+            },
+            include: {
+                organisation: true
+            }
+        }))?.organisation;
+        const clusterAllocation = await prisma.clusterAllocation.findFirst({
+            where: {
+                cluster: {
+                    id: targetCluster
+                },
+                organisationId: contextOrganisation?.id ?? ''
+            },
+            include: {
+                cluster: true
+            }
+        });
+        if (runningKey && clusterAllocation?.cluster) {
+            const sideSCP = new SCP();
+            await sideSCP.connect(`wss://${clusterAllocation.cluster.fqdn}`, runningKey);
+            // Need to extract connection information for this parallel track
+            currentSCP = sideSCP;
+        }
+    }
+
     await Sentry.startSpan({
         name: 'SCP Subtask',
         op: 'scp.task',
@@ -534,7 +571,7 @@ export const sendToSecretarium = async ({
     }, async () => {
         if (wasmB64) {
             logger.debug(`${targetRef ? 'Updating' : 'Registering'} smart contract: ${target}`);
-            await scp.newTx('wasm-manager', 'deploy_instance', `klave-${targetRef ? 'update' : 'register'}-${deployment.id}`, {
+            await currentSCP.newTx('wasm-manager', 'deploy_instance', `klave-${targetRef ? 'update' : 'register'}-${deployment.id}`, {
                 app_id: deployment.applicationId,
                 fqdn: target,
                 wasm_bytes_b64: wasmB64
@@ -564,7 +601,7 @@ export const sendToSecretarium = async ({
                 });
             // } else if (previousDeployment?.deploymentAddress?.fqdn && deployment?.deploymentAddress?.fqdn) {
             //     logger.debug(`Releasing smart contract: ${deployment.deploymentAddress.fqdn} as ${target}`);
-            //     await scp.newTx('wasm-manager', 'clone_instance', `klave-release-${deployment.id}`, {
+            //     await currentSCP.newTx('wasm-manager', 'clone_instance', `klave-release-${deployment.id}`, {
             //         app_id: deployment.applicationId,
             //         fqdn: target,
             //         source_fqdn: previousDeployment.deploymentAddress.fqdn
@@ -599,4 +636,7 @@ export const sendToSecretarium = async ({
             logger.debug(`No wasm to deploy for ${target}`);
         }
     });
+
+    if (targetCluster)
+        currentSCP.close();
 };

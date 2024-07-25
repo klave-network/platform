@@ -17,6 +17,11 @@ module.exports = {
             release: `klave@${JSON.stringify(version)}`
         }) : undefined
     ].filter(Boolean),
+    platform: 'node',
+    loader: {
+        // ensures .node binaries are copied to ./dist
+        '.node': 'copy'
+    },
     outExtension: {
         '.js': '.js'
     },

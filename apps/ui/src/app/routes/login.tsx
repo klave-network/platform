@@ -2,7 +2,6 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { useToggle, useEventListener, useDebounceValue } from 'usehooks-ts';
 import { z } from 'zod';
 import LoginSecKey from '../partials/LoginSecKey';
-import LoginQR from '../partials/LoginQR';
 import api from '../utils/api';
 import { useNavigate } from 'react-router-dom';
 import { useZodForm } from '../utils/useZodForm';
@@ -160,9 +159,11 @@ export const Login: FC = () => {
             <div className="p-5 min-w-[300px] bg-slate-100 dark:bg-gray-800 rounded-md">
                 <LoginSecKey />
             </div>
+            {/*
             <div className="p-5 min-w-[300px] bg-slate-100 dark:bg-gray-800 rounded-md">
                 <LoginQR />
             </div>
+             */}
         </div>
 
     </div>;

@@ -3,6 +3,7 @@ import { ZodError, z } from 'zod';
 const repoConfigSchemaV0 = z.object({
     version: z.string().or(z.number()).optional(),
     branch: z.string().optional(),
+    targetCluster: z.string().optional(),
     applications: z.array(z.object(
         {
             name: z.string(),
@@ -17,6 +18,7 @@ const repoConfigSchemaV0 = z.object({
 const repoConfigSchemaV1 = z.object({
     schema: z.string().or(z.number()).optional(),
     branches: z.array(z.string()).optional(),
+    targetCluster: z.string().optional(),
     applications: z.array(z.object(
         {
             slug: z.string(),
@@ -39,6 +41,7 @@ export const getFinalParseConfig = (config: string | object | null): ReturnType<
         originalParse = {
             ...newParse,
             data: newParse.success ? {
+                ...(originalParse?.data || {}),
                 ...newParse.data,
                 branches: newParse.data.branch ? [newParse.data.branch] : undefined,
                 applications: newParse.data.applications?.map((app) => {
