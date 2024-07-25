@@ -1,4 +1,11 @@
 # Changelog
+## [0.8.1](https://github.com/klave-network/platform/compare/db@0.8.0...db@0.8.1) (2024-07-25)
+
+
+### Bug Fixes
+
+* **db,api,ui:** Correct typo in cluster structure declaration ([5fe9160](https://github.com/klave-network/platform/commit/5fe91607dec8aee57d9cb367715d10231169b83a))
+
 ## [0.8.0](https://github.com/klave-network/platform/compare/db@0.7.1...db@0.8.0) (2024-07-24)
 
 
