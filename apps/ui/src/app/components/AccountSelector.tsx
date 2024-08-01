@@ -41,14 +41,14 @@ const AccountSelector: FC<{ className?: string; }> = ({ className }) => {
                             <Select.Group>
                                 <Select.Label className="text-xs text-slate-400 px-3 py-1">Organisations</Select.Label>
                                 {other.map(o => <SelectItem key={o.id} value={o.slug} className='px-3 py-2 hover:text-klave-cyan hover:cursor-pointer overflow-hidden'>{o.slug.replace('~$~', '')}</SelectItem>)}
-                                <SelectItem value='~$NEW$~' className='overflow-clip flex hidden flex-grow px-3 py-2 w-full hover:text-klave-cyan hover:cursor-pointer'><span className='flex flex-grow justify-between items-center gap-1 align-middle'><PlusCircledIcon className='inline' /> Create Organisation</span></SelectItem>
+                                <SelectItem value='~$NEW$~' className='overflow-clip flex flex-grow px-3 py-2 w-full hover:text-klave-cyan hover:cursor-pointer'><span className='flex flex-grow justify-between items-center gap-1 align-middle'><PlusCircledIcon className='inline' /> Create Organisation</span></SelectItem>
                             </Select.Group>
                         </>
                         : <>
-                            <Select.Separator className="hidden text-xs text-slate-400 p-1" />
+                            <Select.Separator className="text-xs text-slate-400 p-1" />
                             <Select.Group>
-                                <Select.Label className="hidden text-xs text-slate-400 px-3 py-1">Organisations</Select.Label>
-                                <SelectItem value='~$NEW$~' className='overflow-clip flex hidden flex-grow px-3 py-2 w-full hover:text-klave-cyan hover:cursor-pointer'><span className='flex flex-grow justify-between items-center gap-1 align-middle'><PlusCircledIcon className='inline' /> Create Organisation</span></SelectItem>
+                                <Select.Label className="text-xs text-slate-400 px-3 py-1">Organisations</Select.Label>
+                                <SelectItem value='~$NEW$~' className='overflow-clip flex flex-grow px-3 py-2 w-full hover:text-klave-cyan hover:cursor-pointer'><span className='flex flex-grow justify-between items-center gap-1 align-middle'><PlusCircledIcon className='inline' /> Create Organisation</span></SelectItem>
                             </Select.Group>
                         </>}
                 </Select.Viewport>
