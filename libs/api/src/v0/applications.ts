@@ -233,12 +233,27 @@ export const applicationRouter = createTRPCRouter({
             return await prisma.application.findUnique({
                 where: {
                     id: appId,
-                    permissionGrants: {
-                        some: {
-                            AND: [{
-                                userId: user?.id
-                            },
-                            {
+                    OR: [{
+                        organisation: {
+                            permissionGrants: {
+                                some: {
+                                    userId: user?.id
+                                    , OR: [{
+                                        read: true
+                                    },
+                                    {
+                                        write: true
+                                    },
+                                    {
+                                        admin: true
+                                    }]
+                                }
+                            }
+                        }
+                    }, {
+                        permissionGrants: {
+                            some: {
+                                userId: user?.id,
                                 OR: [{
                                     read: true
                                 },
@@ -248,9 +263,9 @@ export const applicationRouter = createTRPCRouter({
                                 {
                                     admin: true
                                 }]
-                            }]
+                            }
                         }
-                    }
+                    }]
                 },
                 select: {
                     id: true,
@@ -365,12 +380,27 @@ export const applicationRouter = createTRPCRouter({
             return await prisma.application.findUnique({
                 where: {
                     id: app.id,
-                    permissionGrants: {
-                        some: {
-                            AND: [{
-                                userId: user?.id
-                            },
-                            {
+                    OR: [{
+                        organisation: {
+                            permissionGrants: {
+                                some: {
+                                    userId: user?.id
+                                    , OR: [{
+                                        read: true
+                                    },
+                                    {
+                                        write: true
+                                    },
+                                    {
+                                        admin: true
+                                    }]
+                                }
+                            }
+                        }
+                    }, {
+                        permissionGrants: {
+                            some: {
+                                userId: user?.id,
                                 OR: [{
                                     read: true
                                 },
@@ -380,9 +410,9 @@ export const applicationRouter = createTRPCRouter({
                                 {
                                     admin: true
                                 }]
-                            }]
+                            }
                         }
-                    }
+                    }]
                 },
                 select: {
                     id: true,
@@ -575,7 +605,7 @@ export const applicationRouter = createTRPCRouter({
                             catogories: [],
                             tags: []
                             // author: webId ?? emphemeralKlaveTag ?? sessionID,
-                            // owner: webId ?? emphemeralKlaveTag ?? sessionID
+                            // owner: webId ?? emphemeralKlaveTag ?? sessionID lklk
                         }
                     });
 
