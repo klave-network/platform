@@ -31,7 +31,7 @@ export const DeploymentPromotion: FC<DeploymentContextProps> = ({ deployment: { 
 
     return <AlertDialog.Root>
         <AlertDialog.Trigger asChild onClick={e => e.stopPropagation()}>
-            <button className="btn btn-sm h-8 inline-flex items-center justify-center font-normal ml-auto">
+            <button title='Release' className="btn btn-sm h-8 inline-flex items-center justify-center font-normal ml-auto">
                 Release
             </button>
         </AlertDialog.Trigger>
