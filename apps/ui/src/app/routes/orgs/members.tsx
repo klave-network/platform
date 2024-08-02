@@ -28,7 +28,7 @@ const AddMember = () => {
 
     const inviteMember = (event: ReactMouseEvent<HTMLButtonElement, MouseEvent>) => {
         (async () => {
-            if (organisation && userSlug)
+            if (organisation && userSlug.length > 0)
                 await addMutation.mutateAsync({
                     orgId: organisation.id,
                     userSlug,
@@ -74,7 +74,7 @@ const AddMember = () => {
                         </p>
                         <input placeholder='Username' className='input input-bordered w-full' onChange={e => setSlug(e.target.value)} />
                         <p className='my-2'>
-                            Enter the username of the member you want to invite.
+                            Select the access level you want to grant to the member.
                         </p>
                         <Select.Root value={permission} defaultValue={orgSlug} onValueChange={changeRight}>
                             <Select.Trigger className={'select select-bordered select-sm inline-flex justify-between flex-grow w-full items-center text-klave-light-blue bg-white data-[placeholder]:text-klave-light-blue mt-3 mb-5'}>
@@ -166,46 +166,44 @@ export const OrganisationMembers: FC = () => {
             <br />
             <UilSpinner className='inline-block animate-spin' />
         </>;
-    console.log(organisation.permissionGrants);
-    return <div className="flex flex-col gap-10 w-full justify-start mb-7">
-        <div>
-            <h1 className='font-bold text-xl mb-5'>Manage Accesses</h1>
-            <div className='mb-6'>
-                <AddMember />
-            </div>
-            <table className='w-full col-span-3'>
-                <thead className='bg-slate-100 border-slate-100 border rounded-sm '>
-                    <th className='text-left p-3'>
-                        Name
-                    </th>
-                    <th className='text-left p-3'>
-                        Permission
-                    </th>
-                    <th className='text-right p-3'>
-                        Action
-                    </th>
-                </thead>
-                <tbody>
-                    {organisation.permissionGrants?.map((grant, i) =>
-                        <tr key={i} className='gap-3 border-slate-100 border border-t-0 rounded-sm p-2'>
-                            <td className='text-left p-3'>
-                                <p className='font-bold'>{grant.user.slug.replace('~$~', '')}</p>
-                                <p>{grant.userId ?? grant.organisationId}</p>
-                            </td>
-                            <td className='text-left p-3'>
-                                <p className='font-bold'>{organisation.personal ? 'Owner' : grant.admin ? 'Admin' : grant.write ? 'Write' : grant.read ? 'Read' : 'None'}</p>
-                            </td>
-                            <td className='text-right p-3'>
-                                <button title='Delete' className="btn btn-sm h-8 inline-flex items-center justify-center text-md font-normal text-red-700 mt-auto" onClick={() => removeGrant(grant.id)}>
-                                    <UilTrash className='inline-block h-4 w-4' /> Delete
-                                </button>
-                            </td>
-                        </tr>
 
-                    )}
-                </tbody>
-            </table>
+    return <div className="flex flex-col w-full justify-start mb-7">
+        <h1 className='font-bold text-xl mb-5'>Manage Accesses</h1>
+        <div className='mb-6'>
+            <AddMember />
         </div>
+        <table className='w-full col-span-3'>
+            <thead className='bg-slate-100 border-slate-100 border rounded-sm '>
+                <th className='text-left p-3'>
+                    Name
+                </th>
+                <th className='text-left p-3'>
+                    Permission
+                </th>
+                <th className='text-right p-3'>
+                    Action
+                </th>
+            </thead>
+            <tbody>
+                {organisation.permissionGrants?.map((grant, i) =>
+                    <tr key={i} className='gap-3 border-slate-100 border border-t-0 rounded-sm p-2'>
+                        <td className='text-left p-3'>
+                            <p className='font-bold'>{grant.user.slug.replace('~$~', '')}</p>
+                            <p>{grant.userId ?? grant.organisationId}</p>
+                        </td>
+                        <td className='text-left p-3'>
+                            <p className='font-bold'>{organisation.personal ? 'Owner' : grant.admin ? 'Admin' : grant.write ? 'Write' : grant.read ? 'Read' : 'None'}</p>
+                        </td>
+                        <td className='text-right p-3'>
+                            <button title='Delete' className="btn btn-sm h-8 inline-flex items-center justify-center text-md font-normal text-red-700 mt-auto" onClick={() => removeGrant(grant.id)}>
+                                <UilTrash className='inline-block h-4 w-4' /> Delete
+                            </button>
+                        </td>
+                    </tr>
+
+                )}
+            </tbody>
+        </table>
     </div>;
 };
 
