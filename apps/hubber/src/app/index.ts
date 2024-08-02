@@ -83,6 +83,7 @@ export const start = async (port: number) => {
 
     const corsConfiguration = cors({
         origin: permissiblePeers,
+        allowedHeaders: ['Sentry-Trace', 'Baggage'],
         credentials: true
     });
 

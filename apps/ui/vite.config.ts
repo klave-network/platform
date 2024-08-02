@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react-swc';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import git from 'git-rev-sync';
 import { version } from './package.json';
+// eslint-disable-next-line @nx/enforce-module-boundaries
+import { permissiblePeers } from '../../libs/constants/src/constants';
 
 export default defineViteConfig({
     cacheDir: '../../node_modules/.vite/ui',
@@ -14,6 +16,12 @@ export default defineViteConfig({
 
     server: {
         host: 'localhost',
+        // cors: false,
+        cors: {
+            origin: permissiblePeers,
+            allowedHeaders: ['Sentry-Trace', 'Baggage'],
+            credentials: true
+        },
         fs: {
             // Allow serving files from one level up to the project root
             allow: ['..']
