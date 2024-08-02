@@ -1,12 +1,101 @@
-import { FC } from 'react';
+import { FC, MouseEvent as ReactMouseEvent, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
-import { UilGlobe, UilSpinner, UilTrash } from '@iconscout/react-unicons';
+import { UilGlobe, UilSpinner, UilTrash, UilUserPlus } from '@iconscout/react-unicons';
 import api from '../../utils/api';
 import { Cluster } from '@klave/db';
 // import { useZodForm } from '../../utils/useZodForm';
 // import { z } from 'zod';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
+
+
+const AddCluster = () => {
+
+    const { orgSlug } = useParams();
+    const [clusterName, setClusterName] = useState('');
+    const [clusterFQDN, setClusterFQDN] = useState('');
+    const [canSubmit, setCanSubmit] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const [error, setError] = useState<string>();
+    const { data: organisation } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug || '' });
+    const utils = api.useUtils().v0.clusters;
+    const addMutation = api.v0.clusters.addCluster.useMutation({
+        onError(error) {
+            setError(error?.message);
+        },
+        onSuccess: async () => {
+            await utils.getAllocationByOrganisationId.invalidate();
+            setIsOpen(false);
+        }
+    });
+
+    const inviteMember = (event: ReactMouseEvent<HTMLButtonElement, MouseEvent>) => {
+        (async () => {
+            if (organisation && clusterName.length > 0 && clusterFQDN.length > 0)
+                await addMutation.mutateAsync({
+                    organisationId: organisation.id,
+                    fqdn: clusterFQDN,
+                    name: clusterName
+                });
+        })()
+            .catch(() => { return; });
+        event.preventDefault();
+        return false;
+    };
+
+    const setName = (slug: string) => {
+        setError(undefined);
+        setClusterName(slug);
+        setCanSubmit(clusterName.length > 0 && clusterFQDN.length > 0);
+    };
+
+    const setFQDN = (slug: string) => {
+        setError(undefined);
+        setClusterFQDN(slug);
+        setCanSubmit(clusterName.length > 0 && clusterFQDN.length > 0);
+    };
+
+    const handleOpen = (open: boolean) => {
+        setIsOpen(open);
+    };
+
+    return <AlertDialog.Root onOpenChange={handleOpen} open={isOpen}>
+        <AlertDialog.Trigger asChild>
+            <button title='Add a cluster' className="btn btn-sm h-8 inline-flex items-center justify-center text-slate-800 text-md font-normal mt-auto">
+                <UilUserPlus className='inline-block h-4 w-4' /> Add a cluster
+            </button>
+        </AlertDialog.Trigger>
+        <AlertDialog.Portal>
+            <AlertDialog.Overlay className="AlertDialogOverlay" />
+            <AlertDialog.Content className="AlertDialogContent overflow-auto w-[calc(412px)]">
+                <AlertDialog.Title className="AlertDialogTitle mb-4">Invite a new member</AlertDialog.Title>
+                <AlertDialog.Description className="AlertDialogDescription" asChild>
+                    <div>
+                        <p className='my-2'>
+                            What is the name of the cluster you want to add?
+                        </p>
+                        <input placeholder='Name' className='input input-bordered w-full' onChange={e => setName(e.target.value)} />
+                        <p className='my-2'>
+                            What is the Fully Qualified Domain Name (FQDN) of the cluster?
+                        </p>
+                        <input placeholder='FQDN' className='input input-bordered w-full' onChange={e => setFQDN(e.target.value)} />
+                    </div>
+                </AlertDialog.Description>
+                {error
+                    ? <div className='flex gap-6 text-sm bg-red-100 p-3 mt-5'>{error}</div>
+                    : null}
+                <div className='flex gap-6 justify-end mt-5'>
+                    <AlertDialog.Cancel asChild>
+                        <button className="btn btn-sm ">{'Cancel'}</button>
+                    </AlertDialog.Cancel>
+                    <AlertDialog.Action asChild disabled={!canSubmit}>
+                        <button disabled={!canSubmit} className={`btn btn-sm  ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={(e) => inviteMember(e)}>Invite</button>
+                    </AlertDialog.Action>
+                </div>
+            </AlertDialog.Content>
+        </AlertDialog.Portal>
+    </AlertDialog.Root>;
+};
 
 type ClusterContextProps = {
     cluster: Cluster
@@ -38,7 +127,7 @@ const ClusterDeletion: FC<ClusterContextProps> = ({ cluster: { id } }) => {
             <AlertDialog.Content className="AlertDialogContent">
                 <AlertDialog.Title className="AlertDialogTitle">Are you absolutely sure?</AlertDialog.Title>
                 <AlertDialog.Description className="AlertDialogDescription">
-                    This action cannot be undone. This will permanently delete this cluster validation.
+                    This action cannot be undone. This will permanently delete this cluster.
                 </AlertDialog.Description>
                 <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
@@ -59,7 +148,7 @@ type ClusterRecordProps = {
 
 const ClusterRecord: FC<ClusterRecordProps> = ({ cluster }) => {
 
-    const { id, fqdn, updatedAt } = cluster;
+    const { id, name, fqdn, updatedAt } = cluster;
 
     return <tr>
         <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 md:table-cell hidden">
@@ -67,6 +156,7 @@ const ClusterRecord: FC<ClusterRecordProps> = ({ cluster }) => {
                 <UilGlobe className='inline-block h-5' />
             </div>
         </td>
+        <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800">{name}</td>
         <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800">{id}</td>
         <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800">{fqdn}</td>
         {/* <td className={`sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 ${verified ? 'text-green-500' : 'text-red-500'}`}>{verified ? <UilCheckCircle className='h-5' /> : <UilTimesCircle className='h-5' />}</td> */}
@@ -86,121 +176,11 @@ const ClusterRecord: FC<ClusterRecordProps> = ({ cluster }) => {
     </tr>;
 };
 
-// type ClusterAddBoxProps = {
-//     onClose(): void
-// }
-
-// const ClusterAddBox: FC<ClusterAddBoxProps> = ({ onClose }) => {
-
-//     const { appSlug, orgSlug } = useParams();
-//     const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug || '', orgSlug: orgSlug || '' });
-//     const utils = api.useUtils().v0.clusters;
-//     const createMutation = api.v0.clusters.add.useMutation({
-//         onSuccess: async () => {
-//             await utils.getAll.invalidate();
-//             await utils.getByApplication.invalidate();
-//         }
-//     });
-
-//     const verifyMutation = api.v0.clusters.validate.useMutation({
-//         onSuccess: async () => {
-//             await utils.getByApplication.invalidate();
-//         }
-//     });
-
-//     const validate = (clusterId: Cluster['id']) => {
-//         (async () => {
-//             await verifyMutation.mutateAsync({ clusterId });
-//         })().catch(() => { return; });
-//     };
-
-//     const methods = useZodForm({
-//         schema: z.object({
-//             fqdn: z.string()
-//         })
-//     });
-
-//     if (!application)
-//         return null;
-
-//     if (createMutation.data)
-//         return <div>
-//             <div className='mb-4' onClick={() => { navigator.clipboard.writeText(createMutation.data.token).catch(() => { return; }); }}>
-//                 <span className='block'>To verify ownership of the cluster please create a TXT record for <b>.{createMutation.data.fqdn}</b> on your DNS.</span>
-//                 <span className='block rounded-md font-mono cursor-pointer px-1 py-2 bg-slate-200 dark:bg-slate-800 border hover:border-slate-500'>{createMutation.data.token}</span>
-//             </div>
-//             <button
-//                 type="submit"
-//                 disabled={createMutation.isPending}
-//                 className="btn btn-sm border bg-primary-500 p-2"
-//                 onClick={() => validate(createMutation.data.id)}
-//             >
-//                 {createMutation.isPending ? 'Loading' : 'Verify'}
-//             </button>
-//             &nbsp;&nbsp;&nbsp;
-//             <button
-//                 type="reset"
-//                 onClick={onClose}
-//                 className="btn btn-sm border bg-primary-500 p-2"
-//             >
-//                 Cancel
-//             </button>
-//         </div>;
-
-//     return <form
-//         onSubmit={(e) => {
-//             e.preventDefault();
-//             e.stopPropagation();
-//             methods.handleSubmit((data) => {
-//                 (async () => {
-//                     await createMutation.mutateAsync({
-//                         applicationId: application.id,
-//                         ...data
-//                     });
-//                     methods.reset();
-//                 })().catch(() => { return; });
-//             })()
-//                 .catch(() => { return; });
-//         }}
-//         className="space-y-2"
-//     >
-//         <div>
-//             <label>
-//                 Cluster name
-//                 <br />
-//                 <input {...methods.register('fqdn')} className="input input-bordered border w-full" />
-//             </label>
-//             {methods.formState.errors.fqdn?.message && (
-//                 <p className="text-red-700">
-//                     {methods.formState.errors.fqdn?.message}
-//                 </p>
-//             )}
-//         </div>
-
-//         <button
-//             type="submit"
-//             disabled={createMutation.isPending}
-//             className="btn btn-sm border bg-primary-500 p-2"
-//         >
-//             {createMutation.isPending ? 'Loading' : 'Submit'}
-//         </button>
-//         &nbsp;&nbsp;&nbsp;
-//         <button
-//             type="reset"
-//             onClick={onClose}
-//             className="btn btn-sm border bg-primary-500 p-2"
-//         >
-//             Cancel
-//         </button>
-//     </form>;
-// };
-
 export const ClusterListing: FC = () => {
 
     const { orgSlug } = useParams();
     const { data: organisation } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug || '' });
     const { data: clustersAllocationList, isLoading } = api.v0.clusters.getAllocationByOrganisationId.useQuery({ organisationId: organisation?.id || '' });
-    // const [addingCluster, setAddingCluster] = useState(false);
 
     if (isLoading || !clustersAllocationList)
         return <>
@@ -210,22 +190,16 @@ export const ClusterListing: FC = () => {
             <UilSpinner className='inline-block animate-spin' />
         </>;
 
-    return <>
-        {/* <div className="flex flex-col w-full items-center mb-7">
-            <div className='w-full mb-5'>
-                <button onClick={() => setAddingCluster(true)} className="btn btn-sm inline-flex mr-3 items-center h-8 pl-2.5 pr-2 rounded-md shadow text-white dark:text-klave-dark-blue bg-blue-500 hover:bg-blue-400 dark:bg-klave-light-blue dark:hover:bg-blue-800 dark:border-gray-800 border border-gray-200 leading-none py-0">
-                    <UilPlus className='inline-block h-5 text-white dark:text-klave-dark-blue' />Add a cluster
-                </button>
-            </div>
-            {addingCluster ?
-                <div className='w-full'>
-                    <ClusterAddBox onClose={() => setAddingCluster(false)} />
-                </div> : null}
-        </div> */}
+    return <div className="flex flex-col w-full justify-start mb-7">
+        <h1 className='font-bold text-xl mb-5'>Custom clusters</h1>
+        <div className='mb-6'>
+            <AddCluster />
+        </div>
         <table className="w-full text-left">
             <thead>
                 <tr className="text-gray-400">
                     <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800 hidden md:table-cell"></th>
+                    <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800">Name</th>
                     <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800">Cluster</th>
                     <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800">FQDN</th>
                     <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800 hidden md:table-cell">Last update</th>
@@ -233,10 +207,12 @@ export const ClusterListing: FC = () => {
                 </tr>
             </thead>
             <tbody className="text-gray-600 dark:text-gray-100">
-                {clustersAllocationList.map(allocation => <ClusterRecord key={allocation.id} cluster={allocation.cluster} />)}
+                {clustersAllocationList
+                    .sort((a, b) => a.cluster.name.toLocaleLowerCase().localeCompare(b.cluster.name))
+                    .map(allocation => <ClusterRecord key={allocation.id} cluster={allocation.cluster} />)}
             </tbody>
         </table>
-    </>;
+    </div>;
 };
 
 export default ClusterListing;
