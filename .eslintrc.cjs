@@ -86,9 +86,12 @@ module.exports = {
             }
         },
         {
-            files: ['*.js', '*.jsx'],
+            files: ['*.js', '*.cjs', '*.jsx'],
             extends: ['plugin:@nx/javascript'],
-            rules: javascriptRules
+            rules: {
+                ...javascriptRules,
+                '@typescript-eslint/no-require-imports': 'off'
+            }
         },
         {
             files: ['*.mjs'],

@@ -37,11 +37,13 @@ const CSSTransition: FC<Partial<TransitionProps<HTMLElement>>> = ({
     const removeFromDom = unmountOnExit;
 
     function addClasses(node: HTMLElement | null, classes: string[]) {
-        classes.length && node && node.classList.add(...classes);
+        if (classes.length && node)
+            node.classList.add(...classes);
     }
 
     function removeClasses(node: HTMLElement | null, classes: string[]) {
-        classes.length && node && node.classList.remove(...classes);
+        if (classes.length && node)
+            node.classList.remove(...classes);
     }
 
     const nodeRef = React.useRef<HTMLElement>(null);

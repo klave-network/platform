@@ -1,6 +1,6 @@
 {
     "extends": [
-        "../../.eslintrc.js"
+        "../../.eslintrc.cjs"
     ],
     "ignorePatterns": [
         "!**/*"
@@ -13,11 +13,6 @@
                 "*.js",
                 "*.jsx"
             ],
-            "parserOptions": {
-                "project": [
-                    "apps/ui-e2e/tsconfig.*?.json"
-                ]
-            },
             "rules": {}
         },
         {
@@ -25,6 +20,11 @@
                 "*.ts",
                 "*.tsx"
             ],
+            "parserOptions": {
+                "project": [
+                    "apps/ui-e2e/tsconfig.*?.json"
+                ]
+            },
             "rules": {}
         },
         {

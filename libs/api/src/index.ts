@@ -17,7 +17,9 @@ declare global {
     // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace Express {
         // eslint-disable-next-line @typescript-eslint/no-empty-interface
-        interface User extends FilteredUserEntity { }
+        interface User extends FilteredUserEntity {
+            readonly id: string;
+        }
         interface Request {
             web: Web;
             webId: string;

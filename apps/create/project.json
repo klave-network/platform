@@ -15,9 +15,6 @@
                 "platform": "node",
                 "outputPath": "dist/apps/create",
                 "outputFileName": "src/index.js",
-                "format": [
-                    "esm"
-                ],
                 "bundle": true,
                 "main": "apps/create/src/index.ts",
                 "tsConfig": "apps/create/tsconfig.app.json",
@@ -33,7 +30,7 @@
                     "apps/create/*.md"
                 ],
                 "generatePackageJson": true,
-                "esbuildConfig": "apps/dispatcher/esbuild.config.js"
+                "esbuildConfig": "apps/dispatcher/esbuild.config.cjs"
             },
             "configurations": {
                 "development": {},

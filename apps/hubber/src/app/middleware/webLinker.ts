@@ -135,7 +135,7 @@ export const webLinkerMiddlware: RequestHandler = (req, __unusedRes, next) => {
             req.webId = currentWeb.id;
 
         } catch (e) {
-            console.error(e);
+            console.error(e?.toString());
         }
 
         next();

@@ -229,7 +229,8 @@ const probotApp = (app: Probot) => {
                     });
                 }
             } catch (e) {
-                logger.error('Probot hook processing failed');
+                console.error(e?.toString());
+                logger.error('Probot hook processing failed', { error: e });
             }
         }, () => {
             logger.error('Probot hook processing failed');

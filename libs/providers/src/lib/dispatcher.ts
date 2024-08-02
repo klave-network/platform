@@ -72,6 +72,7 @@ export const dispatchOps = {
                 });
             });
         } catch (e) {
+            console.error(e?.toString());
             await planReconnection();
         }
     }
