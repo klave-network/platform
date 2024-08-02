@@ -1,4 +1,19 @@
 # Changelog
+## [0.13.0](https://github.com/klave-network/platform/compare/api@0.12.0...api@0.13.0) (2024-08-02)
+
+
+### Features
+
+* **api,ui:** Add the ability to add a custom cluster ([fcc3c5f](https://github.com/klave-network/platform/commit/fcc3c5f0f9b76f4e8a5a7826ef64327061b1d096))
+* **api,ui:** Allow editing of permission grants for organisations ([e2bd7d2](https://github.com/klave-network/platform/commit/e2bd7d2097b773e2a7151594ee837950298cfe2d)), closes [#KN-232](https://github.com/klave-network/platform/issues/KN-232)
+
+
+### Bug Fixes
+
+* **api:** Ensure permission checks on org deletion ([ee905eb](https://github.com/klave-network/platform/commit/ee905eb9daf4981741d4d7f5f0eab7e45176ddc8))
+* **api:** Ensure to query apps based on accessible orgs ([97932cf](https://github.com/klave-network/platform/commit/97932cfd0f9cf66be70a72531e4f80f6cd9bf281))
+* **api:** Guarantee app fetch over accessible organisations ([259d666](https://github.com/klave-network/platform/commit/259d6660abb9b472469a5c72f83de7764eeafe02))
+
 ## [0.12.0](https://github.com/klave-network/platform/compare/api@0.11.0...api@0.12.0) (2024-07-25)
 
 ### Dependency Updates
