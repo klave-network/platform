@@ -344,7 +344,7 @@ export const AppDeploymentDetail: FC = () => {
                 </Tabs.Content>
                 <Tabs.Content value="attest">
                     <div className='mt-10'>
-                        <AttestationChecker deploymentId={deployment.id} address={fqdn} />
+                        <AttestationChecker deploymentId={deployment.id} address={fqdn} cluster={effectiveClusterFQDN} />
                     </div>
                 </Tabs.Content>
             </Tabs.Root>
