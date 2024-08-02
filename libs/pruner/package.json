@@ -1,6 +1,6 @@
 {
     "name": "@klave/pruner",
     "version": "0.1.9",
-    "type": "commonjs",
+    "type": "module",
     "license": "MIT"
 }

@@ -1,5 +1,6 @@
 const git = require('git-rev-sync');
 const { sentryEsbuildPlugin } = require('@sentry/esbuild-plugin');
+const { nodeExternalsPlugin } = require('esbuild-node-externals');
 const { version } = require('./package.json');
 
 const klaveSentryURL = process.env.KLAVE_SENTRY_DSN ? new URL(process.env.KLAVE_SENTRY_DSN) : null;
@@ -8,6 +9,7 @@ const klaveSentryURL = process.env.KLAVE_SENTRY_DSN ? new URL(process.env.KLAVE_
 module.exports = {
     sourcemap: process.env.NODE_ENV === 'development' ? 'inline' : 'external',
     plugins: [
+        nodeExternalsPlugin(),
         // Put the Sentry esbuild plugin after all other plugins
         klaveSentryURL ? sentryEsbuildPlugin({
             url: `${klaveSentryURL.protocol}//${klaveSentryURL.host}`,

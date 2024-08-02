@@ -270,7 +270,7 @@ export class BuildHost {
                 });
             }
 
-            catch (e: unknown) {
+            catch (e) {
                 if (typeof e === 'string')
                     console.error(e);
                 else if (e instanceof Error)

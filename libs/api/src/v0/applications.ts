@@ -209,7 +209,7 @@ export const applicationRouter = createTRPCRouter({
                                 // Swallow this error
                             });
                     } catch (e) {
-                        console.error(e);
+                        console.error(e?.toString());
                         ///
                     }
                 });
@@ -340,7 +340,7 @@ export const applicationRouter = createTRPCRouter({
                                 // Swallow this error
                             });
                     } catch (e) {
-                        console.error(e);
+                        console.error(e?.toString());
                         ///
                     }
                 });

@@ -38,6 +38,7 @@ export const loader: LoaderFunction = async ({ request }): Promise<LoaderResult>
         }
         return { data, state };
     } catch (e) {
+        console.error(e?.toString());
         return null;
     }
 };

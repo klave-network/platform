@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra';
 import * as path from 'node:path';
-import * as chalk from 'chalk';
+import chalk from 'chalk';
 import { posix as pathCompleteExtname } from 'path-complete-extname';
 import { createCompiler, type CompilerHost } from '@klave/compiler';
 import { getFinalParseConfig } from '@klave/constants';

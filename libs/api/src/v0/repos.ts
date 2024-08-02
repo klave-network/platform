@@ -203,7 +203,7 @@ export const reposRouter = createTRPCRouter({
                     repo.config = result.success ? JSON.stringify(result.data) : null;
                     await prisma.deployableRepo.update({ where: { id: repo.id }, data: { config: repo.config } });
                 } catch (e) {
-                    // return [];
+                    console.error(e?.toString());
                     return;
                 }
 
@@ -350,6 +350,7 @@ export const reposRouter = createTRPCRouter({
                             });
                             resolve();
                         } catch (e) {
+                            console.error(e?.toString());
                             setTimeout(() => {
                                 waitForRepo().catch(() => {
                                     // ;
@@ -413,7 +414,7 @@ export const reposRouter = createTRPCRouter({
                 });
 
                 return repo;
-            } catch (e: unknown) {
+            } catch (e) {
 
                 await prisma.web.update({
                     where: {
@@ -434,7 +435,8 @@ export const reposRouter = createTRPCRouter({
                         return resolve();
                     });
                 });
-                console.error(e);
+
+                console.error(e?.toString());
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 throw new Error(`There was an error forking the repository: ${(e as any).message}`);
             }

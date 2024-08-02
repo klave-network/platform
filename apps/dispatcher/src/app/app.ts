@@ -75,6 +75,7 @@ export async function app(fastify: FastifyInstance) {
                         resolve([id, 200]);
                     });
                 } catch (e) {
+                    console.error(e?.toString());
                     resolve([id, 503]);
                 }
             }));

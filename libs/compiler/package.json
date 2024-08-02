@@ -3,7 +3,7 @@
     "version": "0.5.0",
     "license": "MIT",
     "private": false,
-    "type": "commonjs",
+    "type": "module",
     "repository": {
         "type": "git",
         "url": "https://github.com/klave-network/platform.git",

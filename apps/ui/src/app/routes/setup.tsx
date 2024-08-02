@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { LoaderFunction, useLoaderData, useNavigate } from 'react-router-dom';
 import qs from 'query-string';
-import { httpApi } from '../utils/api';
+import type { httpApi } from '../utils/api';
 
 type LoaderResult = {
     data: Awaited<ReturnType<typeof httpApi.v0.repos.registerGitHubCredentials.query>> | null;
@@ -16,8 +16,6 @@ export const loader: LoaderFunction = async ({ request }) => {
         source: string;
         redirectUri: string;
     } : null;
-
-    console.log('OULA ?', typeof state, parsedState);
 
     if (typeof state !== 'string')
         return null;
@@ -34,6 +32,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         }
         return { state };
     } catch (e) {
+        console.error(e?.toString());
         return null;
     }
 };
