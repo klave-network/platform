@@ -16,10 +16,9 @@ export default defineViteConfig({
 
     server: {
         host: 'localhost',
-        // cors: false,
         cors: {
             origin: permissiblePeers,
-            allowedHeaders: ['Sentry-Trace', 'Baggage'],
+            // allowedHeaders: ['Sentry-Trace', 'Baggage'],
             credentials: true
         },
         fs: {
@@ -52,6 +51,7 @@ export default defineViteConfig({
         globals: true,
         passWithNoTests: true,
         environment: 'jsdom',
+        watch: false,
         include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
         includeSource: ['src/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}']
     }
