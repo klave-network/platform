@@ -230,8 +230,6 @@ export const organisationRouter = createTRPCRouter({
                             some: {
                                 userId: user.id,
                                 OR: [{
-                                    read: true
-                                }, {
                                     write: true
                                 }, {
                                     admin: true
@@ -244,7 +242,17 @@ export const organisationRouter = createTRPCRouter({
             else
                 await prisma.organisation.update({
                     where: {
-                        id: orgId
+                        id: orgId,
+                        permissionGrants: {
+                            some: {
+                                userId: user.id,
+                                OR: [{
+                                    write: true
+                                }, {
+                                    admin: true
+                                }]
+                            }
+                        }
                     },
                     data
                 });
@@ -262,7 +270,13 @@ export const organisationRouter = createTRPCRouter({
 
             await prisma.organisation.delete({
                 where: {
-                    id: organisationId
+                    id: organisationId,
+                    permissionGrants: {
+                        some: {
+                            userId: user.id,
+                            admin: true
+                        }
+                    }
                 }
             });
             return;
