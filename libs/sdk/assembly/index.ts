@@ -47,6 +47,9 @@ declare function https_query_raw(query: ArrayBuffer, result: ArrayBuffer, result
 @external("env", "get_ita_token")
 declare function get_ita_token_raw(ta_api_url: ArrayBuffer, ta_base_url: ArrayBuffer, ta_key: ArrayBuffer, request_id: ArrayBuffer, policy_ids_json: ArrayBuffer, token_sign_alg_str: ArrayBuffer, retry_wait_time: i32, retry_max: i32, result: ArrayBuffer, result_size: i32): i32;
 // @ts-ignore: decorator
+@external("env", "get_ita_status")
+declare function get_ita_status(): i32;
+// @ts-ignore: decorator
 @external("env", "start_recording")
 declare function start_recording(): void;
 // @ts-ignore: decorator
@@ -180,6 +183,33 @@ export namespace Attestation {
     
     export namespace ITA {
 
+        class Helper{
+            static get_ita_status_message(status: i32): string {
+                /* ITA status codes 
+                -4001284: SIGNING_CERT_ERROR - Check if ta_base_url input is correct
+                -4000261:  INVALID_API_URL - Check if ta_api_url input is correct
+                -4000259:  INVALID_API_KEY - Check if ta_key input is correct
+                -4001792: TOKEN_VERIFICATION_FAILED - Check if token_sign_alg_str is correct
+                -4001283: STATUS_POST_TOKEN_ERROR - Check inputs
+                else: An error occurred.
+                */
+                switch (status) {
+                    case -4001284:
+                        return "SIGNING_CERT_ERROR - Check if ta_base_url input is correct";
+                    case -4000261:
+                        return "INVALID_API_URL - Check if ta_api_url input is correct";
+                    case -4000259:
+                        return "INVALID_API_KEY - Check if ta_key input is correct";
+                    case -4001792:
+                        return "TOKEN_VERIFICATION_FAILED - Check if token_sign_alg_str is correct";
+                    case -4001283:
+                        return "POST_TOKEN_ERROR - Check inputs";
+                    default:
+                        return "An error occurred.";
+                }
+            }
+        }
+
         @JSON
         export class Config
         {
@@ -193,9 +223,17 @@ export namespace Attestation {
             retry_max!: i32;
         }
 
+        @JSON
+        export class Result
+        {
+            success!: boolean;
+            status!: string;
+            value!: string;
+        }
+
         export class Token
         {
-            static getJWT(ita_config: Config): string {
+            static getJWT(ita_config: Config): Result {
                 
                 let ta_api_url = String.UTF8.encode(ita_config.ta_api_url, true);
                 let ta_base_url = String.UTF8.encode(ita_config.ta_base_url, true);
@@ -208,16 +246,35 @@ export namespace Attestation {
 
                 let value = new ArrayBuffer(5000);
                 let result = get_ita_token_raw(ta_api_url, ta_base_url, ta_key, request_id, policy_ids_json, token_sign_alg_str, retry_wait_time, retry_max, value, value.byteLength);
-                if (result < 0)
-                    return ''; // todo : report error
+
+                if (result === 0)
+                {
+                    let status = get_ita_status();
+                    let res = new Result();
+                    res.success = false;
+                    res.status = Helper.get_ita_status_message(status);
+                    res.value = '';
+                    return res;
+                }
                 if (result > value.byteLength) {
                     // buffer not big enough, retry with a properly sized one
                     value = new ArrayBuffer(result);
                     result = get_ita_token_raw(ta_api_url, ta_base_url, ta_key, request_id, policy_ids_json, token_sign_alg_str, retry_wait_time, retry_max, value, value.byteLength);
-                    if (result < 0)
-                        return ''; // todo : report error
+                    if (result === 0)
+                    {
+                        let status = get_ita_status();
+                        let res = new Result();
+                        res.success = false;
+                        res.status = Helper.get_ita_status_message(status);
+                        res.value = '';
+                        return res;
+                    }
                 }
-                return String.UTF8.decode(value, true);
+                let res = new Result();
+                res.success = true;
+                res.status = '';
+                res.value = String.UTF8.decode(value, true);
+                return res;
             }
         }
     }
