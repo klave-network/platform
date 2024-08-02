@@ -64,7 +64,7 @@ const OrganisationAddCredit = () => {
         <AlertDialog.Trigger asChild onClick={() => {
             setSearchParams();
         }}>
-            <button title='Delete' className="btn btn-sm mt-3 h-8 inline-flex items-center justify-center text-slate-500 text-md font-normalmt-auto">
+            <button title='Add credits' className="btn btn-sm mt-3 h-8 inline-flex items-center justify-center text-slate-500 text-md font-normalmt-auto">
                 <Uil0Plus className='inline-block h-4 w-4' /> Add credits
             </button>
         </AlertDialog.Trigger>
@@ -151,7 +151,7 @@ const CreditCellEdit: FC<{
     </div>;
 };
 
-export const OrganisationSettings: FC = () => {
+export const OrganisationCredits: FC = () => {
 
     const { orgSlug } = useParams();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -230,4 +230,4 @@ export const OrganisationSettings: FC = () => {
     </div>;
 };
 
-export default OrganisationSettings;
+export default OrganisationCredits;
