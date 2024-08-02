@@ -38,7 +38,7 @@
             "inputs": [
                 "default",
                 "^production",
-                "{workspaceRoot}/jest.preset.js"
+                "{workspaceRoot}/jest.preset.cjs"
             ],
             "cache": true
         },
@@ -46,7 +46,7 @@
             "inputs": [
                 "default",
                 "^production",
-                "{workspaceRoot}/jest.preset.js"
+                "{workspaceRoot}/jest.preset.cjs"
             ],
             "cache": true,
             "options": {

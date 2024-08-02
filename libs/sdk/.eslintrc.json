@@ -1,6 +1,6 @@
 {
     "extends": [
-        "../../.eslintrc.js"
+        "../../.eslintrc.cjs"
     ],
     "ignorePatterns": [
         "!**/*",
@@ -15,11 +15,6 @@
                 "*.js",
                 "*.jsx"
             ],
-            "parserOptions": {
-                "project": [
-                    "libs/sdk/tsconfig.*?.json"
-                ]
-            },
             "rules": {
                 "@nx/enforce-module-boundaries": [
                     "error",
@@ -42,6 +37,11 @@
                 "*.ts",
                 "*.tsx"
             ],
+            "parserOptions": {
+                "project": [
+                    "libs/sdk/tsconfig.*?.json"
+                ]
+            },
             "rules": {}
         },
         {

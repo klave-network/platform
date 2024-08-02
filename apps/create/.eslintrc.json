@@ -1,6 +1,6 @@
 {
     "extends": [
-        "../../.eslintrc.js"
+        "../../.eslintrc.cjs"
     ],
     "ignorePatterns": [
         "!**/*",
@@ -14,11 +14,6 @@
                 "*.js",
                 "*.jsx"
             ],
-            "parserOptions": {
-                "project": [
-                    "apps/create/tsconfig.*?.json"
-                ]
-            },
             "rules": {
                 "@nx/enforce-module-boundaries": [
                     "error",
@@ -41,6 +36,11 @@
                 "*.ts",
                 "*.tsx"
             ],
+            "parserOptions": {
+                "project": [
+                    "apps/create/tsconfig.*?.json"
+                ]
+            },
             "rules": {}
         },
         {

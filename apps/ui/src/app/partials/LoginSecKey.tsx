@@ -97,6 +97,7 @@ export const LoginSecKey: FC = () => {
                         const parsedError = JSON.parse(error.message) as Error;
                         setError(parsedError?.message ?? 'An error occured while trying to send your email code. Please try again later.');
                     } catch (e) {
+                        console.error(e?.toString());
                         setError(error.message ?? 'An error occured while trying to send your email code. Please try again later.');
                     }
                 } else if (data?.ok)

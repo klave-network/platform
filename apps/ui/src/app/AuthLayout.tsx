@@ -4,7 +4,7 @@ import { AuthProvider } from './AuthProvider';
 import { AppWrapper } from './AppLayout';
 import Header from './partials/Header';
 import Footer from './partials/Footer';
-import { httpApi } from './utils/api';
+import type { httpApi } from './utils/api';
 
 const MainWrapper: FC<PropsWithChildren> = ({ children }) => {
     return <main className="flex-grow pt-24">

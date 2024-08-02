@@ -132,7 +132,7 @@ export const scpOps = {
             await client.close();
             return;
         } catch (e) {
-            //
+            console.error(e?.toString());
         }
     }
 };

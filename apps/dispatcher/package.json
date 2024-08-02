@@ -1,6 +1,6 @@
 {
     "name": "@klave/dispatcher",
     "version": "0.1.1",
-    "type": "commonjs",
+    "type": "module",
     "license": "MIT"
 }

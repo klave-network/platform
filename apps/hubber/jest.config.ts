@@ -1,6 +1,6 @@
 export default {
     displayName: 'hubber',
-    preset: '../../jest.preset.js',
+    preset: '../../jest.preset.cjs',
     testEnvironment: '../../tools/fixtures/_mongoJestEnv.ts',
     transform: {
         '^.+\\.[tj]s$': '@swc/jest'

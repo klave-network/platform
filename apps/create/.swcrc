@@ -1,6 +1,6 @@
 {
     "jsc": {
-        "target": "es2021",
+        "target": "esnext",
         "parser": {
             "syntax": "typescript",
             "decorators": true,
@@ -21,7 +21,7 @@
         "loose": true
     },
     "module": {
-        "type": "commonjs",
+        "type": "es6",
         "strict": true,
         "lazy": false,
         "noInterop": false

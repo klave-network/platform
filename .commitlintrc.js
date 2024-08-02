@@ -1,6 +1,6 @@
-const { utils: { getProjects } } = require('@commitlint/config-nx-scopes');
+import configNxScopes from '@commitlint/config-nx-scopes';
 
-module.exports = {
+export default {
     extends: [
         '@commitlint/config-conventional',
         '@commitlint/config-nx-scopes'
@@ -10,7 +10,7 @@ module.exports = {
             const projectFilter = ({ name }) =>
                 !name.includes('e2e');
             const projectNames = new Set();
-            (await getProjects(ctx, projectFilter))
+            (await configNxScopes.utils.getProjects(ctx, projectFilter))
                 .forEach(element => {
                     projectNames.add(element);
                 });

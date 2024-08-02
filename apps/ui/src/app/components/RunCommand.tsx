@@ -75,6 +75,7 @@ export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = 
                             key: JSON.parse(e.target?.result as string)
                         });
                     } catch (e) {
+                        console.error(e?.toString());
                         resolve(undefined);
                     }
                 };
@@ -98,6 +99,7 @@ export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = 
                     read.key = await (await Key.importEncryptedKeyPair(key, password)).exportKey();
                 }
             } catch (e) {
+                console.error(e?.toString());
                 return undefined;
             }
             if (read.key)
@@ -143,6 +145,7 @@ export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = 
     try {
         JSON.parse(args);
     } catch (e) {
+        console.error(e?.toString());
         passedArgs = JSON.stringify(args);
     }
 
