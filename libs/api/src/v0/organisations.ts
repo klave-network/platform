@@ -382,6 +382,111 @@ export const organisationRouter = createTRPCRouter({
                 },
                 nextCursor
             };
+        }),
+    addMember: publicProcedure
+        .input(z.object({
+            orgId: z.string().uuid(),
+            userSlug: z.string(),
+            read: z.boolean().optional(),
+            write: z.boolean().optional(),
+            admin: z.boolean().optional()
+        }))
+        .mutation(async ({ ctx: { prisma, session: { user } }, input: { orgId, userSlug, read, write, admin } }) => {
+
+            if (!user)
+                throw new Error('Not logged in');
+
+            const org = await prisma.organisation.findUnique({
+                where: {
+                    id: orgId
+                }
+            });
+
+            if (!org)
+                throw new Error('Organisation not found');
+
+            const currentPermissionGrant = await prisma.permissionGrant.findFirst({
+                where: {
+                    organisationId: orgId,
+                    userId: user.id
+                }
+            });
+
+            if (!currentPermissionGrant || !currentPermissionGrant.admin)
+                throw new Error('Not enough permissions');
+
+            const principal = await prisma.user.findUnique({
+                where: {
+                    slug: userSlug
+                }
+            });
+
+            if (!principal)
+                throw new Error('User not found');
+
+            const permissionGrant = await prisma.permissionGrant.findFirst({
+                where: {
+                    organisationId: org.id,
+                    userId: principal.id
+                }
+            });
+
+            if (permissionGrant)
+                await prisma.permissionGrant.update({
+                    where: {
+                        id: permissionGrant.id
+                    },
+                    data: {
+                        read: read ?? permissionGrant.read,
+                        write: write ?? permissionGrant.write,
+                        admin: admin ?? permissionGrant.admin
+                    }
+                });
+            else
+                await prisma.permissionGrant.create({
+                    data: {
+                        organisationId: org.id,
+                        userId: principal.id,
+                        read: read ?? false,
+                        write: write ?? false,
+                        admin: admin ?? false
+                    }
+                });
+
+        }),
+    removeMember: publicProcedure
+        .input(z.object({
+            grantId: z.string().uuid()
+        }))
+        .mutation(async ({ ctx: { prisma, session: { user } }, input: { grantId } }) => {
+
+            if (!user)
+                throw new Error('Not logged in');
+
+            const permissionGrant = await prisma.permissionGrant.findUnique({
+                where: {
+                    id: grantId
+                }
+            });
+
+            if (!permissionGrant)
+                throw new Error('Permission grant not found');
+
+            const currentPermissionGrant = await prisma.permissionGrant.findFirst({
+                where: {
+                    organisationId: permissionGrant.organisationId,
+                    userId: user.id
+                }
+            });
+
+            if (!currentPermissionGrant || !currentPermissionGrant.admin)
+                throw new Error('Not enough permissions');
+
+            await prisma.permissionGrant.deleteMany({
+                where: {
+                    id: permissionGrant.id
+                }
+            });
         })
 });
 
