@@ -82,6 +82,32 @@ export const activityRouter = createTRPCRouter({
                 }
             });
         }),
+    addCluster: publicProcedure
+        .input(z.object({
+            organisationId: z.string().uuid(),
+            name: z.string(),
+            fqdn: z.string()
+        }))
+        .mutation(async ({ ctx: { prisma }, input: { organisationId, name, fqdn } }) => {
+
+            if (!organisationId || !name)
+                return null;
+
+            return await prisma.cluster.create({
+                data: {
+                    name,
+                    fqdn,
+                    clusterAllocations: {
+                        create: {
+                            organisationId,
+                            read: true,
+                            write: true,
+                            admin: true
+                        }
+                    }
+                }
+            });
+        }),
     deleteAllocation: publicProcedure
         .input(z.object({
             allocationId: z.string().uuid()

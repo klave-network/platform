@@ -1,4 +1,26 @@
 # Changelog
+## [0.13.0](https://github.com/klave-network/platform/compare/ui@0.12.0...ui@0.13.0) (2024-08-02)
+
+### Dependency Updates
+
+* `api` updated to version `0.12.0`
+
+### Features
+
+* **api,ui:** Add the ability to add a custom cluster ([fcc3c5f](https://github.com/klave-network/platform/commit/fcc3c5f0f9b76f4e8a5a7826ef64327061b1d096))
+* **api,ui:** Allow editing of permission grants for organisations ([e2bd7d2](https://github.com/klave-network/platform/commit/e2bd7d2097b773e2a7151594ee837950298cfe2d)), closes [#KN-232](https://github.com/klave-network/platform/issues/KN-232)
+
+
+### Bug Fixes
+
+* **ui:** Fix wrong text on members page + Cleanup ([ff6aa83](https://github.com/klave-network/platform/commit/ff6aa83272699bc3fa550322ae323506f0d1f0a6))
+* **ui:** Run attestation check again the correct custom cluster ([aa5c2fe](https://github.com/klave-network/platform/commit/aa5c2fe1366cd8ca6a83b82af624eb3741e30eb4))
+
+
+### Reverts
+
+* Revert "chore(ui): Hide organisation creation button" ([bd3bc9d](https://github.com/klave-network/platform/commit/bd3bc9dc888b4cb98617ca4d3835ccc914c3c596))
+
 ## [0.12.0](https://github.com/klave-network/platform/compare/ui@0.11.0...ui@0.12.0) (2024-07-25)
 
 ### Dependency Updates

@@ -1,8 +1,8 @@
 {
     "name": "@klave/hubber",
-    "version": "0.3.3",
+    "version": "0.3.4",
     "license": "MIT",
     "dependencies": {
-        "typescript": "^5.5.3"
+        "typescript": "^5.5.4"
     }
 }

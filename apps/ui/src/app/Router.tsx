@@ -27,6 +27,7 @@ import OrgActivity from './routes/orgs/activity';
 import OrgSettings from './routes/orgs/settings';
 import OrgClusters from './routes/orgs/clusters';
 import OrgCredits from './routes/orgs/credits';
+import OrgMembers from './routes/orgs/members';
 import RedeemCreditCoupon from './routes/redeem/coupon';
 import SysDashboard from './routes/system/dashboard';
 import SysMonitoring from './routes/system/monitoring';
@@ -110,6 +111,7 @@ const router = sentryCreateBrowserRouter(
                             <Route index element={<OrgActivity />} />
                             <Route path="clusters" element={<OrgClusters />} />
                             <Route path="credits" element={<OrgCredits />} />
+                            <Route path="members" element={<OrgMembers />} />
                             <Route path="settings" element={<OrgSettings />} />
                             <Route path="*" element={<OrgActivity />} />
                         </Route>
