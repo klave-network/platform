@@ -210,7 +210,7 @@ export namespace Attestation {
             }
         }
 
-        @JSON
+        @json
         export class Config
         {
             ta_api_url!: string;
@@ -223,7 +223,7 @@ export namespace Attestation {
             retry_max!: i32;
         }
 
-        @JSON
+        @json
         export class Result
         {
             success!: boolean;
@@ -285,8 +285,8 @@ export class HttpRequest {
     hostname!: string;
     port: i32 = 443;
     method: string = 'GET';
-    path: string = '';
-    version: string = 'HTTP/1.1';
+    path: string = '/';
+    httpVersion: string = 'HTTP/1.1';
     headers: string[][] = [];
     body: string = '';
 }
