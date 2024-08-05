@@ -276,7 +276,9 @@ export namespace Attestation {
 export class HttpRequest {
     hostname!: string;
     port: i32 = 443;
-    path: string = '';
+    path: string = '/';
+    httpVersion: string = 'HTTP/1.1';
+    method: string = 'GET';
     headers: string[][] = [];
     body: string = '';
 }
