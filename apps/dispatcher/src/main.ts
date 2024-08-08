@@ -4,6 +4,7 @@ import helmet from '@fastify/helmet';
 import sensible from '@fastify/sensible';
 import websocket from '@fastify/websocket';
 import { app } from './app/app';
+import { sentryOps } from './utils/sentry';
 
 process.on('unhandledRejection', (reason, p) => {
     console.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
@@ -13,11 +14,17 @@ const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 (async () => {
+
+    await sentryOps.initialize();
+
     // Instantiate Fastify with some config
     const server = Fastify({
         logger: true,
         bodyLimit: 10485760
     });
+
+    // TODO: Enable when migrating to Sentry 8
+    // Sentry.setupFastifyErrorHandler(server);
 
     server.removeAllContentTypeParsers();
     server.addContentTypeParser('*', function (__unusedReq, __unusedPayload, done) {

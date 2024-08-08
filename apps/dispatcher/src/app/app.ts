@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance, RouteHandler } from 'fastify';
 import type { WebSocket } from 'ws';
 import { v4 as uuid } from 'uuid';
 
@@ -31,7 +31,7 @@ export async function app(fastify: FastifyInstance) {
         });
     });
 
-    fastify.all('/hook', async (req, res) => {
+    const hookMiddleware: RouteHandler = async (req, res) => {
 
         const newHeaders = { ...req.headers };
         delete newHeaders.connection;
@@ -92,6 +92,14 @@ export async function app(fastify: FastifyInstance) {
         await res.status(!statusValues.length ? 200 : statusValues.find(status => status === 200) ? 207 : 500)
             .send({ ok: true, statuses });
 
+    };
+
+    fastify.all('/hook', hookMiddleware);
+    fastify.all('/vcs/hook', hookMiddleware);
+
+    fastify.all('/ingest/usage', async (__unusedReq, res) => {
+        // TODO: Implement kredit storage
+        await res.status(200).send({ ok: true });
     });
 
     fastify.all('/version', async (__unusedReq, res) => {
