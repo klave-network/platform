@@ -8,9 +8,9 @@ export const sentryOps = {
         try {
             console.info('Initializing Sentry');
             Sentry.init({
-                dsn: process.env['KLAVE_SENTRY_DSN'],
+                dsn: process.env['KLAVE_DISPATCH_SENTRY_DSN'],
                 release: `klave@${process.env['GIT_REPO_VERSION']}`,
-                environment: process.env['KLAVE_SENTRY_ENV'] ?? process.env['NODE_ENV'] ?? 'development',
+                environment: process.env['KLAVE_DISPATCH_SENTRY_ENV'] ?? process.env['NODE_ENV'] ?? 'development',
                 integrations: [
                     // enable HTTP calls tracing
                     new Sentry.Integrations.Http({ tracing: true }) as Integration
