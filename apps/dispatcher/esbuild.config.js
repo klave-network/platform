@@ -14,7 +14,7 @@ module.exports = {
             org: process.env.KLAVE_DISPATCH_SENTRY_ORG,
             project: process.env.KLAVE_DISPATCH_SENTRY_PROJECT,
             authToken: process.env.KLAVE_DISPATCH_SENTRY_AUTH_TOKEN,
-            release: `klave@${JSON.stringify(version)}`
+            release: `dispatcher@${JSON.stringify(version)}`
         }) : undefined
     ].filter(Boolean),
     platform: 'node',
