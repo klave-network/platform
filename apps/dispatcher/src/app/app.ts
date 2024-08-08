@@ -14,7 +14,7 @@ export async function app(fastify: FastifyInstance) {
     fastify.log.info(endpoints, 'Preparing for enpoints');
 
     fastify.get('/dev', { websocket: true }, (connection) => {
-        connection.on('data', (data) => {
+        connection.on('message', (data) => {
             if (data.toString() === process.env.KLAVE_DISPATCH_SECRET) {
                 const id = uuid();
                 connection.on('close', () => {
