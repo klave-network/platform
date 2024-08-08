@@ -1,4 +1,11 @@
 # Changelog
+## [0.1.1](https://github.com/klave-network/platform/compare/dispatcher@0.1.0...dispatcher@0.1.1) (2024-08-08)
+
+
+### Bug Fixes
+
+* **dispatcher:** Fastify websocket now use `message` event in place of `data` ([79c38e7](https://github.com/klave-network/platform/commit/79c38e7dd33d7f70b7336645069c9f91739a3ad8))
+
 ## [0.1.0](https://github.com/klave-network/platform/compare/dispatcher@0.0.1...dispatcher@0.1.0) (2024-08-08)
 
 ### Dependency Updates
