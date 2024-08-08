@@ -27,6 +27,13 @@ export async function app(fastify: FastifyInstance) {
                     connectionPool.delete(id);
                 });
                 connectionPool.set(id, connection);
+            } else {
+                connection.send(JSON.stringify({
+                    ok: false,
+                    message: 'Unauthorized'
+                }), () => {
+                    connection.close();
+                });
             }
         });
     });
