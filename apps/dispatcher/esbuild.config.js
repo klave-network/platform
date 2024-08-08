@@ -1,9 +1,27 @@
 const git = require('git-rev-sync');
+const { sentryEsbuildPlugin } = require('@sentry/esbuild-plugin');
 const { version } = require('./package.json');
+
+const klaveDispatcherSentryURL = process.env.KLAVE_DISPATCH_SENTRY_DSN ? new URL(process.env.KLAVE_DISPATCH_SENTRY_DSN) : null;
 
 /** @type {import('esbuild').BuildOptions} */
 module.exports = {
     sourcemap: process.env.NODE_ENV === 'development' ? 'inline' : 'external',
+    plugins: [
+        // Put the Sentry esbuild plugin after all other plugins
+        klaveDispatcherSentryURL ? sentryEsbuildPlugin({
+            url: `${klaveDispatcherSentryURL.protocol}//${klaveDispatcherSentryURL.host}`,
+            org: process.env.KLAVE_DISPATCH_SENTRY_ORG,
+            project: process.env.KLAVE_DISPATCH_SENTRY_PROJECT,
+            authToken: process.env.KLAVE_DISPATCH_SENTRY_AUTH_TOKEN,
+            release: `klave@${JSON.stringify(version)}`
+        }) : undefined
+    ].filter(Boolean),
+    platform: 'node',
+    loader: {
+        // ensures .node binaries are copied to ./dist
+        '.node': 'copy'
+    },
     outExtension: {
         '.js': '.js'
     },
