@@ -23,11 +23,12 @@ export default defineConfig({
     },
     /* Run your local dev server before starting the tests */
     webServer: {
-        command: 'yarn nx serve ui',
+        command: 'yarn nx run ui:preview',
         url: 'http://localhost:4220',
         reuseExistingServer: !process.env.CI,
         cwd: workspaceRoot
-    }, projects: [
+    },
+    projects: [
         { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
         { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
         { name: 'webkit', use: { ...devices['Desktop Safari'] } }
