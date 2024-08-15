@@ -23,7 +23,6 @@
     "private": true,
     "dependencies": {
         "@expo/spawn-async": "1.7.2",
-        "@fastify/autoload": "~5.10.0",
         "@fastify/helmet": "11.1.1",
         "@fastify/rate-limit": "9.1.0",
         "@fastify/sensible": "5.6.0",
@@ -85,7 +84,6 @@
         "express-session": "1.18.0",
         "express-ws": "5.0.2",
         "fakemail-guard": "1.0.0",
-        "fastify-plugin": "~4.5.1",
         "fs-extra": "^11.2.0",
         "github-username": "8.0.0",
         "helmet": "7.1.0",
