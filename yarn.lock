@@ -5032,17 +5032,17 @@
     "@sigstore/core" "^1.1.0"
     "@sigstore/protobuf-specs" "^0.3.2"
 
-"@simplewebauthn/browser@9.0.1":
-  version "9.0.1"
-  resolved "https://registry.yarnpkg.com/@simplewebauthn/browser/-/browser-9.0.1.tgz#46a12c2bcefcb199f7fcb6a7e883531cd6efde17"
-  integrity sha512-wD2WpbkaEP4170s13/HUxPcAV5y4ZXaKo1TfNklS5zDefPinIgXOpgz1kpEvobAsaLPa2KeH7AKKX/od1mrBJw==
+"@simplewebauthn/browser@10.0.0":
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/@simplewebauthn/browser/-/browser-10.0.0.tgz#8305a57dacb35ab6a71a8b670c699ee7ef1c11c4"
+  integrity sha512-hG0JMZD+LiLUbpQcAjS4d+t4gbprE/dLYop/CkE01ugU/9sKXflxV5s0DRjdz3uNMFecatRfb4ZLG3XvF8m5zg==
   dependencies:
-    "@simplewebauthn/types" "^9.0.1"
+    "@simplewebauthn/types" "^10.0.0"
 
-"@simplewebauthn/server@9.0.3":
-  version "9.0.3"
-  resolved "https://registry.yarnpkg.com/@simplewebauthn/server/-/server-9.0.3.tgz#5f73c19ff2420be94cc71a49085879c111d7872d"
-  integrity sha512-FMZieoBosrVLFxCnxPFD9Enhd1U7D8nidVDT4MsHc6l4fdVcjoeHjDueeXCloO1k5O/fZg1fsSXXPKbY2XTzDA==
+"@simplewebauthn/server@10.0.1":
+  version "10.0.1"
+  resolved "https://registry.yarnpkg.com/@simplewebauthn/server/-/server-10.0.1.tgz#b40362f80b2d13a541936a09e1be9829cb59e21d"
+  integrity sha512-djNWcRn+H+6zvihBFJSpG3fzb0NQS9c/Mw5dYOtZ9H+oDw8qn9Htqxt4cpqRvSOAfwqP7rOvE9rwqVaoGGc3hg==
   dependencies:
     "@hexagon/base64" "^1.1.27"
     "@levischuck/tiny-cbor" "^0.2.2"
@@ -5051,13 +5051,13 @@
     "@peculiar/asn1-rsa" "^2.3.8"
     "@peculiar/asn1-schema" "^2.3.8"
     "@peculiar/asn1-x509" "^2.3.8"
-    "@simplewebauthn/types" "^9.0.1"
+    "@simplewebauthn/types" "^10.0.0"
     cross-fetch "^4.0.0"
 
-"@simplewebauthn/types@^9.0.1":
-  version "9.0.1"
-  resolved "https://registry.yarnpkg.com/@simplewebauthn/types/-/types-9.0.1.tgz#3a68d50e63d8821cf2067de3324c68d5e8120d0c"
-  integrity sha512-tGSRP1QvsAvsJmnOlRQyw/mvK9gnPtjEc5fg2+m8n+QUa+D7rvrKkOYyfpy42GTs90X3RDOnqJgfHt+qO67/+w==
+"@simplewebauthn/types@^10.0.0":
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/@simplewebauthn/types/-/types-10.0.0.tgz#a07259d42fbdff7a014473f78401d262b298ed8e"
+  integrity sha512-SFXke7xkgPRowY2E+8djKbdEznTVnD5R6GO7GPTthpHrokLvNKw8C3lFZypTxLI7KkCfGPfhtqB3d7OVGGa9jQ==
 
 "@sinclair/typebox@^0.27.8":
   version "0.27.8"
@@ -6152,17 +6152,17 @@
   resolved "https://registry.yarnpkg.com/@total-typescript/ts-reset/-/ts-reset-0.5.1.tgz#93b0535d00faa588518bcfb0db30182e63e4f7af"
   integrity sha512-AqlrT8YA1o7Ff5wPfMOL0pvL+1X+sw60NN6CcOCqs658emD6RfiXhF7Gu9QcfKBH7ELY2nInLhKSCWVoNL70MQ==
 
-"@trpc/client@next":
+"@trpc/client@11.0.0-rc.477":
   version "11.0.0-rc.477"
   resolved "https://registry.yarnpkg.com/@trpc/client/-/client-11.0.0-rc.477.tgz#5d386fa81372c21d2d2d1110474693827063719d"
   integrity sha512-Ah/Er3vxTm2bIEUcIrike7Z/8Yc+DkFveU2ZHQQ0+zY7yxs931438+4OEJuY/Xl/0p5OTDeZTm6HBuZ1REFiyA==
 
-"@trpc/react-query@next":
+"@trpc/react-query@11.0.0-rc.477":
   version "11.0.0-rc.477"
   resolved "https://registry.yarnpkg.com/@trpc/react-query/-/react-query-11.0.0-rc.477.tgz#1c2123c66f6eb145933ce796425f352a4c67250d"
   integrity sha512-1ZCAm0wv7yLmb3muq+5DTRxdKXzI1KjTrcM2+QRKCFu6EherGM8x6zGI36P9ZmC6o+SCoedzxqazDNe+kkqVqA==
 
-"@trpc/server@next":
+"@trpc/server@11.0.0-rc.477":
   version "11.0.0-rc.477"
   resolved "https://registry.yarnpkg.com/@trpc/server/-/server-11.0.0-rc.477.tgz#9f5772006a42fe8580c27365d27e1040d34518a2"
   integrity sha512-K6zmjRv96fWilqm/ETehEK1DWsy5bSyrs2xbsNzCbjguMgamMhOClRHgYzJcwgLp2kasJ7QgD9YbahOhV1/u1w==
