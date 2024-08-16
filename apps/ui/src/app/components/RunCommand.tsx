@@ -9,14 +9,14 @@ type RunCommandProps = {
     address: string;
     cluster?: string;
     functions?: string[];
-}
+};
 
 type KeyPointer = {
     name: string;
     key: ClearKeyPair & {
         name?: string;
     };
-}
+};
 
 export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = [] }) => {
 
@@ -103,7 +103,7 @@ export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = 
                 return undefined;
             }
             if (read.key)
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
                 (read.key as KeyPointer['key']).name = read.name;
             return read as KeyPointer;
         });

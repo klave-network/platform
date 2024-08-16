@@ -7,7 +7,7 @@ type AuthContextType = {
     user: Awaited<ReturnType<typeof httpApi.v0.auth.getSession.query>> | null;
     login: (data: Awaited<ReturnType<typeof httpApi.v0.auth.getSession.query>> | null) => void;
     logout: () => void;
-}
+};
 
 const AuthContext = createContext<AuthContextType>({
     user: null,
@@ -21,7 +21,7 @@ const AuthContext = createContext<AuthContextType>({
 
 type AuthProviderProps = PropsWithChildren & {
     userData?: Awaited<ReturnType<typeof httpApi.v0.auth.getSession.query>>
-}
+};
 
 export const AuthProvider: FC<AuthProviderProps> = ({ children, userData }) => {
 

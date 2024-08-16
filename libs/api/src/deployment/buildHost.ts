@@ -18,7 +18,7 @@ export type ParentMessage = {
     contents: string | null;
 } | {
     type: 'compile';
-}
+};
 
 type BuildHostMessage = {
     type: 'read';
@@ -57,15 +57,15 @@ type BuildHostMessage = {
     version: string;
 } | {
     type: 'compile';
-}
+};
 
 export type BuildHostCreatorOptions = BuildMiniVMOptions & {
     token: string;
-}
+};
 
 export type BuildHostOptions = BuildHostCreatorOptions & {
     workingDirectory: string;
-}
+};
 
 export class BuildHost {
 

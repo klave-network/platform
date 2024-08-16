@@ -6,7 +6,7 @@ type CreditDisplayProps = {
     size?: 'small' | 'medium' | 'large';
     justify?: 'start' | 'center' | 'end';
     className?: string;
-}
+};
 
 const CreditDisplay: FC<CreditDisplayProps> = ({ kredits, compact, size, justify, className }) => {
 

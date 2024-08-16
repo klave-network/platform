@@ -42,7 +42,7 @@ type BuildOutput = {
 } | {
     success: false;
     error?: Error | ErrorObject;
-})
+});
 
 export type DeploymentContext<Type> = {
     octokit: Context['octokit']
@@ -56,7 +56,7 @@ export type BuildMiniVMOptions = {
     application: NonNullable<RepoConfigSchemaLatest['applications']>[number] | undefined;
     deployment: Deployment;
     // dependencies: Record<string, string>;
-}
+};
 
 export class BuildMiniVM {
 

@@ -1,4 +1,4 @@
-/* eslint-disable */
+
 export default {
     displayName: 'create',
     preset: '../../jest.preset.cjs',

@@ -8,7 +8,7 @@ import { formatTimeAgo } from '../../utils/formatTimeAgo';
 
 type DeploymentContextProps = {
     deployment: Omit<Deployment, 'buildOutputDTS' | 'buildOutputWASM' | 'buildOutputWAT' | 'buildOutputs' | 'configSnapshot'>
-}
+};
 
 export const DeploymentPromotion: FC<DeploymentContextProps> = ({ deployment: { id } }) => {
 

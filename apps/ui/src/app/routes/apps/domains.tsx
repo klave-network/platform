@@ -10,7 +10,7 @@ import { formatTimeAgo } from '../../utils/formatTimeAgo';
 
 type DomainContextProps = {
     domain: Domain
-}
+};
 
 const DomainDeletion: FC<DomainContextProps> = ({ domain: { id } }) => {
 
@@ -56,7 +56,7 @@ const DomainDeletion: FC<DomainContextProps> = ({ domain: { id } }) => {
 
 type DomainRecordProps = {
     domain: Domain
-}
+};
 
 const DomainRecord: FC<DomainRecordProps> = ({ domain }) => {
 
@@ -104,7 +104,7 @@ const DomainRecord: FC<DomainRecordProps> = ({ domain }) => {
 
 type DomainAddBoxProps = {
     onClose(): void
-}
+};
 
 const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
 

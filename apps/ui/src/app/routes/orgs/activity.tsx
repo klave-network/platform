@@ -11,7 +11,7 @@ import { CubeIcon } from '@radix-ui/react-icons';
 
 type ApplicationRecordProps = {
     application: Application
-}
+};
 
 export const ApplicationRecord: FC<ApplicationRecordProps> = ({ application }) => {
     const { orgSlug } = useParams();

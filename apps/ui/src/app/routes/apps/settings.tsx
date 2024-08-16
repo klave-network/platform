@@ -82,7 +82,7 @@ const ApplicationDeletion = () => {
 type LimitEditorProps = {
     kredits: bigint | number
     application: Partial<Application>
-}
+};
 
 const LimitEditor: FC<LimitEditorProps> = ({ kredits, application: { id } }) => {
 

@@ -2,5 +2,8 @@
     "name": "@klave/cli",
     "version": "0.0.1",
     "type": "module",
-    "license": "MIT"
+    "license": "MIT",
+    "dependencies": {
+        "@total-typescript/ts-reset": "^0.5.1"
+    }
 }

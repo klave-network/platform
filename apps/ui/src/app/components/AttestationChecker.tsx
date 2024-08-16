@@ -9,7 +9,7 @@ type AttestationCheckerProps = {
     deploymentId: string;
     address: string;
     cluster?: string;
-}
+};
 
 export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, address, cluster }) => {
 

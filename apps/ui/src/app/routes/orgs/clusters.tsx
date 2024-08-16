@@ -99,7 +99,7 @@ const AddCluster = () => {
 
 type ClusterContextProps = {
     cluster: Cluster
-}
+};
 
 const ClusterDeletion: FC<ClusterContextProps> = ({ cluster: { id } }) => {
 
@@ -144,7 +144,7 @@ const ClusterDeletion: FC<ClusterContextProps> = ({ cluster: { id } }) => {
 
 type ClusterRecordProps = {
     cluster: Cluster
-}
+};
 
 const ClusterRecord: FC<ClusterRecordProps> = ({ cluster }) => {
 

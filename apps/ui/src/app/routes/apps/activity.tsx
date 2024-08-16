@@ -11,7 +11,7 @@ import { CommitIcon } from '@radix-ui/react-icons';
 
 type ActivityRecordProps = {
     activity: ActivityLog
-}
+};
 
 export const ActivityRecord: FC<ActivityRecordProps> = ({ activity }) => {
     if (activity.class === 'pullRequestHook') {
