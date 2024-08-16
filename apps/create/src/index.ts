@@ -5,7 +5,7 @@ import fs from 'fs-extra';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import prompts from 'prompts';
-import rif from 'replace-in-file';
+import { replaceInFile } from 'replace-in-file';
 import { getSlugPrompt, getSubstitutionDataPrompts } from './lib/prompts';
 import {
     PackageManagerName,
@@ -16,7 +16,6 @@ import { newStep } from './lib/utils';
 import packageJson from '../package.json';
 import latestVersion from 'latest-version';
 
-const { replaceInFile } = rif;
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
 // `yarn run` may change the current working dir, then we should use `INIT_CWD` env.
