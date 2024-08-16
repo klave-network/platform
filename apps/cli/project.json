@@ -21,6 +21,7 @@
                     "apps/cli/src/assets"
                 ],
                 "generatePackageJson": true,
+                "thirdParty": true,
                 "esbuildOptions": {
                     "sourcemap": true,
                     "outExtension": {

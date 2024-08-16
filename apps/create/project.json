@@ -30,6 +30,7 @@
                     "apps/create/*.md"
                 ],
                 "generatePackageJson": true,
+                "thirdParty": true,
                 "esbuildConfig": "apps/dispatcher/esbuild.config.cjs"
             },
             "configurations": {
