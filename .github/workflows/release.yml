@@ -8,8 +8,14 @@ on:
 jobs:
   npm:
     runs-on: ubuntu-latest
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.NX_CACHE_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.NX_CACHE_AWS_SECRET_ACCESS_KEY }}
+
     permissions:
       id-token: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
