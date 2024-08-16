@@ -14,9 +14,6 @@
             "options": {
                 "platform": "node",
                 "outputPath": "dist/apps/cli",
-                "format": [
-                    "cjs"
-                ],
                 "bundle": false,
                 "main": "apps/cli/src/index.ts",
                 "tsConfig": "apps/cli/tsconfig.app.json",

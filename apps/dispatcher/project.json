@@ -12,9 +12,6 @@
             ],
             "options": {
                 "outputPath": "dist/apps/dispatcher",
-                "format": [
-                    "cjs"
-                ],
                 "main": "apps/dispatcher/src/main.ts",
                 "tsConfig": "apps/dispatcher/tsconfig.app.json",
                 "assets": [
@@ -22,7 +19,7 @@
                 ],
                 "generatePackageJson": true,
                 "thirdParty": true,
-                "esbuildConfig": "apps/dispatcher/esbuild.config.js"
+                "esbuildConfig": "apps/dispatcher/esbuild.config.cjs"
             }
         },
         "serve": {

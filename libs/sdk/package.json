@@ -16,7 +16,7 @@
     "bin": {
         "stac": "./bin/stac"
     },
-    "type": "commonjs",
+    "type": "module",
     "main": "assembly/index.ts",
     "types": "assembly/index.ts",
     "exports": {

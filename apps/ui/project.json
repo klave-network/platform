@@ -59,7 +59,10 @@
                 "production": {
                     "buildTarget": "ui:build:production"
                 }
-            }
+            },
+            "dependsOn": [
+                "build"
+            ]
         },
         "lint": {
             "executor": "@nx/eslint:lint",

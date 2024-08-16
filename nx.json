@@ -38,7 +38,7 @@
             "inputs": [
                 "default",
                 "^production",
-                "{workspaceRoot}/jest.preset.js"
+                "{workspaceRoot}/jest.preset.cjs"
             ],
             "cache": true
         },
@@ -46,7 +46,7 @@
             "inputs": [
                 "default",
                 "^production",
-                "{workspaceRoot}/jest.preset.js"
+                "{workspaceRoot}/jest.preset.cjs"
             ],
             "cache": true,
             "options": {
@@ -107,6 +107,25 @@
         }
     },
     "defaultProject": "hubber",
-    "nxCloudAccessToken": "MDc0N2UyYTctZTQwMC00YzlmLThjMzEtNDdhMzdmZjY5ZmNjfHJlYWQtd3JpdGU=",
-    "defaultBase": "main"
+    "defaultBase": "main",
+    "tasksRunnerOptions": {
+        "default": {
+            "runner": "@pellegrims/nx-remotecache-s3",
+            "options": {
+                "cacheableOperations": [
+                    "compile",
+                    "build",
+                    "test",
+                    "lint",
+                    "e2e"
+                ],
+                "endpoint": "https://s3.uk.io.cloud.ovh.net/",
+                "bucket": "nx-build-cache",
+                "region": "uk",
+                "forcePathStyle": false,
+                "readOnly": false,
+                "silent": true
+            }
+        }
+    }
 }

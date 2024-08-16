@@ -14,22 +14,13 @@
             "options": {
                 "platform": "node",
                 "outputPath": "dist/apps/hubber",
-                "format": [
-                    "esm"
-                ],
                 "main": "apps/hubber/src/main.ts",
                 "tsConfig": "apps/hubber/tsconfig.app.json",
                 "assets": [
                     "apps/hubber/src/assets"
                 ],
                 "generatePackageJson": true,
-                "external": [
-                    "@klave/as-json",
-                    "assemblyscript",
-                    "typescript",
-                    "visitor-as"
-                ],
-                "esbuildConfig": "apps/hubber/esbuild.config.js"
+                "esbuildConfig": "apps/hubber/esbuild.config.cjs"
             },
             "configurations": {
                 "development": {

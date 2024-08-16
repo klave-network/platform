@@ -8,6 +8,10 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
 
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.NX_CACHE_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.NX_CACHE_AWS_SECRET_ACCESS_KEY }}
+
     strategy:
       matrix:
         os: [ubuntu-latest]
