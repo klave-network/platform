@@ -159,7 +159,7 @@
         "@nx/eslint": "19.6.0",
         "@nx/eslint-plugin": "19.6.0",
         "@nx/express": "19.6.0",
-        "@nx/devkit": "19.6.0",
+        "@nx/devkit": "19.6.1",
         "@nx/jest": "19.6.0",
         "@nx/js": "19.6.0",
         "@nx/node": "19.6.0",
