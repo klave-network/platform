@@ -7,6 +7,61 @@ updates:
     target-branch: "develop"
     labels:
       - "dependencies"
+    groups:
+      nx:
+        patterns:
+          - "nx"
+          - "@nx/*"
+          - "@jscutlery/semver"
+      lint:
+        patterns:
+          - "eslint*"
+          - "@eslint/*"
+          - "@typescript-eslint/*"
+      dev:
+        patterns:
+          - "commitlint"
+          - "@commitlint/*"
+          - "@swc/*"
+          - "@svgr/webpack"
+          - "esbuild*"
+          - "postcss"
+          - "prettier"
+          - "webpack"
+          - "verdaccio"
+          - "typscript"
+      test:
+        patterns:
+          - "jsdom"
+          - "sinon-chrome"
+          - "jest*"
+          - "babel-jest"
+          - "detox"
+          - "cypress"
+      sentry:
+        patterns:
+          - "@sentry/*"
+          - "sentry*"
+      expo:
+        patterns:
+          - "@expo/*"
+          - "expo*"
+          - "eas*"
+          - "jest-expo"
+          - "babel-preset-expo"
+      babel:
+        patterns:
+          - "babel*"
+          - "@babel/*"
+      vite:
+        patterns:
+          - "@vitejs/"
+          - "@vitest/*"
+          - "vite"
+          - "vitest"
+      types:
+        patterns:
+          - "@types/*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
