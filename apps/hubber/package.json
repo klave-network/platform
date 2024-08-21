@@ -25,14 +25,9 @@
         "morgan": "1.10.0",
         "probot": "13.3.7",
         "rate-limiter-flexible": "5.0.3",
-        "@sentry/node": "7.118.0",
         "stripe": "16.8.0",
-        "@trpc/server": "11.0.0-rc.477",
         "@klave/api": "0.13.0",
         "unique-names-generator": "4.7.1",
-        "@sentry/core": "7.118.0",
-        "i18next": "23.13.0",
-        "i18next-fs-backend": "2.3.2",
-        "@total-typescript/ts-reset": "^0.5.1"
+        "i18next-fs-backend": "2.3.2"
     }
 }

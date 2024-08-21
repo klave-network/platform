@@ -21,6 +21,7 @@
         "src/**/*.test.jsx"
     ],
     "include": [
+        "reset.d.ts",
         "src/**/*.js",
         "src/**/*.jsx",
         "src/**/*.ts",

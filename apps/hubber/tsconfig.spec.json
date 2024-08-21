@@ -9,6 +9,7 @@
         ]
     },
     "include": [
+        "reset.d.ts",
         "jest.config.ts",
         "src/**/*.test.ts",
         "src/**/*.spec.ts",

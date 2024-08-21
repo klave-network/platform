@@ -204,7 +204,12 @@ for (const folder of projectsFolders) {
             },
             rules: {
                 ...jsonRules,
-                '@nx/dependency-checks': folder !== '.' ? 'error' : 'off'
+                '@nx/dependency-checks': folder !== '.' ? ['error', {
+                    ignoredDependencies: [
+                        '@nx/*',
+                        '@total-typescript/ts-reset'
+                    ]
+                }] : 'off'
             }
         },
 

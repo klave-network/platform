@@ -15,7 +15,6 @@
     },
     "dependencies": {
         "@klave/as-json": "^0.8.2",
-        "@total-typescript/ts-reset": "^0.5.1",
         "assemblyscript": "^0.27.29",
         "serialize-error": "11.0.3",
         "typescript": "^5.5.4",
