@@ -53,7 +53,7 @@
         "@secretarium/instrumentation": "0.5.0",
         "@sentry/browser": "7.119.0",
         "@sentry/esbuild-plugin": "2.22.2",
-        "@sentry/profiling-node": "7.119.0",
+        "@sentry/profiling-node": "8.26.0",
         "@sentry/react": "7.119.0",
         "@simplewebauthn/browser": "10.0.0",
         "@simplewebauthn/server": "10.0.1",
