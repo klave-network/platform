@@ -207,7 +207,8 @@ for (const folder of projectsFolders) {
                 '@nx/dependency-checks': folder !== '.' ? ['error', {
                     ignoredDependencies: [
                         '@nx/*',
-                        '@total-typescript/ts-reset'
+                        '@total-typescript/ts-reset',
+                        'git-rev-sync'
                     ]
                 }] : 'off'
             }
