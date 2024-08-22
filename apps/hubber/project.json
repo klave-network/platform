@@ -20,6 +20,7 @@
                     "apps/hubber/src/assets"
                 ],
                 "generatePackageJson": true,
+                "thirdParty": true,
                 "esbuildConfig": "apps/hubber/esbuild.config.cjs"
             },
             "configurations": {
