@@ -3098,6 +3098,13 @@
   dependencies:
     "@nx/devkit" "19.6.1"
 
+"@nrwl/devkit@19.6.2":
+  version "19.6.2"
+  resolved "https://registry.yarnpkg.com/@nrwl/devkit/-/devkit-19.6.2.tgz#a06ac1786601c2ef36ffbb5ac46bc674c345939f"
+  integrity sha512-1caQTLJBcvOLDZpB3yHY0zczcaaOh044MeegS0oyllPYYbCi6PiJK33HC8qoH1TGiahT6+VxSFN7OYnD3QK4vQ==
+  dependencies:
+    "@nx/devkit" "19.6.2"
+
 "@nrwl/esbuild@19.6.1":
   version "19.6.1"
   resolved "https://registry.yarnpkg.com/@nrwl/esbuild/-/esbuild-19.6.1.tgz#26d56a03c02c6c09d5881b2b15a06f905c022b98"
@@ -3189,6 +3196,21 @@
   integrity sha512-FGfPM9R7QdEGllNr7Jlx81QbiufNNRHehrJ/4aqftzHWT5ptYmH45bPnd/Wu0qDK4rg1c4PMrjEOLpyCAFXg1Q==
   dependencies:
     "@nrwl/devkit" "19.6.1"
+    ejs "^3.1.7"
+    enquirer "~2.3.6"
+    ignore "^5.0.4"
+    minimatch "9.0.3"
+    semver "^7.5.3"
+    tmp "~0.2.1"
+    tslib "^2.3.0"
+    yargs-parser "21.1.1"
+
+"@nx/devkit@19.6.2":
+  version "19.6.2"
+  resolved "https://registry.yarnpkg.com/@nx/devkit/-/devkit-19.6.2.tgz#8db7eaae181f22dbbf00a548619a184432ace732"
+  integrity sha512-fyZ+z0CnpXsGbnOTgsxwjOJH/K1cgSkhyHSOW3BcIvncx4Q4o8Y74flRz2mrZLJeURBs+IelYI2REkCPdba2cg==
+  dependencies:
+    "@nrwl/devkit" "19.6.2"
     ejs "^3.1.7"
     enquirer "~2.3.6"
     ignore "^5.0.4"
