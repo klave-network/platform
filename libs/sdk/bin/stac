@@ -1,3 +1,6 @@
 #!/usr/bin/env node
 
-require('../src/compile.js');
+if (typeof require !== 'undefined')
+    require('../compile.js');
+else
+    import('../compile.js');
