@@ -206,6 +206,7 @@
         "@types/supertest": "6.0.2",
         "@types/uuid": "10.0.0",
         "@types/validate-npm-package-name": "4.0.2",
+        "@types/ws": "8.5.12",
         "@typescript-eslint/eslint-plugin": "8.2.0",
         "@typescript-eslint/parser": "8.2.0",
         "@vitejs/plugin-react": "4.3.1",

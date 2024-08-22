@@ -5,7 +5,7 @@ import fetch from 'node-fetch';
 import { webcrypto } from 'node:crypto';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { ErrorObject, serializeError } from 'serialize-error';
-import type { Stats } from 'assemblyscript/dist/asc';
+import type { Stats } from 'assemblyscript/dist/asc.js';
 import { Utils } from '@secretarium/connector';
 import type { Context } from 'probot';
 import type { InstallationAccessTokenAuthentication } from '@octokit/auth-app';

@@ -28,6 +28,7 @@ import { usersRouter } from './routes';
 import { logger } from '@klave/providers';
 import { webLinkerMiddlware } from './middleware/webLinker';
 import { permissiblePeers } from '@klave/constants';
+import type Websocket from 'ws';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -193,7 +194,7 @@ export const start = async (port: number) => {
     // Contextualise user session, devices, tags, tokens
     app.use(webLinkerMiddlware);
 
-    app.ws('/bridge', (ws, { session, sessionID, sessionStore }) => {
+    app.ws('/bridge', (ws: Websocket, { session, sessionID, sessionStore }) => {
         type WsWithSession = typeof ws & { sessionID: string };
         type SessionWithLocator = typeof session & { locator?: string, localId?: string };
         (ws as WsWithSession).sessionID = sessionID;
@@ -230,7 +231,7 @@ export const start = async (port: number) => {
                         return;
                     (rsession as SessionWithLocator).localId = localId;
                     sessionStore.set(sid, rsession, () => {
-                        const browserTarget = Array.from(getWss().clients.values()).find(w => (w as WsWithSession).sessionID === sid);
+                        const browserTarget = Array.from((getWss() as Websocket.Server).clients.values()).find(w => (w as WsWithSession).sessionID === sid);
                         browserTarget?.send('confirmed');
                     });
                 });

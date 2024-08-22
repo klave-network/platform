@@ -1,7 +1,7 @@
 import { TransferListItem, Worker } from 'node:worker_threads';
 import ts from 'typescript';
 import { v4 as uuid } from 'uuid';
-import type { Stats } from 'assemblyscript/dist/asc';
+import type { Stats } from 'assemblyscript/dist/asc.js';
 import { formatter } from './languageService';
 import { compilerModuleFunction } from './compilerModule';
 import localPackageJson from '../package.json';
