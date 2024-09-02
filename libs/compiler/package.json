@@ -14,7 +14,7 @@
         "name": "Florian Guitton"
     },
     "dependencies": {
-        "@klave/as-json": "^0.8.2",
+        "@klave/as-json": "^0.9.21",
         "assemblyscript": "^0.27.29",
         "serialize-error": "11.0.3",
         "typescript": "^5.5.4",

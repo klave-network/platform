@@ -265,7 +265,8 @@ export class BuildHost {
                 }).catch(async (error) => {
                     // Leave a bit of time for the last buffered process message to be committed
                     setTimeout(() => {
-                        this.listeners['message']?.forEach(listener => listener({ type: 'errored', error, sourceType: packageManager === 'cargo' ? 'rust-component' : 'assemblyscript', output: this.outputProgress }));
+                        const finalError = error instanceof Error ? error : new Error(error?.toString() ?? 'Unknown error');
+                        this.listeners['message']?.forEach(listener => listener({ type: 'errored', error: finalError, sourceType: packageManager === 'cargo' ? 'rust-component' : 'assemblyscript', output: this.outputProgress }));
                     }, 5000);
                 });
             }
