@@ -114,7 +114,7 @@
         "rate-limiter-flexible": "5.0.3",
         "react": "18.3.1",
         "react-dom": "18.3.1",
-        "react-email": "2.1.6",
+        "react-email": "3.0.0",
         "react-hook-form": "7.52.2",
         "react-qr-code": "2.0.15",
         "react-markdown": "9.0.1",
