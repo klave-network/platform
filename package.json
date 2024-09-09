@@ -92,7 +92,7 @@
         "github-username": "8.0.0",
         "helmet": "7.1.0",
         "https-proxy-agent": "^7.0.5",
-        "i18next": "23.14.0",
+        "i18next": "23.15.0",
         "i18next-fs-backend": "2.3.2",
         "i18next-http-middleware": "3.6.0",
         "ip": "2.0.1",
