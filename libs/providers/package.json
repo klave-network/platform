@@ -10,7 +10,7 @@
         "@sentry/core": "7.119.0",
         "@sentry/node": "7.119.0",
         "@sentry/profiling-node": "7.119.0",
-        "@swc/helpers": "0.5.12",
+        "@swc/helpers": "0.5.13",
         "probot": "13.3.7",
         "strip-ansi": "7.1.0",
         "winston": "3.14.2",
