@@ -16,7 +16,7 @@
         "@swc/helpers": "0.5.13",
         "@trpc/server": "11.0.0-rc.502",
         "assemblyscript": "^0.27.29",
-        "express": "4.19.2",
+        "express": "4.20.0",
         "express-session": "1.18.0",
         "fakemail-guard": "1.0.0",
         "https-proxy-agent": "^7.0.5",
