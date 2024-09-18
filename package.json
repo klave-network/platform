@@ -84,7 +84,7 @@
         "csrf-sync": "4.0.3",
         "daisyui": "4.12.10",
         "expect-ct": "1.0.0",
-        "express": "4.19.2",
+        "express": "4.20.0",
         "express-session": "1.18.0",
         "express-ws": "5.0.2",
         "fakemail-guard": "1.0.0",
