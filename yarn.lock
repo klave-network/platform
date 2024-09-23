@@ -9071,10 +9071,10 @@ cross-spawn@^5.0.1:
     shebang-command "^1.2.0"
     which "^1.2.9"
 
-csrf-csrf@3.0.7:
-  version "3.0.7"
-  resolved "https://registry.yarnpkg.com/csrf-csrf/-/csrf-csrf-3.0.7.tgz#5af1ed06af242cfa4d18573251679ab76e45a0c1"
-  integrity sha512-SmBAsfBM8j5y4llpanDN5kEINIoKYMLyw0HZC2hYkIE6b32NBshGl5GB64sx7dWqRDHA+P0BBHOwyeDdO5gQ+Q==
+csrf-csrf@3.0.8:
+  version "3.0.8"
+  resolved "https://registry.yarnpkg.com/csrf-csrf/-/csrf-csrf-3.0.8.tgz#b73dbeff7b7785abbdef740b6e752d80bdb7e9ac"
+  integrity sha512-JdyBcND7hWgDR9GdBvvwslIGv2y2dI0bZLhAcg/YYdF1HnWFCWg+HQEkgtsiwH3Mi+qs/xRDDZC4G7tpRlrtBg==
   dependencies:
     http-errors "^2.0.0"
 
