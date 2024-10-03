@@ -17,9 +17,12 @@
         "stac": "./bin/stac"
     },
     "type": "module",
+    "main": "assembly/index.ts",
+    "types": "assembly/index.ts",
     "exports": {
         ".": "./index.js",
         "./assembly": "./assembly/index.ts",
+        "./package.json": "./package.json",
         "./stac": "./compile.js"
     },
     "dependencies": {

@@ -6,11 +6,11 @@
         "@klave/constants": "0.4.1",
         "@klave/db": "0.8.1",
         "@swc/helpers": "0.5.13",
-    "ws": "8.18.0",
-    "winston": "3.14.2",
-    "probot": "13.3.8",
-    "strip-ansi": "7.1.0",
-    "@sentry/node": "7.119.0",
-    "winston-transport": "4.7.1"
+        "ws": "8.18.0",
+        "winston": "3.14.2",
+        "probot": "13.3.8",
+        "strip-ansi": "7.1.0",
+        "@sentry/node": "7.119.0",
+        "winston-transport": "4.8.0"
     }
 }
