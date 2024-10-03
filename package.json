@@ -221,7 +221,7 @@
         "esbuild-node-externals": "1.15.0",
         "eslint": "9.11.1",
         "eslint-config-prettier": "9.1.0",
-        "eslint-plugin-import": "2.30.0",
+        "eslint-plugin-import": "2.31.0",
         "eslint-plugin-jsonc": "2.16.0",
         "eslint-plugin-jsx-a11y": "6.10.0",
         "eslint-plugin-playwright": "^1.6.2",
