@@ -6,7 +6,7 @@
 import { decode, encode as b64encode } from 'as-base64/assembly';
 import uuid from './uuid';
 import { CryptoImpl, MemoryType, Key } from './crypto_impl';
-import { JSON, Notifier } from '@klave/sdk';
+import { JSON } from '@klave/sdk';
 
 class CryptoKey extends Key {
     algorithm: string;
@@ -21,38 +21,25 @@ class CryptoKey extends Key {
     }
 }
 
-export enum EncryptionAlgo
+export class RsaHashedKeyGenParams
 {
-    aes128gcm = 0,
-    aes192gcm = 1,
-    aes256gcm = 2,
-    rsa2048oaep = 3,
-    rsa3072oaep = 4,
-    rsa4096oaep = 5,
-    rsa2048pkcs1_v1_5 = 6,
-    rsa3072pkcs1_v1_5 = 7,
-    rsa4096pkcs1_v1_5 = 8,
+    name: string = "RSA-OAEP"; // "RSA-OAEP", "RSA-PSS", "RSA-PKCS1-v1_5"
+    modulusLength: u32 = 2048;
+    publicExponent: u32 = 65537;
+    hash: string = "SHA2-256"; // "SHA2-256", "SHA2-384", "SHA2-512"
 }
 
-export enum aes_tag_length
+export class EcKeyGenParams
 {
-    TAG_96 = 12,
-    TAG_104 = 13,
-    TAG_112 = 14,
-    TAG_120 = 15,
-    TAG_128 = 16,
-};
+    name: string = "ECDSA"; // "ECDSA"
+    namedCurve: string = "P-256"; // "P-256", "P-384", "P-521"
+}
 
-export enum hashingAlgo
+export class AesKeyGenParams
 {
-    none = 0,
-    sha2_256 = 1,
-    sha2_384 = 2,
-    sha2_512 = 3,
-    sha3_256 = 4,
-    sha3_384 = 5,
-    sha3_512 = 6,
-};
+    name: string = "AES-GCM"; // "AES-GCM", "AES-KW"
+    length: u32 = 256;
+}
 
 @JSON
 export class HashInfo 
@@ -118,7 +105,8 @@ export class SubtleCrypto {
     static digest(algorithm: string, hash_info: string, text: string): u8[]
     {
         return CryptoImpl.digest(algorithm, hash_info, text);
-    }    
+    }
+
     static importKey(format: string, b64Data: string, algorithm: string, algo_metadata: string, extractable: boolean, usages: string[]): CryptoKey | null
     {
         let key = CryptoImpl.importKey(MemoryType.InMemory, "", format, b64Data, algorithm, algo_metadata, extractable, usages);

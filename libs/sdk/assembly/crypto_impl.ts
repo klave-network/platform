@@ -58,7 +58,6 @@ declare function wasm_get_random_bytes(bytes: ArrayBuffer, size: i32): i32;
 
 
 export class Key {
-
     name: string;
 
     constructor(keyName: string) {
@@ -315,7 +314,8 @@ export class CryptoImpl {
         for (let i = 0; i < result; ++i)
             ret[i] = value[i];
         return ret;
-    }    
+    }  
+
     static importKey(in_memory: MemoryType, key_name: string, format: string, b64Data: string, algorithm: string, algo_metadata: string, extractable: boolean, usages: string[]): Key | null
     {
         const key = new Key(key_name);
