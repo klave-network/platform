@@ -30,7 +30,7 @@ declare function wasm_get_public_key(key_name: ArrayBuffer, key_format: i32, res
 declare function wasm_sign(key_name: ArrayBuffer, algorithm: i32, signature_metadata: ArrayBuffer, text: ArrayBuffer, text_size: i32, signature: ArrayBuffer, signature_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "verify")
-declare function wasm_verify(key_name: ArrayBuffer, signature_info: ArrayBuffer, text: ArrayBuffer, text_size: i32, signature: ArrayBuffer, signature_size: i32): i32;
+declare function wasm_verify(key_name: ArrayBuffer, algorithm: i32, signature_metadata: ArrayBuffer, text: ArrayBuffer, text_size: i32, signature: ArrayBuffer, signature_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "digest")
 declare function wasm_digest(algorithm: i32, hash_info: ArrayBuffer, text: ArrayBuffer, text_size: i32, digest: ArrayBuffer, digest_size: i32): i32;
@@ -271,15 +271,14 @@ export class CryptoImpl {
         return {data: value.buffer.slice(0, result), err: null};
     }
     
-    static verify(key_name: string, signature_info: string, text: string, signature: u8[]): boolean
+    static verify<T>(key_name: string, algorithm: idlV1.signing_algorithm, algo_metadata: T, data: ArrayBuffer, signature: ArrayBuffer): Result<boolean, Error>
     {
+        if(!(algo_metadata instanceof idlV1.rsa_pss_signature_metadata || algo_metadata instanceof idlV1.ecdsa_signature_metadata))
+            return {data: null, err: new Error("Invalid signature metadata type")};
+
         let k = String.UTF8.encode(key_name, true);
-        let info = String.UTF8.encode(signature_info, true);
-        let t = String.UTF8.encode(text, false);
-        let buffer = new Uint8Array(signature.length);
-        for (let i = 0; i < signature.length; ++i)
-            buffer[i] = signature[i];
-        return wasm_verify(k, info, t, t.byteLength, buffer.buffer, buffer.byteLength) != 0;
+        let info = String.UTF8.encode(JSON.stringify(algo_metadata), true);
+        return wasm_verify(k, algorithm, info, data, data.byteLength, signature, signature.byteLength) != 0;
     }
     
     static digest<T>(algorithm: idlV1.hash_algorithm, hash_info: T, text: ArrayBuffer): Result<ArrayBuffer, Error>

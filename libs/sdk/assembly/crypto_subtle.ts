@@ -203,9 +203,23 @@ export class SubtleCrypto {
         return {data: null, err: new Error("Invalid algorithm")};
     }
     
-    static verify(key: CryptoKey, signature_info: string, text: string, signature: u8[]): boolean
+    static verify<T>(algorithm: T, key: CryptoKey, data: ArrayBuffer, signature: ArrayBuffer): Result<boolean, Error>
     {
-        return CryptoImpl.verify(key.name, signature_info, text, signature);
+        if(algorithm instanceof EcdsaParams)
+        {
+            let hash_info = CryptoUtil.getShaMetadata(algorithm.hash);
+            if(!hash_info.data)
+                return {data: false, err: hash_info.err};
+
+            let metadata: idlV1.ecdsa_signature_metadata = {sha_metadata: hash_info.data};
+            return CryptoImpl.verify(key.name, idlV1.signing_algorithm.ecdsa, metadata, data, signature);
+        }else if(algorithm instanceof RsaPssParams)
+        {
+            let metadata: idlV1.rsa_pss_signature_metadata = {saltLength: algorithm.saltLength};
+            return CryptoImpl.verify(key.name, idlV1.signing_algorithm.rsa_pss, metadata, data, signature);
+        }
+
+        return {data: false, err: new Error("Invalid algorithm")};
     }
     
     static digest(algorithm: string, data: ArrayBuffer): Result<ArrayBuffer, Error>
