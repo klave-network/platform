@@ -3,7 +3,7 @@
     "version": "0.2.1",
     "type": "module",
     "dependencies": {
-        "@klave/constants": "0.4.1",
+        "@klave/constants": "1.0.0",
         "@klave/db": "1.0.0",
         "@swc/helpers": "0.5.13",
         "ws": "8.18.0",

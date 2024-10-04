@@ -9,7 +9,7 @@
         "@iconscout/react-unicons": "2.0.2",
         "@ideafast/idgen": "0.2.1",
         "@klave/api": "0.13.0",
-        "@klave/constants": "0.4.1",
+        "@klave/constants": "1.0.0",
         "@klave/db": "1.0.0",
         "@monaco-editor/react": "4.6.0",
         "@nx/react": "19.8.3",

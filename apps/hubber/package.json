@@ -5,7 +5,7 @@
     "type": "module",
     "dependencies": {
         "@klave/api": "0.13.0",
-        "@klave/constants": "0.4.1",
+        "@klave/constants": "1.0.0",
         "@klave/db": "1.0.0",
         "@klave/providers": "0.2.1",
         "@sentry/esbuild-plugin": "2.22.5",

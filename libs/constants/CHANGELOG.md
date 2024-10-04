@@ -1,4 +1,18 @@
 # Changelog
+## [1.0.0](https://github.com/klave-network/platform/compare/constants@0.4.1...constants@1.0.0) (2024-10-04)
+
+### Dependency Updates
+
+* `db` updated to version `0.4.1`
+
+### ⚠ BREAKING CHANGES
+
+* Moving to pure ESM repo
+
+### Miscellaneous Chores
+
+* Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
+
 ## [0.4.1](https://github.com/klave-network/platform/compare/constants@0.4.0...constants@0.4.1) (2024-07-25)
 
 ### Dependency Updates
