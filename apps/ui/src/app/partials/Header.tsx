@@ -37,11 +37,8 @@ const Header: FC = () => {
                     {/* Site branding */}
                     <div className="flex-shrink-0 flex mr-4 items-center">
                         {/* Logo */}
-                        <Link to={pathname === '/' && (data && (data.hasUnclaimedApplications || data.me)) ? '/home' : '/'} className="block ml-0" aria-label="Secretarium Platform">
-                            <img alt='Secretarium' src={klaveLogo} width={40} className='h-8 inline-block dark:invert' />
-                            <span className='h-full px-4 font-bold text-3xl font-mono align-middle'>
-                                klave
-                            </span>
+                        <Link to={pathname === '/' && (data && (data.hasUnclaimedApplications || data.me)) ? '/home' : '/'} className="block ml-0" aria-label="Klave Platform">
+                            <img alt='Klave' src={klaveLogo} width={40} className='h-8 inline-block dark:invert' />
                         </Link>
                     </div>
 
