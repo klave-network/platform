@@ -1,6 +1,6 @@
 {
     "name": "@klave/providers",
-    "version": "0.2.1",
+    "version": "1.0.0",
     "type": "module",
     "dependencies": {
         "@klave/constants": "1.0.0",
