@@ -9,7 +9,7 @@
         "@klave/db": "1.0.0",
         "@klave/providers": "1.0.0",
         "@sentry/esbuild-plugin": "2.22.5",
-        "@sentry/node": "7.119.0",
+        "@sentry/node": "7.119.1",
         "esbuild-node-externals": "1.15.0",
         "express": "4.21.0",
         "git-rev-sync": "3.0.2",
