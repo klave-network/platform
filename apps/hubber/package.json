@@ -4,7 +4,7 @@
     "license": "MIT",
     "type": "module",
     "dependencies": {
-        "@klave/api": "0.13.0",
+        "@klave/api": "1.0.0",
         "@klave/constants": "1.0.0",
         "@klave/db": "1.0.0",
         "@klave/providers": "1.0.0",
