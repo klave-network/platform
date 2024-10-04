@@ -1,4 +1,25 @@
 # Changelog
+## [1.0.0](https://github.com/klave-network/platform/compare/ui@0.13.0...ui@1.0.0) (2024-10-04)
+
+### Dependency Updates
+
+* `api` updated to version `0.13.0`
+* `constants` updated to version `0.13.0`
+* `db` updated to version `0.13.0`
+
+### ⚠ BREAKING CHANGES
+
+* Moving to pure ESM repo
+
+### Bug Fixes
+
+* Package `git-rev-sync` relies on non-ESM features so we provide explicit location ([cee72ae](https://github.com/klave-network/platform/commit/cee72ae5cd5a2fe998c987864b060f039ddb939b))
+
+
+### Miscellaneous Chores
+
+* Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
+
 ## [0.13.0](https://github.com/klave-network/platform/compare/ui@0.12.0...ui@0.13.0) (2024-08-02)
 
 ### Dependency Updates
