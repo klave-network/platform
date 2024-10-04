@@ -36,7 +36,7 @@ declare function wasm_verify(key_name: ArrayBuffer, algorithm: i32, signature_me
 declare function wasm_digest(algorithm: i32, hash_info: ArrayBuffer, text: ArrayBuffer, text_size: i32, digest: ArrayBuffer, digest_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "unwrap_key")
-declare function wasm_unwrap_key(decryption_key_name: ArrayBuffer, encryption_info: ArrayBuffer, key_name_to_import: ArrayBuffer, key_format: i32, key_data: ArrayBuffer, key_data_size: i32, algorithm: i32, algo_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
+declare function wasm_unwrap_key(decryption_key_name: ArrayBuffer, unwrap_algo_id: i32, unwrap_metadata: ArrayBuffer, key_name_to_import: ArrayBuffer, key_format: i32, wrapped_data: ArrayBuffer, wrapped_data_size: i32, key_gen_algo_id: i32, key_gen_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "wrap_key")
 declare function wasm_wrap_key(key_name_to_export: ArrayBuffer, key_format: i32, wrapping_key_name: ArrayBuffer, wrap_algo_id: i32, wrap_metadata: ArrayBuffer, key: ArrayBuffer, key_size: i32): i32;
@@ -366,40 +366,21 @@ export class CryptoImpl {
         return ret;
     }        
 
-    static unwrapKey(in_memory: MemoryType, decryption_key_name: string, decryption_info: string, key_name: string, format: string, b64Data: string, algorithm: string, algo_metadata: string, extractable: boolean, usages: string[]): Key | null
+    static unwrapKey<T, E>(decryption_key_name: string, unwrap_algo_id: idlV1.wrapping_algorithm, unwrap_metadata: ArrayBuffer, format: idlV1.key_format, wrapped_key: ArrayBuffer, key_gen_algorithm: idlV1.key_algorithm, key_gen_algo_metadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error>
     {
-        const key = new Key(key_name);
-
-        let iFormat = CryptoImpl.format(format);
-        if (iFormat < 0)
-            return null;
-
-        let iAlgorithm = CryptoImpl.algorithm(algorithm);
-        if (iAlgorithm < 0)
-            return null;
-
+        const key = new Key("");
         const local_usages = new Uint8Array(usages.length);
         for(let i = 0; i < usages.length; i++)
         {
             local_usages[i] = this.usage(usages[i]);
         }
 
-        let rawData = decode(b64Data);
-
-        let result = 0;
-        if (in_memory == MemoryType.InMemory) {
-            result = wasm_unwrap_key_in_memory(String.UTF8.encode(decryption_key_name, true), String.UTF8.encode(decryption_info, true), String.UTF8.encode(key.name, true), iFormat, rawData.buffer, rawData.byteLength,
-                iAlgorithm, String.UTF8.encode(algo_metadata, true), extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength);
-        }
-        else {
-            result = wasm_unwrap_key(String.UTF8.encode(decryption_key_name, true), String.UTF8.encode(decryption_info, true), String.UTF8.encode(key.name, true), iFormat, rawData.buffer, rawData.byteLength,
-                iAlgorithm, String.UTF8.encode(algo_metadata, true), extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength);
-        }
+        let result = wasm_unwrap_key(String.UTF8.encode(decryption_key_name, true), unwrap_algo_id, unwrap_metadata, String.UTF8.encode(key.name, true), format, wrapped_key, wrapped_key.byteLength, key_gen_algorithm, key_gen_algo_metadata, extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength);
         
         if (result < 0)
-            return null;
-    
-        return key;
+            return {data: null, err: new Error("Failed to unwrap key")};
+
+        return {data: key, err: null};
     }
 
     static wrapKey<T>(encryption_key_name: string, algorithm: idlV1.wrapping_algorithm, algo_metadata: T, key_name: string, format: idlV1.key_format): Result<ArrayBuffer, Error>

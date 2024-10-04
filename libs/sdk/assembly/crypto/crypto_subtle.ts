@@ -4,8 +4,8 @@
  */
 
 import { decode, encode as b64encode } from 'as-base64/assembly';
-import uuid from './uuid';
-import { Result } from './index';
+import uuid from '../uuid';
+import { Result } from '../index';
 import { CryptoUtil } from './crypto_utils';
 import { CryptoImpl, MemoryType, Key } from './crypto_impl';
 import * as idlV1 from "./crypto_subtle_idl_v1"
@@ -118,20 +118,37 @@ export class SubtleCrypto {
                 return {data: null, err: new Error("Failed to generate RSA metadata")};
         }else if(algorithm instanceof EcKeyGenParams)
         {
-            if(algorithm.namedCurve != "P-256" && algorithm.namedCurve != "P-384" && algorithm.namedCurve != "P-521")
+            if(algorithm.namedCurve != "P-256" && algorithm.namedCurve != "P-384" && algorithm.namedCurve != "P-521" && algorithm.namedCurve != "secp256k1" && algorithm.namedCurve != "SECP256K1")
                 return {data: null, err: new Error("Invalid curve")};
 
-            let metadata = CryptoUtil.getSECPR1Metadata(algorithm);
-            if(metadata.data)
+            if(algorithm.namedCurve != "secp256k1" && algorithm.namedCurve != "SECP256K1")
             {
-                let key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_r1, metadata.data, extractable, usages);
-                if (key.data)
-                    return {data: new CryptoKey(key.data.name, algorithm.name, extractable, usages), err: null};
-                else
-                    return {data: null, err: new Error("Failed to generate EC key")};
+                let metadata = CryptoUtil.getSECPR1Metadata(algorithm);
+                if(metadata.data)
+                {
+                    let key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_r1, metadata.data, extractable, usages);
+                    if (key.data)
+                        return {data: new CryptoKey(key.data.name, algorithm.name, extractable, usages), err: null};
+                    else
+                        return {data: null, err: new Error("Failed to generate EC key")};
+                }else
+                    return {data: null, err: new Error("Failed to generate EC metadata")};
+            }else if(algorithm.namedCurve == "secp256k1" || algorithm.namedCurve == "SECP256K1")
+            {
+                let metadata = CryptoUtil.getSECPK1Metadata(algorithm);
+                if(metadata.data)
+                {
+                    let key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_k1, metadata.data, extractable, usages);
+                    if (key.data)
+                        return {data: new CryptoKey(key.data.name, algorithm.name, extractable, usages), err: null};
+                    else
+                        return {data: null, err: new Error("Failed to generate EC key")};
+                }else
+                    return {data: null, err: new Error("Failed to generate EC metadata")};
             }
             else
                 return {data: null, err: new Error("Failed to generate EC metadata")};
+
         }else if(algorithm instanceof AesKeyGenParams)
         {
             let metadata = CryptoUtil.getAESMetadata(algorithm);
@@ -249,7 +266,7 @@ export class SubtleCrypto {
         if(wrapAlgo instanceof RsaOaepParams)
         {
             let labelUintArray = Uint8Array.wrap(wrapAlgo.label);
-            let wrappingInfo: idlV1.wrapping_info = {algo_id: idlV1.wrapping_algorithm.rsa_oaep, algo_metadata: labelUintArray};
+            let wrappingInfo: idlV1.rsa_oaep_encryption_metadata = {label: labelUintArray};
             return CryptoImpl.wrapKey(wrappingKey.name, idlV1.wrapping_algorithm.rsa_oaep, wrappingInfo, key.name, keyFormat.data);
         }else if(wrapAlgo instanceof AesGcmParams)
         {
@@ -269,13 +286,98 @@ export class SubtleCrypto {
         return {data: null, err: new Error("Invalid algorithm")};
     }
 
-    static unwrapKey(decryptionKey: CryptoKey, wrappingInfo: WrappingInfo, format: string, b64Data: string, algorithm: string, algo_metadata: string, extractable: boolean, usages: string[]): CryptoKey | null
+    //unwrapKey(format, wrappedKey, unwrappingKey, unwrapAlgo, unwrappedKeyAlgo, extractable, keyUsages)
+    static unwrapKey<T, E>(format: string, wrappedKey: ArrayBuffer, unwrappingKey: CryptoKey, unwrapAlgo: T,  unwrappedKeyAlgo: E, extractable: boolean, usages: string[]): Result<CryptoKey, Error>
     {
-        let wrappingInfoJson = JSON.stringify(wrappingInfo);
-        let key = CryptoImpl.unwrapKey(MemoryType.InMemory, decryptionKey.name, wrappingInfoJson, "", format, b64Data, algorithm, algo_metadata, extractable, usages);
-        if (!key)
-            return null;
-        return new CryptoKey(key.name, algorithm, extractable, usages);
+        let keyFormat = CryptoUtil.getKeyFormat(format);
+        if(!keyFormat.data)
+            return {data: null, err: keyFormat.err};
+
+        var wrappingAlgo: idlV1.wrapping_algorithm;
+        var wrappingInfo: ArrayBuffer = new ArrayBuffer(0);
+        if(unwrapAlgo instanceof RsaOaepParams)
+        {
+            let labelUintArray = Uint8Array.wrap(unwrapAlgo.label);
+            let wrappingInfoRsaOaep = {label: labelUintArray};
+            wrappingInfo = String.UTF8.encode(JSON.stringify(wrappingInfoRsaOaep));
+            wrappingAlgo = idlV1.wrapping_algorithm.rsa_oaep;
+        }else if(unwrapAlgo instanceof AesGcmParams)
+        {
+            let iv = Uint8Array.wrap(unwrapAlgo.iv);
+            let additionalData = Uint8Array.wrap(unwrapAlgo.additionalData);
+            let wrappingInfoAesGcm = {iv: iv, additionalData: additionalData, tagLength: unwrapAlgo.tagLength};
+            wrappingInfo = String.UTF8.encode(JSON.stringify(wrappingInfoAesGcm));
+            wrappingAlgo = idlV1.wrapping_algorithm.aes_gcm;
+        }else if(unwrapAlgo instanceof String)
+        {
+            if(unwrapAlgo == "AES-KW" || unwrapAlgo == "aes-kw")
+            {
+                let wrappingInfoAesKw = {with_padding: true};
+                wrappingInfo = String.UTF8.encode(JSON.stringify(wrappingInfoAesKw));
+                wrappingAlgo = idlV1.wrapping_algorithm.aes_kw;
+            }else
+                return {data: null, err: new Error("Invalid wrapping algorithm")};
+        }else
+            return {data: null, err: new Error("Invalid wrapping algorithm")};
+
+        var keyGenAlgo: idlV1.key_algorithm = idlV1.key_algorithm.aes;
+        var keyGenInfo: ArrayBuffer = new ArrayBuffer(0);
+        var keyGenAlgoName: string = "";
+        if(unwrappedKeyAlgo instanceof AesKeyGenParams)
+        {
+            let keyGenMetadataAes = {length: unwrappedKeyAlgo.length};
+            keyGenInfo = String.UTF8.encode(JSON.stringify(keyGenMetadataAes));
+            keyGenAlgo = idlV1.key_algorithm.aes;
+            keyGenAlgoName = unwrappedKeyAlgo.name;
+        }else if(unwrappedKeyAlgo instanceof RsaHashedKeyGenParams)
+        {
+            let rsaMetadata = CryptoUtil.getRSAMetadata(unwrappedKeyAlgo);
+            if(rsaMetadata.data)
+            {
+                let keyGenMetadataRsa = rsaMetadata.data;
+                keyGenInfo = String.UTF8.encode(JSON.stringify(keyGenMetadataRsa));
+                keyGenAlgo = idlV1.key_algorithm.rsa;
+                keyGenAlgoName = unwrappedKeyAlgo.name;
+            }
+            else
+                return {data: null, err: new Error("Failed to generate RSA metadata")};
+        }else if(unwrappedKeyAlgo instanceof EcKeyGenParams)
+        {
+            if(unwrappedKeyAlgo.namedCurve != "P-256" && unwrappedKeyAlgo.namedCurve != "P-384" && unwrappedKeyAlgo.namedCurve != "P-521" && unwrappedKeyAlgo.namedCurve != "secp256k1" && unwrappedKeyAlgo.namedCurve != "SECP256K1")
+                return {data: null, err: new Error("Invalid curve")};
+
+            if(unwrappedKeyAlgo.namedCurve != "secp256k1" && unwrappedKeyAlgo.namedCurve != "SECP256K1")
+            {
+                let metadata = CryptoUtil.getSECPR1Metadata(unwrappedKeyAlgo);
+                if(metadata.data)
+                {
+                    let keyGenMetadataR1 = metadata.data;
+                    keyGenInfo = String.UTF8.encode(JSON.stringify(keyGenMetadataR1));
+                    keyGenAlgo = idlV1.key_algorithm.secp_r1;
+                    keyGenAlgoName = unwrappedKeyAlgo.name;
+                }else
+                    return {data: null, err: new Error("Failed to generate EC metadata")};
+            }else if(unwrappedKeyAlgo.namedCurve == "secp256k1" || unwrappedKeyAlgo.namedCurve == "SECP256K1")
+            {
+                let metadata = CryptoUtil.getSECPK1Metadata(unwrappedKeyAlgo);
+                if(metadata.data)
+                {
+                    let keyGenMetadataK1 = metadata.data;
+                    keyGenInfo = String.UTF8.encode(JSON.stringify(keyGenMetadataK1));
+                    keyGenAlgo = idlV1.key_algorithm.secp_k1;
+                    keyGenAlgoName = unwrappedKeyAlgo.name;
+                }else
+                    return {data: null, err: new Error("Failed to generate EC metadata")};
+            }
+            else
+                return {data: null, err: new Error("Failed to generate EC metadata")};
+        }
+
+        let key = CryptoImpl.unwrapKey(unwrappingKey.name, wrappingAlgo, wrappingInfo, keyFormat.data, wrappedKey, keyGenAlgo, keyGenInfo, extractable, usages);
+        if(key.data)
+            return {data: new CryptoKey(key.data.name, keyGenAlgoName, extractable, usages), err: null};
+        else
+            return {data: null, err: new Error("Failed to unwrap key")};
     }
 
     static exportKey(key: CryptoKey, format: string): u8[]
