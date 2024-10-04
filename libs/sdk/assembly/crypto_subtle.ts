@@ -155,14 +155,21 @@ export class SubtleCrypto {
             return {data: null, err: new Error("Invalid algorithm")};
     }
     
-    static decrypt<T>(key: CryptoKey, decryption_info: T, cipher_text: u8[]): u8[]
+    static decrypt<T>(algorithm: T, key: CryptoKey, cipher_text: ArrayBuffer): Result<ArrayBuffer, Error>
     {
-        if(decryption_info instanceof EncryptionInfo)
+        if(algorithm instanceof RsaOaepParams)
         {
-            let encryptionInfo = JSON.stringify(decryption_info);
-            return CryptoImpl.decrypt(key.name, encryptionInfo, cipher_text);
-        }
-        return [];
+            let labelUintArray = Uint8Array.wrap(algorithm.label);
+            let rsaOaepParams: idlV1.rsa_oaep_encryption_metadata = {label: labelUintArray};
+            return CryptoImpl.decrypt(key.name, idlV1.encryption_algorithm.rsa_oaep, rsaOaepParams, cipher_text);
+        }else if(algorithm instanceof AesGcmParams)
+        {
+            let iv = Uint8Array.wrap(algorithm.iv);
+            let additionalData = Uint8Array.wrap(algorithm.additionalData);
+            let aesGcmParams: idlV1.aes_gcm_encryption_metadata = {iv: iv, additionalData: additionalData, tagLength: algorithm.tagLength};
+            return CryptoImpl.decrypt(key.name, idlV1.encryption_algorithm.aes_gcm, aesGcmParams, cipher_text);
+        }else
+            return {data: null, err: new Error("Invalid algorithm")};
     }
     
     static sign(key: CryptoKey, signature_info: string, text: string): u8[]

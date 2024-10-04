@@ -215,43 +215,39 @@ export class CryptoImpl {
 
         let k = String.UTF8.encode(key_name, true);
         let info = String.UTF8.encode(JSON.stringify(algo_metadata), true);
-        let t = String.UTF8.encode(clear_text, false);
         let value = new Uint8Array(64);
-        let result = wasm_encrypt(k, algorithm, info, t, t.byteLength, value.buffer, value.byteLength);
+        let result = wasm_encrypt(k, algorithm, info, clear_text, clear_text.byteLength, value.buffer, value.byteLength);
         if (result < 0)
             return {data: null, err: new Error("Failed to encrypt")};
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new Uint8Array(result);
-            result = wasm_encrypt(k, algorithm, info, t, t.byteLength, value.buffer, value.byteLength);
+            result = wasm_encrypt(k, algorithm, info, clear_text, clear_text.byteLength, value.buffer, value.byteLength);
             if (result < 0)
                 return {data: null, err: new Error("Failed to encrypt")};
         }
         return {data: value.buffer.slice(0, result), err: null};
     }
     
-    static decrypt(key_name: string, encrypt_info: string, cipher_text: u8[]): u8[]
+    static decrypt<T>(key_name: string, algorithm: idlV1.encryption_algorithm, algo_metadata: T, cipher_text: ArrayBuffer): Result<ArrayBuffer, Error>
     {
+        if(!(algo_metadata instanceof idlV1.aes_gcm_encryption_metadata || algo_metadata instanceof idlV1.rsa_oaep_encryption_metadata))
+            return {data: null, err: new Error("Invalid decryption metadata type")};
+
         let k = String.UTF8.encode(key_name, true);
-        let info = String.UTF8.encode(encrypt_info, true);
-        let buffer = new Uint8Array(cipher_text.length);
-        let ret: u8[] = [];
-        for (let i = 0; i < cipher_text.length; ++i)
-            buffer[i] = cipher_text[i];
+        let info = String.UTF8.encode(JSON.stringify(algo_metadata), true);
         let value = new Uint8Array(64);
-        let result = wasm_decrypt(k, info, buffer.buffer, buffer.byteLength, value.buffer, value.byteLength);
+        let result = wasm_decrypt(k, info, cipher_text, cipher_text.byteLength, value.buffer, value.byteLength);
         if (result < 0)
-            return ret; // todo : report error
+            return {data: null, err: new Error("Failed to decrypt")};
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new Uint8Array(result);
-            result = wasm_decrypt(k, info, buffer.buffer, buffer.byteLength, value.buffer, value.byteLength);
+            result = wasm_decrypt(k, info, cipher_text, cipher_text.byteLength, value.buffer, value.byteLength);
             if (result < 0)
-                return ret; // todo : report error
+                return {data: null, err: new Error("Failed to decrypt")};
         }
-        for (let i = 0; i < result; ++i)
-            ret[i] = value[i];
-        return ret;
+        return {data: value.buffer.slice(0, result), err: null};
     }
     
     static sign(key_name: string, signature_info: string, text: string): u8[]
