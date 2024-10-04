@@ -240,10 +240,33 @@ export class SubtleCrypto {
         return new CryptoKey(key.name, algorithm, extractable, usages);
     }
 
-    static wrapKey(encryptionKey: CryptoKey, wrappingInfo: WrappingInfo, format: string, key: CryptoKey): u8[]
+    static wrapKey<T>(format: string, key: CryptoKey, wrappingKey: CryptoKey, wrapAlgo: T): Result<ArrayBuffer, Error>
     {
-        let wrappingInfoJson = JSON.stringify(wrappingInfo);
-        return CryptoImpl.wrapKey(encryptionKey.name, wrappingInfoJson, key.name, format);
+        let keyFormat = CryptoUtil.getKeyFormat(format);
+        if(!keyFormat.data)
+            return {data: null, err: keyFormat.err};
+
+        if(wrapAlgo instanceof RsaOaepParams)
+        {
+            let labelUintArray = Uint8Array.wrap(wrapAlgo.label);
+            let wrappingInfo: idlV1.wrapping_info = {algo_id: idlV1.wrapping_algorithm.rsa_oaep, algo_metadata: labelUintArray};
+            return CryptoImpl.wrapKey(wrappingKey.name, idlV1.wrapping_algorithm.rsa_oaep, wrappingInfo, key.name, keyFormat.data);
+        }else if(wrapAlgo instanceof AesGcmParams)
+        {
+            let iv = Uint8Array.wrap(wrapAlgo.iv);
+            let additionalData = Uint8Array.wrap(wrapAlgo.additionalData);
+            let wrappingInfo: idlV1.aes_gcm_encryption_metadata = {iv: iv, additionalData: additionalData, tagLength: wrapAlgo.tagLength};
+            return CryptoImpl.wrapKey(wrappingKey.name, idlV1.wrapping_algorithm.aes_gcm, wrappingInfo, key.name, keyFormat.data);
+        }else if(wrapAlgo instanceof String)
+        { 
+            if(wrapAlgo == "AES-KW" || wrapAlgo == "aes-kw")
+            {
+                let wrappingInfo: idlV1.aes_kw_wrapping_metadata = {with_padding: true};
+                return CryptoImpl.wrapKey(wrappingKey.name, idlV1.wrapping_algorithm.aes_kw, wrappingInfo, key.name, keyFormat.data);
+            }else
+                return {data: null, err: new Error("Invalid wrapping algorithm")};
+        }
+        return {data: null, err: new Error("Invalid algorithm")};
     }
 
     static unwrapKey(decryptionKey: CryptoKey, wrappingInfo: WrappingInfo, format: string, b64Data: string, algorithm: string, algo_metadata: string, extractable: boolean, usages: string[]): CryptoKey | null

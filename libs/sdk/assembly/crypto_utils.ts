@@ -135,4 +135,20 @@ export class CryptoUtil
 
         return {data: {length: bitsize}, err: null};
     }
+
+    static getKeyFormat(format: string): Result<idlV1.key_format, Error>
+    {
+        if(format == "raw" || format == "RAW")
+            return {data: idlV1.key_format.raw, err: null};
+        else if(format == "pkcs8" || format == "PKCS8")
+            return {data: idlV1.key_format.pkcs8, err: null};
+        else if(format == "spki" || format == "SPKI")
+            return {data: idlV1.key_format.spki, err: null};
+        else if(format == "sec1" || format == "SEC1")
+            return {data: idlV1.key_format.sec1, err: null};
+        else if(format == "pkcs1" || format == "PKCS1")
+            return {data: idlV1.key_format.pkcs1, err: null};
+        else
+            return {data: null, err: new Error("Invalid or unsupported key format")};
+    }
 }

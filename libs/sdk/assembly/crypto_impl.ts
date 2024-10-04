@@ -39,7 +39,7 @@ declare function wasm_digest(algorithm: i32, hash_info: ArrayBuffer, text: Array
 declare function wasm_unwrap_key(decryption_key_name: ArrayBuffer, encryption_info: ArrayBuffer, key_name_to_import: ArrayBuffer, key_format: i32, key_data: ArrayBuffer, key_data_size: i32, algorithm: i32, algo_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "wrap_key")
-declare function wasm_wrap_key(key_name_to_export: ArrayBuffer, key_format: i32, encryption_key_name: ArrayBuffer, encryption_info: ArrayBuffer, key: ArrayBuffer, key_size: i32): i32;
+declare function wasm_wrap_key(key_name_to_export: ArrayBuffer, key_format: i32, wrapping_key_name: ArrayBuffer, wrap_algo_id: i32, wrap_metadata: ArrayBuffer, key: ArrayBuffer, key_size: i32): i32;
 
 // @ts-ignore: decorator
 @external("env", "key_exists_in_memory")
@@ -278,7 +278,10 @@ export class CryptoImpl {
 
         let k = String.UTF8.encode(key_name, true);
         let info = String.UTF8.encode(JSON.stringify(algo_metadata), true);
-        return wasm_verify(k, algorithm, info, data, data.byteLength, signature, signature.byteLength) != 0;
+        let result = wasm_verify(k, algorithm, info, data, data.byteLength, signature, signature.byteLength);
+        if (result < 0)
+            return {data: null, err: new Error("Failed to verify")};
+        return {data: result != 0, err: null};
     }
     
     static digest<T>(algorithm: idlV1.hash_algorithm, hash_info: T, text: ArrayBuffer): Result<ArrayBuffer, Error>
@@ -399,36 +402,24 @@ export class CryptoImpl {
         return key;
     }
 
-    static wrapKey(encryption_key_name: string, encryption_info: string, key_name: string, format: string): u8[]
+    static wrapKey<T>(encryption_key_name: string, algorithm: idlV1.wrapping_algorithm, algo_metadata: T, key_name: string, format: idlV1.key_format): Result<ArrayBuffer, Error>
     {
-        let ret: u8[] = [];
-        let iFormat = CryptoImpl.format(format);
-        if (iFormat < 0)
-        {
-            Notifier.sendString("Invalid format");
-            return ret;
-        }
+        if(!(algo_metadata instanceof idlV1.aes_kw_wrapping_metadata || algo_metadata instanceof idlV1.rsa_oaep_encryption_metadata || algo_metadata instanceof idlV1.aes_gcm_encryption_metadata))
+            return {data: null, err: new Error("Invalid wrapping metadata type")};
             
         let key = new Uint8Array(32);
-        let result = wasm_wrap_key(String.UTF8.encode(key_name, true), iFormat, String.UTF8.encode(encryption_key_name, true), String.UTF8.encode(encryption_info, true), key.buffer, key.byteLength);
+        let algoMetadata = String.UTF8.encode(JSON.stringify(algo_metadata), true);
+        let result = wasm_wrap_key(String.UTF8.encode(key_name, true), format, String.UTF8.encode(encryption_key_name, true), algorithm, String.UTF8.encode(algoMetadata, true), key.buffer, key.byteLength);
         if (result < 0)
-        {
-            Notifier.sendString("Failed to wrap key");
-            return ret;
-        }
+            return {data: null, err: new Error("Failed to wrap key")};
         if (result > key.byteLength) {
             // buffer not big enough, retry with a properly sized one
             key = new Uint8Array(result);
-            result = wasm_wrap_key(String.UTF8.encode(key_name, true), iFormat, String.UTF8.encode(encryption_key_name, true), String.UTF8.encode(encryption_info, true), key.buffer, key.byteLength);
+            result = wasm_wrap_key(String.UTF8.encode(key_name, true), format, String.UTF8.encode(encryption_key_name, true), algorithm, String.UTF8.encode(algoMetadata, true), key.buffer, key.byteLength);
             if (result < 0)
-            {
-                Notifier.sendString("Failed to wrap key 2");
-                return ret;
-            }
+                return {data: null, err: new Error("Failed to wrap key")};
         }
-        for (let i = 0; i < key.byteLength; ++i)
-            ret[i] = key[i];
-        return ret;
+        return {data: key.buffer.slice(0, result), err: null};
     }        
 
     static getPublicKey(key_name: string, format: string): u8[]
