@@ -51,21 +51,23 @@ declare function stop_recording(): i32;
 @external("env", "cancel_transaction")
 declare function abort_transaction(): i32;
 
-export class Result<T, E> 
+// export type ResultTuple<T, E> = T extends null ? [data: null, err: E] : [data: T, err: null];
+export type ResultTuple<T, E = null> = [data: T | null, err: E | null]
+
+function result(): ResultTuple<number, string> {
+    return [5, null];
+}
+
+const [data, err] = result();
+if (data)
+    console.log(data)
+else
+ console.log(err)
+
+export class Result<T, E>
 {
-    private readonly isOk: bool = false;
-    public data: T;
-    public err: E;
-
-    constructor(isOk: bool, data: T, err: E) {
-        this.isOk = isOk;
-        this.data = data;
-        this.err = err;
-    }
-
-    ok(): bool {
-        return this.isOk;
-    }
+    data: T | null;
+    err: E | null;
 }
 
 export class Router {

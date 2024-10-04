@@ -5,7 +5,10 @@
 
 import { decode, encode as b64encode } from 'as-base64/assembly';
 import uuid from './uuid';
+import { Result } from './index';
+import { CryptoUtil } from './crypto_utils';
 import { CryptoImpl, MemoryType, Key } from './crypto_impl';
+import * as idlV1 from "./crypto_subtle_idl_v1"
 import { JSON } from '@klave/sdk';
 
 class CryptoKey extends Key {
@@ -69,15 +72,58 @@ export class EncryptionInfo
 export const RSA_2048_OAEP_SHA256 : EncryptionInfo = { algo_id: EncryptionAlgo.rsa2048oaep, iv:[], additional_data:[], hash_info: {algo_id: hashingAlgo.sha2_256, tag: ""}, tag_length: aes_tag_length.TAG_128, label: []};
 
 export class SubtleCrypto {
-    static generateKey(algorithm: string, algo_metadata: string, extractable: boolean, usages: string[]): CryptoKey | null
+    static generateKey<T>(algorithm: T, extractable: boolean, usages: string[]): Result<CryptoKey, Error>
     {
-        let key = CryptoImpl.generateKey(MemoryType.InMemory, "", algorithm, algo_metadata, extractable, usages);
-        if (!key)
-            return null;
-        return new CryptoKey(key.name, algorithm, extractable, usages);
+        if(!(algorithm instanceof RsaHashedKeyGenParams || algorithm instanceof EcKeyGenParams || algorithm instanceof AesKeyGenParams))
+            return {data: null, err: new Error("Invalid Key algorithm")};
+
+        if(algorithm instanceof RsaHashedKeyGenParams)
+        {
+            let rsaMetadata = CryptoUtil.getRSAMetadata(algorithm);
+            if(rsaMetadata.data)
+            {
+                let key = CryptoImpl.generateKey(idlV1.key_algorithm.rsa, rsaMetadata.data, extractable, usages);
+                if (key.data)
+                    return {data: new CryptoKey(key.data.name, algorithm.name, extractable, usages), err: null};
+                else
+                    return {data: null, err: new Error("Failed to generate RSA key")};
+            }
+            else
+                return {data: null, err: new Error("Failed to generate RSA metadata")};
+        }else if(algorithm instanceof EcKeyGenParams)
+        {
+            if(algorithm.namedCurve != "P-256" && algorithm.namedCurve != "P-384" && algorithm.namedCurve != "P-521")
+                return {data: null, err: new Error("Invalid curve")};
+
+            let metadata = CryptoUtil.getSECPR1Metadata(algorithm);
+            if(metadata.data)
+            {
+                let key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_r1, metadata.data, extractable, usages);
+                if (key.data)
+                    return {data: new CryptoKey(key.data.name, algorithm.name, extractable, usages), err: null};
+                else
+                    return {data: null, err: new Error("Failed to generate EC key")};
+            }
+            else
+                return {data: null, err: new Error("Failed to generate EC metadata")};
+        }else if(algorithm instanceof AesKeyGenParams)
+        {
+            let metadata = CryptoUtil.getAESMetadata(algorithm);
+            if(metadata.data)
+            {
+                let key = CryptoImpl.generateKey(idlV1.key_algorithm.aes, {length: algorithm.length}, extractable, usages);
+                if (key.data)
+                    return {data: new CryptoKey(key.data.name, algorithm.name, extractable, usages), err: null};
+                else
+                    return {data: null, err: new Error("Failed to generate AES key")};
+            }
+            else
+                return {data: null, err: new Error("Failed to generate AES metadata")};
+        }
+        return {data: null, err: new Error("Invalid algorithm")};
     }
 
-    static encrypt(key: CryptoKey, encryption_info: string, clear_text: string): u8[]
+    static encrypt(key: CryptoKey, encryption_info: string, clear_text: string): Result<ArrayBuffer, Error>
     {
         return CryptoImpl.encrypt(key.name, encryption_info, clear_text);
     }
@@ -102,9 +148,14 @@ export class SubtleCrypto {
         return CryptoImpl.verify(key.name, signature_info, text, signature);
     }
     
-    static digest(algorithm: string, hash_info: string, text: string): u8[]
+    static digest(algorithm: string, data: ArrayBuffer): Result<ArrayBuffer, Error>
     {
-        return CryptoImpl.digest(algorithm, hash_info, text);
+        let hash_info = CryptoUtil.getShaMetadata(algorithm);
+        if(hash_info.data)
+            return CryptoImpl.digest(idlV1.hash_algorithm.sha, hash_info, data);
+        else if(hash_info.err)
+            return {data: null, err: hash_info.err};
+        return {data: null, err: new Error("Invalid algorithm")};
     }
 
     static importKey(format: string, b64Data: string, algorithm: string, algo_metadata: string, extractable: boolean, usages: string[]): CryptoKey | null

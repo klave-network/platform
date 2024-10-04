@@ -1,6 +1,8 @@
 import { decode, encode as b64encode } from 'as-base64/assembly';
 import uuid from './uuid';
 import { Crypto, Notifier } from '@klave/sdk';
+import * as idlV1 from "./crypto_subtle_idl_v1"
+import { Result } from '.';
 
 // @ts-ignore: decorator
 @external("env", "key_exists")
@@ -184,32 +186,23 @@ export class CryptoImpl {
         return result;
     }
 
-    static generateKey(in_memory: MemoryType, key_name: string, algorithm: string, algo_metadata: string, extractable: boolean, usages: string[]): Key | null
+    static generateKey<T>(algorithm: idlV1.key_algorithm, algo_metadata: T, extractable: boolean, usages: string[]): Result<Key,Error>
     {
-        let iAlgorithm = CryptoImpl.algorithm(algorithm);
-        if (iAlgorithm < 0)
-            return null;
-
         const local_usages = new Uint8Array(usages.length);
         for(let i = 0; i < usages.length; i++)
         {
             local_usages[i] = this.usage(usages[i]);
         }
     
-        const key = new Key(key_name);
+        let algoMetadata = JSON.stringify(algo_metadata);
+        const key = new Key("");
         let result = 0;
-        if (in_memory == MemoryType.InMemory) {
-            result = wasm_generate_key_in_memory(
-                String.UTF8.encode(key.name, true), iAlgorithm, String.UTF8.encode(algo_metadata, true), extractable?1:0, local_usages.buffer, local_usages.length);    
-        }
-        else {
-            result = wasm_generate_key(
-                String.UTF8.encode(key.name, true), iAlgorithm, String.UTF8.encode(algo_metadata, true), extractable?1:0, local_usages.buffer, local_usages.length);
-        }
+        result = wasm_generate_key(
+                String.UTF8.encode(key.name, true), algorithm, String.UTF8.encode(algoMetadata, true), extractable?1:0, local_usages.buffer, local_usages.length);
         if (result < 0)
-            return null;
+            return {data: null, err: new Error("Failed to generate key")};
 
-        return key;
+        return {data: key, err: null};
     }
 
     static encrypt(key_name: string, encrypt_info: string, clear_text: string): u8[]
@@ -291,29 +284,26 @@ export class CryptoImpl {
         return wasm_verify(k, info, t, t.byteLength, buffer.buffer, buffer.byteLength) != 0;
     }
     
-    static digest(algorithm: string, hash_info: string, text: string): u8[]
+    static digest<T>(algorithm: idlV1.hash_algorithm, hash_info: T, text: ArrayBuffer): Result<ArrayBuffer, Error>
     {
-        let ret: u8[] = [];
-        let iAlgorithm = CryptoImpl.algorithm(algorithm);
-        if (iAlgorithm < 0)
-            return ret;
+        if(!(hash_info instanceof idlV1.sha_metadata || hash_info instanceof idlV1.tagged_sha_metadata))
+        {
+            return {data: null, err: new Error("Invalid hash metadata type")};
+        }
 
-        let t = String.UTF8.encode(text, false);
-        let info = String.UTF8.encode(hash_info, true);
+        let info = String.UTF8.encode(JSON.stringify(hash_info), true);
         let value = new Uint8Array(32);
-        let result = wasm_digest(iAlgorithm, info, t, t.byteLength, value.buffer, value.byteLength);
+        let result = wasm_digest(algorithm, info, text, text.byteLength, value.buffer, value.byteLength);
         if (result < 0)
-            return ret; // todo : report error
+            return {data: null, err: new Error("Failed to digest")};
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new Uint8Array(result);
-            result = wasm_digest(iAlgorithm, info, t, t.byteLength, value.buffer, value.byteLength);
+            result = wasm_digest(algorithm, info, text, text.byteLength, value.buffer, value.byteLength);
             if (result < 0)
-                return ret; // todo : report error
+                return {data: null, err: new Error("Failed to digest")};
         }
-        for (let i = 0; i < result; ++i)
-            ret[i] = value[i];
-        return ret;
+        return {data: value.buffer.slice(0, result), err: null};
     }  
 
     static importKey(in_memory: MemoryType, key_name: string, format: string, b64Data: string, algorithm: string, algo_metadata: string, extractable: boolean, usages: string[]): Key | null
