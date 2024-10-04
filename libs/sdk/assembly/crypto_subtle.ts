@@ -44,6 +44,20 @@ export class AesKeyGenParams
     length: u32 = 256;
 }
 
+export class RsaOaepParams
+{
+    name: string = "RSA-OAEP";
+    label: ArrayBuffer = new ArrayBuffer(0);
+}
+
+export class AesGcmParams
+{
+    name: string = "AES-GCM";
+    iv!: ArrayBuffer;
+    additionalData: ArrayBuffer = new ArrayBuffer(0);
+    tagLength: u32 = 128;
+}
+
 @JSON
 export class HashInfo 
 {
@@ -123,9 +137,22 @@ export class SubtleCrypto {
         return {data: null, err: new Error("Invalid algorithm")};
     }
 
-    static encrypt(key: CryptoKey, encryption_info: string, clear_text: string): Result<ArrayBuffer, Error>
+    static encrypt<T>(algorithm: T, key: CryptoKey, clear_text: ArrayBuffer): Result<ArrayBuffer, Error>
     {
-        return CryptoImpl.encrypt(key.name, encryption_info, clear_text);
+        if(algorithm instanceof RsaOaepParams)
+        {
+            let labelUintArray = Uint8Array.wrap(algorithm.label);
+            let rsaOaepParams: idlV1.rsa_oaep_encryption_metadata = {label: labelUintArray};
+            return CryptoImpl.encrypt(key.name, idlV1.encryption_algorithm.rsa_oaep, rsaOaepParams, clear_text);
+        }else if(algorithm instanceof AesGcmParams)
+        {
+            let iv = Uint8Array.wrap(algorithm.iv);
+            let additionalData = Uint8Array.wrap(algorithm.additionalData);
+            let aesGcmParams: idlV1.aes_gcm_encryption_metadata = {iv: iv, additionalData: additionalData, tagLength: algorithm.tagLength};
+            return CryptoImpl.encrypt(key.name, idlV1.encryption_algorithm.aes_gcm, aesGcmParams, clear_text);
+
+        }else
+            return {data: null, err: new Error("Invalid algorithm")};
     }
     
     static decrypt<T>(key: CryptoKey, decryption_info: T, cipher_text: u8[]): u8[]

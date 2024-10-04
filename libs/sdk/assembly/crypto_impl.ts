@@ -9,7 +9,7 @@ import { Result } from '.';
 declare function wasm_key_exists(key_name: ArrayBuffer): boolean;
 // @ts-ignore: decorator
 @external("env", "encrypt")
-declare function wasm_encrypt(key_name: ArrayBuffer, encryption_info: ArrayBuffer, clear_text: ArrayBuffer, clear_text_size: i32, cipher_text: ArrayBuffer, cipher_text_size: i32): i32;
+declare function wasm_encrypt(key_name: ArrayBuffer, algorithm: i32, encryption_info: ArrayBuffer, clear_text: ArrayBuffer, clear_text_size: i32, cipher_text: ArrayBuffer, cipher_text_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "decrypt")
 declare function wasm_decrypt(key_name: ArrayBuffer, encryption_info: ArrayBuffer, cipher_text: ArrayBuffer, cipher_text_size: i32, clear_text: ArrayBuffer, clear_text_size: i32): i32;
@@ -188,6 +188,9 @@ export class CryptoImpl {
 
     static generateKey<T>(algorithm: idlV1.key_algorithm, algo_metadata: T, extractable: boolean, usages: string[]): Result<Key,Error>
     {
+        if(!(algo_metadata instanceof idlV1.aes_metadata || algo_metadata instanceof idlV1.rsa_metadata || algo_metadata instanceof idlV1.secp_r1_metadata || algo_metadata instanceof idlV1.secp_k1_metadata))
+            return {data: null, err: new Error("Invalid algorithm metadata type")};
+
         const local_usages = new Uint8Array(usages.length);
         for(let i = 0; i < usages.length; i++)
         {
@@ -205,26 +208,26 @@ export class CryptoImpl {
         return {data: key, err: null};
     }
 
-    static encrypt(key_name: string, encrypt_info: string, clear_text: string): u8[]
+    static encrypt<T>(key_name: string, algorithm: idlV1.encryption_algorithm, algo_metadata: T, clear_text: ArrayBuffer): Result<ArrayBuffer, Error>
     {
+        if(!(algo_metadata instanceof idlV1.aes_gcm_encryption_metadata || algo_metadata instanceof idlV1.rsa_oaep_encryption_metadata))
+            return {data: null, err: new Error("Invalid encryption metadata type")};
+
         let k = String.UTF8.encode(key_name, true);
-        let info = String.UTF8.encode(encrypt_info, true);
+        let info = String.UTF8.encode(JSON.stringify(algo_metadata), true);
         let t = String.UTF8.encode(clear_text, false);
         let value = new Uint8Array(64);
-        let result = wasm_encrypt(k, info, t, t.byteLength, value.buffer, value.byteLength);
-        let ret: u8[] = [];
+        let result = wasm_encrypt(k, algorithm, info, t, t.byteLength, value.buffer, value.byteLength);
         if (result < 0)
-            return ret;
+            return {data: null, err: new Error("Failed to encrypt")};
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new Uint8Array(result);
-            result = wasm_encrypt(k, info, t, t.byteLength, value.buffer, value.byteLength);
+            result = wasm_encrypt(k, algorithm, info, t, t.byteLength, value.buffer, value.byteLength);
             if (result < 0)
-                return ret;
+                return {data: null, err: new Error("Failed to encrypt")};
         }
-        for (let i = 0; i < result; ++i)
-            ret[i] = value[i];
-        return ret;
+        return {data: value.buffer.slice(0, result), err: null};
     }
     
     static decrypt(key_name: string, encrypt_info: string, cipher_text: u8[]): u8[]
