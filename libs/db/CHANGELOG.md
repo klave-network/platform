@@ -1,4 +1,15 @@
 # Changelog
+## [1.0.0](https://github.com/klave-network/platform/compare/db@0.8.1...db@1.0.0) (2024-10-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* Moving to pure ESM repo
+
+### Miscellaneous Chores
+
+* Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
+
 ## [0.8.1](https://github.com/klave-network/platform/compare/db@0.8.0...db@0.8.1) (2024-07-25)
 
 

@@ -4,7 +4,7 @@
     "type": "module",
     "dependencies": {
         "@klave/constants": "0.4.1",
-        "@klave/db": "0.8.1",
+        "@klave/db": "1.0.0",
         "@swc/helpers": "0.5.13",
         "ws": "8.18.0",
         "winston": "3.14.2",
