@@ -7,11 +7,16 @@ on:
 
 jobs:
   npm:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.NX_CACHE_AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.NX_CACHE_AWS_SECRET_ACCESS_KEY }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [22.x]
 
     permissions:
       id-token: write
@@ -21,10 +26,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Setup node
+          
+      - name: Use Node.js ${{ matrix.node }}
         uses: actions/setup-node@v4
         with:
-          node-version: lts/hydrogen # 18
+          node-version: ${{ matrix.node }}
+          cache: yarn
           registry-url: https://registry.npmjs.org
           always-auth: true
 
