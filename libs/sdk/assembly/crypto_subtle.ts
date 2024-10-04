@@ -58,6 +58,18 @@ export class AesGcmParams
     tagLength: u32 = 128;
 }
 
+export class RsaPssParams
+{
+    name: string = "RSA-PSS";
+    saltLength: u32 = 0;
+}
+
+export class EcdsaParams
+{
+    name: string = "ECDSA";
+    hash: string = "SHA-256";
+}
+
 @JSON
 export class HashInfo 
 {
@@ -172,9 +184,23 @@ export class SubtleCrypto {
             return {data: null, err: new Error("Invalid algorithm")};
     }
     
-    static sign(key: CryptoKey, signature_info: string, text: string): u8[]
+    static sign<T>(algorithm: T, key: CryptoKey, data: ArrayBuffer): Result<ArrayBuffer, Error>
     {
-        return CryptoImpl.sign(key.name, signature_info, text);
+        if(algorithm instanceof EcdsaParams)
+        {
+            let hash_info = CryptoUtil.getShaMetadata(algorithm.hash);
+            if(!hash_info.data)
+                return {data: null, err: hash_info.err};
+
+            let metadata: idlV1.ecdsa_signature_metadata = {sha_metadata: hash_info.data};
+            return CryptoImpl.sign(key.name, idlV1.signing_algorithm.ecdsa, metadata, data);
+        }else if(algorithm instanceof RsaPssParams)
+        {
+            let metadata: idlV1.rsa_pss_signature_metadata = {saltLength: algorithm.saltLength};
+            return CryptoImpl.sign(key.name, idlV1.signing_algorithm.rsa_pss, metadata, data);
+        }
+
+        return {data: null, err: new Error("Invalid algorithm")};
     }
     
     static verify(key: CryptoKey, signature_info: string, text: string, signature: u8[]): boolean

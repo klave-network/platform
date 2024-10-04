@@ -12,7 +12,7 @@ declare function wasm_key_exists(key_name: ArrayBuffer): boolean;
 declare function wasm_encrypt(key_name: ArrayBuffer, algorithm: i32, encryption_info: ArrayBuffer, clear_text: ArrayBuffer, clear_text_size: i32, cipher_text: ArrayBuffer, cipher_text_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "decrypt")
-declare function wasm_decrypt(key_name: ArrayBuffer, encryption_info: ArrayBuffer, cipher_text: ArrayBuffer, cipher_text_size: i32, clear_text: ArrayBuffer, clear_text_size: i32): i32;
+declare function wasm_decrypt(key_name: ArrayBuffer, algorithm: i32, encryption_info: ArrayBuffer, cipher_text: ArrayBuffer, cipher_text_size: i32, clear_text: ArrayBuffer, clear_text_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "generate_key")
 declare function wasm_generate_key(key_name: ArrayBuffer, algorithm: i32, algo_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
@@ -27,7 +27,7 @@ declare function wasm_export_key(key_name: ArrayBuffer, key_format: i32, key: Ar
 declare function wasm_get_public_key(key_name: ArrayBuffer, key_format: i32, result: ArrayBuffer, result_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "sign")
-declare function wasm_sign(key_name: ArrayBuffer, signature_info: ArrayBuffer, text: ArrayBuffer, text_size: i32, signature: ArrayBuffer, signature_size: i32): i32;
+declare function wasm_sign(key_name: ArrayBuffer, algorithm: i32, signature_metadata: ArrayBuffer, text: ArrayBuffer, text_size: i32, signature: ArrayBuffer, signature_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "verify")
 declare function wasm_verify(key_name: ArrayBuffer, signature_info: ArrayBuffer, text: ArrayBuffer, text_size: i32, signature: ArrayBuffer, signature_size: i32): i32;
@@ -237,39 +237,38 @@ export class CryptoImpl {
         let k = String.UTF8.encode(key_name, true);
         let info = String.UTF8.encode(JSON.stringify(algo_metadata), true);
         let value = new Uint8Array(64);
-        let result = wasm_decrypt(k, info, cipher_text, cipher_text.byteLength, value.buffer, value.byteLength);
+        let result = wasm_decrypt(k, algorithm, info, cipher_text, cipher_text.byteLength, value.buffer, value.byteLength);
         if (result < 0)
             return {data: null, err: new Error("Failed to decrypt")};
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new Uint8Array(result);
-            result = wasm_decrypt(k, info, cipher_text, cipher_text.byteLength, value.buffer, value.byteLength);
+            result = wasm_decrypt(k, algorithm, info, cipher_text, cipher_text.byteLength, value.buffer, value.byteLength);
             if (result < 0)
                 return {data: null, err: new Error("Failed to decrypt")};
         }
         return {data: value.buffer.slice(0, result), err: null};
     }
     
-    static sign(key_name: string, signature_info: string, text: string): u8[]
+    static sign<T>(key_name: string, algorithm: idlV1.signing_algorithm, algo_metadata: T, data: ArrayBuffer): Result<ArrayBuffer, Error>
     {
+        if(!(algo_metadata instanceof idlV1.rsa_pss_signature_metadata || algo_metadata instanceof idlV1.ecdsa_signature_metadata))
+            return {data: null, err: new Error("Invalid signature metadata type")};
+
         let k = String.UTF8.encode(key_name, true);
-        let info = String.UTF8.encode(signature_info, true);
-        let t = String.UTF8.encode(text, false);
+        let info = String.UTF8.encode(JSON.stringify(algo_metadata), true);
         let value = new Uint8Array(64);
-        let result = wasm_sign(k, info, t, t.byteLength, value.buffer, value.byteLength);
-        let ret: u8[] = [];
+        let result = wasm_sign(k, algorithm, info, data, data.byteLength, value.buffer, value.byteLength);
         if (result < 0)
-            return ret; // todo : report error
+            return {data: null, err: new Error("Failed to sign")};
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new Uint8Array(result);
-            result = wasm_sign(k, info, t, t.byteLength, value.buffer, value.byteLength);
+            result = wasm_sign(k, algorithm, info, data, data.byteLength, value.buffer, value.byteLength);
             if (result < 0)
-                return ret; // todo : report error
+                return {data: null, err: new Error("Failed to sign")};
         }
-        for (let i = 0; i < result; ++i)
-            ret[i] = value[i];
-        return ret;
+        return {data: value.buffer.slice(0, result), err: null};
     }
     
     static verify(key_name: string, signature_info: string, text: string, signature: u8[]): boolean
