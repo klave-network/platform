@@ -4,6 +4,19 @@ import { Crypto, Notifier } from '@klave/sdk';
 import * as idlV1 from "./crypto_subtle_idl_v1"
 import { Result } from '..';
 
+//Persistent Crypto operations (i.e. output that are stored in the ledger)
+// @ts-ignore: decorator
+@external("env", "generate_key_and_persist")
+declare function wasm_generate_key_and_persist(key_name: ArrayBuffer, algorithm: i32, algo_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
+// @ts-ignore: decorator
+@external("env", "import_key_and_persist")
+declare function wasm_import_key_and_persist(key_name: ArrayBuffer, key_format: i32, key_data: ArrayBuffer, key_data_size: i32, algorithm: i32, algo_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
+// @ts-ignore: decorator
+@external("env", "unwrap_key_and_persist")
+declare function wasm_unwrap_key_and_persist(decryption_key_name: ArrayBuffer, unwrap_algo_id: i32, unwrap_metadata: ArrayBuffer, key_name_to_import: ArrayBuffer, key_format: i32, wrapped_data: ArrayBuffer, wrapped_data_size: i32, key_gen_algo_id: i32, key_gen_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
+
+
+//In-memory Crypto operations
 // @ts-ignore: decorator
 @external("env", "key_exists")
 declare function wasm_key_exists(key_name: ArrayBuffer): boolean;
@@ -40,19 +53,6 @@ declare function wasm_unwrap_key(decryption_key_name: ArrayBuffer, unwrap_algo_i
 // @ts-ignore: decorator
 @external("env", "wrap_key")
 declare function wasm_wrap_key(key_name_to_export: ArrayBuffer, key_format: i32, wrapping_key_name: ArrayBuffer, wrap_algo_id: i32, wrap_metadata: ArrayBuffer, key: ArrayBuffer, key_size: i32): i32;
-
-// @ts-ignore: decorator
-@external("env", "key_exists_in_memory")
-declare function wasm_key_exists_in_memory(key_name: ArrayBuffer): boolean;
-// @ts-ignore: decorator
-@external("env", "generate_key_in_memory")
-declare function wasm_generate_key_in_memory(key_name: ArrayBuffer, algorithm: i32, algo_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
-// @ts-ignore: decorator
-@external("env", "import_key_in_memory")
-declare function wasm_import_key_in_memory(key_name: ArrayBuffer, key_format: i32, key_data: ArrayBuffer, key_data_size: i32, algorithm: i32, algo_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
-// @ts-ignore: decorator
-@external("env", "unwrap_key_in_memory")
-declare function wasm_unwrap_key_in_memory(decryption_key_name: ArrayBuffer, encryption_info: ArrayBuffer, key_name_to_import: ArrayBuffer, key_format: i32, key_data: ArrayBuffer, key_data_size: i32, algorithm: i32, algo_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
 
 // @ts-ignore: decorator
 @external("env", "get_random_bytes")
@@ -105,14 +105,9 @@ export class CryptoImpl {
         return -1;
     }
 
-    static keyExists(in_memory: MemoryType, key_name: string): boolean {        
+    static keyExists(key_name: string): boolean {        
         let result = false;
-        if (in_memory == MemoryType.InMemory) {
-            result = wasm_key_exists_in_memory(String.UTF8.encode(key_name, true));
-        }
-        else {
-            result = wasm_key_exists(String.UTF8.encode(key_name, true));
-        }
+        result = wasm_key_exists(String.UTF8.encode(key_name, true));
         return result;
     }
 
