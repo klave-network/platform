@@ -2,7 +2,7 @@ import { decode, encode as b64encode } from 'as-base64/assembly';
 import uuid from '../uuid';
 import { Crypto, Notifier } from '@klave/sdk';
 import * as idlV1 from "./crypto_subtle_idl_v1"
-import { Result } from '.';
+import { Result } from '..';
 
 // @ts-ignore: decorator
 @external("env", "key_exists")
@@ -303,4 +303,3 @@ export class CryptoImpl {
         return ret;
     }    
 }
-

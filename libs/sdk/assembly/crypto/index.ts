@@ -4,18 +4,22 @@
  */
 
 import { CryptoImpl, Key, MemoryType } from './crypto_impl';
-import { SubtleCrypto } from './crypto_subtle';
-import { CryptoAES } from './crypto_aes';
-import { CryptoECDSA } from './crypto_ecc';
-import { CryptoRSA } from './crypto_rsa';
-import { CryptoSHA } from './crypto_sha';
+import { SubtleCrypto, RsaHashedKeyGenParams as RsaKeyGenInput, RsaOaepParams as RsaOaepInput, AesKeyGenParams as AesKeyGenInput, EcKeyGenParams as EcKeyGenInput } from './crypto_subtle';
+// import { CryptoAES } from './crypto_aes';
+// import { CryptoECDSA } from './crypto_ecc';
+// import { CryptoRSA } from './crypto_rsa';
+// import { CryptoSHA } from './crypto_sha';
 import { encode as b64encode } from 'as-base64/assembly';
 
 export class Subtle extends SubtleCrypto { }
-export class AES extends CryptoAES { };
-export class ECDSA extends CryptoECDSA { };
-export class RSA extends CryptoRSA { };
-export class SHA extends CryptoSHA { };
+export class RsaHashedKeyGenParams extends RsaKeyGenInput { }
+export class RsaOaepParams extends RsaOaepInput { }
+export class AesKeyGenParams extends AesKeyGenInput { }
+export class EcKeyGenParams extends EcKeyGenInput { }
+// export class AES extends CryptoAES { };
+// export class ECDSA extends CryptoECDSA { };
+// export class RSA extends CryptoRSA { };
+// export class SHA extends CryptoSHA { };
 
 export function getKey(keyName: string): Key | null {    
     if (CryptoImpl.keyExists(MemoryType.Persistent, keyName))
@@ -27,21 +31,17 @@ export function getRandomValues(size: i32): u8[] {
     return CryptoImpl.getRandomBytes(size);
 }
 
-export function getPem(key: u8[], isPrivate: bool = false) : string
+export function getPem(key: Uint8Array, isPrivate: bool = false) : string
 {
     if(!isPrivate)
-    {
-        const buffer = new Uint8Array(key.length);        
-        buffer.set(key);        
+    {        
         const pem = `-----BEGIN PUBLIC KEY-----
-${b64encode(buffer)}
+${b64encode(key)}
 -----END PUBLIC KEY-----`;
         return pem;
     }else{
-        const buffer = new Uint8Array(key.length);
-        buffer.set(key);
         const pem = `-----BEGIN PRIVATE KEY-----
-${b64encode(buffer)}
+${b64encode(key)}
 -----END PRIVATE KEY-----`;
         return pem;
     }

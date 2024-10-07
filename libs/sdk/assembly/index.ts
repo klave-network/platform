@@ -51,19 +51,6 @@ declare function stop_recording(): i32;
 @external("env", "cancel_transaction")
 declare function abort_transaction(): i32;
 
-// export type ResultTuple<T, E> = T extends null ? [data: null, err: E] : [data: T, err: null];
-// export type ResultTuple<T, E = null> = [data: T | null, err: E | null]
-
-// function result(): ResultTuple<number, string> {
-//     return [5, null];
-// }
-
-// const [data, err] = result();
-// if (data)
-//     console.log(data)
-// else
-//  console.log(err)
-
 export class Result<T, E>
 {
     data!: T | null;

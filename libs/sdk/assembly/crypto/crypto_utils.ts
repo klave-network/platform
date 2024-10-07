@@ -4,7 +4,7 @@
  */
 
 import * as idlV1 from "./crypto_subtle_idl_v1"
-import { RsaHashedKeyGenParams, EcKeyGenParams, AesKeyGenParams } from "./crypto_subtle"
+import { RsaHashedKeyGenParams, EcKeyGenParams, AesKeyGenParams, KeyFormatWrapper } from "./crypto_subtle"
 import { Result } from '..';
 
 export class CryptoUtil
@@ -49,25 +49,27 @@ export class CryptoUtil
 
     static getShaMetadata(algorithm: string): Result<idlV1.sha_metadata, Error>
     {
-        switch (algorithm)
+        if(algorithm == "sha2-256" || algorithm == "sha2_256" || algorithm == "sha256")
         {
-            case "sha2-256":
-            case "sha256":
-                return  {data: {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_256}, err: null};
-            case "sha2-384":
-            case "sha384":
-                return {data: {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_384}, err: null};
-            case "sha2-512":
-            case "sha512":
-                return {data: {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_512}, err: null};
-            case "sha3-256":
-                return {data: {algo_id: idlV1.sha_algorithm.sha3, length: idlV1.sha_digest_bitsize.SHA_256}, err: null};
-            case "sha3-384":
-                return {data: {algo_id: idlV1.sha_algorithm.sha3, length: idlV1.sha_digest_bitsize.SHA_384}, err: null};
-            case "sha3-512":
-                return {data: {algo_id: idlV1.sha_algorithm.sha3, length: idlV1.sha_digest_bitsize.SHA_512}, err: null};
-            default:
-                return {data: null, err: new Error(`Unsupported algorithm ${algorithm}`)};
+            return  {data: {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_256}, err: null};
+        }else if(algorithm == "sha2-384" || algorithm == "sha2_384" || algorithm == "sha384")
+        {
+            return {data: {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_384}, err: null};
+        }else if(algorithm == "sha2-512" || algorithm == "sha2_512" || algorithm == "sha512")
+        {
+            return {data: {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_512}, err: null};
+        }else if(algorithm == "sha3-256" || algorithm == "sha3_256")
+        {
+            return {data: {algo_id: idlV1.sha_algorithm.sha3, length: idlV1.sha_digest_bitsize.SHA_256}, err: null};
+        }else if(algorithm == "sha3-384" || algorithm == "sha3_384")
+        {
+            return {data: {algo_id: idlV1.sha_algorithm.sha3, length: idlV1.sha_digest_bitsize.SHA_384}, err: null};
+        }else if (algorithm == "sha3-512" || algorithm == "sha3_512")
+        {
+            return {data: {algo_id: idlV1.sha_algorithm.sha3, length: idlV1.sha_digest_bitsize.SHA_512}, err: null};
+        }else
+        {
+            return {data: null, err: new Error(`Unsupported algorithm ${algorithm}`)};
         }
     }
 
@@ -83,10 +85,10 @@ export class CryptoUtil
         else
             return {data: null, err: new Error("Invalid RSA key size")};
 
-        let shaMetadata = DigestUtil.getShaMetadata(params.hash);
+        let shaMetadata = CryptoUtil.getShaMetadata(params.hash);
 
         if(shaMetadata.data)
-            return {data: {modulus: bitsize, sha_metadata: shaMetadata.data}, err: null};
+            return {data: {modulus: bitsize, sha_metadata: shaMetadata.data as idlV1.sha_metadata}, err: null};
         else if(shaMetadata.err)
             return {data: null, err: shaMetadata.err};
 
@@ -136,18 +138,18 @@ export class CryptoUtil
         return {data: {length: bitsize}, err: null};
     }
 
-    static getKeyFormat(format: string): Result<idlV1.key_format, Error>
+    static getKeyFormat(format: string): Result<KeyFormatWrapper, Error>
     {
         if(format == "raw" || format == "RAW")
-            return {data: idlV1.key_format.raw, err: null};
+            return {data: { format: idlV1.key_format.raw }, err: null};
         else if(format == "pkcs8" || format == "PKCS8")
-            return {data: idlV1.key_format.pkcs8, err: null};
+            return {data: { format: idlV1.key_format.pkcs8 }, err: null};
         else if(format == "spki" || format == "SPKI")
-            return {data: idlV1.key_format.spki, err: null};
+            return {data: { format: idlV1.key_format.spki }, err: null};
         else if(format == "sec1" || format == "SEC1")
-            return {data: idlV1.key_format.sec1, err: null};
+            return {data: { format: idlV1.key_format.sec1 }, err: null};
         else if(format == "pkcs1" || format == "PKCS1")
-            return {data: idlV1.key_format.pkcs1, err: null};
+            return {data: { format: idlV1.key_format.pkcs1 }, err: null};
         else
             return {data: null, err: new Error("Invalid or unsupported key format")};
     }
