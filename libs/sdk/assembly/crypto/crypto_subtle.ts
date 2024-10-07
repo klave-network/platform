@@ -2,21 +2,18 @@
  * Environment definitions for compiling Klave Trustless Applications.
  * @module klave/sdk/crypto
  */
-
-import { decode, encode as b64encode } from 'as-base64/assembly';
-import uuid from '../uuid';
 import { Result } from '../index';
 import { CryptoUtil } from './crypto_utils';
-import { CryptoImpl, MemoryType, Key } from './crypto_impl';
+import { CryptoImpl, Key } from './crypto_impl';
 import * as idlV1 from "./crypto_subtle_idl_v1"
 import { JSON } from '@klave/sdk';
 
 class CryptoKey extends Key {
-    algorithm: string;
+    algorithm: String;
     extractable: boolean;
     usages: string[];
 
-    constructor(name: string, algorithm: string, extractable: boolean, usages: string[]) {
+    constructor(name: string, algorithm: String, extractable: boolean, usages: string[]) {
         super(name);
         this.algorithm = algorithm;
         this.extractable = extractable;
@@ -24,6 +21,7 @@ class CryptoKey extends Key {
     }
 }
 
+@JSON
 export class RsaHashedKeyGenParams
 {
     name: string = "RSA-OAEP"; // "RSA-OAEP", "RSA-PSS", "RSA-PKCS1-v1_5"
@@ -32,24 +30,28 @@ export class RsaHashedKeyGenParams
     hash: string = "SHA2-256"; // "SHA2-256", "SHA2-384", "SHA2-512"
 }
 
+@JSON
 export class EcKeyGenParams
 {
     name: string = "ECDSA"; // "ECDSA"
     namedCurve: string = "P-256"; // "P-256", "P-384", "P-521"
 }
 
+@JSON
 export class AesKeyGenParams
 {
     name: string = "AES-GCM"; // "AES-GCM", "AES-KW"
     length: u32 = 256;
 }
 
+@JSON
 export class RsaOaepParams
 {
     name: string = "RSA-OAEP";
     label: ArrayBuffer = new ArrayBuffer(0);
 }
 
+@JSON
 export class AesGcmParams
 {
     name: string = "AES-GCM";
@@ -58,12 +60,14 @@ export class AesGcmParams
     tagLength: u32 = 128;
 }
 
+@JSON
 export class RsaPssParams
 {
     name: string = "RSA-PSS";
     saltLength: u32 = 0;
 }
 
+@JSON
 export class EcdsaParams
 {
     name: string = "ECDSA";
@@ -71,31 +75,17 @@ export class EcdsaParams
 }
 
 @JSON
-export class HashInfo 
+export class EcKeyImportParams
 {
-    algo_id!: hashingAlgo;
-    tag: string = "";
+    name: string = "ECDSA";
+    namedCurve: string = "P-256";
 }
 
 @JSON
-export class WrappingInfo
+export class NamedAlgorithm
 {
-    algo_id!: i32;
-    with_padding!: bool;
+    name: string = "";
 }
-
-@JSON
-export class EncryptionInfo
-{
-    algo_id!: EncryptionAlgo;
-    iv: u8[] = [];
-    additional_data: u8[] = [];
-    hash_info: HashInfo = {algo_id: hashingAlgo.none, tag: ""};
-    tag_length: aes_tag_length = aes_tag_length.TAG_96;
-    label: u8[] = [];
-}
-
-export const RSA_2048_OAEP_SHA256 : EncryptionInfo = { algo_id: EncryptionAlgo.rsa2048oaep, iv:[], additional_data:[], hash_info: {algo_id: hashingAlgo.sha2_256, tag: ""}, tag_length: aes_tag_length.TAG_128, label: []};
 
 export class SubtleCrypto {
     static generateKey<T>(algorithm: T, extractable: boolean, usages: string[]): Result<CryptoKey, Error>
@@ -108,7 +98,7 @@ export class SubtleCrypto {
             let rsaMetadata = CryptoUtil.getRSAMetadata(algorithm);
             if(rsaMetadata.data)
             {
-                let key = CryptoImpl.generateKey(idlV1.key_algorithm.rsa, rsaMetadata.data, extractable, usages);
+                let key = CryptoImpl.generateKey(idlV1.key_algorithm.rsa, String.UTF8.encode(JSON.stringify(rsaMetadata.data)), extractable, usages);
                 if (key.data)
                     return {data: new CryptoKey(key.data.name, algorithm.name, extractable, usages), err: null};
                 else
@@ -126,7 +116,7 @@ export class SubtleCrypto {
                 let metadata = CryptoUtil.getSECPR1Metadata(algorithm);
                 if(metadata.data)
                 {
-                    let key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_r1, metadata.data, extractable, usages);
+                    let key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_r1, String.UTF8.encode(JSON.stringify(metadata.data)), extractable, usages);
                     if (key.data)
                         return {data: new CryptoKey(key.data.name, algorithm.name, extractable, usages), err: null};
                     else
@@ -138,7 +128,7 @@ export class SubtleCrypto {
                 let metadata = CryptoUtil.getSECPK1Metadata(algorithm);
                 if(metadata.data)
                 {
-                    let key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_k1, metadata.data, extractable, usages);
+                    let key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_k1, String.UTF8.encode(JSON.stringify(metadata.data)), extractable, usages);
                     if (key.data)
                         return {data: new CryptoKey(key.data.name, algorithm.name, extractable, usages), err: null};
                     else
@@ -154,7 +144,7 @@ export class SubtleCrypto {
             let metadata = CryptoUtil.getAESMetadata(algorithm);
             if(metadata.data)
             {
-                let key = CryptoImpl.generateKey(idlV1.key_algorithm.aes, {length: algorithm.length}, extractable, usages);
+                let key = CryptoImpl.generateKey(idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(metadata.data)), extractable, usages);
                 if (key.data)
                     return {data: new CryptoKey(key.data.name, algorithm.name, extractable, usages), err: null};
                 else
@@ -172,13 +162,13 @@ export class SubtleCrypto {
         {
             let labelUintArray = Uint8Array.wrap(algorithm.label);
             let rsaOaepParams: idlV1.rsa_oaep_encryption_metadata = {label: labelUintArray};
-            return CryptoImpl.encrypt(key.name, idlV1.encryption_algorithm.rsa_oaep, rsaOaepParams, clear_text);
+            return CryptoImpl.encrypt(key.name, idlV1.encryption_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(rsaOaepParams)), clear_text);
         }else if(algorithm instanceof AesGcmParams)
         {
             let iv = Uint8Array.wrap(algorithm.iv);
             let additionalData = Uint8Array.wrap(algorithm.additionalData);
             let aesGcmParams: idlV1.aes_gcm_encryption_metadata = {iv: iv, additionalData: additionalData, tagLength: algorithm.tagLength};
-            return CryptoImpl.encrypt(key.name, idlV1.encryption_algorithm.aes_gcm, aesGcmParams, clear_text);
+            return CryptoImpl.encrypt(key.name, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams)), clear_text);
 
         }else
             return {data: null, err: new Error("Invalid algorithm")};
@@ -190,13 +180,13 @@ export class SubtleCrypto {
         {
             let labelUintArray = Uint8Array.wrap(algorithm.label);
             let rsaOaepParams: idlV1.rsa_oaep_encryption_metadata = {label: labelUintArray};
-            return CryptoImpl.decrypt(key.name, idlV1.encryption_algorithm.rsa_oaep, rsaOaepParams, cipher_text);
+            return CryptoImpl.decrypt(key.name, idlV1.encryption_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(rsaOaepParams)), cipher_text);
         }else if(algorithm instanceof AesGcmParams)
         {
             let iv = Uint8Array.wrap(algorithm.iv);
             let additionalData = Uint8Array.wrap(algorithm.additionalData);
             let aesGcmParams: idlV1.aes_gcm_encryption_metadata = {iv: iv, additionalData: additionalData, tagLength: algorithm.tagLength};
-            return CryptoImpl.decrypt(key.name, idlV1.encryption_algorithm.aes_gcm, aesGcmParams, cipher_text);
+            return CryptoImpl.decrypt(key.name, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams)), cipher_text);
         }else
             return {data: null, err: new Error("Invalid algorithm")};
     }
@@ -210,11 +200,11 @@ export class SubtleCrypto {
                 return {data: null, err: hash_info.err};
 
             let metadata: idlV1.ecdsa_signature_metadata = {sha_metadata: hash_info.data};
-            return CryptoImpl.sign(key.name, idlV1.signing_algorithm.ecdsa, metadata, data);
+            return CryptoImpl.sign(key.name, idlV1.signing_algorithm.ecdsa, String.UTF8.encode(JSON.stringify(metadata)), data);
         }else if(algorithm instanceof RsaPssParams)
         {
             let metadata: idlV1.rsa_pss_signature_metadata = {saltLength: algorithm.saltLength};
-            return CryptoImpl.sign(key.name, idlV1.signing_algorithm.rsa_pss, metadata, data);
+            return CryptoImpl.sign(key.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata)), data);
         }
 
         return {data: null, err: new Error("Invalid algorithm")};
@@ -229,11 +219,11 @@ export class SubtleCrypto {
                 return {data: false, err: hash_info.err};
 
             let metadata: idlV1.ecdsa_signature_metadata = {sha_metadata: hash_info.data};
-            return CryptoImpl.verify(key.name, idlV1.signing_algorithm.ecdsa, metadata, data, signature);
+            return CryptoImpl.verify(key.name, idlV1.signing_algorithm.ecdsa, String.UTF8.encode(JSON.stringify(metadata)), data, signature);
         }else if(algorithm instanceof RsaPssParams)
         {
             let metadata: idlV1.rsa_pss_signature_metadata = {saltLength: algorithm.saltLength};
-            return CryptoImpl.verify(key.name, idlV1.signing_algorithm.rsa_pss, metadata, data, signature);
+            return CryptoImpl.verify(key.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata)), data, signature);
         }
 
         return {data: false, err: new Error("Invalid algorithm")};
@@ -241,20 +231,63 @@ export class SubtleCrypto {
     
     static digest(algorithm: string, data: ArrayBuffer): Result<ArrayBuffer, Error>
     {
-        let hash_info = CryptoUtil.getShaMetadata(algorithm);
-        if(hash_info.data)
-            return CryptoImpl.digest(idlV1.hash_algorithm.sha, hash_info, data);
-        else if(hash_info.err)
-            return {data: null, err: hash_info.err};
+        let hashInfo = CryptoUtil.getShaMetadata(algorithm);
+        if(hashInfo.data)
+            return CryptoImpl.digest(idlV1.hash_algorithm.sha, String.UTF8.encode(JSON.stringify(hashInfo.data)), data);
+        else if(hashInfo.err)
+            return {data: null, err: hashInfo.err};
         return {data: null, err: new Error("Invalid algorithm")};
     }
 
-    static importKey(format: string, b64Data: string, algorithm: string, algo_metadata: string, extractable: boolean, usages: string[]): CryptoKey | null
+    static importKey<T>(format: string, keyData: ArrayBuffer, algorithm: T, extractable: boolean, usages: string[]): Result<CryptoKey, Error>
     {
-        let key = CryptoImpl.importKey(MemoryType.InMemory, "", format, b64Data, algorithm, algo_metadata, extractable, usages);
+        let keyFormat = CryptoUtil.getKeyFormat(format);
+        if(!keyFormat.data)
+            return {data: null, err: keyFormat.err};
+
+        var algoMetadata: ArrayBuffer;
+        var keyAlgo: idlV1.key_algorithm;
+        var keyGenAlgoName: String;
+        if(algorithm instanceof EcKeyImportParams)
+        {
+            if(algorithm.name != "ECDSA")
+                return {data: null, err: new Error("Invalid EC algorithm")};
+
+            if(algorithm.namedCurve != "P-256" && algorithm.namedCurve != "P-384" && algorithm.namedCurve != "P-521" && algorithm.namedCurve != "secp256k1" && algorithm.namedCurve != "SECP256K1")
+                return {data: null, err: new Error("Invalid EC curve")};
+
+            if(algorithm.namedCurve == "secp256k1" || algorithm.namedCurve == "SECP256K1")
+                
+                keyAlgo = idlV1.key_algorithm.secp_k1;
+            else
+                keyAlgo = idlV1.key_algorithm.secp_r1;
+
+            keyGenAlgoName = algorithm.name;
+            algoMetadata = String.UTF8.encode(JSON.stringify(algorithm));
+        }else if(algorithm instanceof NamedAlgorithm)
+        {
+            if(algorithm.name != "AES-GCM" && algorithm.name != "aes-gcm" && algorithm.name != "AES-KW" && algorithm.name != "aes-kw")
+                return {data: null, err: new Error("Invalid algorithm name")};
+
+            keyAlgo = idlV1.key_algorithm.aes;
+            keyGenAlgoName = algorithm.name;
+            algoMetadata = String.UTF8.encode(JSON.stringify(algorithm));
+        }else if(algorithm instanceof String)
+        {
+            if(algorithm != "AES-KW" && algorithm != "aes-kw" && algorithm != "AES-GCM" && algorithm != "aes-gcm")
+                return {data: null, err: new Error("Invalid algorithm")};
+
+            keyAlgo = idlV1.key_algorithm.aes;
+            keyGenAlgoName = algorithm;
+            algoMetadata = String.UTF8.encode(algorithm);
+        }else
+            return {data: null, err: new Error("Invalid algorithm")};
+
+        let key = CryptoImpl.importKey(keyFormat, keyData, keyAlgo, algoMetadata, extractable, usages);
         if (!key)
-            return null;
-        return new CryptoKey(key.name, algorithm, extractable, usages);
+            return {data: null, err: new Error("Failed to import key")};
+
+        return {data: new CryptoKey(key.name, keyGenAlgoName, extractable, usages), err: null};
     }
 
     static wrapKey<T>(format: string, key: CryptoKey, wrappingKey: CryptoKey, wrapAlgo: T): Result<ArrayBuffer, Error>
@@ -267,26 +300,25 @@ export class SubtleCrypto {
         {
             let labelUintArray = Uint8Array.wrap(wrapAlgo.label);
             let wrappingInfo: idlV1.rsa_oaep_encryption_metadata = {label: labelUintArray};
-            return CryptoImpl.wrapKey(wrappingKey.name, idlV1.wrapping_algorithm.rsa_oaep, wrappingInfo, key.name, keyFormat.data);
+            return CryptoImpl.wrapKey(wrappingKey.name, idlV1.wrapping_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(wrappingInfo)), key.name, keyFormat.data);
         }else if(wrapAlgo instanceof AesGcmParams)
         {
             let iv = Uint8Array.wrap(wrapAlgo.iv);
             let additionalData = Uint8Array.wrap(wrapAlgo.additionalData);
             let wrappingInfo: idlV1.aes_gcm_encryption_metadata = {iv: iv, additionalData: additionalData, tagLength: wrapAlgo.tagLength};
-            return CryptoImpl.wrapKey(wrappingKey.name, idlV1.wrapping_algorithm.aes_gcm, wrappingInfo, key.name, keyFormat.data);
+            return CryptoImpl.wrapKey(wrappingKey.name, idlV1.wrapping_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(wrappingInfo)), key.name, keyFormat.data);
         }else if(wrapAlgo instanceof String)
         { 
             if(wrapAlgo == "AES-KW" || wrapAlgo == "aes-kw")
             {
                 let wrappingInfo: idlV1.aes_kw_wrapping_metadata = {with_padding: true};
-                return CryptoImpl.wrapKey(wrappingKey.name, idlV1.wrapping_algorithm.aes_kw, wrappingInfo, key.name, keyFormat.data);
+                return CryptoImpl.wrapKey(wrappingKey.name, idlV1.wrapping_algorithm.aes_kw, String.UTF8.encode(JSON.stringify(wrappingInfo)), key.name, keyFormat.data);
             }else
                 return {data: null, err: new Error("Invalid wrapping algorithm")};
         }
         return {data: null, err: new Error("Invalid algorithm")};
     }
 
-    //unwrapKey(format, wrappedKey, unwrappingKey, unwrapAlgo, unwrappedKeyAlgo, extractable, keyUsages)
     static unwrapKey<T, E>(format: string, wrappedKey: ArrayBuffer, unwrappingKey: CryptoKey, unwrapAlgo: T,  unwrappedKeyAlgo: E, extractable: boolean, usages: string[]): Result<CryptoKey, Error>
     {
         let keyFormat = CryptoUtil.getKeyFormat(format);
@@ -294,7 +326,7 @@ export class SubtleCrypto {
             return {data: null, err: keyFormat.err};
 
         var wrappingAlgo: idlV1.wrapping_algorithm;
-        var wrappingInfo: ArrayBuffer = new ArrayBuffer(0);
+        var wrappingInfo: ArrayBuffer;
         if(unwrapAlgo instanceof RsaOaepParams)
         {
             let labelUintArray = Uint8Array.wrap(unwrapAlgo.label);
@@ -320,9 +352,9 @@ export class SubtleCrypto {
         }else
             return {data: null, err: new Error("Invalid wrapping algorithm")};
 
-        var keyGenAlgo: idlV1.key_algorithm = idlV1.key_algorithm.aes;
-        var keyGenInfo: ArrayBuffer = new ArrayBuffer(0);
-        var keyGenAlgoName: string = "";
+        var keyGenAlgo: idlV1.key_algorithm;
+        var keyGenInfo: ArrayBuffer;
+        var keyGenAlgoName: string;
         if(unwrappedKeyAlgo instanceof AesKeyGenParams)
         {
             let keyGenMetadataAes = {length: unwrappedKeyAlgo.length};
@@ -371,7 +403,8 @@ export class SubtleCrypto {
             }
             else
                 return {data: null, err: new Error("Failed to generate EC metadata")};
-        }
+        }else
+            return {data: null, err: new Error("Invalid Key Gen algorithm")};
 
         let key = CryptoImpl.unwrapKey(unwrappingKey.name, wrappingAlgo, wrappingInfo, keyFormat.data, wrappedKey, keyGenAlgo, keyGenInfo, extractable, usages);
         if(key.data)
@@ -380,13 +413,28 @@ export class SubtleCrypto {
             return {data: null, err: new Error("Failed to unwrap key")};
     }
 
-    static exportKey(key: CryptoKey, format: string): u8[]
+    static exportKey(format: string, key: CryptoKey): Result<ArrayBuffer, Error>
     {
-        return CryptoImpl.exportKey(key.name, format);
+        let keyFormat = CryptoUtil.getKeyFormat(format);
+        if(!keyFormat.data)
+            return {data: null, err: keyFormat.err};
+
+        let result = CryptoImpl.exportKey(key.name, format);
+        if(result.data)
+            return {data: result.data, err: null};
+        else
+            return {data: null, err: new Error("Failed to export key")};
     }        
 
-    static getPublicKey(key: CryptoKey, format: string): u8[]
+    static getPublicKey(format: string, key: CryptoKey): Result<ArrayBuffer, Error>
     {
+        let keyFormat = CryptoUtil.getKeyFormat(format);
+        if(!keyFormat.data)
+            return {data: null, err: keyFormat.err};
+
+        if(keyFormat.data != idlV1.key_format.spki)
+            return {data: null, err: new Error("Invalid public key format")};
+
         return CryptoImpl.getPublicKey(key.name, format);
     }        
 }

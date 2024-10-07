@@ -1,5 +1,5 @@
 import { decode, encode as b64encode } from 'as-base64/assembly';
-import uuid from './uuid';
+import uuid from '../uuid';
 import { Crypto, Notifier } from '@klave/sdk';
 import * as idlV1 from "./crypto_subtle_idl_v1"
 import { Result } from '.';
@@ -85,76 +85,6 @@ export const enum MemoryType {
 
 export class CryptoImpl {
 
-    static format(input: string): i32 {
-        if (input === "raw")
-            return 0;
-        if (input === "spki")
-            return 1;
-        if (input === "pkcs8")
-            return 2;
-        if (input === "jwk")
-            return 3;
-        if (input === "sec1")
-            return 4;
-        if (input === "pkcs1")
-            return 5;
-        return -1;
-    }
-
-    static algorithm(input: string): i32 {
-        if (input === "secp256r1" || input === "ecc256")
-            return 0;
-        if (input === "secp384r1" || input === "ecc384")
-            return 1;
-        if (input === "secp521r1" || input === "ecc521")
-            return 2;
-        if (input === "secp256k1")
-            return 3;
-        if (input === "aes128gcm")
-            return 4;
-        if (input === "aes192gcm")
-            return 5;
-        if (input === "aes256gcm")
-            return 6;
-        if (input === "sha2-256" || input === "sha256")
-            return 7;
-        if (input === "sha2-384" || input === "sha384")
-            return 8;
-        if (input === "sha2-512" || input === "sha512")
-            return 9;
-        if (input === "sha3-256")
-            return 10;
-        if (input === "sha3_384")
-            return 11;
-        if (input === "sha3_512")
-            return 12;
-        if (input === "rsa2048oaep")
-            return 13;
-        if (input === "rsa3072oaep")
-            return 14;
-        if (input === "rsa4096oaep")
-            return 15;
-        if (input === "rsa2048pss")
-            return 16;
-        if (input === "rsa3072pss")
-            return 17;
-        if (input === "rsa4096pss")
-            return 18;
-        if (input === "rsa2048pkcs1_v1_5")
-            return 19;
-        if (input === "rsa3072pkcs1_v1_5")
-            return 20;
-        if (input === "rsa4096pkcs1_v1_5")
-            return 21;
-        if (input === "aes128kw")
-            return 22;
-        if (input === "aes192kw")
-            return 23;
-        if (input === "aes256kw")
-            return 24;
-        return -1;
-    }
-
     static usage(input: string): i32 {
         if (input === "encrypt")
             return 0;
@@ -186,137 +116,103 @@ export class CryptoImpl {
         return result;
     }
 
-    static generateKey<T>(algorithm: idlV1.key_algorithm, algo_metadata: T, extractable: boolean, usages: string[]): Result<Key,Error>
+    static generateKey(algorithm: u32, algoMetadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key,Error>
     {
-        if(!(algo_metadata instanceof idlV1.aes_metadata || algo_metadata instanceof idlV1.rsa_metadata || algo_metadata instanceof idlV1.secp_r1_metadata || algo_metadata instanceof idlV1.secp_k1_metadata))
-            return {data: null, err: new Error("Invalid algorithm metadata type")};
-
         const local_usages = new Uint8Array(usages.length);
         for(let i = 0; i < usages.length; i++)
         {
             local_usages[i] = this.usage(usages[i]);
         }
-    
-        let algoMetadata = JSON.stringify(algo_metadata);
+
         const key = new Key("");
         let result = 0;
         result = wasm_generate_key(
-                String.UTF8.encode(key.name, true), algorithm, String.UTF8.encode(algoMetadata, true), extractable?1:0, local_usages.buffer, local_usages.length);
+                String.UTF8.encode(key.name, true), algorithm, algoMetadata, extractable?1:0, local_usages.buffer, local_usages.length);
         if (result < 0)
             return {data: null, err: new Error("Failed to generate key")};
 
         return {data: key, err: null};
     }
 
-    static encrypt<T>(key_name: string, algorithm: idlV1.encryption_algorithm, algo_metadata: T, clear_text: ArrayBuffer): Result<ArrayBuffer, Error>
+    static encrypt(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, clearText: ArrayBuffer): Result<ArrayBuffer, Error>
     {
-        if(!(algo_metadata instanceof idlV1.aes_gcm_encryption_metadata || algo_metadata instanceof idlV1.rsa_oaep_encryption_metadata))
-            return {data: null, err: new Error("Invalid encryption metadata type")};
-
-        let k = String.UTF8.encode(key_name, true);
-        let info = String.UTF8.encode(JSON.stringify(algo_metadata), true);
+        let k = String.UTF8.encode(keyName, true);
         let value = new Uint8Array(64);
-        let result = wasm_encrypt(k, algorithm, info, clear_text, clear_text.byteLength, value.buffer, value.byteLength);
+        let result = wasm_encrypt(k, algorithm, algoMetadata, clearText, clearText.byteLength, value.buffer, value.byteLength);
         if (result < 0)
             return {data: null, err: new Error("Failed to encrypt")};
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new Uint8Array(result);
-            result = wasm_encrypt(k, algorithm, info, clear_text, clear_text.byteLength, value.buffer, value.byteLength);
+            result = wasm_encrypt(k, algorithm, algoMetadata, clearText, clearText.byteLength, value.buffer, value.byteLength);
             if (result < 0)
                 return {data: null, err: new Error("Failed to encrypt")};
         }
         return {data: value.buffer.slice(0, result), err: null};
     }
     
-    static decrypt<T>(key_name: string, algorithm: idlV1.encryption_algorithm, algo_metadata: T, cipher_text: ArrayBuffer): Result<ArrayBuffer, Error>
+    static decrypt(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, cipherText: ArrayBuffer): Result<ArrayBuffer, Error>
     {
-        if(!(algo_metadata instanceof idlV1.aes_gcm_encryption_metadata || algo_metadata instanceof idlV1.rsa_oaep_encryption_metadata))
-            return {data: null, err: new Error("Invalid decryption metadata type")};
-
-        let k = String.UTF8.encode(key_name, true);
-        let info = String.UTF8.encode(JSON.stringify(algo_metadata), true);
+        let k = String.UTF8.encode(keyName, true);
         let value = new Uint8Array(64);
-        let result = wasm_decrypt(k, algorithm, info, cipher_text, cipher_text.byteLength, value.buffer, value.byteLength);
+        let result = wasm_decrypt(k, algorithm, algoMetadata, cipherText, cipherText.byteLength, value.buffer, value.byteLength);
         if (result < 0)
             return {data: null, err: new Error("Failed to decrypt")};
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new Uint8Array(result);
-            result = wasm_decrypt(k, algorithm, info, cipher_text, cipher_text.byteLength, value.buffer, value.byteLength);
+            result = wasm_decrypt(k, algorithm, algoMetadata, cipherText, cipherText.byteLength, value.buffer, value.byteLength);
             if (result < 0)
                 return {data: null, err: new Error("Failed to decrypt")};
         }
         return {data: value.buffer.slice(0, result), err: null};
     }
     
-    static sign<T>(key_name: string, algorithm: idlV1.signing_algorithm, algo_metadata: T, data: ArrayBuffer): Result<ArrayBuffer, Error>
+    static sign(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, data: ArrayBuffer): Result<ArrayBuffer, Error>
     {
-        if(!(algo_metadata instanceof idlV1.rsa_pss_signature_metadata || algo_metadata instanceof idlV1.ecdsa_signature_metadata))
-            return {data: null, err: new Error("Invalid signature metadata type")};
-
-        let k = String.UTF8.encode(key_name, true);
-        let info = String.UTF8.encode(JSON.stringify(algo_metadata), true);
+        let k = String.UTF8.encode(keyName, true);
         let value = new Uint8Array(64);
-        let result = wasm_sign(k, algorithm, info, data, data.byteLength, value.buffer, value.byteLength);
+        let result = wasm_sign(k, algorithm, algoMetadata, data, data.byteLength, value.buffer, value.byteLength);
         if (result < 0)
             return {data: null, err: new Error("Failed to sign")};
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new Uint8Array(result);
-            result = wasm_sign(k, algorithm, info, data, data.byteLength, value.buffer, value.byteLength);
+            result = wasm_sign(k, algorithm, algoMetadata, data, data.byteLength, value.buffer, value.byteLength);
             if (result < 0)
                 return {data: null, err: new Error("Failed to sign")};
         }
         return {data: value.buffer.slice(0, result), err: null};
     }
     
-    static verify<T>(key_name: string, algorithm: idlV1.signing_algorithm, algo_metadata: T, data: ArrayBuffer, signature: ArrayBuffer): Result<boolean, Error>
+    static verify(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, data: ArrayBuffer, signature: ArrayBuffer): Result<boolean, Error>
     {
-        if(!(algo_metadata instanceof idlV1.rsa_pss_signature_metadata || algo_metadata instanceof idlV1.ecdsa_signature_metadata))
-            return {data: null, err: new Error("Invalid signature metadata type")};
-
-        let k = String.UTF8.encode(key_name, true);
-        let info = String.UTF8.encode(JSON.stringify(algo_metadata), true);
-        let result = wasm_verify(k, algorithm, info, data, data.byteLength, signature, signature.byteLength);
+        let k = String.UTF8.encode(keyName, true);
+        let result = wasm_verify(k, algorithm, algoMetadata, data, data.byteLength, signature, signature.byteLength);
         if (result < 0)
             return {data: null, err: new Error("Failed to verify")};
         return {data: result != 0, err: null};
     }
     
-    static digest<T>(algorithm: idlV1.hash_algorithm, hash_info: T, text: ArrayBuffer): Result<ArrayBuffer, Error>
+    static digest(algorithm: idlV1.hash_algorithm, hashInfo: ArrayBuffer, text: ArrayBuffer): Result<ArrayBuffer, Error>
     {
-        if(!(hash_info instanceof idlV1.sha_metadata || hash_info instanceof idlV1.tagged_sha_metadata))
-        {
-            return {data: null, err: new Error("Invalid hash metadata type")};
-        }
-
-        let info = String.UTF8.encode(JSON.stringify(hash_info), true);
         let value = new Uint8Array(32);
-        let result = wasm_digest(algorithm, info, text, text.byteLength, value.buffer, value.byteLength);
+        let result = wasm_digest(algorithm, hashInfo, text, text.byteLength, value.buffer, value.byteLength);
         if (result < 0)
             return {data: null, err: new Error("Failed to digest")};
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new Uint8Array(result);
-            result = wasm_digest(algorithm, info, text, text.byteLength, value.buffer, value.byteLength);
+            result = wasm_digest(algorithm, hashInfo, text, text.byteLength, value.buffer, value.byteLength);
             if (result < 0)
                 return {data: null, err: new Error("Failed to digest")};
         }
         return {data: value.buffer.slice(0, result), err: null};
     }  
 
-    static importKey(in_memory: MemoryType, key_name: string, format: string, b64Data: string, algorithm: string, algo_metadata: string, extractable: boolean, usages: string[]): Key | null
+    static importKey(format: u32, keyData: ArrayBuffer, algorithm: u32, algo_metadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error>
     {
-        const key = new Key(key_name);
-
-        let iFormat = CryptoImpl.format(format);
-        if (iFormat < 0)
-            return null;
-
-        let iAlgorithm = CryptoImpl.algorithm(algorithm);
-        if (iAlgorithm < 0)
-            return null;
+        const key = new Key("");
 
         const local_usages = new Uint8Array(usages.length);
         for(let i = 0; i < usages.length; i++)
@@ -324,49 +220,30 @@ export class CryptoImpl {
             local_usages[i] = this.usage(usages[i]);
         }
 
-        let rawData = decode(b64Data);
-
-        let result = 0;
-        if (in_memory == MemoryType.InMemory) {
-            result = wasm_import_key_in_memory(String.UTF8.encode(key.name, true), iFormat, rawData.buffer, rawData.byteLength,
-                iAlgorithm, String.UTF8.encode(algo_metadata, true), extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength);
-        }
-        else {
-            result = wasm_import_key(String.UTF8.encode(key.name, true), iFormat, rawData.buffer, rawData.byteLength,
-                iAlgorithm, String.UTF8.encode(algo_metadata, true), extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength);
-        }
-        
+        let result = wasm_import_key(String.UTF8.encode(key.name, true), format, keyData, keyData.byteLength, algorithm, algo_metadata, extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength);
         if (result < 0)
-            return null;
-    
-        return key;
+            return {data: null, err: new Error("Failed to import key")};
+
+        return {data: key, err: null};
     }
 
-    static exportKey(key_name: string, format: string): u8[]
+    static exportKey(keyName: string, format: u32): Result<ArrayBuffer, Error>
     {
-        let ret: u8[] = [];
-        let iFormat = CryptoImpl.format(format);
-        if (iFormat < 0)
-            return ret;
-
         let key = new Uint8Array(32);
-
-        let result = wasm_export_key(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
+        let result = wasm_export_key(String.UTF8.encode(keyName, true), format, key.buffer, key.byteLength);
         if (result < 0)
-            return ret;
+            return {data: null, err: new Error("Failed to export key")};
         if (result > key.byteLength) {
             // buffer not big enough, retry with a properly sized one
             key = new Uint8Array(result);
-            result = wasm_export_key(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
+            result = wasm_export_key(String.UTF8.encode(keyName, true), format, key.buffer, key.byteLength);
             if (result < 0)
-                return ret;
+                return {data: null, err: new Error("Failed to export key")};
         }
-        for (let i = 0; i < key.byteLength; ++i)
-            ret[i] = key[i];
-        return ret;
+        return {data: key.buffer.slice(0, result), err: null};
     }        
 
-    static unwrapKey<T, E>(decryption_key_name: string, unwrap_algo_id: idlV1.wrapping_algorithm, unwrap_metadata: ArrayBuffer, format: idlV1.key_format, wrapped_key: ArrayBuffer, key_gen_algorithm: idlV1.key_algorithm, key_gen_algo_metadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error>
+    static unwrapKey(decryptionKeyName: string, unwrap_algo_id: u32, unwrap_metadata: ArrayBuffer, format: u32, wrapped_key: ArrayBuffer, key_gen_algorithm: u32, key_gen_algo_metadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error>
     {
         const key = new Key("");
         const local_usages = new Uint8Array(usages.length);
@@ -375,7 +252,7 @@ export class CryptoImpl {
             local_usages[i] = this.usage(usages[i]);
         }
 
-        let result = wasm_unwrap_key(String.UTF8.encode(decryption_key_name, true), unwrap_algo_id, unwrap_metadata, String.UTF8.encode(key.name, true), format, wrapped_key, wrapped_key.byteLength, key_gen_algorithm, key_gen_algo_metadata, extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength);
+        let result = wasm_unwrap_key(String.UTF8.encode(decryptionKeyName, true), unwrap_algo_id, unwrap_metadata, String.UTF8.encode(key.name, true), format, wrapped_key, wrapped_key.byteLength, key_gen_algorithm, key_gen_algo_metadata, extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength);
         
         if (result < 0)
             return {data: null, err: new Error("Failed to unwrap key")};
@@ -383,47 +260,36 @@ export class CryptoImpl {
         return {data: key, err: null};
     }
 
-    static wrapKey<T>(encryption_key_name: string, algorithm: idlV1.wrapping_algorithm, algo_metadata: T, key_name: string, format: idlV1.key_format): Result<ArrayBuffer, Error>
+    static wrapKey(encryptionKeyName: string, algorithm: u32, algo_metadata: ArrayBuffer, key_name: string, format: u32): Result<ArrayBuffer, Error>
     {
-        if(!(algo_metadata instanceof idlV1.aes_kw_wrapping_metadata || algo_metadata instanceof idlV1.rsa_oaep_encryption_metadata || algo_metadata instanceof idlV1.aes_gcm_encryption_metadata))
-            return {data: null, err: new Error("Invalid wrapping metadata type")};
-            
         let key = new Uint8Array(32);
-        let algoMetadata = String.UTF8.encode(JSON.stringify(algo_metadata), true);
-        let result = wasm_wrap_key(String.UTF8.encode(key_name, true), format, String.UTF8.encode(encryption_key_name, true), algorithm, String.UTF8.encode(algoMetadata, true), key.buffer, key.byteLength);
+        let result = wasm_wrap_key(String.UTF8.encode(key_name, true), format, String.UTF8.encode(encryptionKeyName, true), algorithm, algo_metadata, key.buffer, key.byteLength);
         if (result < 0)
             return {data: null, err: new Error("Failed to wrap key")};
         if (result > key.byteLength) {
             // buffer not big enough, retry with a properly sized one
             key = new Uint8Array(result);
-            result = wasm_wrap_key(String.UTF8.encode(key_name, true), format, String.UTF8.encode(encryption_key_name, true), algorithm, String.UTF8.encode(algoMetadata, true), key.buffer, key.byteLength);
+            result = wasm_wrap_key(String.UTF8.encode(key_name, true), format, String.UTF8.encode(encryptionKeyName, true), algorithm, algo_metadata, key.buffer, key.byteLength);
             if (result < 0)
                 return {data: null, err: new Error("Failed to wrap key")};
         }
         return {data: key.buffer.slice(0, result), err: null};
     }        
 
-    static getPublicKey(key_name: string, format: string): u8[]
+    static getPublicKey(keyName: string, format: u32): Result<ArrayBuffer, Error>
     {
-        let ret: u8[] = [];
-        let iFormat = CryptoImpl.format(format);
-        if (iFormat < 0)
-            return ret;
-
         let key = new Uint8Array(32);
-        let result = wasm_get_public_key(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
+        let result = wasm_get_public_key(String.UTF8.encode(keyName, true), format, key.buffer, key.byteLength);
         if (result < 0)
-            return ret;
+            return {data: null, err: new Error("Failed to get public key")};
         if (result > key.byteLength) {
             // buffer not big enough, retry with a properly sized one
             key = new Uint8Array(result);
-            result = wasm_get_public_key(String.UTF8.encode(key_name, true), iFormat, key.buffer, key.byteLength);
+            result = wasm_get_public_key(String.UTF8.encode(keyName, true), format, key.buffer, key.byteLength);
             if (result < 0)
-                return ret;
+                return {data: null, err: new Error("Failed to get public key")};
         }
-        for (let i = 0; i < key.byteLength; ++i)
-            ret[i] = key[i];
-        return ret;
+        return {data: key.buffer.slice(0, result), err: null};
     }        
 
     static getRandomBytes(size: i32): u8[] {
