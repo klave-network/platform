@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "type": "module",
     "dependencies": {
-        "@swc/helpers": "0.5.13",
-        "@prisma/client": "5.20.0"
+        "@prisma/client": "5.20.0",
+        "@swc/helpers": "0.5.13"
     }
 }

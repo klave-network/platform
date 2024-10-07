@@ -1,14 +1,14 @@
 {
     "name": "create-on-klave",
-    "description": "The tool to bootstrap trustless apps on Klave",
     "version": "0.3.20",
-    "license": "MIT",
-    "type": "module",
     "private": false,
+    "description": "The tool to bootstrap trustless apps on Klave",
+    "license": "MIT",
     "author": {
-        "email": "florian@secretarium.com",
-        "name": "Florian Guitton"
+        "name": "Florian Guitton",
+        "email": "florian@secretarium.com"
     },
+    "type": "module",
     "bin": {
         "create-on-klave": "./bin/create-on-klave.js",
         "create-trustless-app": "./bin/create-trustless-app.js"

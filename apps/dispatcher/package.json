@@ -1,11 +1,11 @@
 {
     "name": "@klave/dispatcher",
     "version": "0.1.1",
-    "type": "module",
     "license": "MIT",
+    "type": "module",
     "dependencies": {
         "@fastify/helmet": "12.0.1",
-        "@fastify/rate-limit": "10.1.0",
+        "@fastify/rate-limit": "10.1.1",
         "@fastify/sensible": "6.0.1",
         "@fastify/websocket": "11.0.1",
         "@klave/constants": "1.0.0",
