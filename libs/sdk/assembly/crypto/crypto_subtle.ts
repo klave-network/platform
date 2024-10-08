@@ -162,8 +162,10 @@ export class SubtleCrypto {
             {
                 let key = CryptoImpl.generateKey(idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(metadata.data)), extractable, usages);
                 if (key.data)
-                    return {data: new CryptoKey(key.data.name, algorithm.name, extractable, usages), err: null};
-                else
+                {
+                    let keyData = key.data as Key;
+                    return {data: new CryptoKey(keyData.name, algorithm.name, extractable, usages), err: null};
+                }else
                     return {data: null, err: new Error("Failed to generate AES key")};
             }
             else
@@ -172,8 +174,10 @@ export class SubtleCrypto {
         return {data: null, err: new Error("Invalid algorithm")};
     }
 
-    static encrypt<T>(algorithm: T, key: CryptoKey, clear_text: ArrayBuffer): Result<ArrayBuffer, Error>
+    static encrypt<T>(algorithm: T, key: CryptoKey, clear_text: ArrayBuffer | null): Result<ArrayBuffer, Error>
     {
+        if(!clear_text)
+            return {data: null, err: new Error("Invalid clear text: clear text cannot be null")};
         if(algorithm instanceof RsaOaepParams)
         {
             let labelUintArray = Uint8Array.wrap(algorithm.label);
@@ -190,8 +194,10 @@ export class SubtleCrypto {
             return {data: null, err: new Error("Invalid algorithm")};
     }
     
-    static decrypt<T>(algorithm: T, key: CryptoKey | null, cipher_text: ArrayBuffer): Result<ArrayBuffer, Error>
+    static decrypt<T>(algorithm: T, key: CryptoKey | null, cipher_text: ArrayBuffer | null): Result<ArrayBuffer, Error>
     {
+        if(!cipher_text)
+            return {data: null, err: new Error("Invalid cipher text: cipher text cannot be null")};
         if(!key)
             return {data: null, err: new Error("Invalid key")};
 
@@ -210,8 +216,10 @@ export class SubtleCrypto {
             return {data: null, err: new Error("Invalid algorithm")};
     }
     
-    static sign<T>(algorithm: T, key: CryptoKey, data: ArrayBuffer): Result<ArrayBuffer, Error>
+    static sign<T>(algorithm: T, key: CryptoKey, data: ArrayBuffer | null): Result<ArrayBuffer, Error>
     {
+        if(!data)
+            return {data: null, err: new Error("Invalid data: data cannot be null")};
         if(algorithm instanceof EcdsaParams)
         {
             let hash_info = CryptoUtil.getShaMetadata(algorithm.hash);
@@ -229,8 +237,12 @@ export class SubtleCrypto {
         return {data: null, err: new Error("Invalid algorithm")};
     }
     
-    static verify<T>(algorithm: T, key: CryptoKey, data: ArrayBuffer, signature: ArrayBuffer): Result<boolean, Error>
+    static verify<T>(algorithm: T, key: CryptoKey, data: ArrayBuffer | null, signature: ArrayBuffer | null): Result<boolean, Error>
     {
+        if(!data)
+            return {data: false, err: new Error("Invalid data: data cannot be null")};
+        if(!signature)
+            return {data: false, err: new Error("Invalid signature: signature cannot be null")};
         if(algorithm instanceof EcdsaParams)
         {
             let hash_info = CryptoUtil.getShaMetadata(algorithm.hash);
@@ -248,8 +260,10 @@ export class SubtleCrypto {
         return {data: false, err: new Error("Invalid algorithm")};
     }
     
-    static digest(algorithm: string, data: ArrayBuffer): Result<ArrayBuffer, Error>
+    static digest(algorithm: string, data: ArrayBuffer | null): Result<ArrayBuffer, Error>
     {
+        if(!data)
+            return {data: null, err: new Error("Invalid data: data cannot be null")};
         let hashInfo = CryptoUtil.getShaMetadata(algorithm);
         if(hashInfo.data)
             return CryptoImpl.digest(idlV1.hash_algorithm.sha, String.UTF8.encode(JSON.stringify(hashInfo.data)), data);
@@ -258,8 +272,11 @@ export class SubtleCrypto {
         return {data: null, err: new Error("Invalid algorithm")};
     }
 
-    static importKey<T>(format: string, keyData: ArrayBuffer, algorithm: T, extractable: boolean, usages: string[]): Result<CryptoKey, Error>
+    static importKey<T>(format: string, keyData: ArrayBuffer | null, algorithm: T, extractable: boolean, usages: string[]): Result<CryptoKey, Error>
     {
+        if(!keyData)
+            return {data: null, err: new Error("Invalid key data: key data cannot be null")};
+
         let keyFormat = CryptoUtil.getKeyFormat(format);
         if(!keyFormat.data)
             return {data: null, err: keyFormat.err};
@@ -370,8 +387,11 @@ export class SubtleCrypto {
         return {data: null, err: new Error("Invalid algorithm")};
     }
 
-    static unwrapKey<T, E>(format: string, wrappedKey: ArrayBuffer, unwrappingKey: CryptoKey | null, unwrapAlgo: T,  unwrappedKeyAlgo: E, extractable: boolean, usages: string[]): Result<CryptoKey, Error>
+    static unwrapKey<T, E>(format: string, wrappedKey: ArrayBuffer | null, unwrappingKey: CryptoKey | null, unwrapAlgo: T,  unwrappedKeyAlgo: E, extractable: boolean, usages: string[]): Result<CryptoKey, Error>
     {
+        if(!wrappedKey)
+            return {data: null, err: new Error("Invalid wrapped key: wrapped key cannot be null")};
+
         if(!unwrappingKey)
             return {data: null, err: new Error("Invalid unwrapping key")};
 
