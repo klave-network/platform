@@ -122,7 +122,7 @@ export class SubtleCrypto {
             if(algorithm.namedCurve != "P-256" && algorithm.namedCurve != "P-384" && algorithm.namedCurve != "P-521" && algorithm.namedCurve != "secp256k1" && algorithm.namedCurve != "SECP256K1")
                 return {data: null, err: new Error("Invalid curve")};
 
-            if(algorithm.namedCurve != "secp256k1" && algorithm.namedCurve != "SECP256K1")
+            if(algorithm.namedCurve == "P-256" || algorithm.namedCurve == "P-384" || algorithm.namedCurve == "P-521")
             {
                 let metadata = CryptoUtil.getSECPR1Metadata(algorithm);
                 if(metadata.data)
@@ -286,7 +286,7 @@ export class SubtleCrypto {
                 else
                     return {data: null, err: new Error("Failed to generate EC metadata")};
             }
-            else
+            else if(algorithm.namedCurve == "P-256" || algorithm.namedCurve == "P-384" || algorithm.namedCurve == "P-521")
             {
                 keyAlgo = idlV1.key_algorithm.secp_r1;
                 let algoMetadataResult = CryptoUtil.getSECPR1Metadata(algorithm);
@@ -294,7 +294,8 @@ export class SubtleCrypto {
                     algoMetadata = String.UTF8.encode(JSON.stringify(algoMetadataResult.data));
                 else
                     return {data: null, err: new Error("Failed to generate EC metadata")};
-            }
+            }else
+                return {data: null, err: new Error("Invalid EC curve")};
             
             keyGenAlgoName = algorithm.name;
         }else if(algorithm instanceof AesKeyGenParams)

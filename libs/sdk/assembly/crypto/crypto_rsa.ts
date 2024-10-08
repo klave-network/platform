@@ -33,7 +33,7 @@ class KeyRSA extends Key {
         else if(this.moduluslength == 4096)
             saltLength = 64;
 
-        let metadata: idlV1.rsa_pss_signature_metadata = {saltLength: 32}; //32 corresponds to the length of the hash sha256
+        let metadata: idlV1.rsa_pss_signature_metadata = {saltLength: saltLength};
         return CryptoImpl.sign(this.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata)), data);
     }
 
