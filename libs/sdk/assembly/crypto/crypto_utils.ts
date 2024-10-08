@@ -4,8 +4,13 @@
  */
 
 import * as idlV1 from "./crypto_subtle_idl_v1"
-import { RsaHashedKeyGenParams, EcKeyGenParams, AesKeyGenParams, KeyFormatWrapper } from "./crypto_subtle"
+import { RsaHashedKeyGenParams, EcKeyGenParams, AesKeyGenParams } from "./crypto_subtle"
 import { Result } from '..';
+
+export class KeyFormatWrapper 
+{
+    format!: idlV1.key_format;
+}
 
 export class CryptoUtil
 {

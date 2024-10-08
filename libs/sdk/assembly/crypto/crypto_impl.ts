@@ -58,11 +58,6 @@ declare function wasm_wrap_key(key_name_to_export: ArrayBuffer, key_format: i32,
 @external("env", "get_random_bytes")
 declare function wasm_get_random_bytes(bytes: ArrayBuffer, size: i32): i32;
 
-export class KeyFormatWrapper 
-{
-    format!: idlV1.key_format;
-}
-
 export class Key {
     name: string;
 
@@ -238,6 +233,23 @@ export class CryptoImpl {
         }
 
         let result = wasm_import_key(String.UTF8.encode(key.name, true), format, keyData, keyData.byteLength, algorithm, algo_metadata, extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength);
+        if (result < 0)
+            return {data: null, err: new Error("Failed to import key")};
+
+        return {data: key, err: null};
+    }
+
+    static importKeyAndPersist(keyName: string, format: u32, keyData: ArrayBuffer, algorithm: u32, algo_metadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error>
+    {
+        const key = new Key(keyName);
+
+        const local_usages = new Uint8Array(usages.length);
+        for(let i = 0; i < usages.length; i++)
+        {
+            local_usages[i] = this.usage(usages[i]);
+        }
+
+        let result = wasm_import_key_and_persist(String.UTF8.encode(key.name, true), format, keyData, keyData.byteLength, algorithm, algo_metadata, extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength);
         if (result < 0)
             return {data: null, err: new Error("Failed to import key")};
 

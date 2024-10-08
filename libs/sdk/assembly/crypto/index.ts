@@ -3,7 +3,7 @@
  * @module klave/sdk/crypto
  */
 
-import { CryptoImpl, Key, MemoryType } from './crypto_impl';
+import { CryptoImpl, Key } from './crypto_impl';
 import { SubtleCrypto, RsaHashedKeyGenParams as RsaKeyGenInput, RsaOaepParams as RsaOaepInput, AesKeyGenParams as AesKeyGenInput, EcKeyGenParams as EcKeyGenInput } from './crypto_subtle';
 // import { CryptoAES } from './crypto_aes';
 // import { CryptoECDSA } from './crypto_ecc';

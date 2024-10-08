@@ -3,9 +3,9 @@
  * @module klave/sdk/crypto
  */
 import { Result } from '../index';
-import { CryptoImpl, KeyFormatWrapper, Key } from './crypto_impl';
+import { CryptoImpl, Key } from './crypto_impl';
 import * as idlV1 from "./crypto_subtle_idl_v1"
-import { CryptoUtil } from './crypto_utils';
+import { CryptoUtil, KeyFormatWrapper } from './crypto_utils';
 import { PrivateKey, PublicKey } from './crypto_keys';
 
 class KeyRSA extends Key {
@@ -136,7 +136,7 @@ export class CryptoRSA {
         let algoMetadataStr = String.UTF8.encode(JSON.stringify(algoMetadata));
         let formatData = formatMetadata.data as KeyFormatWrapper;
         
-        let keyImportResult = CryptoImpl.importKey(formatData.format, keyData, idlV1.key_algorithm.rsa, algoMetadataStr, true, ["sign", "decrypt"]);
+        let keyImportResult = CryptoImpl.importKeyAndPersist(keyName, formatData.format, keyData, idlV1.key_algorithm.rsa, algoMetadataStr, true, ["sign", "decrypt"]);
 
         if (!keyImportResult.data)
             return {data: null, err: new Error("Failed to import key")};
@@ -175,7 +175,7 @@ export class CryptoRSA {
         let algoMetadataStr = String.UTF8.encode(JSON.stringify(algoMetadata));
         let formatData = formatMetadata.data as KeyFormatWrapper;
         
-        let keyImportResult = CryptoImpl.importKey(formatData.format, keyData, idlV1.key_algorithm.rsa, algoMetadataStr, true, ["verify", "encrypt"]);
+        let keyImportResult = CryptoImpl.importKeyAndPersist(keyName, formatData.format, keyData, idlV1.key_algorithm.rsa, algoMetadataStr, true, ["verify", "encrypt"]);
 
         if (!keyImportResult.data)
             return {data: null, err: new Error("Failed to import key")};

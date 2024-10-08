@@ -3,8 +3,8 @@
  * @module klave/sdk/crypto
  */
 import { Result } from '../index';
-import { CryptoUtil } from './crypto_utils';
-import { CryptoImpl, KeyFormatWrapper, Key } from './crypto_impl';
+import { CryptoUtil, KeyFormatWrapper } from './crypto_utils';
+import { CryptoImpl, Key } from './crypto_impl';
 import * as idlV1 from "./crypto_subtle_idl_v1"
 import { JSON } from '@klave/sdk';
 
