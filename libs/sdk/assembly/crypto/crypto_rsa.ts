@@ -185,12 +185,13 @@ export class CryptoRSA {
         return {data: key, err: null};
     }
 
-    static exportKey(key_name: string, format: string): Result<ArrayBuffer, Error>
+    static exportPrivateKey(keyName: string): Result<ArrayBuffer, Error>
     {
-        let formatMetadata = CryptoUtil.getKeyFormat(format);
-        if (!formatMetadata)
-            return {data: null, err: new Error("Invalid key format")};
+        return CryptoImpl.exportKey(keyName, "pkcs1");
+    }
 
-        return CryptoImpl.exportKey(key_name, format);
+    static exportPublicKey(keyName: string): Result<ArrayBuffer, Error>
+    {
+        return CryptoImpl.exportKey(keyName, "spki");
     }
 }
