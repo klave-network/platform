@@ -2,108 +2,195 @@
  * Environment definitions for compiling Klave Trustless Applications.
  * @module klave/sdk/crypto
  */
-
-import { CryptoImpl, Key, MemoryType } from './crypto_impl';
+import { Result } from '../index';
+import { CryptoImpl, KeyFormatWrapper, Key } from './crypto_impl';
+import * as idlV1 from "./crypto_subtle_idl_v1"
+import { CryptoUtil } from './crypto_utils';
 import { PrivateKey, PublicKey } from './crypto_keys';
 
 class KeyRSA extends Key {
 
-    encrypt(encrypt_info: string, data: string): u8[] {
-        return CryptoImpl.encrypt(this.name, encrypt_info, data);
+    moduluslength: u32 = 2048;
+
+    encrypt(data: ArrayBuffer): Result<ArrayBuffer, Error> 
+    {
+        let labelUintArray = new Uint8Array(0);
+        let rsaOaepParams: idlV1.rsa_oaep_encryption_metadata = {label: labelUintArray};
+        return CryptoImpl.encrypt(this.name, idlV1.encryption_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(rsaOaepParams)), data);
     }
 
-    decrypt(encrypt_info: string, cipher: u8[]): string {
-        return CryptoImpl.decrypt(this.name, encrypt_info, cipher);
+    decrypt(data: ArrayBuffer): Result<ArrayBuffer, Error>{
+        let labelUintArray = new Uint8Array(0);
+        let rsaOaepParams: idlV1.rsa_oaep_encryption_metadata = {label: labelUintArray};
+        return CryptoImpl.decrypt(this.name, idlV1.encryption_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(rsaOaepParams)), data);
     }
 
-    sign(sign_info: string, text: string): u8[] {
-        return CryptoImpl.sign(this.name, sign_info, text);
+    sign(data: ArrayBuffer): Result<ArrayBuffer, Error> 
+    {
+        let saltLength = 32;
+        if(this.moduluslength == 3072)
+            saltLength = 48;
+        else if(this.moduluslength == 4096)
+            saltLength = 64;
+
+        let metadata: idlV1.rsa_pss_signature_metadata = {saltLength: 32}; //32 corresponds to the length of the hash sha256
+        return CryptoImpl.sign(this.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata)), data);
     }
 
-    verify(sign_info: string, data: string, signature: u8[]): boolean {
-        return CryptoImpl.verify(this.name, sign_info, data, signature);
+    verify(data: ArrayBuffer, signature: ArrayBuffer): Result<boolean, Error>{
+        let saltLength = 32;
+        if(this.moduluslength == 3072)
+            saltLength = 48;
+        else if(this.moduluslength == 4096)
+            saltLength = 64;
+
+        let metadata: idlV1.rsa_pss_signature_metadata = {saltLength: saltLength};
+        return CryptoImpl.verify(this.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata)), data, signature);
     }
 
-    getPublicKey(format: string = 'spki'): PublicKey {
-        if (!CryptoRSA.isValidFormat(format))
-            return new PublicKey([]);
-        let result = CryptoImpl.getPublicKey(this.name, format);
-        return new PublicKey(result);
+    getPublicKey(): PublicKey {
+        let result = CryptoImpl.getPublicKey(this.name, "spki");
+        if(!result.data)
+            return new PublicKey(new Uint8Array(0));
+
+        let resBuffer = result.data as ArrayBuffer;
+        return new PublicKey(Uint8Array.wrap(resBuffer));
     }
 
-    getPrivateKey(format: string = 'pkcs1'): PrivateKey {        
-        if (!CryptoRSA.isValidFormat(format))
-            return new PrivateKey([]);
+    getPrivateKey(): PrivateKey {
+        let result = CryptoImpl.exportKey(this.name, "pkcs1");
+        if(!result.data)
+            return new PublicKey(new Uint8Array(0));
 
-        let result = CryptoImpl.exportKey(this.name, format);
-        return new PrivateKey(result);
+        let resBuffer = result.data as ArrayBuffer;
+        return new PrivateKey(Uint8Array.wrap(resBuffer));
     }
 
 }
 
 export class CryptoRSA {
 
-    static isValidFormat(format: string): boolean {
-        if (format != "raw")
-            return false;
-        return true;
-    }
-
-    static isValidAlgorithm(algorithm: string): boolean {
-        if (algorithm != "rsa2048" && algorithm != "rsa3072" && algorithm != "rsa4096")
-            return false;
-        return true;
-    }
-
     static getKey(keyName: string): KeyRSA | null {
-        if (CryptoImpl.keyExists(MemoryType.Persistent, keyName))
+        if (CryptoImpl.keyExists(keyName))
             return new KeyRSA(keyName);
         return null
     }
 
-    static generateKey(keyName: string, algorithm: string = 'rsa2048', algo_metadata: string = '', extractable: boolean = false): KeyRSA | null 
+    static generateKey(keyName: string, moduluslength: u32 = 2048): Result<KeyRSA, Error>
     {
-        const key = CryptoImpl.generateKey(MemoryType.Persistent, keyName, algorithm, algo_metadata, extractable, ["sign", "decrypt"]);
-        if (!key) {
-            return null;
+        if(keyName == "")
+            return {data: null, err: new Error("Invalid key name: key name cannot be empty")};
+
+        if(CryptoImpl.keyExists(keyName))
+            return {data: null, err: new Error("Invalid key name: key name already exists")};
+
+        if(moduluslength != 2048 && moduluslength != 3072 && moduluslength != 4096)
+            return {data: null, err: new Error("Invalid modulus length: modulus length must be 2048, 3072, or 4096")};
+
+        let shaAlgo = "sha2-256";
+        if(moduluslength == 3072)
+            shaAlgo = "sha2-384";
+        else if(moduluslength == 4096)
+            shaAlgo = "sha2-512";
+
+        let shaMetadata = CryptoUtil.getShaMetadata(shaAlgo);
+        let algoMetadata = {modulus: moduluslength, sha_metadata: shaMetadata.data} as idlV1.rsa_metadata;
+        const key = CryptoImpl.generateKeyAndPersist(keyName, idlV1.key_algorithm.rsa, String.UTF8.encode(JSON.stringify(algoMetadata)), true, ["sign", "decrypt"]);
+        if (!key.data) {
+            return {data: null, err: new Error("Failed to generate RSA key")};
         }
 
-        const kAES = new KeyRSA(key.name);
-        return kAES;
+        let keyData = key.data as Key;
+        let rsaKey = new KeyRSA(keyData.name);
+        rsaKey.moduluslength = moduluslength;
+
+        return {data: rsaKey, err: null};
     }
 
-    static generateKey_deprecated(keyName: string, algo_metadata: string = '', extractable: boolean = false): KeyRSA | null {
-        return this.generateKey(keyName, 'rsa2048', algo_metadata, extractable);
-    }    
+    static importPrivateKey(keyName: string, keyData: ArrayBuffer, moduluslength: u32 = 2048): Result<KeyRSA, Error> 
+    {
+        if(keyName == "")
+            return {data: null, err: new Error("Invalid key name: key name cannot be empty")};
 
-    static importKey(keyName: string, format: string, keyData: string, algorithm: string = 'rsa2048', algo_metadata: string = '', extractable: boolean = false): KeyRSA | null {
-        
-        //Crypto SDK currently only supports import of algorithm "rsa2048" in a "raw" format.
-        //JWK will eventually be added
-        if (!this.isValidFormat(format))
-            return null;
-        
-        if (!this.isValidAlgorithm(algorithm))
-            return null;
+        if (keyData.byteLength == 0)
+            return {data: null, err: new Error("Invalid key data: key data cannot be empty")};
 
-        if (keyData.length === 0)
-            return null;
+        if(CryptoImpl.keyExists(keyName))
+            return {data: null, err: new Error("Invalid key name: key name already exists")};
+
+        if(moduluslength != 2048 && moduluslength != 3072 && moduluslength != 4096)
+            return {data: null, err: new Error("Invalid modulus length: modulus length must be 2048, 3072, or 4096")};
+
+        let formatMetadata = CryptoUtil.getKeyFormat("pkcs1");
+        if (!formatMetadata)
+            return {data: null, err: new Error("Invalid key format")};
+
+        let shaAlgo = "sha2-256";
+        if(moduluslength == 3072)
+            shaAlgo = "sha2-384";
+        else if(moduluslength == 4096)
+            shaAlgo = "sha2-512";
+
+        let shaMetadata = CryptoUtil.getShaMetadata(shaAlgo);
+        let algoMetadata = {modulus: moduluslength, sha_metadata: shaMetadata.data} as idlV1.rsa_metadata;
+        let algoMetadataStr = String.UTF8.encode(JSON.stringify(algoMetadata));
+        let formatData = formatMetadata.data as KeyFormatWrapper;
+        
+        let keyImportResult = CryptoImpl.importKey(formatData.format, keyData, idlV1.key_algorithm.rsa, algoMetadataStr, true, ["sign", "decrypt"]);
+
+        if (!keyImportResult.data)
+            return {data: null, err: new Error("Failed to import key")};
 
         const key = new KeyRSA(keyName);
-        const result = CryptoImpl.importKey(MemoryType.Persistent, key.name, format, keyData, algorithm, algo_metadata, extractable, 
-            (format === "spki") ? 
-                ["verify", "encrypt"] :  //Public Key
-                ["sign", "decrypt"]);    //Private Key
-        if (!result)
-            return null;
-        return key;
+        key.moduluslength = moduluslength;
+        return {data: key, err: null};
     }
 
-    static exportKey(key_name: string, format: string): u8[]
+    static importPublicKey(keyName: string, keyData: ArrayBuffer, moduluslength: u32 = 2048): Result<KeyRSA, Error> 
     {
-        const ret: u8[] = [];
-        if (!this.isValidFormat(format))
-            return ret;
+        if(keyName == "")
+            return {data: null, err: new Error("Invalid key name: key name cannot be empty")};
+
+        if (keyData.byteLength == 0)
+            return {data: null, err: new Error("Invalid key data: key data cannot be empty")};
+
+        if(CryptoImpl.keyExists(keyName))
+            return {data: null, err: new Error("Invalid key name: key name already exists")};
+
+        if(moduluslength != 2048 && moduluslength != 3072 && moduluslength != 4096)
+            return {data: null, err: new Error("Invalid modulus length: modulus length must be 2048, 3072, or 4096")};
+
+        let formatMetadata = CryptoUtil.getKeyFormat("spki");
+        if (!formatMetadata)
+            return {data: null, err: new Error("Invalid key format")};
+
+        let shaAlgo = "sha2-256";
+        if(moduluslength == 3072)
+            shaAlgo = "sha2-384";
+        else if(moduluslength == 4096)
+            shaAlgo = "sha2-512";
+
+        let shaMetadata = CryptoUtil.getShaMetadata(shaAlgo);
+        let algoMetadata = {modulus: moduluslength, sha_metadata: shaMetadata.data} as idlV1.rsa_metadata;
+        let algoMetadataStr = String.UTF8.encode(JSON.stringify(algoMetadata));
+        let formatData = formatMetadata.data as KeyFormatWrapper;
+        
+        let keyImportResult = CryptoImpl.importKey(formatData.format, keyData, idlV1.key_algorithm.rsa, algoMetadataStr, true, ["verify", "encrypt"]);
+
+        if (!keyImportResult.data)
+            return {data: null, err: new Error("Failed to import key")};
+
+        const key = new KeyRSA(keyName);
+        key.moduluslength = moduluslength;
+        return {data: key, err: null};
+    }
+
+    static exportKey(key_name: string, format: string): Result<ArrayBuffer, Error>
+    {
+        let formatMetadata = CryptoUtil.getKeyFormat(format);
+        if (!formatMetadata)
+            return {data: null, err: new Error("Invalid key format")};
+
         return CryptoImpl.exportKey(key_name, format);
     }
 }

@@ -4,7 +4,7 @@
  */
 import { Result } from '../index';
 import { CryptoUtil } from './crypto_utils';
-import { CryptoImpl, Key } from './crypto_impl';
+import { CryptoImpl, KeyFormatWrapper, Key } from './crypto_impl';
 import * as idlV1 from "./crypto_subtle_idl_v1"
 import { JSON } from '@klave/sdk';
 
@@ -94,11 +94,6 @@ export class EcdsaParams
 //     name: string = "RSA-OAEP";
 //     hash: string = "SHA-256";
 // }
-
-export class KeyFormatWrapper 
-{
-    format!: idlV1.key_format;
-}
 
 export class SubtleCrypto {
     static generateKey<T>(algorithm: T, extractable: boolean, usages: string[]): Result<CryptoKey, Error>
@@ -321,8 +316,11 @@ export class SubtleCrypto {
 
             keyAlgo = idlV1.key_algorithm.rsa;
             keyGenAlgoName = algorithm.name;
-            algoMetadata = String.UTF8.encode(JSON.stringify(algorithm));
-
+            let rsaMetadata = CryptoUtil.getRSAMetadata(algorithm);
+            if(rsaMetadata.data)
+                algoMetadata = String.UTF8.encode(JSON.stringify(rsaMetadata.data));
+            else
+                return {data: null, err: new Error("Failed to generate RSA metadata")};
         }else
             return {data: null, err: new Error("Invalid algorithm")};
 
@@ -489,7 +487,7 @@ export class SubtleCrypto {
             return {data: result.data, err: null};
         else
             return {data: null, err: new Error("Failed to export key")};
-    }        
+    }
 
     static getPublicKey(format: string, key: CryptoKey | null): Result<ArrayBuffer, Error>
     {
@@ -506,5 +504,5 @@ export class SubtleCrypto {
             return {data: null, err: new Error("Invalid public key format")};
 
         return CryptoImpl.getPublicKey(key.name, formatData.format);
-    }        
+    }
 }

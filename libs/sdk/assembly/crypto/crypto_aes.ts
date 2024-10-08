@@ -31,7 +31,7 @@ export class CryptoAES {
     }
 
     static getKey(keyName: string): KeyAES | null {
-        if (CryptoImpl.keyExists(MemoryType.Persistent, keyName))
+        if (CryptoImpl.keyExists(keyName))
             return new KeyAES(keyName);
         return null
     }

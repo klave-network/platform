@@ -7,17 +7,15 @@ import { encode as b64encode } from 'as-base64/assembly';
 
 export class PublicKey {
 
-    bytes: u8[];
+    bytes: Uint8Array;
 
-    constructor(bytes: u8[]) {
+    constructor(bytes: Uint8Array) {
         this.bytes = bytes;
     }
 
     getPem(): string {
-        const buffer = new Uint8Array(this.bytes.length);        
-        buffer.set(this.bytes);        
         const pem = `-----BEGIN PUBLIC KEY-----
-${b64encode(buffer)}
+${b64encode(this.bytes)}
 -----END PUBLIC KEY-----`;
         return pem;
     }
@@ -25,17 +23,15 @@ ${b64encode(buffer)}
 
 export class PrivateKey {
 
-    bytes: u8[];
+    bytes: Uint8Array;
 
-    constructor(bytes: u8[]) {
+    constructor(bytes: Uint8Array) {
         this.bytes = bytes;
     }
 
     getPem(): string {
-        const buffer = new Uint8Array(this.bytes.length);
-        buffer.set(this.bytes);
         const pem = `-----BEGIN PRIVATE KEY-----
-${b64encode(buffer)}
+${b64encode(this.bytes)}
 -----END PRIVATE KEY-----`;
         return pem;
     }

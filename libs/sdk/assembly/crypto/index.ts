@@ -22,7 +22,7 @@ export class EcKeyGenParams extends EcKeyGenInput { }
 // export class SHA extends CryptoSHA { };
 
 export function getKey(keyName: string): Key | null {    
-    if (CryptoImpl.keyExists(MemoryType.Persistent, keyName))
+    if (CryptoImpl.keyExists(keyName))
         return new Key(keyName);
     return null
 }
