@@ -2,14 +2,13 @@
  * Environment definitions for compiling Klave Trustless Applications.
  * @module klave/sdk/crypto
  */
-
 import { Result} from '../index';
 import { CryptoImpl, Key } from './crypto_impl';
 import * as idlV1 from "./crypto_subtle_idl_v1"
-import { CryptoUtil } from './crypto_utils';
 import { PrivateKey, PublicKey } from './crypto_keys';
+import { JSON } from '@klave/sdk';
 
-class KeyECC extends Key {
+export class KeyECC extends Key {
 
     namedCurve: string = "P-256";
 
@@ -75,42 +74,36 @@ export class CryptoECDSA {
 
         if(namedCurve == "P-256" || namedCurve == "P-384" || namedCurve == "P-521")
         {
-            let algorithm = {name: "ECDSA", namedCurve: namedCurve} as EcKeyGenParams;
-            let metadata = CryptoUtil.getSECPR1Metadata(algorithm);
-            if(metadata.data)
+            let metadata : idlV1.secp_r1_metadata = {length: idlV1.secp_r1_key_bitsize.SECP_R1_256};
+            if(namedCurve == "P-256") metadata = {length: idlV1.secp_r1_key_bitsize.SECP_R1_256};
+            else if(namedCurve == "P-384") metadata = {length: idlV1.secp_r1_key_bitsize.SECP_R1_384};
+            else if(namedCurve == "P-521") metadata = {length: idlV1.secp_r1_key_bitsize.SECP_R1_521};
+            else
+                return {data: null, err: new Error("Unsupported curve")};
+            
+            let key = CryptoImpl.generateKeyAndPersist(keyName, idlV1.key_algorithm.secp_k1, String.UTF8.encode(JSON.stringify(metadata)), true, ["sign"]);
+            if (key.data)
             {
-                let algo_metadata = metadata.data as idlV1.secp_r1_metadata;
-                let key = CryptoImpl.generateKeyAndPersist(keyName, idlV1.key_algorithm.secp_k1, String.UTF8.encode(JSON.stringify(algo_metadata)), true, ["sign"]);
-                if (key.data)
-                {
-                    let keyData = key.data as Key;
-                    let kECC = new KeyECC(keyData.name);
-                    kECC.namedCurve = namedCurve;
-                    return {data: kECC, err: null};
-                }
-                else
-                    return {data: null, err: new Error("Failed to generate EC key")};
-            }else
-                return {data: null, err: new Error("Failed to generate EC metadata")};
+                let keyData = key.data as Key;
+                let kECC = new KeyECC(keyData.name);
+                kECC.namedCurve = namedCurve;
+                return {data: kECC, err: null};
+            }
+            else
+                return {data: null, err: new Error("Failed to generate EC key")};
         }else if(namedCurve == "secp256k1" || namedCurve == "SECP256K1")
         {
-            let algorithm = {name: "ECDSA", namedCurve: namedCurve} as EcKeyGenParams;
-            let metadata = CryptoUtil.getSECPK1Metadata(algorithm);
-            if(metadata.data)
+            let metadata : idlV1.secp_k1_metadata = {length: idlV1.secp_k1_key_bitsize.SECP_K1_256};
+            let key = CryptoImpl.generateKeyAndPersist(keyName, idlV1.key_algorithm.secp_k1, String.UTF8.encode(JSON.stringify(metadata)), true, ["sign"]);
+            if (key.data)
             {
-                let algo_metadata = metadata.data as idlV1.secp_k1_metadata;
-                let key = CryptoImpl.generateKeyAndPersist(keyName, idlV1.key_algorithm.secp_k1, String.UTF8.encode(JSON.stringify(algo_metadata)), true, ["sign"]);
-                if (key.data)
-                {
-                    let keyData = key.data as Key;
-                    let kECC = new KeyECC(keyData.name);
-                    kECC.namedCurve = namedCurve;
-                    return {data: kECC, err: null};
-                }
-                else
-                    return {data: null, err: new Error("Failed to generate EC key")};
-            }else
-                return {data: null, err: new Error("Failed to generate EC metadata")};
+                let keyData = key.data as Key;
+                let kECC = new KeyECC(keyData.name);
+                kECC.namedCurve = namedCurve;
+                return {data: kECC, err: null};
+            }
+            else
+                return {data: null, err: new Error("Failed to generate EC key")};
         }else
             return {data: null, err: new Error("Unsupported curve")};
     }
@@ -131,32 +124,26 @@ export class CryptoECDSA {
 
         if(namedCurve == "P-256" || namedCurve == "P-384" || namedCurve == "P-521")
         {
-            let algorithm = {name: "ECDSA", namedCurve: namedCurve} as EcKeyGenParams;
-            let metadata = CryptoUtil.getSECPR1Metadata(algorithm);
-            if(metadata.data)
-            {
-                let algo_metadata = metadata.data as idlV1.secp_r1_metadata;
-                let result = CryptoImpl.importKeyAndPersist(key.name, idlV1.key_format.pkcs8, keyData, idlV1.key_algorithm.secp_r1, String.UTF8.encode(JSON.stringify(algo_metadata)), true, ["sign"]);
-                if (!result)
-                    return {data: null, err: new Error("Failed to import EC key")};
-                else
-                    return {data: key, err: null};
-            }else
-                return {data: null, err: new Error("Failed to generate EC metadata")};
+            let metadata : idlV1.secp_r1_metadata = {length: idlV1.secp_r1_key_bitsize.SECP_R1_256};
+            if(namedCurve == "P-256") metadata = {length: idlV1.secp_r1_key_bitsize.SECP_R1_256};
+            else if(namedCurve == "P-384") metadata = {length: idlV1.secp_r1_key_bitsize.SECP_R1_384};
+            else if(namedCurve == "P-521") metadata = {length: idlV1.secp_r1_key_bitsize.SECP_R1_521};
+            else
+                return {data: null, err: new Error("Unsupported curve")};
+
+            let result = CryptoImpl.importKeyAndPersist(key.name, idlV1.key_format.pkcs8, keyData, idlV1.key_algorithm.secp_r1, String.UTF8.encode(JSON.stringify(metadata)), true, ["sign"]);
+            if (!result)
+                return {data: null, err: new Error("Failed to import EC key")};
+            else
+                return {data: key, err: null};
         }else if(namedCurve == "secp256k1" || namedCurve == "SECP256K1")
         {
-            let algorithm = {name: "ECDSA", namedCurve: namedCurve} as EcKeyGenParams;
-            let metadata = CryptoUtil.getSECPK1Metadata(algorithm);
-            if(metadata.data)
-            {
-                let algo_metadata = metadata.data as idlV1.secp_k1_metadata;
-                let result = CryptoImpl.importKeyAndPersist(key.name, idlV1.key_format.pkcs8, keyData, idlV1.key_algorithm.secp_k1, String.UTF8.encode(JSON.stringify(algo_metadata)), true, ["sign"]);
-                if (!result)
-                    return {data: null, err: new Error("Failed to import EC key")};
-                else
-                    return {data: key, err: null};
-            }else
-                return {data: null, err: new Error("Failed to generate EC metadata")};
+            let metadata : idlV1.secp_k1_metadata = {length: idlV1.secp_k1_key_bitsize.SECP_K1_256};
+            let result = CryptoImpl.importKeyAndPersist(key.name, idlV1.key_format.pkcs8, keyData, idlV1.key_algorithm.secp_k1, String.UTF8.encode(JSON.stringify(metadata)), true, ["sign"]);
+            if (!result)
+                return {data: null, err: new Error("Failed to import EC key")};
+            else
+                return {data: key, err: null};
         }else
             return {data: null, err: new Error("Unsupported curve")};
     }
@@ -177,43 +164,37 @@ export class CryptoECDSA {
 
         if(namedCurve == "P-256" || namedCurve == "P-384" || namedCurve == "P-521")
         {
-            let algorithm = {name: "ECDSA", namedCurve: namedCurve} as EcKeyGenParams;
-            let metadata = CryptoUtil.getSECPR1Metadata(algorithm);
-            if(metadata.data)
-            {
-                let algo_metadata = metadata.data as idlV1.secp_r1_metadata;
-                let result = CryptoImpl.importKeyAndPersist(key.name, idlV1.key_format.spki, keyData, idlV1.key_algorithm.secp_r1, String.UTF8.encode(JSON.stringify(algo_metadata)), true, ["verify"]);
-                if (!result)
-                    return {data: null, err: new Error("Failed to import EC key")};
-                else
-                    return {data: key, err: null};
-            }else
-                return {data: null, err: new Error("Failed to generate EC metadata")};
+            let metadata : idlV1.secp_r1_metadata = {length: idlV1.secp_r1_key_bitsize.SECP_R1_256};
+            if(namedCurve == "P-256") metadata = {length: idlV1.secp_r1_key_bitsize.SECP_R1_256};
+            else if(namedCurve == "P-384") metadata = {length: idlV1.secp_r1_key_bitsize.SECP_R1_384};
+            else if(namedCurve == "P-521") metadata = {length: idlV1.secp_r1_key_bitsize.SECP_R1_521};
+            else
+                return {data: null, err: new Error("Unsupported curve")};
+
+            let result = CryptoImpl.importKeyAndPersist(key.name, idlV1.key_format.spki, keyData, idlV1.key_algorithm.secp_r1, String.UTF8.encode(JSON.stringify(metadata)), true, ["verify"]);
+            if (!result)
+                return {data: null, err: new Error("Failed to import EC key")};
+            else
+                return {data: key, err: null};
         }else if(namedCurve == "secp256k1" || namedCurve == "SECP256K1")
         {
-            let algorithm = {name: "ECDSA", namedCurve: namedCurve} as EcKeyGenParams;
-            let metadata = CryptoUtil.getSECPK1Metadata(algorithm);
-            if(metadata.data)
-            {
-                let algo_metadata = metadata.data as idlV1.secp_k1_metadata;
-                let result = CryptoImpl.importKeyAndPersist(key.name, idlV1.key_format.spki, keyData, idlV1.key_algorithm.secp_k1, String.UTF8.encode(JSON.stringify(algo_metadata)), true, ["verify"]);
-                if (!result)
-                    return {data: null, err: new Error("Failed to import EC key")};
-                else
-                    return {data: key, err: null};
-            }else
-                return {data: null, err: new Error("Failed to generate EC metadata")};
+            let metadata : idlV1.secp_k1_metadata = {length: idlV1.secp_k1_key_bitsize.SECP_K1_256};
+            let result = CryptoImpl.importKeyAndPersist(key.name, idlV1.key_format.spki, keyData, idlV1.key_algorithm.secp_k1, String.UTF8.encode(JSON.stringify(metadata)), true, ["verify"]);
+            if (!result)
+                return {data: null, err: new Error("Failed to import EC key")};
+            else
+                return {data: key, err: null};
         }else
             return {data: null, err: new Error("Unsupported curve")};
     }
 
     static exportPrivateKey(keyName: string): Result<ArrayBuffer, Error>
     {
-        return CryptoImpl.exportKey(keyName, "pkcs8");
+        return CryptoImpl.exportKey(keyName, idlV1.key_format.pkcs8);
     }
 
     static exportPublicKey(keyName: string): Result<ArrayBuffer, Error>
     {
-        return CryptoImpl.exportKey(keyName, "spki");
+        return CryptoImpl.exportKey(keyName, idlV1.key_format.spki);
     }
 }

@@ -6,8 +6,8 @@
 import { CryptoImpl, Key } from './crypto_impl';
 import * as SubtleCrypto from './crypto_subtle';
 import { CryptoAES } from './crypto_aes';
-import { CryptoECDSA } from './crypto_ecc';
-import { CryptoRSA } from './crypto_rsa';
+import { CryptoECDSA, KeyECC as ECCKey } from './crypto_ecc';
+import { CryptoRSA, KeyRSA as RSAKey } from './crypto_rsa';
 import { CryptoSHA } from './crypto_sha';
 import { encode as b64encode } from 'as-base64/assembly';
 
@@ -21,7 +21,9 @@ export class EcKeyGenParams extends SubtleCrypto.EcKeyGenParams { }
 export class EcdsaParams extends SubtleCrypto.EcdsaParams { }
 export class AES extends CryptoAES { };
 export class ECDSA extends CryptoECDSA { };
+export class KeyECC extends ECCKey { };
 export class RSA extends CryptoRSA { };
+export class KeyRSA extends RSAKey { };
 export class SHA extends CryptoSHA { };
 
 export function getKey(keyName: string): Key | null {    

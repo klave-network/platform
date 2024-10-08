@@ -7,8 +7,9 @@ import { CryptoImpl, Key } from './crypto_impl';
 import * as idlV1 from "./crypto_subtle_idl_v1"
 import { CryptoUtil, KeyFormatWrapper } from './crypto_utils';
 import { PrivateKey, PublicKey } from './crypto_keys';
+import { JSON } from '@klave/sdk';
 
-class KeyRSA extends Key {
+export class KeyRSA extends Key {
 
     moduluslength: u32 = 2048;
 
@@ -94,7 +95,8 @@ export class CryptoRSA {
             shaAlgo = "sha2-512";
 
         let shaMetadata = CryptoUtil.getShaMetadata(shaAlgo);
-        let algoMetadata = {modulus: moduluslength, sha_metadata: shaMetadata.data} as idlV1.rsa_metadata;
+        let metadata = shaMetadata.data as idlV1.sha_metadata;
+        let algoMetadata = {modulus: moduluslength, sha_metadata: metadata} as idlV1.rsa_metadata;
         const key = CryptoImpl.generateKeyAndPersist(keyName, idlV1.key_algorithm.rsa, String.UTF8.encode(JSON.stringify(algoMetadata)), true, ["sign", "decrypt"]);
         if (!key.data) {
             return {data: null, err: new Error("Failed to generate RSA key")};
@@ -132,7 +134,8 @@ export class CryptoRSA {
             shaAlgo = "sha2-512";
 
         let shaMetadata = CryptoUtil.getShaMetadata(shaAlgo);
-        let algoMetadata = {modulus: moduluslength, sha_metadata: shaMetadata.data} as idlV1.rsa_metadata;
+        let metadata = shaMetadata.data as idlV1.sha_metadata;
+        let algoMetadata = {modulus: moduluslength, sha_metadata: metadata} as idlV1.rsa_metadata;
         let algoMetadataStr = String.UTF8.encode(JSON.stringify(algoMetadata));
         let formatData = formatMetadata.data as KeyFormatWrapper;
         
@@ -171,7 +174,8 @@ export class CryptoRSA {
             shaAlgo = "sha2-512";
 
         let shaMetadata = CryptoUtil.getShaMetadata(shaAlgo);
-        let algoMetadata = {modulus: moduluslength, sha_metadata: shaMetadata.data} as idlV1.rsa_metadata;
+        let metadata = shaMetadata.data as idlV1.sha_metadata;
+        let algoMetadata = {modulus: moduluslength, sha_metadata: metadata} as idlV1.rsa_metadata;
         let algoMetadataStr = String.UTF8.encode(JSON.stringify(algoMetadata));
         let formatData = formatMetadata.data as KeyFormatWrapper;
         
@@ -187,11 +191,11 @@ export class CryptoRSA {
 
     static exportPrivateKey(keyName: string): Result<ArrayBuffer, Error>
     {
-        return CryptoImpl.exportKey(keyName, "pkcs1");
+        return CryptoImpl.exportKey(keyName, idlV1.key_format.pkcs1);
     }
 
     static exportPublicKey(keyName: string): Result<ArrayBuffer, Error>
     {
-        return CryptoImpl.exportKey(keyName, "spki");
+        return CryptoImpl.exportKey(keyName, idlV1.key_format.spki);
     }
 }
