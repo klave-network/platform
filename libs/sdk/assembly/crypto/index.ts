@@ -4,18 +4,21 @@
  */
 
 import { CryptoImpl, Key } from './crypto_impl';
-import { SubtleCrypto, RsaHashedKeyGenParams as RsaKeyGenInput, RsaOaepParams as RsaOaepInput, AesKeyGenParams as AesKeyGenInput, EcKeyGenParams as EcKeyGenInput } from './crypto_subtle';
+import * as SubtleCrypto from './crypto_subtle';
 import { CryptoAES } from './crypto_aes';
 import { CryptoECDSA } from './crypto_ecc';
 import { CryptoRSA } from './crypto_rsa';
 import { CryptoSHA } from './crypto_sha';
 import { encode as b64encode } from 'as-base64/assembly';
 
-export class Subtle extends SubtleCrypto { }
-export class RsaHashedKeyGenParams extends RsaKeyGenInput { }
-export class RsaOaepParams extends RsaOaepInput { }
-export class AesKeyGenParams extends AesKeyGenInput { }
-export class EcKeyGenParams extends EcKeyGenInput { }
+export class Subtle extends SubtleCrypto.SubtleCrypto { }
+export class RsaHashedKeyGenParams extends SubtleCrypto.RsaHashedKeyGenParams { }
+export class RsaOaepParams extends SubtleCrypto.RsaOaepParams { }
+export class RsaPssParams extends SubtleCrypto.RsaPssParams { }
+export class AesKeyGenParams extends SubtleCrypto.AesKeyGenParams { }
+export class AesGcmParams extends SubtleCrypto.AesGcmParams { }
+export class EcKeyGenParams extends SubtleCrypto.EcKeyGenParams { }
+export class EcdsaParams extends SubtleCrypto.EcdsaParams { }
 export class AES extends CryptoAES { };
 export class ECDSA extends CryptoECDSA { };
 export class RSA extends CryptoRSA { };
