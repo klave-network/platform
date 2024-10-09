@@ -7,9 +7,9 @@ import { Utils } from './index';
 import { Result} from '../index';
 import { CryptoImpl, Key } from './crypto_impl';
 import * as idlV1 from "./crypto_subtle_idl_v1"
-import { CryptoUtil, KeyFormatWrapper } from './crypto_utils';
+import { JSON } from '@klave/sdk';
 
-class KeyAES extends Key {
+export class KeyAES extends Key {
 
     length: u32 = 256;
 
@@ -45,16 +45,18 @@ export class CryptoAES {
         if(CryptoImpl.keyExists(keyName))
             return {data: null, err: new Error("Invalid key name: key name already exists")};
 
-        if(length != 128 && length != 192 && length != 256)
+        let bitSize : idlV1.aes_key_bitsize = idlV1.aes_key_bitsize.AES_256;
+        if(length == 128)
+            bitSize = idlV1.aes_key_bitsize.AES_128;
+        else if(length == 192)
+            bitSize = idlV1.aes_key_bitsize.AES_192;
+        else if(length == 256)
+            bitSize = idlV1.aes_key_bitsize.AES_256;
+        else
             return {data: null, err: new Error("Invalid AES Key length: Length must be 128, 192, or 256")};
-
-        let algorithm = {name: "AES-GCM", length: length} as AesKeyGenParams;
-        let metadata = CryptoUtil.getAESMetadata(algorithm);
-        if(!metadata.data)
-            return {data: null, err: new Error("Invalid AES Metadata")};
-
-        let aesMetadata = metadata.data as idlV1.aes_metadata;
-        let key = CryptoImpl.generateKeyAndPersist(keyName, idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(aesMetadata)), true, ["decrypt", "encrypt"]);
+        
+        let metadata = {length: bitSize} as idlV1.aes_metadata;
+        let key = CryptoImpl.generateKeyAndPersist(keyName, idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(metadata)), true, ["decrypt", "encrypt"]);
 
         if(!key)
             return {data: null, err: new Error("Failed to generate AES Key")};
@@ -76,21 +78,18 @@ export class CryptoAES {
         if(CryptoImpl.keyExists(keyName))
             return {data: null, err: new Error("Invalid key name: key name already exists")};
 
-        if(length != 128 && length != 192 && length != 256)
+        let bitSize : idlV1.aes_key_bitsize = idlV1.aes_key_bitsize.AES_256;
+        if(length == 128)
+            bitSize = idlV1.aes_key_bitsize.AES_128;
+        else if(length == 192)
+            bitSize = idlV1.aes_key_bitsize.AES_192;
+        else if(length == 256)
+            bitSize = idlV1.aes_key_bitsize.AES_256;
+        else
             return {data: null, err: new Error("Invalid AES Key length: Length must be 128, 192, or 256")};
-
-        let formatMetadata = CryptoUtil.getKeyFormat("raw");
-        if (!formatMetadata)
-            return {data: null, err: new Error("Invalid key format")};
-
-        let format = formatMetadata.data as KeyFormatWrapper;
-        let algorithm = {name: "AES-GCM", length: length} as AesKeyGenParams;
-        let metadata = CryptoUtil.getAESMetadata(algorithm);
-        if(!metadata.data)
-            return {data: null, err: new Error("Invalid AES Metadata")};
-
-        let aesMetadata = metadata.data as idlV1.aes_metadata;
-        let key = CryptoImpl.importKeyAndPersist(keyName, format.format, keyData, idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(aesMetadata)), true, ["decrypt", "encrypt"]);
+        
+        let metadata = {length: bitSize} as idlV1.aes_metadata;
+        let key = CryptoImpl.importKeyAndPersist(keyName, idlV1.key_format.raw, keyData, idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(metadata)), true, ["decrypt", "encrypt"]);
         
         if(!key)
             return {data: null, err: new Error("Failed to import AES Key")};
@@ -103,7 +102,7 @@ export class CryptoAES {
 
     static exportKey(keyName: string): Result<ArrayBuffer, Error>
     {
-        return CryptoImpl.exportKey(keyName, "raw");
+        return CryptoImpl.exportKey(keyName, idlV1.key_format.raw);
     }
 }
 

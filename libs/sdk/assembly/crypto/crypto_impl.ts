@@ -1,6 +1,4 @@
-import { decode, encode as b64encode } from 'as-base64/assembly';
 import uuid from '../uuid';
-import { Crypto, Notifier } from '@klave/sdk';
 import * as idlV1 from "./crypto_subtle_idl_v1"
 import { Result } from '..';
 
@@ -75,6 +73,11 @@ export class Key {
             this.name = uuid(rndsArray);
         }
     }
+}
+
+export class VerifySignResult 
+{
+    isValid!: boolean;
 }
 
 export const enum MemoryType {
@@ -197,13 +200,15 @@ export class CryptoImpl {
         return {data: value.buffer.slice(0, result), err: null};
     }
     
-    static verify(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, data: ArrayBuffer, signature: ArrayBuffer): Result<boolean, Error>
+    static verify(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, data: ArrayBuffer, signature: ArrayBuffer): Result<VerifySignResult, Error>
     {
         let k = String.UTF8.encode(keyName, true);
         let result = wasm_verify(k, algorithm, algoMetadata, data, data.byteLength, signature, signature.byteLength);
         if (result < 0)
             return {data: null, err: new Error("Failed to verify")};
-        return {data: result != 0, err: null};
+        
+        let resBool = {isValid: result == 1} as VerifySignResult;
+        return {data: resBool, err: null};
     }
     
     static digest(algorithm: idlV1.hash_algorithm, hashInfo: ArrayBuffer, text: ArrayBuffer): Result<ArrayBuffer, Error>

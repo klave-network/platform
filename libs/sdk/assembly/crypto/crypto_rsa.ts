@@ -3,7 +3,7 @@
  * @module klave/sdk/crypto
  */
 import { Result } from '../index';
-import { CryptoImpl, Key } from './crypto_impl';
+import { CryptoImpl, Key, VerifySignResult } from './crypto_impl';
 import * as idlV1 from "./crypto_subtle_idl_v1"
 import { CryptoUtil, KeyFormatWrapper } from './crypto_utils';
 import { PrivateKey, PublicKey } from './crypto_keys';
@@ -38,7 +38,7 @@ export class KeyRSA extends Key {
         return CryptoImpl.sign(this.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata)), data);
     }
 
-    verify(data: ArrayBuffer, signature: ArrayBuffer): Result<boolean, Error>{
+    verify(data: ArrayBuffer, signature: ArrayBuffer): Result<VerifySignResult, Error>{
         let saltLength = 32;
         if(this.moduluslength == 3072)
             saltLength = 48;
@@ -50,7 +50,7 @@ export class KeyRSA extends Key {
     }
 
     getPublicKey(): PublicKey {
-        let result = CryptoImpl.getPublicKey(this.name, "spki");
+        let result = CryptoImpl.getPublicKey(this.name, idlV1.key_format.spki);
         if(!result.data)
             return new PublicKey(new Uint8Array(0));
 
@@ -59,9 +59,9 @@ export class KeyRSA extends Key {
     }
 
     getPrivateKey(): PrivateKey {
-        let result = CryptoImpl.exportKey(this.name, "pkcs1");
+        let result = CryptoImpl.exportKey(this.name, idlV1.key_format.pkcs1);
         if(!result.data)
-            return new PublicKey(new Uint8Array(0));
+            return new PrivateKey(new Uint8Array(0));
 
         let resBuffer = result.data as ArrayBuffer;
         return new PrivateKey(Uint8Array.wrap(resBuffer));

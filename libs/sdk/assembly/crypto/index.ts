@@ -5,7 +5,7 @@
 
 import { CryptoImpl, Key } from './crypto_impl';
 import * as SubtleCrypto from './crypto_subtle';
-import { CryptoAES } from './crypto_aes';
+import { CryptoAES, KeyAES as AESKey } from './crypto_aes';
 import { CryptoECDSA, KeyECC as ECCKey } from './crypto_ecc';
 import { CryptoRSA, KeyRSA as RSAKey } from './crypto_rsa';
 import { CryptoSHA } from './crypto_sha';
@@ -20,6 +20,7 @@ export class AesGcmParams extends SubtleCrypto.AesGcmParams { }
 export class EcKeyGenParams extends SubtleCrypto.EcKeyGenParams { }
 export class EcdsaParams extends SubtleCrypto.EcdsaParams { }
 export class AES extends CryptoAES { };
+export class KeyAES extends AESKey { }
 export class ECDSA extends CryptoECDSA { };
 export class KeyECC extends ECCKey { };
 export class RSA extends CryptoRSA { };

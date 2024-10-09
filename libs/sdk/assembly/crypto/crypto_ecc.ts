@@ -3,7 +3,7 @@
  * @module klave/sdk/crypto
  */
 import { Result} from '../index';
-import { CryptoImpl, Key } from './crypto_impl';
+import { CryptoImpl, VerifySignResult, Key } from './crypto_impl';
 import * as idlV1 from "./crypto_subtle_idl_v1"
 import { PrivateKey, PublicKey } from './crypto_keys';
 import { JSON } from '@klave/sdk';
@@ -14,7 +14,7 @@ export class KeyECC extends Key {
 
     sign(text: ArrayBuffer): Result<ArrayBuffer, Error> 
     {
-        let hashAlgo = {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_256};
+        let hashAlgo = {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_256} as idlV1.sha_metadata;
         if(this.namedCurve == "P-256") hashAlgo = {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_256};
         else if(this.namedCurve == "P-384") hashAlgo = {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_384};
         else if(this.namedCurve == "P-521") hashAlgo = {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_512};
@@ -24,21 +24,21 @@ export class KeyECC extends Key {
         return CryptoImpl.sign(this.name, idlV1.signing_algorithm.ecdsa, String.UTF8.encode(JSON.stringify(signatureMetadata)), text);
     }
 
-    verify(data: ArrayBuffer, signature: ArrayBuffer): Result<Boolean, Error>
+    verify(data: ArrayBuffer, signature: ArrayBuffer): Result<VerifySignResult, Error>
     {
-        let hashAlgo = {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_256};
+        let hashAlgo = {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_256}  as idlV1.sha_metadata;
         if(this.namedCurve == "P-256") hashAlgo = {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_256};
         else if(this.namedCurve == "P-384") hashAlgo = {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_384};
         else if(this.namedCurve == "P-521") hashAlgo = {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_512};
         else if(this.namedCurve == "secp256k1" || this.namedCurve == "SECP256K1") hashAlgo = {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_256};
-        else return {data: false, err: new Error("Unsupported curve")};
+        else return {data: null, err: new Error("Unsupported curve")};
 
         let signatureMetadata: idlV1.ecdsa_signature_metadata = {sha_metadata: hashAlgo};
         return CryptoImpl.verify(this.name, idlV1.signing_algorithm.ecdsa, String.UTF8.encode(JSON.stringify(signatureMetadata)), data, signature);
     }
 
     getPublicKey(): PublicKey {
-        let result = CryptoImpl.getPublicKey(this.name, "spki");
+        let result = CryptoImpl.getPublicKey(this.name, idlV1.key_format.spki);
         if(!result.data)
             return new PublicKey(new Uint8Array(0));
 
@@ -47,9 +47,9 @@ export class KeyECC extends Key {
     }
 
     getPrivateKey(): PrivateKey {
-        let result = CryptoImpl.exportKey(this.name, "pkcs8");
+        let result = CryptoImpl.exportKey(this.name, idlV1.key_format.pkcs8);
         if(!result.data)
-            return new PublicKey(new Uint8Array(0));
+            return new PrivateKey(new Uint8Array(0));
 
         let resBuffer = result.data as ArrayBuffer;
         return new PrivateKey(Uint8Array.wrap(resBuffer));

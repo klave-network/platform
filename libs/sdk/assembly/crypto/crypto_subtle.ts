@@ -4,7 +4,7 @@
  */
 import { Result } from '../index';
 import { CryptoUtil, KeyFormatWrapper } from './crypto_utils';
-import { CryptoImpl, Key } from './crypto_impl';
+import { CryptoImpl, Key, VerifySignResult } from './crypto_impl';
 import * as idlV1 from "./crypto_subtle_idl_v1"
 import { JSON } from '@klave/sdk';
 
@@ -237,17 +237,17 @@ export class SubtleCrypto {
         return {data: null, err: new Error("Invalid algorithm")};
     }
     
-    static verify<T>(algorithm: T, key: CryptoKey, data: ArrayBuffer | null, signature: ArrayBuffer | null): Result<boolean, Error>
+    static verify<T>(algorithm: T, key: CryptoKey, data: ArrayBuffer | null, signature: ArrayBuffer | null): Result<VerifySignResult, Error>
     {
         if(!data)
-            return {data: false, err: new Error("Invalid data: data cannot be null")};
+            return {data: null, err: new Error("Invalid data: data cannot be null")};
         if(!signature)
-            return {data: false, err: new Error("Invalid signature: signature cannot be null")};
+            return {data: null, err: new Error("Invalid signature: signature cannot be null")};
         if(algorithm instanceof EcdsaParams)
         {
             let hash_info = CryptoUtil.getShaMetadata(algorithm.hash);
             if(!hash_info.data)
-                return {data: false, err: hash_info.err};
+                return {data: null, err: hash_info.err};
 
             let metadata: idlV1.ecdsa_signature_metadata = {sha_metadata: hash_info.data};
             return CryptoImpl.verify(key.name, idlV1.signing_algorithm.ecdsa, String.UTF8.encode(JSON.stringify(metadata)), data, signature);
@@ -257,7 +257,7 @@ export class SubtleCrypto {
             return CryptoImpl.verify(key.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata)), data, signature);
         }
 
-        return {data: false, err: new Error("Invalid algorithm")};
+        return {data: null, err: new Error("Invalid algorithm")};
     }
     
     static digest(algorithm: string, data: ArrayBuffer | null): Result<ArrayBuffer, Error>
