@@ -80,11 +80,6 @@ export class VerifySignResult
     isValid!: boolean;
 }
 
-export const enum MemoryType {
-    Persistent = 0,
-    InMemory = 1,
-};
-
 export class CryptoImpl {
 
     static usage(input: string): i32 {

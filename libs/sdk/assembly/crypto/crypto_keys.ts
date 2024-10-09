@@ -36,9 +36,3 @@ ${b64encode(this.bytes)}
         return pem;
     }
 }
-
-@JSON
-export class SimpleKeyPair {
-    privateKey: string | null = null;
-    publicKey: string | null = null;
-}
