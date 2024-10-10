@@ -19,6 +19,7 @@ export class AesKeyGenParams extends SubtleCrypto.AesKeyGenParams { }
 export class AesGcmParams extends SubtleCrypto.AesGcmParams { }
 export class EcKeyGenParams extends SubtleCrypto.EcKeyGenParams { }
 export class EcdsaParams extends SubtleCrypto.EcdsaParams { }
+export class NamedAlgorithm extends SubtleCrypto.NamedAlgorithm { }
 export class AES extends CryptoAES { };
 export class KeyAES extends AESKey { }
 export class ECDSA extends CryptoECDSA { };

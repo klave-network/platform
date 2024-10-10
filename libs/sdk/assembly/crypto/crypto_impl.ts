@@ -1,6 +1,6 @@
 import uuid from '../uuid';
 import * as idlV1 from "./crypto_subtle_idl_v1"
-import { Result } from '..';
+import { Result } from '../index';
 
 //Persistent Crypto operations (i.e. output that are stored in the ledger)
 // @ts-ignore: decorator
@@ -75,8 +75,7 @@ export class Key {
     }
 }
 
-export class VerifySignResult 
-{
+export class VerifySignResult {
     isValid!: boolean;
 }
 

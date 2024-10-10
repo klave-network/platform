@@ -54,22 +54,22 @@ export class CryptoUtil
 
     static getShaMetadata(algorithm: string): Result<idlV1.sha_metadata, Error>
     {
-        if(algorithm == "sha2-256" || algorithm == "sha2_256" || algorithm == "sha256")
+        if(algorithm == "sha2-256" || algorithm == "SHA2-256" || algorithm == "sha256" || algorithm == "SHA256")
         {
             return  {data: {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_256}, err: null};
-        }else if(algorithm == "sha2-384" || algorithm == "sha2_384" || algorithm == "sha384")
+        }else if(algorithm == "sha2-384" || algorithm == "SHA2-384" || algorithm == "sha384" || algorithm == "SHA384")
         {
             return {data: {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_384}, err: null};
-        }else if(algorithm == "sha2-512" || algorithm == "sha2_512" || algorithm == "sha512")
+        }else if(algorithm == "sha2-512" || algorithm == "SHA2-512" || algorithm == "sha512" || algorithm == "SHA512")
         {
             return {data: {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_512}, err: null};
-        }else if(algorithm == "sha3-256" || algorithm == "sha3_256")
+        }else if(algorithm == "sha3-256" || algorithm == "SHA3-256")
         {
             return {data: {algo_id: idlV1.sha_algorithm.sha3, length: idlV1.sha_digest_bitsize.SHA_256}, err: null};
-        }else if(algorithm == "sha3-384" || algorithm == "sha3_384")
+        }else if(algorithm == "sha3-384" || algorithm == "SHA3-384")
         {
             return {data: {algo_id: idlV1.sha_algorithm.sha3, length: idlV1.sha_digest_bitsize.SHA_384}, err: null};
-        }else if (algorithm == "sha3-512" || algorithm == "sha3_512")
+        }else if (algorithm == "sha3-512" || algorithm == "SHA3-512")
         {
             return {data: {algo_id: idlV1.sha_algorithm.sha3, length: idlV1.sha_digest_bitsize.SHA_512}, err: null};
         }else
@@ -93,11 +93,11 @@ export class CryptoUtil
         let shaMetadata = CryptoUtil.getShaMetadata(params.hash);
 
         if(shaMetadata.data)
-            return {data: {modulus: bitsize, sha_metadata: shaMetadata.data as idlV1.sha_metadata}, err: null};
+            return {data: {modulus: bitsize, public_exponent:params.publicExponent, sha_metadata: shaMetadata.data as idlV1.sha_metadata}, err: null};
         else if(shaMetadata.err)
             return {data: null, err: shaMetadata.err};
 
-        return {data: null, err: new Error("Invalid RSA Metadata")};
+        return {data: null, err: new Error("getRSAMetadata: Invalid RSA Metadata")};
     }
 
     static getSECPR1Metadata(params: EcKeyGenParams): Result<idlV1.secp_r1_metadata, Error>

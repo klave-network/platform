@@ -87,8 +87,18 @@ export class SubtleCrypto {
                     let keyData = key.data as Key;
                     return {data: new CryptoKey(keyData.name, algorithm.name, extractable, usages), err: null};
                 }
+                else if(key.err)
+                {
+                    let error = key.err as Error;
+                    return {data: null, err: new Error(error.message)};
+                }
                 else
                     return {data: null, err: new Error("Failed to generate RSA key")};
+            }
+            else if(rsaMetadata.err)
+            {
+                let error = rsaMetadata.err as Error;
+                return {data: null, err: new Error(error.message)};
             }
             else
                 return {data: null, err: new Error("Failed to generate RSA metadata")};
@@ -166,6 +176,7 @@ export class SubtleCrypto {
             let additionalData = Uint8Array.wrap(algorithm.additionalData);
             let aesGcmParams: idlV1.aes_gcm_encryption_metadata = {iv: iv, additionalData: additionalData, tagLength: algorithm.tagLength};
             return CryptoImpl.encrypt(key.name, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams)), clear_text);
+
         }else
             return {data: null, err: new Error("Invalid algorithm")};
     }
@@ -205,11 +216,11 @@ export class SubtleCrypto {
                 return {data: null, err: hash_info.err};
 
             let hashMetadata = hash_info.data as idlV1.sha_metadata;
-            let metadata = {sha_metadata: hashMetadata} as idlV1.ecdsa_signature_metadata;
+            let metadata: idlV1.ecdsa_signature_metadata = {sha_metadata: hashMetadata};
             return CryptoImpl.sign(key.name, idlV1.signing_algorithm.ecdsa, String.UTF8.encode(JSON.stringify(metadata)), data);
         }else if(algorithm instanceof RsaPssParams)
         {
-            let metadata = {saltLength: algorithm.saltLength} as idlV1.rsa_pss_signature_metadata;
+            let metadata: idlV1.rsa_pss_signature_metadata = {saltLength: algorithm.saltLength};
             return CryptoImpl.sign(key.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata)), data);
         }
 
@@ -231,11 +242,11 @@ export class SubtleCrypto {
                 return {data: null, err: hash_info.err};
 
             let hashMetadata = hash_info.data as idlV1.sha_metadata;
-            let metadata = {sha_metadata: hashMetadata} as idlV1.ecdsa_signature_metadata;
+            let metadata: idlV1.ecdsa_signature_metadata = {sha_metadata: hashMetadata};
             return CryptoImpl.verify(key.name, idlV1.signing_algorithm.ecdsa, String.UTF8.encode(JSON.stringify(metadata)), data, signature);
         }else if(algorithm instanceof RsaPssParams)
         {
-            let metadata = {saltLength: algorithm.saltLength} as idlV1.rsa_pss_signature_metadata;
+            let metadata: idlV1.rsa_pss_signature_metadata = {saltLength: algorithm.saltLength};
             return CryptoImpl.verify(key.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata)), data, signature);
         }
 

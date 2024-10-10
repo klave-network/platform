@@ -121,6 +121,7 @@ export enum rsa_key_bitsize
 export class rsa_metadata      
 {
     modulus!: rsa_key_bitsize;
+    public_exponent!: u32;
     sha_metadata!: sha_metadata;
 };
 
