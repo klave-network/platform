@@ -51,8 +51,7 @@ declare function stop_recording(): i32;
 @external("env", "cancel_transaction")
 declare function abort_transaction(): i32;
 
-export class Result<T, E>
-{
+export class Result<T, E> {
     data!: T | null;
     err!: E | null;
 }

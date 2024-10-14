@@ -20,18 +20,18 @@ export class AesGcmParams extends SubtleCrypto.AesGcmParams { }
 export class EcKeyGenParams extends SubtleCrypto.EcKeyGenParams { }
 export class EcdsaParams extends SubtleCrypto.EcdsaParams { }
 export class NamedAlgorithm extends SubtleCrypto.NamedAlgorithm { }
-export class AES extends CryptoAES { };
+export class AES extends CryptoAES { }
 export class KeyAES extends AESKey { }
-export class ECDSA extends CryptoECDSA { };
-export class KeyECC extends ECCKey { };
-export class RSA extends CryptoRSA { };
-export class KeyRSA extends RSAKey { };
-export class SHA extends CryptoSHA { };
+export class ECDSA extends CryptoECDSA { }
+export class KeyECC extends ECCKey { }
+export class RSA extends CryptoRSA { }
+export class KeyRSA extends RSAKey { }
+export class SHA extends CryptoSHA { }
 
-export function getKey(keyName: string): Key | null {    
+export function getKey(keyName: string): Key | null {
     if (CryptoImpl.keyExists(keyName))
         return new Key(keyName);
-    return null
+    return null;
 }
 
 export function getRandomValues(size: i32): u8[] {
@@ -41,7 +41,7 @@ export function getRandomValues(size: i32): u8[] {
 export function getPem(key: Uint8Array, isPrivate: bool = false) : string
 {
     if(!isPrivate)
-    {        
+    {
         const pem = `-----BEGIN PUBLIC KEY-----
 ${b64encode(key)}
 -----END PUBLIC KEY-----`;
@@ -57,7 +57,7 @@ ${b64encode(key)}
 export class Utils {
 
     static convertToU8Array(input: Uint8Array): u8[] {
-        let ret: u8[] = [];
+        const ret: u8[] = [];
         for (let i = 0; i < input.length; ++i)
             ret[i] = input[i];
 
@@ -65,7 +65,7 @@ export class Utils {
     }
 
     static convertToUint8Array(input: u8[]): Uint8Array {
-        let value = new Uint8Array(input.length);
+        const value = new Uint8Array(input.length);
         for (let i = 0; i < input.length; ++i) {
             value[i] = input[i];
         }

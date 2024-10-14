@@ -101,223 +101,205 @@ export class CryptoImpl {
         return -1;
     }
 
-    static keyExists(key_name: string): boolean {        
+    static keyExists(key_name: string): boolean {
         let result = false;
         result = wasm_key_exists(String.UTF8.encode(key_name, true));
         return result;
     }
 
-    static generateKeyAndPersist(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key,Error>
-    {
+    static generateKeyAndPersist(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error> {
         const local_usages = new Uint8Array(usages.length);
-        for(let i = 0; i < usages.length; i++)
-        {
+        for (let i = 0; i < usages.length; i++) {
             local_usages[i] = this.usage(usages[i]);
         }
 
         const key = new Key(keyName);
         let result = 0;
         result = wasm_generate_key_and_persist(
-                String.UTF8.encode(key.name, true), algorithm, algoMetadata, extractable?1:0, local_usages.buffer, local_usages.length);
+            String.UTF8.encode(key.name, true), algorithm, algoMetadata, extractable ? 1 : 0, local_usages.buffer, local_usages.length);
         if (result < 0)
-            return {data: null, err: new Error("Failed to generate key")};
+            return { data: null, err: new Error("Failed to generate key") };
 
-        return {data: key, err: null};
+        return { data: key, err: null };
     }
 
-    static generateKey(algorithm: u32, algoMetadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key,Error>
-    {
+    static generateKey(algorithm: u32, algoMetadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error> {
         const local_usages = new Uint8Array(usages.length);
-        for(let i = 0; i < usages.length; i++)
-        {
+        for (let i = 0; i < usages.length; i++) {
             local_usages[i] = this.usage(usages[i]);
         }
 
         const key = new Key("");
         let result = 0;
         result = wasm_generate_key(
-                String.UTF8.encode(key.name, true), algorithm, algoMetadata, extractable?1:0, local_usages.buffer, local_usages.length);
+            String.UTF8.encode(key.name, true), algorithm, algoMetadata, extractable ? 1 : 0, local_usages.buffer, local_usages.length);
         if (result < 0)
-            return {data: null, err: new Error("Failed to generate key")};
+            return { data: null, err: new Error("Failed to generate key") };
 
-        return {data: key, err: null};
+        return { data: key, err: null };
     }
 
-    static encrypt(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, clearText: ArrayBuffer): Result<ArrayBuffer, Error>
-    {
+    static encrypt(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, clearText: ArrayBuffer): Result<ArrayBuffer, Error> {
         let k = String.UTF8.encode(keyName, true);
         let value = new Uint8Array(64);
         let result = wasm_encrypt(k, algorithm, algoMetadata, clearText, clearText.byteLength, value.buffer, value.byteLength);
         if (result < 0)
-            return {data: null, err: new Error("Failed to encrypt")};
+            return { data: null, err: new Error("Failed to encrypt") };
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new Uint8Array(result);
             result = wasm_encrypt(k, algorithm, algoMetadata, clearText, clearText.byteLength, value.buffer, value.byteLength);
             if (result < 0)
-                return {data: null, err: new Error("Failed to encrypt")};
+                return { data: null, err: new Error("Failed to encrypt") };
         }
-        return {data: value.buffer.slice(0, result), err: null};
+        return { data: value.buffer.slice(0, result), err: null };
     }
-    
-    static decrypt(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, cipherText: ArrayBuffer): Result<ArrayBuffer, Error>
-    {
+
+    static decrypt(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, cipherText: ArrayBuffer): Result<ArrayBuffer, Error> {
         let k = String.UTF8.encode(keyName, true);
         let value = new Uint8Array(64);
         let result = wasm_decrypt(k, algorithm, algoMetadata, cipherText, cipherText.byteLength, value.buffer, value.byteLength);
         if (result < 0)
-            return {data: null, err: new Error("Failed to decrypt")};
+            return { data: null, err: new Error("Failed to decrypt") };
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new Uint8Array(result);
             result = wasm_decrypt(k, algorithm, algoMetadata, cipherText, cipherText.byteLength, value.buffer, value.byteLength);
             if (result < 0)
-                return {data: null, err: new Error("Failed to decrypt")};
+                return { data: null, err: new Error("Failed to decrypt") };
         }
-        return {data: value.buffer.slice(0, result), err: null};
+        return { data: value.buffer.slice(0, result), err: null };
     }
-    
-    static sign(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, data: ArrayBuffer): Result<ArrayBuffer, Error>
-    {
+
+    static sign(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, data: ArrayBuffer): Result<ArrayBuffer, Error> {
         let k = String.UTF8.encode(keyName, true);
         let value = new Uint8Array(64);
         let result = wasm_sign(k, algorithm, algoMetadata, data, data.byteLength, value.buffer, value.byteLength);
         if (result < 0)
-            return {data: null, err: new Error("Failed to sign")};
+            return { data: null, err: new Error("Failed to sign") };
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new Uint8Array(result);
             result = wasm_sign(k, algorithm, algoMetadata, data, data.byteLength, value.buffer, value.byteLength);
             if (result < 0)
-                return {data: null, err: new Error("Failed to sign")};
+                return { data: null, err: new Error("Failed to sign") };
         }
-        return {data: value.buffer.slice(0, result), err: null};
+        return { data: value.buffer.slice(0, result), err: null };
     }
-    
-    static verify(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, data: ArrayBuffer, signature: ArrayBuffer): Result<VerifySignResult, Error>
-    {
+
+    static verify(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, data: ArrayBuffer, signature: ArrayBuffer): Result<VerifySignResult, Error> {
         let k = String.UTF8.encode(keyName, true);
         let result = wasm_verify(k, algorithm, algoMetadata, data, data.byteLength, signature, signature.byteLength);
         if (result < 0)
-            return {data: null, err: new Error("Failed to verify")};
-        
-        let resBool = {isValid: result == 1} as VerifySignResult;
-        return {data: resBool, err: null};
+            return { data: null, err: new Error("Failed to verify") };
+
+        let resBool = { isValid: result == 1 } as VerifySignResult;
+        return { data: resBool, err: null };
     }
-    
-    static digest(algorithm: idlV1.hash_algorithm, hashInfo: ArrayBuffer, text: ArrayBuffer): Result<ArrayBuffer, Error>
-    {
+
+    static digest(algorithm: idlV1.hash_algorithm, hashInfo: ArrayBuffer, text: ArrayBuffer): Result<ArrayBuffer, Error> {
         let value = new Uint8Array(32);
         let result = wasm_digest(algorithm, hashInfo, text, text.byteLength, value.buffer, value.byteLength);
         if (result < 0)
-            return {data: null, err: new Error("Failed to digest")};
+            return { data: null, err: new Error("Failed to digest") };
         if (result > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new Uint8Array(result);
             result = wasm_digest(algorithm, hashInfo, text, text.byteLength, value.buffer, value.byteLength);
             if (result < 0)
-                return {data: null, err: new Error("Failed to digest")};
+                return { data: null, err: new Error("Failed to digest") };
         }
-        return {data: value.buffer.slice(0, result), err: null};
+        return { data: value.buffer.slice(0, result), err: null };
     }
 
-    static importKey(format: u32, keyData: ArrayBuffer, algorithm: u32, algo_metadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error>
-    {
+    static importKey(format: u32, keyData: ArrayBuffer, algorithm: u32, algo_metadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error> {
         const key = new Key("");
 
         const local_usages = new Uint8Array(usages.length);
-        for(let i = 0; i < usages.length; i++)
-        {
+        for (let i = 0; i < usages.length; i++) {
             local_usages[i] = this.usage(usages[i]);
         }
 
         let result = wasm_import_key(String.UTF8.encode(key.name, true), format, keyData, keyData.byteLength, algorithm, algo_metadata, extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength);
         if (result < 0)
-            return {data: null, err: new Error("Failed to import key")};
+            return { data: null, err: new Error("Failed to import key") };
 
-        return {data: key, err: null};
+        return { data: key, err: null };
     }
 
-    static importKeyAndPersist(keyName: string, format: u32, keyData: ArrayBuffer, algorithm: u32, algo_metadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error>
-    {
+    static importKeyAndPersist(keyName: string, format: u32, keyData: ArrayBuffer, algorithm: u32, algo_metadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error> {
         const key = new Key(keyName);
 
         const local_usages = new Uint8Array(usages.length);
-        for(let i = 0; i < usages.length; i++)
-        {
+        for (let i = 0; i < usages.length; i++) {
             local_usages[i] = this.usage(usages[i]);
         }
 
         let result = wasm_import_key_and_persist(String.UTF8.encode(key.name, true), format, keyData, keyData.byteLength, algorithm, algo_metadata, extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength);
         if (result < 0)
-            return {data: null, err: new Error("Failed to import key")};
+            return { data: null, err: new Error("Failed to import key") };
 
-        return {data: key, err: null};
+        return { data: key, err: null };
     }
 
-    static exportKey(keyName: string, format: u32): Result<ArrayBuffer, Error>
-    {
+    static exportKey(keyName: string, format: u32): Result<ArrayBuffer, Error> {
         let key = new Uint8Array(32);
         let result = wasm_export_key(String.UTF8.encode(keyName, true), format, key.buffer, key.byteLength);
         if (result < 0)
-            return {data: null, err: new Error("Failed to export key")};
+            return { data: null, err: new Error("Failed to export key") };
         if (result > key.byteLength) {
             // buffer not big enough, retry with a properly sized one
             key = new Uint8Array(result);
             result = wasm_export_key(String.UTF8.encode(keyName, true), format, key.buffer, key.byteLength);
             if (result < 0)
-                return {data: null, err: new Error("Failed to export key")};
+                return { data: null, err: new Error("Failed to export key") };
         }
-        return {data: key.buffer.slice(0, result), err: null};
+        return { data: key.buffer.slice(0, result), err: null };
     }
 
-    static unwrapKey(decryptionKeyName: string, unwrap_algo_id: u32, unwrap_metadata: ArrayBuffer, format: u32, wrapped_key: ArrayBuffer, key_gen_algorithm: u32, key_gen_algo_metadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error>
-    {
+    static unwrapKey(decryptionKeyName: string, unwrap_algo_id: u32, unwrap_metadata: ArrayBuffer, format: u32, wrapped_key: ArrayBuffer, key_gen_algorithm: u32, key_gen_algo_metadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error> {
         const key = new Key("");
         const local_usages = new Uint8Array(usages.length);
-        for(let i = 0; i < usages.length; i++)
-        {
+        for (let i = 0; i < usages.length; i++) {
             local_usages[i] = this.usage(usages[i]);
         }
 
         let result = wasm_unwrap_key(String.UTF8.encode(decryptionKeyName, true), unwrap_algo_id, unwrap_metadata, String.UTF8.encode(key.name, true), format, wrapped_key, wrapped_key.byteLength, key_gen_algorithm, key_gen_algo_metadata, extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength);
-        
-        if (result < 0)
-            return {data: null, err: new Error("Failed to unwrap key")};
 
-        return {data: key, err: null};
+        if (result < 0)
+            return { data: null, err: new Error("Failed to unwrap key") };
+
+        return { data: key, err: null };
     }
 
-    static wrapKey(encryptionKeyName: string, algorithm: u32, algo_metadata: ArrayBuffer, key_name: string, format: u32): Result<ArrayBuffer, Error>
-    {
+    static wrapKey(encryptionKeyName: string, algorithm: u32, algo_metadata: ArrayBuffer, key_name: string, format: u32): Result<ArrayBuffer, Error> {
         let key = new Uint8Array(32);
         let result = wasm_wrap_key(String.UTF8.encode(key_name, true), format, String.UTF8.encode(encryptionKeyName, true), algorithm, algo_metadata, key.buffer, key.byteLength);
         if (result < 0)
-            return {data: null, err: new Error("Failed to wrap key")};
+            return { data: null, err: new Error("Failed to wrap key") };
         if (result > key.byteLength) {
             // buffer not big enough, retry with a properly sized one
             key = new Uint8Array(result);
             result = wasm_wrap_key(String.UTF8.encode(key_name, true), format, String.UTF8.encode(encryptionKeyName, true), algorithm, algo_metadata, key.buffer, key.byteLength);
             if (result < 0)
-                return {data: null, err: new Error("Failed to wrap key")};
+                return { data: null, err: new Error("Failed to wrap key") };
         }
-        return {data: key.buffer.slice(0, result), err: null};
+        return { data: key.buffer.slice(0, result), err: null };
     }
 
-    static getPublicKey(keyName: string, format: u32): Result<ArrayBuffer, Error>
-    {
+    static getPublicKey(keyName: string, format: u32): Result<ArrayBuffer, Error> {
         let key = new Uint8Array(32);
         let result = wasm_get_public_key(String.UTF8.encode(keyName, true), format, key.buffer, key.byteLength);
         if (result < 0)
-            return {data: null, err: new Error("Failed to get public key")};
+            return { data: null, err: new Error("Failed to get public key") };
         if (result > key.byteLength) {
             // buffer not big enough, retry with a properly sized one
             key = new Uint8Array(result);
             result = wasm_get_public_key(String.UTF8.encode(keyName, true), format, key.buffer, key.byteLength);
             if (result < 0)
-                return {data: null, err: new Error("Failed to get public key")};
+                return { data: null, err: new Error("Failed to get public key") };
         }
-        return {data: key.buffer.slice(0, result), err: null};
+        return { data: key.buffer.slice(0, result), err: null };
     }
 
     static getRandomBytes(size: i32): u8[] {

@@ -4,27 +4,25 @@
  */
 
 import { Utils } from './index';
-import { Result} from '../index';
+import { Result } from '../index';
 import { CryptoImpl, Key } from './crypto_impl';
-import * as idlV1 from "./crypto_subtle_idl_v1"
-import { JSON } from '@klave/sdk';
+import * as idlV1 from './crypto_subtle_idl_v1';
+import { JSON } from '@klave/as-json/assembly';
 
 export class KeyAES extends Key {
 
     length: u32 = 256;
 
-    encrypt(data: ArrayBuffer): Result<ArrayBuffer, Error> 
-    {
-        let iv = Utils.convertToUint8Array(CryptoImpl.getRandomBytes(12));
-        let additionalData = new Uint8Array(0);
-        let aesGcmParams: idlV1.aes_gcm_encryption_metadata = {iv: iv, additionalData: additionalData, tagLength: idlV1.aes_tag_length.TAG_96};
+    encrypt(data: ArrayBuffer): Result<ArrayBuffer, Error> {
+        const iv = Utils.convertToUint8Array(CryptoImpl.getRandomBytes(12));
+        const additionalData = new Uint8Array(0);
+        const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: idlV1.aes_tag_length.TAG_96 };
         return CryptoImpl.encrypt(this.name, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams)), data);
     }
 
-    decrypt(data: ArrayBuffer): Result<ArrayBuffer, Error> 
-    {
-        let additionalData = new Uint8Array(0);
-        let aesGcmParams: idlV1.aes_gcm_encryption_metadata = {iv: new Uint8Array(0), additionalData: additionalData, tagLength: idlV1.aes_tag_length.TAG_96};
+    decrypt(data: ArrayBuffer): Result<ArrayBuffer, Error> {
+        const additionalData = new Uint8Array(0);
+        const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: new Uint8Array(0), additionalData: additionalData, tagLength: idlV1.aes_tag_length.TAG_96 };
         return CryptoImpl.decrypt(this.name, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams)), data);
     }
 }
@@ -34,74 +32,71 @@ export class CryptoAES {
     static getKey(keyName: string): KeyAES | null {
         if (CryptoImpl.keyExists(keyName))
             return new KeyAES(keyName);
-        return null
+        return null;
     }
 
-    static generateKey(keyName: string, length: u32 = 256): Result<KeyAES, Error> 
-    {
-        if(keyName == "")
-            return {data: null, err: new Error("Invalid key name: key name cannot be empty")};
+    static generateKey(keyName: string, length: u32 = 256): Result<KeyAES, Error> {
+        if (keyName == '')
+            return { data: null, err: new Error('Invalid key name: key name cannot be empty') };
 
-        if(CryptoImpl.keyExists(keyName))
-            return {data: null, err: new Error("Invalid key name: key name already exists")};
+        if (CryptoImpl.keyExists(keyName))
+            return { data: null, err: new Error('Invalid key name: key name already exists') };
 
-        let bitSize : idlV1.aes_key_bitsize = idlV1.aes_key_bitsize.AES_256;
-        if(length == 128)
+        let bitSize: idlV1.aes_key_bitsize = idlV1.aes_key_bitsize.AES_256;
+        if (length == 128)
             bitSize = idlV1.aes_key_bitsize.AES_128;
-        else if(length == 192)
+        else if (length == 192)
             bitSize = idlV1.aes_key_bitsize.AES_192;
-        else if(length == 256)
+        else if (length == 256)
             bitSize = idlV1.aes_key_bitsize.AES_256;
         else
-            return {data: null, err: new Error("Invalid AES Key length: Length must be 128, 192, or 256")};
-        
-        let metadata = {length: bitSize} as idlV1.aes_metadata;
-        let key = CryptoImpl.generateKeyAndPersist(keyName, idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(metadata)), true, ["decrypt", "encrypt"]);
+            return { data: null, err: new Error('Invalid AES Key length: Length must be 128, 192, or 256') };
 
-        if(!key)
-            return {data: null, err: new Error("Failed to generate AES Key")};
+        const metadata = { length: bitSize } as idlV1.aes_metadata;
+        const key = CryptoImpl.generateKeyAndPersist(keyName, idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(metadata)), true, ['decrypt', 'encrypt']);
 
-        let keyData = key.data as Key;
-        let kAES = new KeyAES(keyData.name);
+        if (!key)
+            return { data: null, err: new Error('Failed to generate AES Key') };
+
+        const keyData = key.data as Key;
+        const kAES = new KeyAES(keyData.name);
         kAES.length = length;
-        return {data: kAES, err: null};
+        return { data: kAES, err: null };
     }
 
-    static importKey(keyName: string, keyData: ArrayBuffer, length: u32 = 256): Result<KeyAES, Error>
-    {
-        if(keyName == "")
-            return {data: null, err: new Error("Invalid key name: key name cannot be empty")};
+    static importKey(keyName: string, keyData: ArrayBuffer, length: u32 = 256): Result<KeyAES, Error> {
+        if (keyName == '')
+            return { data: null, err: new Error('Invalid key name: key name cannot be empty') };
 
         if (keyData.byteLength == 0)
-            return {data: null, err: new Error("Invalid key data: key data cannot be empty")};
+            return { data: null, err: new Error('Invalid key data: key data cannot be empty') };
 
-        if(CryptoImpl.keyExists(keyName))
-            return {data: null, err: new Error("Invalid key name: key name already exists")};
+        if (CryptoImpl.keyExists(keyName))
+            return { data: null, err: new Error('Invalid key name: key name already exists') };
 
-        let bitSize : idlV1.aes_key_bitsize = idlV1.aes_key_bitsize.AES_256;
-        if(length == 128)
+        let bitSize: idlV1.aes_key_bitsize = idlV1.aes_key_bitsize.AES_256;
+        if (length == 128)
             bitSize = idlV1.aes_key_bitsize.AES_128;
-        else if(length == 192)
+        else if (length == 192)
             bitSize = idlV1.aes_key_bitsize.AES_192;
-        else if(length == 256)
+        else if (length == 256)
             bitSize = idlV1.aes_key_bitsize.AES_256;
         else
-            return {data: null, err: new Error("Invalid AES Key length: Length must be 128, 192, or 256")};
-        
-        let metadata = {length: bitSize} as idlV1.aes_metadata;
-        let key = CryptoImpl.importKeyAndPersist(keyName, idlV1.key_format.raw, keyData, idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(metadata)), true, ["decrypt", "encrypt"]);
-        
-        if(!key)
-            return {data: null, err: new Error("Failed to import AES Key")};
+            return { data: null, err: new Error('Invalid AES Key length: Length must be 128, 192, or 256') };
 
-        let keyObject = key.data as Key;
-        let kAES = new KeyAES(keyObject.name);
+        const metadata = { length: bitSize } as idlV1.aes_metadata;
+        const key = CryptoImpl.importKeyAndPersist(keyName, idlV1.key_format.raw, keyData, idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(metadata)), true, ['decrypt', 'encrypt']);
+
+        if (!key)
+            return { data: null, err: new Error('Failed to import AES Key') };
+
+        const keyObject = key.data as Key;
+        const kAES = new KeyAES(keyObject.name);
         kAES.length = length;
-        return {data: kAES, err: null};
+        return { data: kAES, err: null };
     }
 
-    static exportKey(keyName: string): Result<ArrayBuffer, Error>
-    {
+    static exportKey(keyName: string): Result<ArrayBuffer, Error> {
         return CryptoImpl.exportKey(keyName, idlV1.key_format.raw);
     }
 }
