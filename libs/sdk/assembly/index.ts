@@ -51,6 +51,11 @@ declare function stop_recording(): i32;
 @external("env", "cancel_transaction")
 declare function abort_transaction(): i32;
 
+export class Result<T, E> {
+    data!: T | null;
+    err!: E | null;
+}
+
 export class Router {
     static addQuery(queryFunctionName: ArrayBuffer): void {
         runtime_add_user_query(queryFunctionName);
@@ -169,15 +174,15 @@ export class Transaction {
 export class HttpRequest {
     hostname!: string;
     port: i32 = 443;
-    path: string = '';
-    httpVersion: string = 'HTTP/1.1';
     method: string = 'GET';
+    path: string = '';
+    version: string = 'HTTP/1.1';
     headers: string[][] = [];
     body: string = '';
 }
 @JSON
 export class HttpResponse {
-    statusCode: i32 = 200;
+    status_code: i32 = 200;
     headers: string[][] = [];
     body: string = '';
 }
