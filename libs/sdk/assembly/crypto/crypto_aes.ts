@@ -55,7 +55,7 @@ export class CryptoAES {
         const metadata = { length: bitSize } as idlV1.aes_metadata;
         const key = CryptoImpl.generateKeyAndPersist(keyName, idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(metadata)), true, ['decrypt', 'encrypt']);
 
-        if (!key)
+        if (!key.data)
             return { data: null, err: new Error('Failed to generate AES Key') };
 
         const keyData = key.data as Key;
@@ -87,7 +87,7 @@ export class CryptoAES {
         const metadata = { length: bitSize } as idlV1.aes_metadata;
         const key = CryptoImpl.importKeyAndPersist(keyName, idlV1.key_format.raw, keyData, idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(metadata)), true, ['decrypt', 'encrypt']);
 
-        if (!key)
+        if (!key.data)
             return { data: null, err: new Error('Failed to import AES Key') };
 
         const keyObject = key.data as Key;
