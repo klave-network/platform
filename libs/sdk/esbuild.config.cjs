@@ -1,10 +1,14 @@
 const git = require('git-rev-sync');
 const { version } = require('./package.json');
+const { nodeExternalsPlugin } = require('esbuild-node-externals');
 
 /** @type {import('esbuild').BuildOptions} */
 module.exports = {
     entryPoints: ['./src/index.ts', './src/compile.ts'],
     sourcemap: process.env.NODE_ENV === 'development' ? 'inline' : 'external',
+    plugins: [
+        nodeExternalsPlugin()
+    ],
     outExtension: {
         '.js': '.js'
     },

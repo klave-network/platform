@@ -78,6 +78,7 @@ const base = [
             'tmp/',
             'tools/**/_msr*',
             '**/assembly/**/*.ts',
+            '**/stac*',
             '**/.expo',
             '**/node_modules/**',
             '**/template/',
