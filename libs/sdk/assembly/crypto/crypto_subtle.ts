@@ -9,16 +9,9 @@ import * as idlV1 from './crypto_subtle_idl_v1';
 import { JSON } from '@klave/as-json/assembly';
 
 class CryptoKey extends Key {
-    algorithm: string;
-    extractable: boolean;
-    usages: string[];
-
-    constructor(name: string, algorithm: string, extractable: boolean, usages: string[]) {
-        super(name);
-        this.algorithm = algorithm;
-        this.extractable = extractable;
-        this.usages = usages;
-    }
+    algorithm!: string;
+    extractable!: boolean;
+    usages!: string[];
 }
 
 export class RsaHashedKeyGenParams {
@@ -73,7 +66,7 @@ export class SubtleCrypto {
                 const key = CryptoImpl.generateKey(idlV1.key_algorithm.rsa, String.UTF8.encode(JSON.stringify(rsaMeta)), extractable, usages);
                 if (key.data) {
                     const keyData = key.data as Key;
-                    return { data: new CryptoKey(keyData.name, algorithm.name, extractable, usages), err: null };
+                    return { data: { name: keyData.name, algorithm: algorithm.name, extractable: extractable, usages: usages } as CryptoKey, err: null };
                 }
                 else if (key.err) {
                     const error = key.err as Error;
@@ -96,7 +89,7 @@ export class SubtleCrypto {
                     const key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_r1, String.UTF8.encode(JSON.stringify(secpr1Metadata)), extractable, usages);
                     if (key.data) {
                         const keyData = key.data as Key;
-                        return { data: new CryptoKey(keyData.name, algorithm.name, extractable, usages), err: null };
+                        return { data: { name: keyData.name, algorithm: algorithm.name, extractable: extractable, usages: usages } as CryptoKey, err: null };
                     } else
                         return { data: null, err: new Error('Failed to generate EC key') };
                 } else
@@ -108,7 +101,7 @@ export class SubtleCrypto {
                     const key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_k1, String.UTF8.encode(JSON.stringify(secpk1Metadata)), extractable, usages);
                     if (key.data) {
                         const keyData = key.data as Key;
-                        return { data: new CryptoKey(keyData.name, algorithm.name, extractable, usages), err: null };
+                        return { data: { name: keyData.name, algorithm: algorithm.name, extractable: extractable, usages: usages } as CryptoKey, err: null };
                     }
                     else
                         return { data: null, err: new Error('Failed to generate EC key') };
@@ -125,7 +118,7 @@ export class SubtleCrypto {
                 const key = CryptoImpl.generateKey(idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(aesMetadata)), extractable, usages);
                 if (key.data) {
                     const keyData = key.data as Key;
-                    return { data: new CryptoKey(keyData.name, algorithm.name, extractable, usages), err: null };
+                    return { data: { name: keyData.name, algorithm: algorithm.name, extractable: extractable, usages: usages } as CryptoKey, err: null };
                 } else
                     return { data: null, err: new Error('Failed to generate AES key') };
             }
@@ -304,7 +297,7 @@ export class SubtleCrypto {
             return { data: null, err: new Error('Failed to import key') };
 
         const keyDataImported = key.data as Key;
-        return { data: new CryptoKey(keyDataImported.name, keyGenAlgoName, extractable, usages), err: null };
+        return { data: { name: keyDataImported.name, algorithm: keyGenAlgoName, extractable: extractable, usages: usages } as CryptoKey, err: null };
     }
 
     static wrapKey<T>(format: string, key: CryptoKey | null, wrappingKey: CryptoKey | null, wrapAlgo: T): Result<ArrayBuffer, Error> {
@@ -425,7 +418,7 @@ export class SubtleCrypto {
         const key = CryptoImpl.unwrapKey(unwrappingKey.name, wrappingAlgo, wrappingInfo, formatData.format, wrappedKey, keyGenAlgo, keyGenInfo, extractable, usages);
         if (key.data) {
             const keyData = key.data as Key;
-            return { data: new CryptoKey(keyData.name, keyGenAlgoName, extractable, usages), err: null };
+            return { data: { name: keyData.name, algorithm: keyGenAlgoName, extractable: extractable, usages: usages } as CryptoKey, err: null };
         }
         else
             return { data: null, err: new Error('Failed to unwrap key') };

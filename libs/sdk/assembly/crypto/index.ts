@@ -30,12 +30,16 @@ export class SHA extends CryptoSHA { }
 
 export function getKey(keyName: string): Key | null {
     if (CryptoImpl.keyExists(keyName))
-        return new Key(keyName);
+        return Key.create(keyName);
     return null;
 }
 
-export function getRandomValues(size: i32): u8[] {
-    return CryptoImpl.getRandomBytes(size);
+export function getRandomValues(size: i32): Uint8Array | null {
+    let randomByteRes = CryptoImpl.getRandomBytes(size);
+    if (!randomByteRes.data)
+        return null;
+    else
+        return randomByteRes.data as Uint8Array;
 }
 
 export function getPem(key: Uint8Array, isPrivate: bool = false) : string

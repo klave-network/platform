@@ -14,9 +14,11 @@ export class KeyAES extends Key {
     length: u32 = 256;
 
     encrypt(data: ArrayBuffer): Result<ArrayBuffer, Error> {
-        const iv = Utils.convertToUint8Array(CryptoImpl.getRandomBytes(12));
+        const iv = CryptoImpl.getRandomBytes(12);
+        if(!iv.data)
+            return { data: null, err: new Error('Failed to generate IV') };
         const additionalData = new Uint8Array(0);
-        const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: idlV1.aes_tag_length.TAG_96 };
+        const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: iv.data as Uint8Array, additionalData: additionalData, tagLength: idlV1.aes_tag_length.TAG_96 };
         return CryptoImpl.encrypt(this.name, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams)), data);
     }
 
@@ -31,7 +33,7 @@ export class CryptoAES {
 
     static getKey(keyName: string): KeyAES | null {
         if (CryptoImpl.keyExists(keyName))
-            return new KeyAES(keyName);
+            return {name: keyName, length: 256} as KeyAES;
         return null;
     }
 
@@ -59,7 +61,7 @@ export class CryptoAES {
             return { data: null, err: new Error('Failed to generate AES Key') };
 
         const keyData = key.data as Key;
-        const kAES = new KeyAES(keyData.name);
+        const kAES = {name: keyData.name, length: length} as KeyAES;
         kAES.length = length;
         return { data: kAES, err: null };
     }
@@ -91,7 +93,7 @@ export class CryptoAES {
             return { data: null, err: new Error('Failed to import AES Key') };
 
         const keyObject = key.data as Key;
-        const kAES = new KeyAES(keyObject.name);
+        const kAES = {name: keyObject.name, length: length} as KeyAES;
         kAES.length = length;
         return { data: kAES, err: null };
     }

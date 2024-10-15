@@ -56,20 +56,23 @@ declare function wasm_wrap_key(key_name_to_export: ArrayBuffer, key_format: i32,
 declare function wasm_get_random_bytes(bytes: ArrayBuffer, size: i32): i32;
 
 export class Key {
-    name: string;
+    name!: string;
 
-    constructor(keyName: string) {
+    static create(keyName: string): Key | null {
         if (keyName.length !== 0 && keyName !== "")
-            this.name = keyName;
-        else {
+        {
+            return { name: keyName } as Key;
+        }else
+        {
             const rnds = CryptoImpl.getRandomBytes(16);
-            // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
-            unchecked(rnds[6] = (rnds[6] & 0x0f) | 0x40);
-            unchecked(rnds[8] = (rnds[8] & 0x3f) | 0x80);
+            if(!rnds.data)
+                return null;
 
-            const rndsArray = new Uint8Array(rnds.length);
-            rndsArray.set(rnds);
-            this.name = uuid(rndsArray);
+            let rndsAsArray = rnds.data as Uint8Array;
+            // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+            unchecked(rndsAsArray[6] = (rndsAsArray[6] & 0x0f) | 0x40);
+            unchecked(rndsAsArray[8] = (rndsAsArray[8] & 0x3f) | 0x80);
+            return { name: uuid(rndsAsArray) } as Key;
         }
     }
 }
@@ -100,19 +103,22 @@ export class CryptoImpl {
         return -1;
     }
 
-    static keyExists(key_name: string): boolean {
+    static keyExists(keyName: string): boolean {
         let result = false;
-        result = wasm_key_exists(String.UTF8.encode(key_name, true));
+        result = wasm_key_exists(String.UTF8.encode(keyName, true));
         return result;
     }
 
     static generateKeyAndPersist(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error> {
+        if(keyName == "")
+            return { data: null, err: new Error("Invalid key name: key name cannot be empty") };
         const local_usages = new Uint8Array(usages.length);
         for (let i = 0; i < usages.length; i++) {
             local_usages[i] = this.usage(usages[i]);
         }
-
-        const key = new Key(keyName);
+        const key = Key.create(keyName);
+        if (!key)
+            return { data: null, err: new Error("Failed to generate key") };
         let result = 0;
         result = wasm_generate_key_and_persist(
             String.UTF8.encode(key.name, true), algorithm, algoMetadata, extractable ? 1 : 0, local_usages.buffer, local_usages.length);
@@ -128,7 +134,9 @@ export class CryptoImpl {
             local_usages[i] = this.usage(usages[i]);
         }
 
-        const key = new Key("");
+        const key = Key.create("");
+        if (!key)
+            return { data: null, err: new Error("Failed to generate key") };
         let result = 0;
         result = wasm_generate_key(
             String.UTF8.encode(key.name, true), algorithm, algoMetadata, extractable ? 1 : 0, local_usages.buffer, local_usages.length);
@@ -212,8 +220,9 @@ export class CryptoImpl {
     }
 
     static importKey(format: u32, keyData: ArrayBuffer, algorithm: u32, algo_metadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error> {
-        const key = new Key("");
-
+        const key = Key.create("");
+        if (!key)
+            return { data: null, err: new Error("Failed to generate key UUID") };
         const local_usages = new Uint8Array(usages.length);
         for (let i = 0; i < usages.length; i++) {
             local_usages[i] = this.usage(usages[i]);
@@ -227,8 +236,11 @@ export class CryptoImpl {
     }
 
     static importKeyAndPersist(keyName: string, format: u32, keyData: ArrayBuffer, algorithm: u32, algo_metadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error> {
-        const key = new Key(keyName);
-
+        if(keyName == "")
+            return { data: null, err: new Error("Invalid key name: key name cannot be empty") };
+        const key = Key.create(keyName);
+        if(!key)
+            return { data: null, err: new Error("Failed to generate key") };
         const local_usages = new Uint8Array(usages.length);
         for (let i = 0; i < usages.length; i++) {
             local_usages[i] = this.usage(usages[i]);
@@ -257,7 +269,9 @@ export class CryptoImpl {
     }
 
     static unwrapKey(decryptionKeyName: string, unwrap_algo_id: u32, unwrap_metadata: ArrayBuffer, format: u32, wrapped_key: ArrayBuffer, key_gen_algorithm: u32, key_gen_algo_metadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error> {
-        const key = new Key("");
+        const key = Key.create("");
+        if(!key)
+            return { data: null, err: new Error("Failed to generate key") };
         const local_usages = new Uint8Array(usages.length);
         for (let i = 0; i < usages.length; i++) {
             local_usages[i] = this.usage(usages[i]);

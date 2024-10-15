@@ -58,11 +58,11 @@ export class CryptoECDSA {
 
     static getKey(keyName: string): KeyECC | null {
         if (CryptoImpl.keyExists(keyName))
-            return new KeyECC(keyName);
+            return { name: keyName, namedCurve: 'P-256' } as KeyECC;
         return null;
     }
 
-    static generateKey(keyName: string, namedCurve = 'P-256'): Result<KeyECC, Error> {
+    static generateKey(keyName: string, namedCurve: string = 'P-256'): Result<KeyECC, Error> {
         if (keyName == '')
             return { data: null, err: new Error('Invalid key name: key name cannot be empty') };
 
@@ -80,7 +80,7 @@ export class CryptoECDSA {
             const key = CryptoImpl.generateKeyAndPersist(keyName, idlV1.key_algorithm.secp_k1, String.UTF8.encode(JSON.stringify(metadata)), true, ['sign']);
             if (key.data) {
                 const keyData = key.data as Key;
-                const kECC = new KeyECC(keyData.name);
+                const kECC = { name: keyData.name, namedCurve: namedCurve } as KeyECC;
                 kECC.namedCurve = namedCurve;
                 return { data: kECC, err: null };
             }
@@ -91,7 +91,7 @@ export class CryptoECDSA {
             const key = CryptoImpl.generateKeyAndPersist(keyName, idlV1.key_algorithm.secp_k1, String.UTF8.encode(JSON.stringify(metadata)), true, ['sign']);
             if (key.data) {
                 const keyData = key.data as Key;
-                const kECC = new KeyECC(keyData.name);
+                const kECC = { name: keyData.name, namedCurve: namedCurve } as KeyECC;
                 kECC.namedCurve = namedCurve;
                 return { data: kECC, err: null };
             }
@@ -101,7 +101,7 @@ export class CryptoECDSA {
             return { data: null, err: new Error('Unsupported curve') };
     }
 
-    static importPrivateKey(keyName: string, keyData: ArrayBuffer, namedCurve = 'P-256'): Result<KeyECC, Error> {
+    static importPrivateKey(keyName: string, keyData: ArrayBuffer, namedCurve: string = 'P-256'): Result<KeyECC, Error> {
         if (keyName == '')
             return { data: null, err: new Error('Invalid key name: key name cannot be empty') };
 
@@ -111,7 +111,7 @@ export class CryptoECDSA {
         if (CryptoImpl.keyExists(keyName))
             return { data: null, err: new Error('Invalid key name: key name already exists') };
 
-        const key = new KeyECC(keyName);
+        const key = { name: keyName, namedCurve: namedCurve } as KeyECC;
         key.namedCurve = namedCurve;
 
         if (namedCurve == 'P-256' || namedCurve == 'P-384' || namedCurve == 'P-521') {
@@ -138,7 +138,7 @@ export class CryptoECDSA {
             return { data: null, err: new Error('Unsupported curve') };
     }
 
-    static importPublicKey(keyName: string, keyData: ArrayBuffer, namedCurve = 'P-256'): Result<KeyECC, Error> {
+    static importPublicKey(keyName: string, keyData: ArrayBuffer, namedCurve: string = 'P-256'): Result<KeyECC, Error> {
         if (keyName == '')
             return { data: null, err: new Error('Invalid key name: key name cannot be empty') };
 
@@ -148,7 +148,7 @@ export class CryptoECDSA {
         if (CryptoImpl.keyExists(keyName))
             return { data: null, err: new Error('Invalid key name: key name already exists') };
 
-        const key = new KeyECC(keyName);
+        const key = { name: keyName, namedCurve: namedCurve } as KeyECC;
         key.namedCurve = namedCurve;
 
         if (namedCurve == 'P-256' || namedCurve == 'P-384' || namedCurve == 'P-521') {

@@ -71,7 +71,7 @@ export class CryptoRSA {
 
     static getKey(keyName: string): KeyRSA | null {
         if (CryptoImpl.keyExists(keyName))
-            return new KeyRSA(keyName);
+            return { name: keyName, moduluslength: 2048 } as KeyRSA;
         return null;
     }
 
@@ -100,7 +100,7 @@ export class CryptoRSA {
         }
 
         const keyData = key.data as Key;
-        const rsaKey = new KeyRSA(keyData.name);
+        const rsaKey = { name: keyData.name, moduluslength: moduluslength } as KeyRSA;
         rsaKey.moduluslength = moduluslength;
 
         return { data: rsaKey, err: null };
@@ -140,7 +140,7 @@ export class CryptoRSA {
         if (!keyImportResult.data)
             return { data: null, err: new Error('Failed to import key') };
 
-        const key = new KeyRSA(keyName);
+        const key = { name: keyName, moduluslength: moduluslength } as KeyRSA;
         key.moduluslength = moduluslength;
         return { data: key, err: null };
     }
@@ -179,7 +179,7 @@ export class CryptoRSA {
         if (!keyImportResult.data)
             return { data: null, err: new Error('Failed to import key') };
 
-        const key = new KeyRSA(keyName);
+        const key = { name: keyName, moduluslength: moduluslength } as KeyRSA;
         key.moduluslength = moduluslength;
         return { data: key, err: null };
     }
