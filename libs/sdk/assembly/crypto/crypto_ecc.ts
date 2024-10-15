@@ -10,7 +10,7 @@ import { JSON } from '@klave/as-json/assembly';
 
 export class KeyECC extends Key {
 
-    namedCurve = 'P-256';
+    namedCurve: string = 'P-256';
 
     sign(text: ArrayBuffer): Result<ArrayBuffer, Error> {
         let hashAlgo = { algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_256 } as idlV1.sha_metadata;

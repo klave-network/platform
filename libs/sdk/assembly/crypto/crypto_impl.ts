@@ -1,5 +1,4 @@
 import uuid from '../uuid';
-import * as idlV1 from "./crypto_subtle_idl_v1"
 import { Result } from '../index';
 
 //Persistent Crypto operations (i.e. output that are stored in the ledger)
@@ -197,7 +196,7 @@ export class CryptoImpl {
         return { data: resBool, err: null };
     }
 
-    static digest(algorithm: idlV1.hash_algorithm, hashInfo: ArrayBuffer, text: ArrayBuffer): Result<ArrayBuffer, Error> {
+    static digest(algorithm: u32, hashInfo: ArrayBuffer, text: ArrayBuffer): Result<ArrayBuffer, Error> {
         let value = new Uint8Array(32);
         let result = wasm_digest(algorithm, hashInfo, text, text.byteLength, value.buffer, value.byteLength);
         if (result < 0)
@@ -302,14 +301,11 @@ export class CryptoImpl {
         return { data: key.buffer.slice(0, result), err: null };
     }
 
-    static getRandomBytes(size: i32): u8[] {
+    static getRandomBytes(size: i32): Result<Uint8Array, Error> {
         const value = new Uint8Array(size);
         const result = wasm_get_random_bytes(value.buffer, value.byteLength);
-        const ret: u8[] = []
         if (result < 0)
-            return ret; // todo : report error
-        for (let i = 0; i < size; ++i)
-            ret[i] = value[i];
-        return ret;
+            return { data: null, err: new Error("Failed to get random bytes") }
+        return { data: value, err: null };
     }
 }

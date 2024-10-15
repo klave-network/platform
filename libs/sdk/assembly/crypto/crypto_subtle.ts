@@ -22,42 +22,42 @@ class CryptoKey extends Key {
 }
 
 export class RsaHashedKeyGenParams {
-    name = 'RSA-OAEP'; // "RSA-OAEP", "RSA-PSS", "RSA-PKCS1-v1_5"
+    name: string = 'RSA-OAEP'; // "RSA-OAEP", "RSA-PSS", "RSA-PKCS1-v1_5"
     modulusLength: u32 = 2048;
     publicExponent: u32 = 65537;
-    hash = 'SHA2-256'; // "SHA2-256", "SHA2-384", "SHA2-512"
+    hash: string = 'SHA2-256'; // "SHA2-256", "SHA2-384", "SHA2-512"
 }
 
 export class EcKeyGenParams {
-    name = 'ECDSA'; // "ECDSA"
-    namedCurve = 'P-256'; // "P-256", "P-384", "P-521"
+    name: string = 'ECDSA'; // "ECDSA"
+    namedCurve: string = 'P-256'; // "P-256", "P-384", "P-521"
 }
 
 export class AesKeyGenParams {
-    name = 'AES-GCM'; // "AES-GCM", "AES-KW"
+    name: string = 'AES-GCM'; // "AES-GCM", "AES-KW"
     length: u32 = 256;
 }
 
 export class RsaOaepParams {
-    name = 'RSA-OAEP';
+    name: string = 'RSA-OAEP';
     label: ArrayBuffer = new ArrayBuffer(0);
 }
 
 export class AesGcmParams {
-    name = 'AES-GCM';
+    name: string = 'AES-GCM';
     iv!: ArrayBuffer;
     additionalData: ArrayBuffer = new ArrayBuffer(0);
     tagLength: u32 = 128;
 }
 
 export class RsaPssParams {
-    name = 'RSA-PSS';
+    name: string = 'RSA-PSS';
     saltLength: u32 = 0;
 }
 
 export class EcdsaParams {
-    name = 'ECDSA';
-    hash = 'SHA-256';
+    name: string = 'ECDSA';
+    hash: string = 'SHA-256';
 }
 
 export class NamedAlgorithm {
