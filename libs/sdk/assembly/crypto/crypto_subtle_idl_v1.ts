@@ -11,7 +11,7 @@ export enum key_algorithm {
     rsa = 3
 }
 
-@JSON
+@json
 export class key_generation_info {
     algo_id!: key_algorithm;
     algo_metadata!: string;
@@ -45,13 +45,13 @@ export enum sha_digest_bitsize {
     SHA_512 = 512
 }
 
-@JSON
+@json
 export class sha_metadata {
     algo_id!: sha_algorithm;
     length!: sha_digest_bitsize;
 }
 
-@JSON
+@json
 export class tagged_sha_metadata {
     algo_id!: tagged_sha_algorithm;
     length!: sha_digest_bitsize;
@@ -64,7 +64,7 @@ export enum secp_r1_key_bitsize {
     SECP_R1_521 = 521
 }
 
-@JSON
+@json
 export class secp_r1_metadata {
     length!: secp_r1_key_bitsize;
 }
@@ -73,7 +73,7 @@ export enum secp_k1_key_bitsize {
     SECP_K1_256 = 256
 }
 
-@JSON
+@json
 export class secp_k1_metadata {
     length!: secp_k1_key_bitsize;
 }
@@ -84,12 +84,12 @@ export enum aes_key_bitsize {
     AES_256 = 256
 }
 
-@JSON
+@json
 export class aes_metadata {
     length!: aes_key_bitsize;
 }
 
-@JSON
+@json
 export class hash_info {
     algo_id!: hash_algorithm;
     algo_metadata!: string;
@@ -101,7 +101,7 @@ export enum rsa_key_bitsize {
     RSA_4096 = 4096
 }
 
-@JSON
+@json
 export class rsa_metadata {
     modulus!: rsa_key_bitsize;
     public_exponent!: u32;
@@ -146,56 +146,56 @@ export enum signing_algorithm {
     rsa_pss
 }
 
-@JSON
+@json
 export class schnorr_signature_metadata {
     tagged_sha_metadata!: tagged_sha_metadata;
 }
 
-@JSON
+@json
 export class ecdsa_signature_metadata {
     sha_metadata!: sha_metadata;
 }
 
-@JSON
+@json
 export class rsa_pss_signature_metadata {
     saltLength!: u64;
 }
 
-@JSON
+@json
 export class signature_info {
     algo_id!: signing_algorithm;
     algo_metadata!: string;
 }
 
-@JSON
+@json
 export class aes_gcm_encryption_metadata {
     iv!: Uint8Array;
     additionalData!: Uint8Array;
     tagLength!: aes_tag_length;
 }
 
-@JSON
+@json
 export class rsa_oaep_encryption_metadata {
     label!: Uint8Array;
 }
 
-@JSON
+@json
 export class rsa_pkcs1_v1_5_encryption_metadata {
     label!: Uint8Array;
 }
 
-@JSON
+@json
 export class encryption_info {
     algo_id!: encryption_algorithm;
     algo_metadata!: string;
 }
 
-@JSON
+@json
 export class aes_kw_wrapping_metadata {
     with_padding!: boolean;
 }
 
-@JSON
+@json
 export class wrapping_info {
     algo_id!: wrapping_algorithm;
     algo_metadata!: string;

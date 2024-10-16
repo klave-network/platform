@@ -170,7 +170,7 @@ export class Transaction {
     }
 }
 
-@JSON
+@json
 export class HttpRequest {
     hostname!: string;
     port: i32 = 443;
@@ -180,7 +180,7 @@ export class HttpRequest {
     headers: string[][] = [];
     body: string = '';
 }
-@JSON
+@json
 export class HttpResponse {
     status_code: i32 = 200;
     headers: string[][] = [];
