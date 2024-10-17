@@ -3,10 +3,10 @@
  * @module klave/sdk/crypto
  */
 
-import { CryptoImpl, Key } from './crypto_impl';
+import { CryptoImpl, Key, VerifySignResult as  SigValidation} from './crypto_impl';
 import * as SubtleCrypto from './crypto_subtle';
 import { CryptoAES, KeyAES as AESKey } from './crypto_aes';
-import { CryptoECDSA, KeyECC as ECCKey } from './crypto_ecc';
+import { CryptoECDSA, KeyECC as ECCKey} from './crypto_ecc';
 import { CryptoRSA, KeyRSA as RSAKey } from './crypto_rsa';
 import { CryptoSHA } from './crypto_sha';
 import { encode as b64encode } from 'as-base64/assembly';
@@ -23,6 +23,7 @@ export class NamedAlgorithm extends SubtleCrypto.NamedAlgorithm { }
 export class AES extends CryptoAES { }
 export class KeyAES extends AESKey { }
 export class ECDSA extends CryptoECDSA { }
+export class SignatureVerification extends SigValidation { }
 export class KeyECC extends ECCKey { }
 export class RSA extends CryptoRSA { }
 export class KeyRSA extends RSAKey { }
