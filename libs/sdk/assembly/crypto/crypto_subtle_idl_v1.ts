@@ -2,7 +2,6 @@
  * Environment definitions for compiling Klave Trustless Applications.
  * @module klave/sdk/crypto
  */
-import { JSON } from '@klave/as-json/assembly';
 
 export enum key_algorithm {
     secp_r1 = 0,

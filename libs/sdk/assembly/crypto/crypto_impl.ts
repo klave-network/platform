@@ -1,3 +1,8 @@
+/**
+ * Environment definitions for compiling Klave Trustless Applications.
+ * @module klave/sdk/crypto
+ */
+
 import uuid from '../uuid';
 import { Result } from '../index';
 

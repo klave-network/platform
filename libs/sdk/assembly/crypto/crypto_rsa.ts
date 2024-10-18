@@ -5,8 +5,8 @@
 import { Result } from '../index';
 import { CryptoImpl, Key, VerifySignResult } from './crypto_impl';
 import * as idlV1 from './crypto_subtle_idl_v1';
-import { CryptoUtil, KeyFormatWrapper } from './crypto_utils';
-import { PrivateKey, PublicKey } from './crypto_keys';
+import { CryptoUtil } from './crypto_utils';
+import { PublicKey } from './crypto_keys';
 import { JSON } from '@klave/as-json/assembly';
 
 export class KeyRSA extends Key {
@@ -26,23 +26,13 @@ export class KeyRSA extends Key {
     }
 
     sign(data: ArrayBuffer): Result<ArrayBuffer, Error> {
-        let saltLength = 32;
-        if (this.moduluslength == 3072)
-            saltLength = 48;
-        else if (this.moduluslength == 4096)
-            saltLength = 64;
-
+        let saltLength = 32; // default salt length for sha256
         const metadata: idlV1.rsa_pss_signature_metadata = { saltLength: saltLength };
         return CryptoImpl.sign(this.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata)), data);
     }
 
     verify(data: ArrayBuffer, signature: ArrayBuffer): Result<VerifySignResult, Error> {
-        let saltLength = 32;
-        if (this.moduluslength == 3072)
-            saltLength = 48;
-        else if (this.moduluslength == 4096)
-            saltLength = 64;
-
+        let saltLength = 32; // default length for sha256
         const metadata: idlV1.rsa_pss_signature_metadata = { saltLength: saltLength };
         return CryptoImpl.verify(this.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata)), data, signature);
     }
@@ -55,16 +45,6 @@ export class KeyRSA extends Key {
         const resBuffer = result.data as ArrayBuffer;
         return new PublicKey(Uint8Array.wrap(resBuffer));
     }
-
-    getPrivateKey(): PrivateKey {
-        const result = CryptoImpl.exportKey(this.name, idlV1.key_format.pkcs1);
-        if (!result.data)
-            return new PrivateKey(new Uint8Array(0));
-
-        const resBuffer = result.data as ArrayBuffer;
-        return new PrivateKey(Uint8Array.wrap(resBuffer));
-    }
-
 }
 
 export class CryptoRSA {
@@ -75,120 +55,24 @@ export class CryptoRSA {
         return null;
     }
 
-    static generateKey(keyName: string, moduluslength: u32 = 2048): Result<KeyRSA, Error> {
+    static generateKey(keyName: string): Result<KeyRSA, Error> {
         if (keyName == '')
             return { data: null, err: new Error('Invalid key name: key name cannot be empty') };
 
         if (CryptoImpl.keyExists(keyName))
             return { data: null, err: new Error('Invalid key name: key name already exists') };
 
-        if (moduluslength != 2048 && moduluslength != 3072 && moduluslength != 4096)
-            return { data: null, err: new Error('Invalid modulus length: modulus length must be 2048, 3072, or 4096') };
-
         let shaAlgo = 'sha2-256';
-        if (moduluslength == 3072)
-            shaAlgo = 'sha2-384';
-        else if (moduluslength == 4096)
-            shaAlgo = 'sha2-512';
-
         const shaMetadata = CryptoUtil.getShaMetadata(shaAlgo);
         const metadata = shaMetadata.data as idlV1.sha_metadata;
-        const algoMetadata = { modulus: moduluslength, sha_metadata: metadata } as idlV1.rsa_metadata;
+        const algoMetadata = { modulus: idlV1.rsa_key_bitsize.RSA_2048, sha_metadata: metadata } as idlV1.rsa_metadata;
         const key = CryptoImpl.generateKeyAndPersist(keyName, idlV1.key_algorithm.rsa, String.UTF8.encode(JSON.stringify(algoMetadata)), true, ['sign', 'decrypt']);
         if (!key.data) {
             return { data: null, err: new Error('Failed to generate RSA key') };
         }
 
         const keyData = key.data as Key;
-        const rsaKey = { name: keyData.name, moduluslength: moduluslength } as KeyRSA;
-        rsaKey.moduluslength = moduluslength;
-
+        const rsaKey = { name: keyData.name, moduluslength: 2048 } as KeyRSA;
         return { data: rsaKey, err: null };
-    }
-
-    static importPrivateKey(keyName: string, keyData: ArrayBuffer, moduluslength: u32 = 2048): Result<KeyRSA, Error> {
-        if (keyName == '')
-            return { data: null, err: new Error('Invalid key name: key name cannot be empty') };
-
-        if (keyData.byteLength == 0)
-            return { data: null, err: new Error('Invalid key data: key data cannot be empty') };
-
-        if (CryptoImpl.keyExists(keyName))
-            return { data: null, err: new Error('Invalid key name: key name already exists') };
-
-        if (moduluslength != 2048 && moduluslength != 3072 && moduluslength != 4096)
-            return { data: null, err: new Error('Invalid modulus length: modulus length must be 2048, 3072, or 4096') };
-
-        const formatMetadata = CryptoUtil.getKeyFormat('pkcs1');
-        if (!formatMetadata)
-            return { data: null, err: new Error('Invalid key format') };
-
-        let shaAlgo = 'sha2-256';
-        if (moduluslength == 3072)
-            shaAlgo = 'sha2-384';
-        else if (moduluslength == 4096)
-            shaAlgo = 'sha2-512';
-
-        const shaMetadata = CryptoUtil.getShaMetadata(shaAlgo);
-        const metadata = shaMetadata.data as idlV1.sha_metadata;
-        const algoMetadata = { modulus: moduluslength, sha_metadata: metadata } as idlV1.rsa_metadata;
-        const algoMetadataStr = String.UTF8.encode(JSON.stringify(algoMetadata));
-        const formatData = formatMetadata.data as KeyFormatWrapper;
-
-        const keyImportResult = CryptoImpl.importKeyAndPersist(keyName, formatData.format, keyData, idlV1.key_algorithm.rsa, algoMetadataStr, true, ['sign', 'decrypt']);
-
-        if (!keyImportResult.data)
-            return { data: null, err: new Error('Failed to import key') };
-
-        const key = { name: keyName, moduluslength: moduluslength } as KeyRSA;
-        key.moduluslength = moduluslength;
-        return { data: key, err: null };
-    }
-
-    static importPublicKey(keyName: string, keyData: ArrayBuffer, moduluslength: u32 = 2048): Result<KeyRSA, Error> {
-        if (keyName == '')
-            return { data: null, err: new Error('Invalid key name: key name cannot be empty') };
-
-        if (keyData.byteLength == 0)
-            return { data: null, err: new Error('Invalid key data: key data cannot be empty') };
-
-        if (CryptoImpl.keyExists(keyName))
-            return { data: null, err: new Error('Invalid key name: key name already exists') };
-
-        if (moduluslength != 2048 && moduluslength != 3072 && moduluslength != 4096)
-            return { data: null, err: new Error('Invalid modulus length: modulus length must be 2048, 3072, or 4096') };
-
-        const formatMetadata = CryptoUtil.getKeyFormat('spki');
-        if (!formatMetadata)
-            return { data: null, err: new Error('Invalid key format') };
-
-        let shaAlgo = 'sha2-256';
-        if (moduluslength == 3072)
-            shaAlgo = 'sha2-384';
-        else if (moduluslength == 4096)
-            shaAlgo = 'sha2-512';
-
-        const shaMetadata = CryptoUtil.getShaMetadata(shaAlgo);
-        const metadata = shaMetadata.data as idlV1.sha_metadata;
-        const algoMetadata = { modulus: moduluslength, sha_metadata: metadata } as idlV1.rsa_metadata;
-        const algoMetadataStr = String.UTF8.encode(JSON.stringify(algoMetadata));
-        const formatData = formatMetadata.data as KeyFormatWrapper;
-
-        const keyImportResult = CryptoImpl.importKeyAndPersist(keyName, formatData.format, keyData, idlV1.key_algorithm.rsa, algoMetadataStr, true, ['verify', 'encrypt']);
-
-        if (!keyImportResult.data)
-            return { data: null, err: new Error('Failed to import key') };
-
-        const key = { name: keyName, moduluslength: moduluslength } as KeyRSA;
-        key.moduluslength = moduluslength;
-        return { data: key, err: null };
-    }
-
-    static exportPrivateKey(keyName: string): Result<ArrayBuffer, Error> {
-        return CryptoImpl.exportKey(keyName, idlV1.key_format.pkcs1);
-    }
-
-    static exportPublicKey(keyName: string): Result<ArrayBuffer, Error> {
-        return CryptoImpl.exportKey(keyName, idlV1.key_format.spki);
     }
 }
