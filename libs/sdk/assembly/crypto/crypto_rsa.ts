@@ -14,13 +14,13 @@ export class KeyRSA extends Key {
     moduluslength: u32 = 2048;
 
     encrypt(data: ArrayBuffer): Result<ArrayBuffer, Error> {
-        const labelUintArray = new Uint8Array(0);
+        const labelUintArray = new Array<u8>(0);
         const rsaOaepParams: idlV1.rsa_oaep_encryption_metadata = { label: labelUintArray };
         return CryptoImpl.encrypt(this.name, idlV1.encryption_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(rsaOaepParams)), data);
     }
 
     decrypt(data: ArrayBuffer): Result<ArrayBuffer, Error> {
-        const labelUintArray = new Uint8Array(0);
+        const labelUintArray = new Array<u8>(0);
         const rsaOaepParams: idlV1.rsa_oaep_encryption_metadata = { label: labelUintArray };
         return CryptoImpl.decrypt(this.name, idlV1.encryption_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(rsaOaepParams)), data);
     }

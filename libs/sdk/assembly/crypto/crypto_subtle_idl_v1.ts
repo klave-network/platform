@@ -169,19 +169,19 @@ export class signature_info {
 
 @json
 export class aes_gcm_encryption_metadata {
-    iv!: Uint8Array;
-    additionalData!: Uint8Array;
+    iv!: Array<u8>;
+    additionalData!: Array<u8>;
     tagLength!: aes_tag_length;
 }
 
 @json
 export class rsa_oaep_encryption_metadata {
-    label!: Uint8Array;
+    label!: Array<u8>;
 }
 
 @json
 export class rsa_pkcs1_v1_5_encryption_metadata {
-    label!: Uint8Array;
+    label!: Array<u8>;
 }
 
 @json

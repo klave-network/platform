@@ -17,14 +17,16 @@ export class KeyAES extends Key {
         const iv = CryptoImpl.getRandomBytes(12);
         if(!iv.data)
             return { data: null, err: new Error('Failed to generate IV') };
-        const additionalData = new Uint8Array(0);
-        const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: iv.data as Uint8Array, additionalData: additionalData, tagLength: idlV1.aes_tag_length.TAG_96 };
+        const ivArray = Utils.convertToU8Array(iv.data as Uint8Array);
+        const additionalData = new Array<u8>(0);
+        const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: ivArray, additionalData: additionalData, tagLength: idlV1.aes_tag_length.TAG_96 };
         return CryptoImpl.encrypt(this.name, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams)), data);
     }
 
     decrypt(data: ArrayBuffer): Result<ArrayBuffer, Error> {
-        const additionalData = new Uint8Array(0);
-        const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: new Uint8Array(0), additionalData: additionalData, tagLength: idlV1.aes_tag_length.TAG_96 };
+        const ivArray = new Array<u8>(0);
+        const additionalData = new Array<u8>(0);
+        const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: ivArray, additionalData: additionalData, tagLength: idlV1.aes_tag_length.TAG_96 };
         return CryptoImpl.decrypt(this.name, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams)), data);
     }
 }

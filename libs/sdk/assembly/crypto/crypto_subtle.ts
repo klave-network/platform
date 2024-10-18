@@ -3,6 +3,7 @@
  * @module klave/sdk/crypto
  */
 import { Result } from '../index';
+import { Utils } from './index';
 import { CryptoUtil, KeyFormatWrapper } from './crypto_utils';
 import { CryptoImpl, Key, VerifySignResult } from './crypto_impl';
 import * as idlV1 from './crypto_subtle_idl_v1';
@@ -134,12 +135,12 @@ export class SubtleCrypto {
         if (!clear_text)
             return { data: null, err: new Error('Invalid clear text: clear text cannot be null') };
         if (algorithm instanceof RsaOaepParams) {
-            const labelUintArray = Uint8Array.wrap(algorithm.label);
+            const labelUintArray = Utils.convertToU8Array(Uint8Array.wrap(algorithm.label));
             const rsaOaepParams: idlV1.rsa_oaep_encryption_metadata = { label: labelUintArray };
             return CryptoImpl.encrypt(key.name, idlV1.encryption_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(rsaOaepParams)), clear_text);
         } else if (algorithm instanceof AesGcmParams) {
-            const iv = Uint8Array.wrap(algorithm.iv);
-            const additionalData = Uint8Array.wrap(algorithm.additionalData);
+            const iv = Utils.convertToU8Array(Uint8Array.wrap(algorithm.iv));
+            const additionalData = Utils.convertToU8Array(Uint8Array.wrap(algorithm.additionalData));
             const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: algorithm.tagLength };
             return CryptoImpl.encrypt(key.name, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams)), clear_text);
 
@@ -154,12 +155,12 @@ export class SubtleCrypto {
             return { data: null, err: new Error('Invalid key') };
 
         if (algorithm instanceof RsaOaepParams) {
-            const labelUintArray = Uint8Array.wrap(algorithm.label);
+            const labelUintArray = Utils.convertToU8Array(Uint8Array.wrap(algorithm.label));
             const rsaOaepParams: idlV1.rsa_oaep_encryption_metadata = { label: labelUintArray };
             return CryptoImpl.decrypt(key.name, idlV1.encryption_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(rsaOaepParams)), cipher_text);
         } else if (algorithm instanceof AesGcmParams) {
-            const iv = Uint8Array.wrap(algorithm.iv);
-            const additionalData = Uint8Array.wrap(algorithm.additionalData);
+            const iv = Utils.convertToU8Array(Uint8Array.wrap(algorithm.iv));
+            const additionalData = Utils.convertToU8Array(Uint8Array.wrap(algorithm.additionalData));
             const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: algorithm.tagLength };
             return CryptoImpl.decrypt(key.name, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams)), cipher_text);
         } else
@@ -314,12 +315,12 @@ export class SubtleCrypto {
         const formatData = keyFormat.data as KeyFormatWrapper;
 
         if (wrapAlgo instanceof RsaOaepParams) {
-            const labelUintArray = Uint8Array.wrap(wrapAlgo.label);
+            const labelUintArray = Utils.convertToU8Array(Uint8Array.wrap(wrapAlgo.label));
             const wrappingInfo: idlV1.rsa_oaep_encryption_metadata = { label: labelUintArray };
             return CryptoImpl.wrapKey(wrappingKey.name, idlV1.wrapping_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(wrappingInfo)), key.name, formatData.format);
         } else if (wrapAlgo instanceof AesGcmParams) {
-            const iv = Uint8Array.wrap(wrapAlgo.iv);
-            const additionalData = Uint8Array.wrap(wrapAlgo.additionalData);
+            const iv = Utils.convertToU8Array(Uint8Array.wrap(wrapAlgo.iv));
+            const additionalData = Utils.convertToU8Array(Uint8Array.wrap(wrapAlgo.additionalData));
             const wrappingInfo: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: wrapAlgo.tagLength };
             return CryptoImpl.wrapKey(wrappingKey.name, idlV1.wrapping_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(wrappingInfo)), key.name, formatData.format);
         } else if (wrapAlgo instanceof NamedAlgorithm) {
@@ -348,13 +349,13 @@ export class SubtleCrypto {
         let wrappingAlgo: idlV1.wrapping_algorithm;
         let wrappingInfo: ArrayBuffer;
         if (unwrapAlgo instanceof RsaOaepParams) {
-            const labelUintArray = Uint8Array.wrap(unwrapAlgo.label);
+            const labelUintArray = Utils.convertToU8Array(Uint8Array.wrap(unwrapAlgo.label));
             const wrappingInfoRsaOaep: idlV1.rsa_oaep_encryption_metadata = { label: labelUintArray };
             wrappingInfo = String.UTF8.encode(JSON.stringify(wrappingInfoRsaOaep));
             wrappingAlgo = idlV1.wrapping_algorithm.rsa_oaep;
         } else if (unwrapAlgo instanceof AesGcmParams) {
-            const iv = Uint8Array.wrap(unwrapAlgo.iv);
-            const additionalData = Uint8Array.wrap(unwrapAlgo.additionalData);
+            const iv = Utils.convertToU8Array(Uint8Array.wrap(unwrapAlgo.iv));
+            const additionalData = Utils.convertToU8Array(Uint8Array.wrap(unwrapAlgo.additionalData));
             const wrappingInfoAesGcm: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: unwrapAlgo.tagLength };
             wrappingInfo = String.UTF8.encode(JSON.stringify(wrappingInfoAesGcm));
             wrappingAlgo = idlV1.wrapping_algorithm.aes_gcm;
