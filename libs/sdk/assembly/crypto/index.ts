@@ -3,35 +3,26 @@
  * @module klave/sdk/crypto
  */
 
-import { CryptoImpl, Key, VerifySignResult as  SigValidation} from './crypto_impl';
-import * as SubtleCrypto from './crypto_subtle';
-import { CryptoAES, KeyAES as AESKey } from './crypto_aes';
-import { CryptoECDSA, KeyECC as ECCKey} from './crypto_ecc';
-import { CryptoRSA, KeyRSA as RSAKey } from './crypto_rsa';
-import { CryptoSHA } from './crypto_sha';
 import { encode as b64encode } from 'as-base64/assembly';
 
-export class Subtle extends SubtleCrypto.SubtleCrypto { }
-export class RsaHashedKeyGenParams extends SubtleCrypto.RsaHashedKeyGenParams { }
-export class RsaOaepParams extends SubtleCrypto.RsaOaepParams { }
-export class RsaPssParams extends SubtleCrypto.RsaPssParams { }
-export class AesKeyGenParams extends SubtleCrypto.AesKeyGenParams { }
-export class AesGcmParams extends SubtleCrypto.AesGcmParams { }
-export class EcKeyGenParams extends SubtleCrypto.EcKeyGenParams { }
-export class EcdsaParams extends SubtleCrypto.EcdsaParams { }
-export class NamedAlgorithm extends SubtleCrypto.NamedAlgorithm { }
-export class AES extends CryptoAES { }
-export class KeyAES extends AESKey { }
-export class ECDSA extends CryptoECDSA { }
-export class SignatureVerification extends SigValidation { }
-export class KeyECC extends ECCKey { }
-export class RSA extends CryptoRSA { }
-export class KeyRSA extends RSAKey { }
-export class SHA extends CryptoSHA { }
+import { CryptoImpl, Key } from './crypto_impl';
+
+export { Key, UnitType, VerifySignResult as SignatureVerification } from './crypto_impl';
+export { CryptoAES as AES, KeyAES } from './crypto_aes';
+export { CryptoECDSA as ECDSA, KeyECC } from './crypto_ecc';
+export { CryptoRSA as RSA, KeyRSA } from './crypto_rsa';
+export { CryptoSHA as SHA } from './crypto_sha';
+export {
+    AesGcmParams, AesKeyGenParams,
+    CryptoKey,
+    EcdsaParams, EcKeyGenParams,
+    NamedAlgorithm,
+    RsaHashedKeyGenParams, RsaOaepParams, RsaPssParams,
+    SubtleCrypto as Subtle
+} from './crypto_subtle';
 
 export function getKey(keyName: string): Key | null {
-    if (CryptoImpl.keyExists(keyName))
-        return Key.create(keyName);
+    if (CryptoImpl.keyExists(keyName)) return Key.create(keyName);
     return null;
 }
 
@@ -43,15 +34,13 @@ export function getRandomValues(size: i32): Uint8Array | null {
         return randomByteRes.data as Uint8Array;
 }
 
-export function getPem(key: Uint8Array, isPrivate: bool = false) : string
-{
-    if(!isPrivate)
-    {
+export function getPem(key: Uint8Array, isPrivate: bool = false): string {
+    if (!isPrivate) {
         const pem = `-----BEGIN PUBLIC KEY-----
 ${b64encode(key)}
 -----END PUBLIC KEY-----`;
         return pem;
-    }else{
+    } else {
         const pem = `-----BEGIN PRIVATE KEY-----
 ${b64encode(key)}
 -----END PRIVATE KEY-----`;
@@ -60,7 +49,6 @@ ${b64encode(key)}
 }
 
 export class Utils {
-
     static convertToU8Array(input: Uint8Array): u8[] {
         const ret: u8[] = [];
         for (let i = 0; i < input.length; ++i)
@@ -77,5 +65,4 @@ export class Utils {
 
         return value;
     }
-
 }

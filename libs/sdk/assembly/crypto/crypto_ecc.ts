@@ -50,12 +50,16 @@ export class CryptoECDSA {
             return { data: null, err: new Error('Invalid key name: key name already exists') };
 
         let metadata: idlV1.secp_r1_metadata = { length: idlV1.secp_r1_key_bitsize.SECP_R1_256 };
-        const key = CryptoImpl.generateKeyAndPersist(keyName, idlV1.key_algorithm.secp_k1, String.UTF8.encode(JSON.stringify(metadata)), true, ['sign']);
-        if (key.data) {
-            const keyData = key.data as Key;
-            const kECC = { name: keyData.name, namedCurve: "P-256" } as KeyECC;
-            return { data: kECC, err: null };
-        }else
-            return { data: null, err: new Error('Failed to generate ECDSA Key') };
+        const key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_k1, String.UTF8.encode(JSON.stringify(metadata)), true, ['sign'], keyName);
+        if (key.err)
+            return { data: null, err: key.err };
+
+        const saved = CryptoImpl.saveKey(keyName);
+        if (saved.err)
+            return { data: null, err: saved.err };
+
+        const keyData = key.data as Key;
+        const kECC = { name: keyData.name, namedCurve: "P-256" } as KeyECC;
+        return { data: kECC, err: null };
     }
 }

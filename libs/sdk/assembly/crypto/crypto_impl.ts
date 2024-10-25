@@ -6,18 +6,6 @@
 import uuid from '../uuid';
 import { Result } from '../index';
 
-//Persistent Crypto operations (i.e. output that are stored in the ledger)
-// @ts-ignore: decorator
-@external("env", "generate_key_and_persist")
-declare function wasm_generate_key_and_persist(key_name: ArrayBuffer, algorithm: i32, algo_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
-// @ts-ignore: decorator
-@external("env", "import_key_and_persist")
-declare function wasm_import_key_and_persist(key_name: ArrayBuffer, key_format: i32, key_data: ArrayBuffer, key_data_size: i32, algorithm: i32, algo_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
-// @ts-ignore: decorator
-@external("env", "unwrap_key_and_persist")
-declare function wasm_unwrap_key_and_persist(decryption_key_name: ArrayBuffer, unwrap_algo_id: i32, unwrap_metadata: ArrayBuffer, key_name_to_import: ArrayBuffer, key_format: i32, wrapped_data: ArrayBuffer, wrapped_data_size: i32, key_gen_algo_id: i32, key_gen_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32): i32;
-
-
 //In-memory Crypto operations
 // @ts-ignore: decorator
 @external("env", "key_exists")
@@ -39,7 +27,7 @@ declare function wasm_import_key(key_name: ArrayBuffer, key_format: i32, key_dat
 declare function wasm_export_key(key_name: ArrayBuffer, key_format: i32, key: ArrayBuffer, key_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "get_public_key")
-declare function wasm_get_public_key(key_name: ArrayBuffer, key_format: i32, result: ArrayBuffer, result_size: i32): i32;
+declare function wasm_get_public_key(key_name: ArrayBuffer, result: ArrayBuffer, result_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "sign")
 declare function wasm_sign(key_name: ArrayBuffer, algorithm: i32, signature_metadata: ArrayBuffer, text: ArrayBuffer, text_size: i32, signature: ArrayBuffer, signature_size: i32): i32;
@@ -55,6 +43,16 @@ declare function wasm_unwrap_key(decryption_key_name: ArrayBuffer, unwrap_algo_i
 // @ts-ignore: decorator
 @external("env", "wrap_key")
 declare function wasm_wrap_key(key_name_to_export: ArrayBuffer, key_format: i32, wrapping_key_name: ArrayBuffer, wrap_algo_id: i32, wrap_metadata: ArrayBuffer, key: ArrayBuffer, key_size: i32): i32;
+
+// @ts-ignore: decorator
+@external("env", "save_key")
+declare function wasm_save_key(key_name: ArrayBuffer): i32;
+// @ts-ignore: decorator
+@external("env", "load_key")
+declare function wasm_load_key(key_name: ArrayBuffer, key_info: ArrayBuffer, key_info_size: i32): i32;
+// @ts-ignore: decorator
+@external("env", "delete_key")
+declare function wasm_delete_key(key_name: ArrayBuffer): i32;
 
 // @ts-ignore: decorator
 @external("env", "get_random_bytes")
@@ -86,6 +84,10 @@ export class VerifySignResult {
     isValid!: boolean;
 }
 
+// null as a type should be an acceptable unit type, but AssemblyScript doesn't support it
+export class UnitType {
+}
+
 export class CryptoImpl {
 
     static usage(input: string): i32 {
@@ -114,32 +116,13 @@ export class CryptoImpl {
         return result;
     }
 
-    static generateKeyAndPersist(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error> {
-        if(keyName == "")
-            return { data: null, err: new Error("Invalid key name: key name cannot be empty") };
+    static generateKey(algorithm: u32, algoMetadata: ArrayBuffer, extractable: boolean, usages: string[], keyName: string): Result<Key, Error> {
         const local_usages = new Uint8Array(usages.length);
         for (let i = 0; i < usages.length; i++) {
             local_usages[i] = this.usage(usages[i]);
         }
+
         const key = Key.create(keyName);
-        if (!key)
-            return { data: null, err: new Error("Failed to generate key") };
-        let result = 0;
-        result = wasm_generate_key_and_persist(
-            String.UTF8.encode(key.name, true), algorithm, algoMetadata, extractable ? 1 : 0, local_usages.buffer, local_usages.length);
-        if (result < 0)
-            return { data: null, err: new Error("Failed to generate key") };
-
-        return { data: key, err: null };
-    }
-
-    static generateKey(algorithm: u32, algoMetadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error> {
-        const local_usages = new Uint8Array(usages.length);
-        for (let i = 0; i < usages.length; i++) {
-            local_usages[i] = this.usage(usages[i]);
-        }
-
-        const key = Key.create("");
         if (!key)
             return { data: null, err: new Error("Failed to generate key") };
         let result = 0;
@@ -224,8 +207,8 @@ export class CryptoImpl {
         return { data: value.buffer.slice(0, result), err: null };
     }
 
-    static importKey(format: u32, keyData: ArrayBuffer, algorithm: u32, algo_metadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error> {
-        const key = Key.create("");
+    static importKey(format: u32, keyData: ArrayBuffer, algorithm: u32, algo_metadata: ArrayBuffer, extractable: boolean, usages: string[], keyName: string): Result<Key, Error> {
+        const key = Key.create(keyName);
         if (!key)
             return { data: null, err: new Error("Failed to generate key UUID") };
         const local_usages = new Uint8Array(usages.length);
@@ -234,24 +217,6 @@ export class CryptoImpl {
         }
 
         let result = wasm_import_key(String.UTF8.encode(key.name, true), format, keyData, keyData.byteLength, algorithm, algo_metadata, extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength);
-        if (result < 0)
-            return { data: null, err: new Error("Failed to import key") };
-
-        return { data: key, err: null };
-    }
-
-    static importKeyAndPersist(keyName: string, format: u32, keyData: ArrayBuffer, algorithm: u32, algo_metadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error> {
-        if(keyName == "")
-            return { data: null, err: new Error("Invalid key name: key name cannot be empty") };
-        const key = Key.create(keyName);
-        if(!key)
-            return { data: null, err: new Error("Failed to generate key") };
-        const local_usages = new Uint8Array(usages.length);
-        for (let i = 0; i < usages.length; i++) {
-            local_usages[i] = this.usage(usages[i]);
-        }
-
-        let result = wasm_import_key_and_persist(String.UTF8.encode(key.name, true), format, keyData, keyData.byteLength, algorithm, algo_metadata, extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength);
         if (result < 0)
             return { data: null, err: new Error("Failed to import key") };
 
@@ -305,19 +270,48 @@ export class CryptoImpl {
         return { data: key.buffer.slice(0, result), err: null };
     }
 
-    static getPublicKey(keyName: string, format: u32): Result<ArrayBuffer, Error> {
+    static getPublicKey(keyName: string): Result<ArrayBuffer, Error> {
         let key = new Uint8Array(32);
-        let result = wasm_get_public_key(String.UTF8.encode(keyName, true), format, key.buffer, key.byteLength);
+        let result = wasm_get_public_key(String.UTF8.encode(keyName, true), key.buffer, key.byteLength);
         if (result < 0)
             return { data: null, err: new Error("Failed to get public key") };
         if (result > key.byteLength) {
             // buffer not big enough, retry with a properly sized one
             key = new Uint8Array(result);
-            result = wasm_get_public_key(String.UTF8.encode(keyName, true), format, key.buffer, key.byteLength);
+            result = wasm_get_public_key(String.UTF8.encode(keyName, true), key.buffer, key.byteLength);
             if (result < 0)
                 return { data: null, err: new Error("Failed to get public key") };
         }
         return { data: key.buffer.slice(0, result), err: null };
+    }
+
+    static saveKey(keyName: string): Result<UnitType, Error> {
+        let result = wasm_save_key(String.UTF8.encode(keyName, true));
+        if (result < 0)
+            return { data: null, err: new Error("Failed to save key") };
+        return { data: new UnitType(), err: null };
+    }
+
+    static loadKey(keyName: string): Result<ArrayBuffer, Error> {
+        let keyInfo = new ArrayBuffer(64);
+        let result = wasm_load_key(String.UTF8.encode(keyName, true), keyInfo, keyInfo.byteLength);
+        if (result < 0)
+            return { data: null, err: new Error("Failed to load key") };
+        if (result > keyInfo.byteLength) {
+            // buffer not big enough, retry with a properly sized one
+            keyInfo = new ArrayBuffer(result);
+            result = wasm_load_key(String.UTF8.encode(keyName, true), keyInfo, keyInfo.byteLength);
+            if (result < 0)
+                return { data: null, err: new Error("Failed to load key") };
+        }
+        return { data: keyInfo.slice(0, result), err: null };
+    }
+
+    static deleteKey(keyName: string): Result<UnitType, Error> {
+        let result = wasm_delete_key(String.UTF8.encode(keyName, true));
+        if (result < 0)
+            return { data: null, err: new Error("Failed to delete key") };
+        return { data: new UnitType(), err: null };
     }
 
     static getRandomBytes(size: i32): Result<Uint8Array, Error> {

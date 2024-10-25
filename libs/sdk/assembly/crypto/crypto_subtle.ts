@@ -5,14 +5,14 @@
 import { Result } from '../index';
 import { Utils } from './index';
 import { CryptoUtil, KeyFormatWrapper } from './crypto_utils';
-import { CryptoImpl, Key, VerifySignResult } from './crypto_impl';
+import { CryptoImpl, Key, UnitType, VerifySignResult } from './crypto_impl';
 import * as idlV1 from './crypto_subtle_idl_v1';
 import { JSON } from '@klave/as-json/assembly';
 
-class CryptoKey extends Key {
+export class CryptoKey extends Key {
     algorithm!: string;
-    extractable!: boolean;
-    usages!: string[];
+    extractable: boolean = false;
+    usages: string[] = [];
 }
 
 export class RsaHashedKeyGenParams {
@@ -51,7 +51,7 @@ export class RsaPssParams {
 
 export class EcdsaParams {
     name: string = 'ECDSA';
-    hash: string = 'SHA-256';
+    hash: string = 'SHA2-256';
 }
 
 export class NamedAlgorithm {
@@ -59,12 +59,12 @@ export class NamedAlgorithm {
 }
 
 export class SubtleCrypto {
-    static generateKey<T>(algorithm: T, extractable: boolean, usages: string[]): Result<CryptoKey, Error> {
+    static generateKey<T>(algorithm: T, extractable: boolean, usages: string[], keyName: string = ""): Result<CryptoKey, Error> {
         if (algorithm instanceof RsaHashedKeyGenParams) {
             const rsaMetadata = CryptoUtil.getRSAMetadata(algorithm);
             if (rsaMetadata.data) {
                 const rsaMeta = rsaMetadata.data as idlV1.rsa_metadata;
-                const key = CryptoImpl.generateKey(idlV1.key_algorithm.rsa, String.UTF8.encode(JSON.stringify(rsaMeta)), extractable, usages);
+                const key = CryptoImpl.generateKey(idlV1.key_algorithm.rsa, String.UTF8.encode(JSON.stringify(rsaMeta)), extractable, usages, keyName);
                 if (key.data) {
                     const keyData = key.data as Key;
                     return { data: { name: keyData.name, algorithm: algorithm.name, extractable: extractable, usages: usages } as CryptoKey, err: null };
@@ -87,7 +87,7 @@ export class SubtleCrypto {
                 const metadata = CryptoUtil.getSECPR1Metadata(algorithm);
                 if (metadata.data) {
                     const secpr1Metadata = metadata.data as idlV1.secp_r1_metadata;
-                    const key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_r1, String.UTF8.encode(JSON.stringify(secpr1Metadata)), extractable, usages);
+                    const key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_r1, String.UTF8.encode(JSON.stringify(secpr1Metadata)), extractable, usages, keyName);
                     if (key.data) {
                         const keyData = key.data as Key;
                         return { data: { name: keyData.name, algorithm: algorithm.name, extractable: extractable, usages: usages } as CryptoKey, err: null };
@@ -99,7 +99,7 @@ export class SubtleCrypto {
                 const metadata = CryptoUtil.getSECPK1Metadata(algorithm);
                 if (metadata.data) {
                     const secpk1Metadata = metadata.data as idlV1.secp_k1_metadata;
-                    const key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_k1, String.UTF8.encode(JSON.stringify(secpk1Metadata)), extractable, usages);
+                    const key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_k1, String.UTF8.encode(JSON.stringify(secpk1Metadata)), extractable, usages, keyName);
                     if (key.data) {
                         const keyData = key.data as Key;
                         return { data: { name: keyData.name, algorithm: algorithm.name, extractable: extractable, usages: usages } as CryptoKey, err: null };
@@ -116,7 +116,7 @@ export class SubtleCrypto {
             const metadata = CryptoUtil.getAESMetadata(algorithm);
             if (metadata.data) {
                 const aesMetadata = metadata.data as idlV1.aes_metadata;
-                const key = CryptoImpl.generateKey(idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(aesMetadata)), extractable, usages);
+                const key = CryptoImpl.generateKey(idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(aesMetadata)), extractable, usages, keyName);
                 if (key.data) {
                     const keyData = key.data as Key;
                     return { data: { name: keyData.name, algorithm: algorithm.name, extractable: extractable, usages: usages } as CryptoKey, err: null };
@@ -224,7 +224,7 @@ export class SubtleCrypto {
         return { data: null, err: new Error('Invalid algorithm') };
     }
 
-    static importKey<T>(format: string, keyData: ArrayBuffer | null, algorithm: T, extractable: boolean, usages: string[]): Result<CryptoKey, Error> {
+    static importKey<T>(format: string, keyData: ArrayBuffer | null, algorithm: T, extractable: boolean, usages: string[], keyName: string = ""): Result<CryptoKey, Error> {
         if (!keyData)
             return { data: null, err: new Error('Invalid key data: key data cannot be null') };
 
@@ -293,7 +293,7 @@ export class SubtleCrypto {
         } else
             return { data: null, err: new Error('Invalid algorithm') };
 
-        const key = CryptoImpl.importKey(formatData.format, keyData, keyAlgo, algoMetadata, extractable, usages);
+        const key = CryptoImpl.importKey(formatData.format, keyData, keyAlgo, algoMetadata, extractable, usages, keyName);
         if (!key.data)
             return { data: null, err: new Error('Failed to import key') };
 
@@ -444,19 +444,27 @@ export class SubtleCrypto {
             return { data: null, err: new Error('Failed to export key') };
     }
 
-    static getPublicKey(format: string, key: CryptoKey | null): Result<ArrayBuffer, Error> {
+    static getPublicKey(key: CryptoKey | null): Result<ArrayBuffer, Error> {
         if (!key)
             return { data: null, err: new Error('Invalid key') };
 
-        const keyFormat = CryptoUtil.getKeyFormat(format);
-        if (!keyFormat.data)
-            return { data: null, err: keyFormat.err };
+        return CryptoImpl.getPublicKey(key.name);
+    }
 
-        const formatData = keyFormat.data as KeyFormatWrapper;
+    static saveKey(keyName: string): Result<UnitType, Error> {
+        return CryptoImpl.saveKey(keyName);
+    }
 
-        if (formatData.format != idlV1.key_format.spki)
-            return { data: null, err: new Error('Invalid public key format') };
+    static loadKey(keyName: string): Result<CryptoKey, Error> {
+        const loadKey = CryptoImpl.loadKey(keyName);
+        if (loadKey.err)
+            return { data: null, err: loadKey.err };
 
-        return CryptoImpl.getPublicKey(key.name, formatData.format);
+        // will need to be improved
+        let key = new CryptoKey();
+        const keyInfo = String.UTF8.decode(loadKey.data!, true);
+        key.algorithm = keyInfo;
+        key.name = keyName;
+        return { data: key, err: null };
     }
 }
