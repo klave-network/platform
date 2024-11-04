@@ -20,7 +20,7 @@ export class KeyAES extends Key {
         const ivArray = Utils.convertToU8Array(iv.data as Uint8Array);
         const additionalData = new Array<u8>(0);
         const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: ivArray, additionalData: additionalData, tagLength: idlV1.aes_tag_length.TAG_96 };
-        const encrypted = CryptoImpl.encrypt(this.name, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams)), data);
+        const encrypted = CryptoImpl.encrypt(this.name, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams), true), data);
         if (encrypted.err)
             return { data: null, err: encrypted.err };
         // prepend iv : encrypted blob can only be decrypted by KeyAES.decrypt
@@ -35,7 +35,7 @@ export class KeyAES extends Key {
         const encrypted = data.slice(12);
         const additionalData = new Array<u8>(0);
         const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: ivArray, additionalData: additionalData, tagLength: idlV1.aes_tag_length.TAG_96 };
-        return CryptoImpl.decrypt(this.name, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams)), encrypted);
+        return CryptoImpl.decrypt(this.name, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams), true), encrypted);
     }
 }
 
@@ -55,7 +55,7 @@ export class CryptoAES {
             return { data: null, err: new Error('Invalid key name: key name already exists') };
 
         const metadata = { length: idlV1.aes_key_bitsize.AES_256 } as idlV1.aes_metadata;
-        const key = CryptoImpl.generateKey(idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(metadata)), true, ['decrypt', 'encrypt'], keyName);
+        const key = CryptoImpl.generateKey(idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(metadata), true), true, ['decrypt', 'encrypt'], keyName);
 
         if (key.err)
             return { data: null, err: key.err };

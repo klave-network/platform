@@ -64,7 +64,7 @@ export class SubtleCrypto {
             const rsaMetadata = CryptoUtil.getRSAMetadata(algorithm);
             if (rsaMetadata.data) {
                 const rsaMeta = rsaMetadata.data as idlV1.rsa_metadata;
-                const key = CryptoImpl.generateKey(idlV1.key_algorithm.rsa, String.UTF8.encode(JSON.stringify(rsaMeta)), extractable, usages, keyName);
+                const key = CryptoImpl.generateKey(idlV1.key_algorithm.rsa, String.UTF8.encode(JSON.stringify(rsaMeta), true), extractable, usages, keyName);
                 if (key.data) {
                     const keyData = key.data as Key;
                     return { data: { name: keyData.name, algorithm: algorithm.name, extractable: extractable, usages: usages } as CryptoKey, err: null };
@@ -87,7 +87,7 @@ export class SubtleCrypto {
                 const metadata = CryptoUtil.getSECPR1Metadata(algorithm);
                 if (metadata.data) {
                     const secpr1Metadata = metadata.data as idlV1.secp_r1_metadata;
-                    const key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_r1, String.UTF8.encode(JSON.stringify(secpr1Metadata)), extractable, usages, keyName);
+                    const key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_r1, String.UTF8.encode(JSON.stringify(secpr1Metadata), true), extractable, usages, keyName);
                     if (key.data) {
                         const keyData = key.data as Key;
                         return { data: { name: keyData.name, algorithm: algorithm.name, extractable: extractable, usages: usages } as CryptoKey, err: null };
@@ -99,7 +99,7 @@ export class SubtleCrypto {
                 const metadata = CryptoUtil.getSECPK1Metadata(algorithm);
                 if (metadata.data) {
                     const secpk1Metadata = metadata.data as idlV1.secp_k1_metadata;
-                    const key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_k1, String.UTF8.encode(JSON.stringify(secpk1Metadata)), extractable, usages, keyName);
+                    const key = CryptoImpl.generateKey(idlV1.key_algorithm.secp_k1, String.UTF8.encode(JSON.stringify(secpk1Metadata), true), extractable, usages, keyName);
                     if (key.data) {
                         const keyData = key.data as Key;
                         return { data: { name: keyData.name, algorithm: algorithm.name, extractable: extractable, usages: usages } as CryptoKey, err: null };
@@ -116,7 +116,7 @@ export class SubtleCrypto {
             const metadata = CryptoUtil.getAESMetadata(algorithm);
             if (metadata.data) {
                 const aesMetadata = metadata.data as idlV1.aes_metadata;
-                const key = CryptoImpl.generateKey(idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(aesMetadata)), extractable, usages, keyName);
+                const key = CryptoImpl.generateKey(idlV1.key_algorithm.aes, String.UTF8.encode(JSON.stringify(aesMetadata), true), extractable, usages, keyName);
                 if (key.data) {
                     const keyData = key.data as Key;
                     return { data: { name: keyData.name, algorithm: algorithm.name, extractable: extractable, usages: usages } as CryptoKey, err: null };
@@ -137,12 +137,12 @@ export class SubtleCrypto {
         if (algorithm instanceof RsaOaepParams) {
             const labelUintArray = Utils.convertToU8Array(Uint8Array.wrap(algorithm.label));
             const rsaOaepParams: idlV1.rsa_oaep_encryption_metadata = { label: labelUintArray };
-            return CryptoImpl.encrypt(key.name, idlV1.encryption_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(rsaOaepParams)), clear_text);
+            return CryptoImpl.encrypt(key.name, idlV1.encryption_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(rsaOaepParams), true), clear_text);
         } else if (algorithm instanceof AesGcmParams) {
             const iv = Utils.convertToU8Array(Uint8Array.wrap(algorithm.iv));
             const additionalData = Utils.convertToU8Array(Uint8Array.wrap(algorithm.additionalData));
             const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: algorithm.tagLength };
-            return CryptoImpl.encrypt(key.name, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams)), clear_text);
+            return CryptoImpl.encrypt(key.name, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams), true), clear_text);
 
         } else
             return { data: null, err: new Error('Invalid algorithm') };
@@ -157,12 +157,12 @@ export class SubtleCrypto {
         if (algorithm instanceof RsaOaepParams) {
             const labelUintArray = Utils.convertToU8Array(Uint8Array.wrap(algorithm.label));
             const rsaOaepParams: idlV1.rsa_oaep_encryption_metadata = { label: labelUintArray };
-            return CryptoImpl.decrypt(key.name, idlV1.encryption_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(rsaOaepParams)), cipher_text);
+            return CryptoImpl.decrypt(key.name, idlV1.encryption_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(rsaOaepParams), true), cipher_text);
         } else if (algorithm instanceof AesGcmParams) {
             const iv = Utils.convertToU8Array(Uint8Array.wrap(algorithm.iv));
             const additionalData = Utils.convertToU8Array(Uint8Array.wrap(algorithm.additionalData));
             const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: algorithm.tagLength };
-            return CryptoImpl.decrypt(key.name, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams)), cipher_text);
+            return CryptoImpl.decrypt(key.name, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams), true), cipher_text);
         } else
             return { data: null, err: new Error('Invalid algorithm') };
     }
@@ -179,10 +179,10 @@ export class SubtleCrypto {
 
             const hashMetadata = hash_info.data as idlV1.sha_metadata;
             const metadata: idlV1.ecdsa_signature_metadata = { sha_metadata: hashMetadata };
-            return CryptoImpl.sign(key.name, idlV1.signing_algorithm.ecdsa, String.UTF8.encode(JSON.stringify(metadata)), data);
+            return CryptoImpl.sign(key.name, idlV1.signing_algorithm.ecdsa, String.UTF8.encode(JSON.stringify(metadata), true), data);
         } else if (algorithm instanceof RsaPssParams) {
             const metadata: idlV1.rsa_pss_signature_metadata = { saltLength: algorithm.saltLength };
-            return CryptoImpl.sign(key.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata)), data);
+            return CryptoImpl.sign(key.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata), true), data);
         }
 
         return { data: null, err: new Error('Invalid algorithm') };
@@ -202,10 +202,10 @@ export class SubtleCrypto {
 
             const hashMetadata = hash_info.data as idlV1.sha_metadata;
             const metadata: idlV1.ecdsa_signature_metadata = { sha_metadata: hashMetadata };
-            return CryptoImpl.verify(key.name, idlV1.signing_algorithm.ecdsa, String.UTF8.encode(JSON.stringify(metadata)), data, signature);
+            return CryptoImpl.verify(key.name, idlV1.signing_algorithm.ecdsa, String.UTF8.encode(JSON.stringify(metadata), true), data, signature);
         } else if (algorithm instanceof RsaPssParams) {
             const metadata: idlV1.rsa_pss_signature_metadata = { saltLength: algorithm.saltLength };
-            return CryptoImpl.verify(key.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata)), data, signature);
+            return CryptoImpl.verify(key.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata), true), data, signature);
         }
 
         return { data: null, err: new Error('Invalid algorithm') };
@@ -217,7 +217,7 @@ export class SubtleCrypto {
         const hashInfo = CryptoUtil.getShaMetadata(algorithm);
         if (hashInfo.data) {
             const hashMetadata = hashInfo.data as idlV1.sha_metadata;
-            return CryptoImpl.digest(idlV1.hash_algorithm.sha, String.UTF8.encode(JSON.stringify(hashMetadata)), data);
+            return CryptoImpl.digest(idlV1.hash_algorithm.sha, String.UTF8.encode(JSON.stringify(hashMetadata), true), data);
         }
         else if (hashInfo.err)
             return { data: null, err: hashInfo.err };
@@ -246,7 +246,7 @@ export class SubtleCrypto {
                 const algoMetadataResult = CryptoUtil.getSECPK1Metadata(algorithm);
                 if (algoMetadataResult.data) {
                     const secpk1Metadata = algoMetadataResult.data as idlV1.secp_k1_metadata;
-                    algoMetadata = String.UTF8.encode(JSON.stringify(secpk1Metadata));
+                    algoMetadata = String.UTF8.encode(JSON.stringify(secpk1Metadata), true);
                 }
                 else
                     return { data: null, err: new Error('Failed to generate EC metadata') };
@@ -256,7 +256,7 @@ export class SubtleCrypto {
                 const algoMetadataResult = CryptoUtil.getSECPR1Metadata(algorithm);
                 if (algoMetadataResult.data) {
                     const secpr1Metadata = algoMetadataResult.data as idlV1.secp_r1_metadata;
-                    algoMetadata = String.UTF8.encode(JSON.stringify(secpr1Metadata));
+                    algoMetadata = String.UTF8.encode(JSON.stringify(secpr1Metadata), true);
                 }
                 else
                     return { data: null, err: new Error('Failed to generate EC metadata') };
@@ -273,7 +273,7 @@ export class SubtleCrypto {
             const algoMetadataResult = CryptoUtil.getAESMetadata(algorithm);
             if (algoMetadataResult.data) {
                 const aesMetadata = algoMetadataResult.data as idlV1.aes_metadata;
-                algoMetadata = String.UTF8.encode(JSON.stringify(aesMetadata));
+                algoMetadata = String.UTF8.encode(JSON.stringify(aesMetadata), true);
             }
             else
                 return { data: null, err: new Error('Failed to generate AES metadata') };
@@ -286,7 +286,7 @@ export class SubtleCrypto {
             const rsaMetadata = CryptoUtil.getRSAMetadata(algorithm);
             if (rsaMetadata.data) {
                 const metadata = rsaMetadata.data as idlV1.rsa_metadata;
-                algoMetadata = String.UTF8.encode(JSON.stringify(metadata));
+                algoMetadata = String.UTF8.encode(JSON.stringify(metadata), true);
             }
             else
                 return { data: null, err: new Error('Failed to generate RSA metadata') };
@@ -317,16 +317,16 @@ export class SubtleCrypto {
         if (wrapAlgo instanceof RsaOaepParams) {
             const labelUintArray = Utils.convertToU8Array(Uint8Array.wrap(wrapAlgo.label));
             const wrappingInfo: idlV1.rsa_oaep_encryption_metadata = { label: labelUintArray };
-            return CryptoImpl.wrapKey(wrappingKey.name, idlV1.wrapping_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(wrappingInfo)), key.name, formatData.format);
+            return CryptoImpl.wrapKey(wrappingKey.name, idlV1.wrapping_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(wrappingInfo), true), key.name, formatData.format);
         } else if (wrapAlgo instanceof AesGcmParams) {
             const iv = Utils.convertToU8Array(Uint8Array.wrap(wrapAlgo.iv));
             const additionalData = Utils.convertToU8Array(Uint8Array.wrap(wrapAlgo.additionalData));
             const wrappingInfo: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: wrapAlgo.tagLength };
-            return CryptoImpl.wrapKey(wrappingKey.name, idlV1.wrapping_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(wrappingInfo)), key.name, formatData.format);
+            return CryptoImpl.wrapKey(wrappingKey.name, idlV1.wrapping_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(wrappingInfo), true), key.name, formatData.format);
         } else if (wrapAlgo instanceof NamedAlgorithm) {
             if (wrapAlgo.name == 'AES-KW' || wrapAlgo.name == 'aes-kw') {
                 const wrappingInfo: idlV1.aes_kw_wrapping_metadata = { with_padding: true };
-                return CryptoImpl.wrapKey(wrappingKey.name, idlV1.wrapping_algorithm.aes_kw, String.UTF8.encode(JSON.stringify(wrappingInfo)), key.name, formatData.format);
+                return CryptoImpl.wrapKey(wrappingKey.name, idlV1.wrapping_algorithm.aes_kw, String.UTF8.encode(JSON.stringify(wrappingInfo), true), key.name, formatData.format);
             } else
                 return { data: null, err: new Error('Invalid wrapping algorithm') };
         }
@@ -351,18 +351,18 @@ export class SubtleCrypto {
         if (unwrapAlgo instanceof RsaOaepParams) {
             const labelUintArray = Utils.convertToU8Array(Uint8Array.wrap(unwrapAlgo.label));
             const wrappingInfoRsaOaep: idlV1.rsa_oaep_encryption_metadata = { label: labelUintArray };
-            wrappingInfo = String.UTF8.encode(JSON.stringify(wrappingInfoRsaOaep));
+            wrappingInfo = String.UTF8.encode(JSON.stringify(wrappingInfoRsaOaep), true);
             wrappingAlgo = idlV1.wrapping_algorithm.rsa_oaep;
         } else if (unwrapAlgo instanceof AesGcmParams) {
             const iv = Utils.convertToU8Array(Uint8Array.wrap(unwrapAlgo.iv));
             const additionalData = Utils.convertToU8Array(Uint8Array.wrap(unwrapAlgo.additionalData));
             const wrappingInfoAesGcm: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: unwrapAlgo.tagLength };
-            wrappingInfo = String.UTF8.encode(JSON.stringify(wrappingInfoAesGcm));
+            wrappingInfo = String.UTF8.encode(JSON.stringify(wrappingInfoAesGcm), true);
             wrappingAlgo = idlV1.wrapping_algorithm.aes_gcm;
         } else if (unwrapAlgo instanceof NamedAlgorithm) {
             if (unwrapAlgo.name == 'AES-KW' || unwrapAlgo.name == 'aes-kw') {
                 const wrappingInfoAesKw: idlV1.aes_kw_wrapping_metadata = { with_padding: true };
-                wrappingInfo = String.UTF8.encode(JSON.stringify(wrappingInfoAesKw));
+                wrappingInfo = String.UTF8.encode(JSON.stringify(wrappingInfoAesKw), true);
                 wrappingAlgo = idlV1.wrapping_algorithm.aes_kw;
             } else
                 return { data: null, err: new Error('Invalid wrapping algorithm') };
@@ -376,7 +376,7 @@ export class SubtleCrypto {
             const aesMetadata = CryptoUtil.getAESMetadata(unwrappedKeyAlgo);
             if (aesMetadata.data) {
                 const keyGenMetadataAes = aesMetadata.data as idlV1.aes_metadata;
-                keyGenInfo = String.UTF8.encode(JSON.stringify(keyGenMetadataAes));
+                keyGenInfo = String.UTF8.encode(JSON.stringify(keyGenMetadataAes), true);
                 keyGenAlgo = idlV1.key_algorithm.aes;
                 keyGenAlgoName = unwrappedKeyAlgo.name;
             } else
@@ -385,7 +385,7 @@ export class SubtleCrypto {
             const rsaMetadata = CryptoUtil.getRSAMetadata(unwrappedKeyAlgo);
             if (rsaMetadata.data) {
                 const keyGenMetadataRsa = rsaMetadata.data as idlV1.rsa_metadata;
-                keyGenInfo = String.UTF8.encode(JSON.stringify(keyGenMetadataRsa));
+                keyGenInfo = String.UTF8.encode(JSON.stringify(keyGenMetadataRsa), true);
                 keyGenAlgo = idlV1.key_algorithm.rsa;
                 keyGenAlgoName = unwrappedKeyAlgo.name;
             }
@@ -396,7 +396,7 @@ export class SubtleCrypto {
                 const metadata = CryptoUtil.getSECPR1Metadata(unwrappedKeyAlgo);
                 if (metadata.data) {
                     const keyGenMetadataR1 = metadata.data as idlV1.secp_r1_metadata;
-                    keyGenInfo = String.UTF8.encode(JSON.stringify(keyGenMetadataR1));
+                    keyGenInfo = String.UTF8.encode(JSON.stringify(keyGenMetadataR1), true);
                     keyGenAlgo = idlV1.key_algorithm.secp_r1;
                     keyGenAlgoName = unwrappedKeyAlgo.name;
                 } else
@@ -405,7 +405,7 @@ export class SubtleCrypto {
                 const metadata = CryptoUtil.getSECPK1Metadata(unwrappedKeyAlgo);
                 if (metadata.data) {
                     const keyGenMetadataK1 = metadata.data as idlV1.secp_k1_metadata;
-                    keyGenInfo = String.UTF8.encode(JSON.stringify(keyGenMetadataK1));
+                    keyGenInfo = String.UTF8.encode(JSON.stringify(keyGenMetadataK1), true);
                     keyGenAlgo = idlV1.key_algorithm.secp_k1;
                     keyGenAlgoName = unwrappedKeyAlgo.name;
                 } else

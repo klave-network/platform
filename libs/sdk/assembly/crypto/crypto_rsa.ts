@@ -16,29 +16,29 @@ export class KeyRSA extends Key {
     encrypt(data: ArrayBuffer): Result<ArrayBuffer, Error> {
         const labelUintArray = new Array<u8>(0);
         const rsaOaepParams: idlV1.rsa_oaep_encryption_metadata = { label: labelUintArray };
-        return CryptoImpl.encrypt(this.name, idlV1.encryption_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(rsaOaepParams)), data);
+        return CryptoImpl.encrypt(this.name, idlV1.encryption_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(rsaOaepParams), true), data);
     }
 
     decrypt(data: ArrayBuffer): Result<ArrayBuffer, Error> {
         const labelUintArray = new Array<u8>(0);
         const rsaOaepParams: idlV1.rsa_oaep_encryption_metadata = { label: labelUintArray };
-        return CryptoImpl.decrypt(this.name, idlV1.encryption_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(rsaOaepParams)), data);
+        return CryptoImpl.decrypt(this.name, idlV1.encryption_algorithm.rsa_oaep, String.UTF8.encode(JSON.stringify(rsaOaepParams), true), data);
     }
 
     sign(data: ArrayBuffer): Result<ArrayBuffer, Error> {
         let saltLength = 32; // default salt length for sha256
         const metadata: idlV1.rsa_pss_signature_metadata = { saltLength: saltLength };
-        return CryptoImpl.sign(this.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata)), data);
+        return CryptoImpl.sign(this.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata), true), data);
     }
 
     verify(data: ArrayBuffer, signature: ArrayBuffer): Result<VerifySignResult, Error> {
         let saltLength = 32; // default length for sha256
         const metadata: idlV1.rsa_pss_signature_metadata = { saltLength: saltLength };
-        return CryptoImpl.verify(this.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata)), data, signature);
+        return CryptoImpl.verify(this.name, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata), true), data, signature);
     }
 
     getPublicKey(): PublicKey {
-        const result = CryptoImpl.getPublicKey(this.name, idlV1.key_format.spki);
+        const result = CryptoImpl.getPublicKey(this.name);
         if (!result.data)
             return new PublicKey(new Uint8Array(0));
 
@@ -66,10 +66,13 @@ export class CryptoRSA {
         const shaMetadata = CryptoUtil.getShaMetadata(shaAlgo);
         const metadata = shaMetadata.data as idlV1.sha_metadata;
         const algoMetadata = { modulus: idlV1.rsa_key_bitsize.RSA_2048, sha_metadata: metadata } as idlV1.rsa_metadata;
-        const key = CryptoImpl.generateKeyAndPersist(keyName, idlV1.key_algorithm.rsa, String.UTF8.encode(JSON.stringify(algoMetadata)), true, ['sign', 'decrypt']);
-        if (!key.data) {
-            return { data: null, err: new Error('Failed to generate RSA key') };
-        }
+        const key = CryptoImpl.generateKey(idlV1.key_algorithm.rsa, String.UTF8.encode(JSON.stringify(algoMetadata), true), true, ['sign', 'decrypt'], keyName);
+        if (key.err)
+            return { data: null, err: key.err };
+
+        const saved = CryptoImpl.saveKey(keyName);
+        if (saved.err)
+            return { data: null, err: saved.err };
 
         const keyData = key.data as Key;
         const rsaKey = { name: keyData.name, moduluslength: 2048 } as KeyRSA;
