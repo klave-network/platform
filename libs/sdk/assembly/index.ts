@@ -76,7 +76,6 @@ class Table {
         let k = String.UTF8.encode(key, true);
         let value = new ArrayBuffer(64);
         let result = runtime_read_ledger_raw(this.table, k, k.byteLength, value, value.byteLength);
-        Notifier.sendString(`call to read_ledger returned ${result}`);
         if (abs(result) > value.byteLength) {
             // buffer not big enough, retry with a properly sized one
             value = new ArrayBuffer(abs(result));
