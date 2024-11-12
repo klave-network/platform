@@ -1,29 +1,29 @@
 import { JSON } from '@klave/sdk';
 
-@JSON
+@json
 export class ErrorMessage {
     success!: boolean;
     message!: string;
 }
 
-@JSON
+@json
 export class FetchInput {
     key!: string;
 }
 
-@JSON
+@json
 export class FetchOutput {
     success!: boolean;
     value!: string;
 }
 
-@JSON
+@json
 export class StoreInput {
     key!: string;
     value!: string;
 }
 
-@JSON
+@json
 export class StoreOutput {
     success!: boolean;
 }
