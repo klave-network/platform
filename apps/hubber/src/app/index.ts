@@ -99,7 +99,7 @@ export const start = async (port: number) => {
     );
 
     // Plug Probot for GitHub Apps
-    app.use('/hook', (req, res, next) => {
+    app.use('/hook', async (req, res, next) => {
         if (req.headers['x-github-event'])
             return probotMiddleware(req, res, next);
         if (req.headers['stripe-signature'])

@@ -4,7 +4,7 @@ import { FC, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import api from '../../utils/api';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
-import { Octicon, Timeline } from '@primer/react';
+import { CircleOcticon, Timeline } from '@primer/react';
 import { CubeIcon } from '@radix-ui/react-icons';
 // import { UilSpinner } from '@iconscout/react-unicons';
 // import api from '../../utils/api';
@@ -17,7 +17,7 @@ export const ApplicationRecord: FC<ApplicationRecordProps> = ({ application }) =
     const { orgSlug } = useParams();
     return <Timeline.Item condensed >
         <Timeline.Badge>
-            <Octicon icon={CubeIcon} />
+            <CircleOcticon icon={CubeIcon} />
         </Timeline.Badge>
         <Timeline.Body>
             Created application <Link to={`/${orgSlug}/${application.slug}`} className='font-semibold'>{application.slug}</Link> <i>({formatTimeAgo(application.createdAt)})</i>
