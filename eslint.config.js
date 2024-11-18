@@ -77,7 +77,8 @@ const base = [
             'dist/',
             'tmp/',
             'tools/**/_msr*',
-            '**/assembly/*.ts',
+            '**/assembly/**/*.ts',
+            '**/stac*',
             '**/.expo',
             '**/node_modules/**',
             '**/template/',
@@ -136,6 +137,8 @@ for (const folder of projectsFolders) {
             languageOptions: {
                 parser: tsParser,
                 parserOptions: {
+                    experimentalDecorators: true,
+                    emitDecoratorMetadata: true,
                     projectService: true,
                     warnOnUnsupportedTypeScriptVersion: false,
                     tsconfigRootDir: folder,

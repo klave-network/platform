@@ -24,6 +24,10 @@
                     "libs/sdk/sdk.json",
                     "libs/sdk/*.md"
                 ],
+                "format": [
+                    "esm",
+                    "cjs"
+                ],
                 "bundle": true,
                 "external": [
                     "@klave/compiler"
