@@ -7,12 +7,12 @@
         "@klave/constants": "1.0.0",
         "@klave/db": "1.0.0",
         "@klave/providers": "1.0.0",
-        "@sentry/node": "7.119.2",
-        "@swc/helpers": "0.5.13",
-        "@trpc/server": "11.0.0-rc.593",
-        "stripe": "17.2.1",
+        "@sentry/node": "7.120.0",
+        "@swc/helpers": "0.5.15",
+        "@trpc/server": "11.0.0-rc.638",
+        "stripe": "17.3.1",
         "superjson": "2.2.1",
-        "uuid": "^10.0.0",
+        "uuid": "^11.0.3",
         "wabt": "1.0.36",
         "zod": "^3.23.8"
     }
