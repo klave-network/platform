@@ -4,19 +4,19 @@
     "license": "MIT",
     "type": "module",
     "dependencies": {
-        "@klave/api": "1.0.0",
-        "@klave/constants": "1.0.0",
-        "@klave/db": "1.0.0",
-        "@klave/providers": "1.0.0",
         "@sentry/esbuild-plugin": "2.22.6",
-        "@sentry/node": "7.119.2",
+        "@sentry/node": "7.120.0",
         "esbuild-node-externals": "1.15.0",
         "express": "4.21.1",
         "git-rev-sync": "3.0.2",
-        "i18next": "23.16.3",
+        "i18next": "23.16.5",
         "i18next-fs-backend": "2.3.2",
         "i18next-http-middleware": "3.6.0",
         "passport": "0.7.0",
-        "rate-limiter-flexible": "5.0.4"
+        "rate-limiter-flexible": "5.0.4",
+    "@klave/db": "1.0.0",
+    "@klave/providers": "1.0.0",
+    "@klave/constants": "1.0.0",
+    "@klave/api": "1.0.0"
     }
 }
