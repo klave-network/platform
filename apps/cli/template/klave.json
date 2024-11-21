@@ -1,0 +1,14 @@
+{
+    "version": "1",
+    "branches": [
+        "*"
+    ],
+    "applications": [
+        {
+            "slug": "{{KLAVE_APP_SLUG}}",
+            "description": "{{KLAVE_APP_DESCRIPTION}}",
+            "version": "{{KLAVE_APP_VERSION}}",
+            "rootDir": "/apps/{{KLAVE_APP_SLUG}}"
+        }
+    ]
+}
