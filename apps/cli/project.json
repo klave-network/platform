@@ -14,46 +14,28 @@
             "options": {
                 "platform": "node",
                 "outputPath": "dist/apps/cli",
-                "bundle": false,
+                "outputFileName": "src/index.js",
+                "bundle": true,
                 "main": "apps/cli/src/index.ts",
                 "tsConfig": "apps/cli/tsconfig.app.json",
                 "assets": [
-                    "apps/cli/src/assets"
+                    {
+                        "glob": "**/(\\.*|*)",
+                        "input": "apps/cli/template",
+                        "output": "template",
+                        "ignore": []
+                    },
+                    "apps/cli/template/.gitignore",
+                    "apps/cli/bin/*",
+                    "apps/cli/*.md"
                 ],
                 "generatePackageJson": true,
                 "thirdParty": true,
-                "esbuildOptions": {
-                    "sourcemap": true,
-                    "outExtension": {
-                        ".js": ".js"
-                    }
-                }
+                "esbuildConfig": "apps/hubber/esbuild.config.cjs"
             },
             "configurations": {
                 "development": {},
-                "production": {
-                    "esbuildOptions": {
-                        "sourcemap": false,
-                        "outExtension": {
-                            ".js": ".js"
-                        }
-                    }
-                }
-            }
-        },
-        "serve": {
-            "executor": "@nx/js:node",
-            "defaultConfiguration": "development",
-            "options": {
-                "buildTarget": "cli:build"
-            },
-            "configurations": {
-                "development": {
-                    "buildTarget": "cli:build:development"
-                },
-                "production": {
-                    "buildTarget": "cli:build:production"
-                }
+                "production": {}
             }
         },
         "lint": {
