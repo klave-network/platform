@@ -2,8 +2,5 @@
     "name": "@klave/db",
     "version": "1.0.0",
     "type": "module",
-    "dependencies": {
-        "@prisma/client": "5.22.0",
-        "@swc/helpers": "0.5.15"
-    }
+    "dependencies": {}
 }
