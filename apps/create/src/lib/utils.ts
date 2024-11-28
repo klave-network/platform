@@ -2,6 +2,7 @@ import spawn from 'cross-spawn';
 import githubUsername from 'github-username';
 import path from 'node:path';
 import fs from 'node:fs';
+import terminalLink from 'terminal-link';
 
 /**
  * Checks whether the target directory is empty.
@@ -89,4 +90,13 @@ export async function guessRepoUrl(authorUrl: string, slug: string) {
         return `${authorUrl}/${normalizedSlug}`;
     }
     return '';
+}
+
+/**
+ * Create terminalLink with fallback for unsupported terminals
+ */
+export function createTerminalLink(text: string, url: string) {
+    return terminalLink(text, url, {
+        fallback: (text, url) => `${text}: ${url}`
+    });
 }

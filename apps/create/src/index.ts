@@ -6,10 +6,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'fs-extra';
 import { replaceInFile } from 'replace-in-file';
-import { findGitHubEmail, findGitHubProfileUrl, findMyName, guessRepoUrl, isEmpty, isValidName } from '~/lib/utils';
+import { findGitHubEmail, findGitHubProfileUrl, findMyName, guessRepoUrl, isEmpty, isValidName, createTerminalLink } from '~/lib/utils';
 import { resolvePackageManager } from '~/lib/resolve-package-manager';
 import latestVersion from 'latest-version';
-import { DOCS_URL } from '~/lib/constants';
+import { DOCS_URL, KLAVE_PLATFORM_URL, DISCORD_URL } from '~/lib/constants';
 import { SubstitutionData } from '~/lib/types';
 import sanitize from 'sanitize-filename';
 import validateNpmPackage from 'validate-npm-package-name';
@@ -22,7 +22,10 @@ const CWD = process.env.INIT_CWD || process.cwd();
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
 async function main() {
-    p.intro(KLAVE_CYAN_BG(chalk.bold(' Klave - The honest-by-design platform ')));
+
+    console.log('\n');
+    p.intro(KLAVE_CYAN_BG(chalk.bold.black(' Klave - The honest-by-design platform ')));
+    p.note('Welcome to Klave. Let\'s create your honest application!');
 
     const appInfo = await p.group(
         {
@@ -159,7 +162,15 @@ async function main() {
         const s = p.spinner();
         s.start(`Installing via ${packageManager}`);
 
-        await spawnAsync(packageManager, [], {
+        let args = ['install', '--legacy-peer-deps'];
+
+        if (packageManager === 'yarn') {
+            args = [];
+        } else if (packageManager === 'pnpm') {
+            args = [];
+        }
+
+        await spawnAsync(packageManager, args, {
             cwd: targetDir,
             stdio: 'ignore'
         });
@@ -167,11 +178,23 @@ async function main() {
         s.stop(`Installed via ${packageManager}`);
     }
 
-    const nextSteps = `cd ${dir}        \n${installDeps ? '' : `${packageManager} install\n`}`;
+    const buildCmd = packageManager === 'yarn' ? 'build' : 'run build';
+    const nextSteps = `
+Build your application:
 
-    p.note(nextSteps, 'Next steps.');
+    - Enter your project directory using ${KLAVE_LIGHT_BLUE(chalk.bold(`cd ${dir}`))}
+    ${installDeps ? 'EMPTY_LINE' : `- To install dependencies, run ${KLAVE_LIGHT_BLUE(chalk.bold(`${packageManager} install`))}`}
+- To build your application, run ${KLAVE_LIGHT_BLUE(chalk.bold(`${packageManager} ${buildCmd}`))}
+    - Log in to ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('Klave', KLAVE_PLATFORM_URL)))} to deploy your application
 
-    p.outro(`Visit ${KLAVE_LIGHT_BLUE(chalk.bold(DOCS_URL))} for the documentation on Klave`);
+Documentation
+
+    - Learn more about Klave ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', DOCS_URL)))}
+    `.replace(/EMPTY_LINE\n?/g, ''); // Remove unnecessary blank lines;
+
+    p.note(nextSteps, KLAVE_CYAN_BG(chalk.bold.black(' Next steps ')));
+
+    p.outro(`Stuck? Reach out to us on ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('Discord', DISCORD_URL)))}`);
 }
 
 /**
