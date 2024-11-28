@@ -1,32 +1,40 @@
-import chalk from 'chalk';
 import spawn from 'cross-spawn';
 import githubUsername from 'github-username';
-import ora, { Options, Ora } from 'ora';
+import path from 'node:path';
+import fs from 'node:fs';
 
-export type StepOptions = Options;
-
-export async function newStep<Result>(
-    title: string,
-    action: (step: Ora) => Promise<Result> | Result,
-    options: StepOptions = {}
-): Promise<Result> {
-    const disabled = process.env.CI || process.env.EXPO_DEBUG;
-    const step = ora({
-        text: chalk.bold(title),
-        isEnabled: !disabled,
-        stream: disabled ? process.stdout : process.stderr,
-        ...options
-    });
-
-    step.start();
-
-    try {
-        return await action(step);
-    } catch (error) {
-        step.fail();
-        console.error(error);
-        process.exit(1);
+/**
+ * Checks whether the target directory is empty.
+ */
+export function isEmpty(dirPath: string) {
+    if (!fs.existsSync(dirPath)) {
+        return true;
     }
+
+    return false;
+}
+
+/**
+ * Checks whether the project name is valid.
+ */
+export function isValidName(projectName: string) {
+    return /^(?:@[a-z\d\-*~][a-z\d\-*._~]*\/)?[a-z\d\-~][a-z\d\-._~]*$/.test(projectName);
+}
+
+/**
+ * Converts a project name to a valid NPM package name.
+ */
+export function toValidName(projectName: string) {
+    if (isValidName(projectName)) return projectName;
+
+    return projectName
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/^[._]/, '')
+        .replace(/[^a-z\d\-~]+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '');
 }
 
 /**
@@ -68,7 +76,16 @@ export async function findGitHubProfileUrl(email: string): Promise<string> {
  */
 export async function guessRepoUrl(authorUrl: string, slug: string) {
     if (/^https?:\/\/github.com\/[^/]+/.test(authorUrl)) {
-        const normalizedSlug = slug.replace(/^@/, '').replace(/\//g, '-');
+        //const normalizedSlug = slug.replace(/^@/, '').replace(/\//g, '-');
+        let normalizedSlug;
+        if (slug === '.' || slug === './') {
+            const parts = process.cwd().split(path.sep);
+            normalizedSlug = parts[parts.length - 1];
+        } else if (slug.startsWith('./') || slug.startsWith('../')) {
+            const parts = slug.split('/');
+            normalizedSlug = parts[parts.length - 1];
+        }
+
         return `${authorUrl}/${normalizedSlug}`;
     }
     return '';
