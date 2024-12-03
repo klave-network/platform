@@ -87,7 +87,7 @@
         "as-base64": "0.2.0",
         "assemblyscript": "^0.27.30",
         "autoprefixer": "10.4.20",
-        "axios": "1.7.7",
+        "axios": "1.7.8",
         "base64url": "3.0.1",
         "chalk": "^5.3.0",
         "commander": "^12.1.0",
