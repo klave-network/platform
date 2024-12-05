@@ -94,7 +94,7 @@
         "connect-mongo": "5.1.0",
         "core-js": "^3.38.1",
         "cors": "2.8.5",
-        "cross-spawn": "7.0.3",
+        "cross-spawn": "7.0.5",
         "csrf-csrf": "3.0.8",
         "csrf-sync": "4.0.3",
         "daisyui": "4.12.13",
