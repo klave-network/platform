@@ -306,13 +306,13 @@ export class CryptoImpl {
         return { data: key.slice(0, result), err: null };
     }
 
-    static saveKey(keyName: string): Result<UnitType, Error> {
+    static saveKey(keyPersistData: ArrayBuffer): Result<UnitType, Error> {
         let buf = new ArrayBuffer(64);
-        let result = wasm_save_key(String.UTF8.encode(keyName, true), buf, buf.byteLength);
+        let result = wasm_save_key(keyPersistData, buf, buf.byteLength);
         if (abs(result) > buf.byteLength) {
             // buffer not big enough, retry with a properly sized one
             buf = new ArrayBuffer(abs(result));
-            result = wasm_save_key(String.UTF8.encode(keyName, true), buf, buf.byteLength);
+            result = wasm_save_key(keyPersistData, buf, buf.byteLength);
         }
         if (result < 0)
             return { data: null, err: new Error("Failed to save key : " + String.UTF8.decode(buf.slice(0, -result))) };
