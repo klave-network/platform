@@ -1,4 +1,21 @@
 # Changelog
+## [0.4.0](https://github.com/klave-network/platform/compare/create@0.3.20...create@0.4.0) (2024-12-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* Moving to pure ESM repo
+
+### Bug Fixes
+
+* Package `git-rev-sync` relies on non-ESM features so we provide explicit location ([cee72ae](https://github.com/klave-network/platform/commit/cee72ae5cd5a2fe998c987864b060f039ddb939b))
+* **sdk:** Fix [@json](https://github.com/json) decorator casing ([1bfdb6b](https://github.com/klave-network/platform/commit/1bfdb6be8b084a824d7c9470e2ed26aae54a3d79))
+
+
+### Miscellaneous Chores
+
+* Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
+
 ## [0.3.20](https://github.com/klave-network/platform/compare/create@0.3.19...create@0.3.20) (2024-05-02)
 
 ### Dependency Updates
