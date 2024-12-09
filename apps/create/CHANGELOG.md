@@ -1,4 +1,11 @@
 # Changelog
+## [0.4.1](https://github.com/klave-network/platform/compare/create@0.4.0...create@0.4.1) (2024-12-09)
+
+
+### Miscellaneous Chores
+
+* Format outro message ([7dd39c0](https://github.com/klave-network/platform/commit/7dd39c0a94a346c34e181f063036d3058ac147fd))
+
 ## [0.4.0](https://github.com/klave-network/platform/compare/create@0.3.20...create@0.4.0) (2024-12-09)
 
 
