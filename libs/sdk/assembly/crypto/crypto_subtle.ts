@@ -24,6 +24,7 @@ class keyPersistParams
 {
     keyId!: string;
     keyName!: string;
+    keyType!: string;
 }
 
 @json
@@ -496,6 +497,12 @@ export class SubtleCrypto {
         if (!key)
             return { data: null, err: new Error('Invalid key') };
 
+        if (key.type == "secret" || key.family == "aes")
+            return { data: null, err: new Error('Invalid key type: AES symmetric key cannot have public key') };
+
+        if(key.type == "public")
+            return { data: key, err: null };
+
         let pk = CryptoImpl.getPublicKey(key.name);
         if(!pk.data)
             return { data: null, err: new Error('Failed to get public key') };
@@ -512,7 +519,7 @@ export class SubtleCrypto {
             return { data: null, err: new Error('Invalid key name: key name cannot be null') };
         if(CryptoImpl.keyExists(keyPersistedName))
             return { data: null, err: new Error('Key already exists') };
-        let params = { keyId: key.name, keyName: keyPersistedName } as keyPersistParams;
+        let params = { keyId: key.name, keyName: keyPersistedName, keyType: key.type } as keyPersistParams;
         return CryptoImpl.persistKey(String.UTF8.encode(JSON.stringify(params)));
     }
 
