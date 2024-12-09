@@ -48,6 +48,9 @@ declare function wasm_wrap_key(key_name_to_export: ArrayBuffer, key_format: i32,
 @external("env", "save_key")
 declare function wasm_save_key(key_name: ArrayBuffer, error: ArrayBuffer, error_size: i32): i32;
 // @ts-ignore: decorator
+@external("env", "persist_key")
+declare function wasm_persist_key(key_persist_params: ArrayBuffer, error: ArrayBuffer, error_size: i32): i32;
+// @ts-ignore: decorator
 @external("env", "load_key")
 declare function wasm_load_key(key_name: ArrayBuffer, key_info: ArrayBuffer, key_info_size: i32): i32;
 // @ts-ignore: decorator
@@ -306,13 +309,26 @@ export class CryptoImpl {
         return { data: key.slice(0, result), err: null };
     }
 
-    static saveKey(keyPersistData: ArrayBuffer): Result<UnitType, Error> {
+    static saveKey(keyName: string): Result<UnitType, Error> {
         let buf = new ArrayBuffer(64);
-        let result = wasm_save_key(keyPersistData, buf, buf.byteLength);
+        let result = wasm_save_key(String.UTF8.encode(keyName, true), buf, buf.byteLength);
         if (abs(result) > buf.byteLength) {
             // buffer not big enough, retry with a properly sized one
             buf = new ArrayBuffer(abs(result));
-            result = wasm_save_key(keyPersistData, buf, buf.byteLength);
+            result = wasm_save_key(String.UTF8.encode(keyName, true), buf, buf.byteLength);
+        }
+        if (result < 0)
+            return { data: null, err: new Error("Failed to save key : " + String.UTF8.decode(buf.slice(0, -result))) };
+        return { data: new UnitType(), err: null };
+    }
+
+    static persistKey(keyPersistData: ArrayBuffer): Result<UnitType, Error> {
+        let buf = new ArrayBuffer(64);
+        let result = wasm_persist_key(keyPersistData, buf, buf.byteLength);
+        if (abs(result) > buf.byteLength) {
+            // buffer not big enough, retry with a properly sized one
+            buf = new ArrayBuffer(abs(result));
+            result = wasm_persist_key(keyPersistData, buf, buf.byteLength);
         }
         if (result < 0)
             return { data: null, err: new Error("Failed to save key : " + String.UTF8.decode(buf.slice(0, -result))) };

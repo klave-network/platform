@@ -513,7 +513,7 @@ export class SubtleCrypto {
         if(CryptoImpl.keyExists(keyPersistedName))
             return { data: null, err: new Error('Key already exists') };
         let params = { keyId: key.name, keyName: keyPersistedName } as keyPersistParams;
-        return CryptoImpl.saveKey(String.UTF8.encode(JSON.stringify(params)));
+        return CryptoImpl.persistKey(String.UTF8.encode(JSON.stringify(params)));
     }
 
     static loadKey(keyName: string): Result<CryptoKey, Error> {
