@@ -1,6 +1,6 @@
 {
     "name": "create-on-klave",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "private": false,
     "description": "The tool to bootstrap trustless apps on Klave",
     "license": "MIT",
@@ -27,6 +27,6 @@
         "replace-in-file": "^8.2.0",
         "sanitize-filename": "1.6.3",
         "validate-npm-package-name": "6.0.0",
-    "terminal-link": "^3.0.0"
+        "terminal-link": "^3.0.0"
     }
 }
