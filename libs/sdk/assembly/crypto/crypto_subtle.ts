@@ -450,7 +450,7 @@ export class SubtleCrypto {
         if(key.type == "public")
             return { data: key, err: null };
 
-        let pk = CryptoImpl.getPublicKey(key.name);
+        let pk = CryptoImpl.getPublicKeyAsCryptoKey(key.name);
         if(!pk.data)
             return { data: null, err: new Error('Failed to get public key') };
         

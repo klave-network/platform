@@ -29,6 +29,9 @@ declare function wasm_export_key(key_name: ArrayBuffer, key_format: i32, key: Ar
 @external("env", "get_public_key")
 declare function wasm_get_public_key(key_name: ArrayBuffer, result: ArrayBuffer, result_size: i32): i32;
 // @ts-ignore: decorator
+@external("env", "get_public_key_as_cryptokey")
+declare function wasm_get_public_key_as_cryptokey(key_name: ArrayBuffer, result: ArrayBuffer, result_size: i32): i32;
+// @ts-ignore: decorator
 @external("env", "sign")
 declare function wasm_sign(key_name: ArrayBuffer, sign_algo_id: i32, sign_metadata: ArrayBuffer, text: ArrayBuffer, text_size: i32, signature: ArrayBuffer, signature_size: i32): i32;
 // @ts-ignore: decorator
@@ -293,6 +296,20 @@ export class CryptoImpl {
             // buffer not big enough, retry with a properly sized one
             key = new ArrayBuffer(abs(result));
             result = wasm_get_public_key(String.UTF8.encode(keyName, true), key, key.byteLength);
+        }
+        if (result < 0)
+            return { data: null, err: new Error("Failed to get public key : " + String.UTF8.decode(key.slice(0, -result))) };
+
+        return { data: key.slice(0, result), err: null };
+    }
+
+    static getPublicKeyAsCryptoKey(keyName: string): Result<ArrayBuffer, Error> {
+        let key = new ArrayBuffer(64);
+        let result = wasm_get_public_key_as_cryptokey(String.UTF8.encode(keyName, true), key, key.byteLength);
+        if (abs(result) > key.byteLength) {
+            // buffer not big enough, retry with a properly sized one
+            key = new ArrayBuffer(abs(result));
+            result = wasm_get_public_key_as_cryptokey(String.UTF8.encode(keyName, true), key, key.byteLength);
         }
         if (result < 0)
             return { data: null, err: new Error("Failed to get public key : " + String.UTF8.decode(key.slice(0, -result))) };
