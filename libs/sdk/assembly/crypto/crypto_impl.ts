@@ -119,27 +119,24 @@ export class CryptoImpl {
         return String.UTF8.decode(buf.slice(0, result)) == 'true';
     }
 
-    static generateKey(algorithm: u32, algoMetadata: ArrayBuffer, extractable: boolean, usages: string[], keyName: string): Result<Key, Error> {
+    static generateKey(algorithm: u32, algoMetadata: ArrayBuffer, extractable: boolean, usages: string[], keyName: string): Result<ArrayBuffer, Error> {
         const local_usages = new Uint8Array(usages.length);
         for (let i = 0; i < usages.length; i++) {
             local_usages[i] = this.usage(usages[i]);
         }
 
-        const key = Key.create(keyName);
-        if (!key)
-            return { data: null, err: new Error("Failed to generate key") };
-        let buf = new ArrayBuffer(32);
+        let buf = new ArrayBuffer(64);
         let result = wasm_generate_key(
-            String.UTF8.encode(key.name, true), algorithm, algoMetadata, extractable ? 1 : 0, local_usages.buffer, local_usages.length, buf, buf.byteLength);
+            String.UTF8.encode(keyName, true), algorithm, algoMetadata, extractable ? 1 : 0, local_usages.buffer, local_usages.length, buf, buf.byteLength);
         if (abs(result) > buf.byteLength) {
             buf = new ArrayBuffer(abs(result));
             result = wasm_generate_key(
-                String.UTF8.encode(key.name, true), algorithm, algoMetadata, extractable ? 1 : 0, local_usages.buffer, local_usages.length, buf, buf.byteLength);
+                String.UTF8.encode(keyName, true), algorithm, algoMetadata, extractable ? 1 : 0, local_usages.buffer, local_usages.length, buf, buf.byteLength);
         }
         if (result < 0)
             return { data: null, err: new Error("Failed to generate key : " + String.UTF8.decode(buf.slice(0, -result))) };
 
-        return { data: key, err: null };
+        return { data: buf.slice(0, result), err: null };
     }
 
     static encrypt(keyName: string, algorithm: u32, algoMetadata: ArrayBuffer, clearText: ArrayBuffer): Result<ArrayBuffer, Error> {
@@ -219,28 +216,25 @@ export class CryptoImpl {
         return { data: value.slice(0, result), err: null };
     }
 
-    static importKey(format: u32, keyData: ArrayBuffer, algorithm: u32, algo_metadata: ArrayBuffer, extractable: boolean, usages: string[], keyName: string): Result<Key, Error> {
-        const key = Key.create(keyName);
-        if (!key)
-            return { data: null, err: new Error("Failed to generate key UUID") };
+    static importKey(format: u32, keyData: ArrayBuffer, algorithm: u32, algo_metadata: ArrayBuffer, extractable: boolean, usages: string[], keyName: string): Result<ArrayBuffer, Error> {
         const local_usages = new Uint8Array(usages.length);
         for (let i = 0; i < usages.length; i++) {
             local_usages[i] = this.usage(usages[i]);
         }
 
         let buf = new ArrayBuffer(64);
-        let result = wasm_import_key(String.UTF8.encode(key.name, true), format, keyData, keyData.byteLength, algorithm, algo_metadata,
+        let result = wasm_import_key(String.UTF8.encode(keyName, true), format, keyData, keyData.byteLength, algorithm, algo_metadata,
             extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength, buf, buf.byteLength);
         if (abs(result) > buf.byteLength) {
             // buffer not big enough, retry with a properly sized one
             buf = new ArrayBuffer(abs(result));
-            result = wasm_import_key(String.UTF8.encode(key.name, true), format, keyData, keyData.byteLength, algorithm, algo_metadata,
+            result = wasm_import_key(String.UTF8.encode(keyName, true), format, keyData, keyData.byteLength, algorithm, algo_metadata,
                 extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength, buf, buf.byteLength);
         }
         if (result < 0)
             return { data: null, err: new Error("Failed to import key : " + String.UTF8.decode(buf.slice(0, -result))) };
 
-        return { data: key, err: null };
+        return { data: buf.slice(0, result), err: null };
     }
 
     static exportKey(keyName: string, format: u32): Result<ArrayBuffer, Error> {
@@ -257,28 +251,25 @@ export class CryptoImpl {
         return { data: key.slice(0, result), err: null };
     }
 
-    static unwrapKey(decryptionKeyName: string, unwrap_algo_id: u32, unwrap_metadata: ArrayBuffer, format: u32, wrapped_key: ArrayBuffer, key_gen_algorithm: u32, key_gen_algo_metadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<Key, Error> {
-        const key = Key.create("");
-        if (!key)
-            return { data: null, err: new Error("Failed to generate key") };
+    static unwrapKey(decryptionKeyName: string, unwrap_algo_id: u32, unwrap_metadata: ArrayBuffer, format: u32, wrapped_key: ArrayBuffer, key_gen_algorithm: u32, key_gen_algo_metadata: ArrayBuffer, extractable: boolean, usages: string[]): Result<ArrayBuffer, Error> {
         const local_usages = new Uint8Array(usages.length);
         for (let i = 0; i < usages.length; i++) {
             local_usages[i] = this.usage(usages[i]);
         }
 
         let buf = new ArrayBuffer(64);
-        let result = wasm_unwrap_key(String.UTF8.encode(decryptionKeyName, true), unwrap_algo_id, unwrap_metadata, String.UTF8.encode(key.name, true), format, wrapped_key, wrapped_key.byteLength, key_gen_algorithm, key_gen_algo_metadata,
+        let result = wasm_unwrap_key(String.UTF8.encode(decryptionKeyName, true), unwrap_algo_id, unwrap_metadata, String.UTF8.encode("", true), format, wrapped_key, wrapped_key.byteLength, key_gen_algorithm, key_gen_algo_metadata,
             extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength, buf, buf.byteLength);
         if (abs(result) > buf.byteLength) {
             // buffer not big enough, retry with a properly sized one
             buf = new ArrayBuffer(abs(result));
-            result = wasm_unwrap_key(String.UTF8.encode(decryptionKeyName, true), unwrap_algo_id, unwrap_metadata, String.UTF8.encode(key.name, true), format, wrapped_key, wrapped_key.byteLength, key_gen_algorithm, key_gen_algo_metadata,
+            result = wasm_unwrap_key(String.UTF8.encode(decryptionKeyName, true), unwrap_algo_id, unwrap_metadata, String.UTF8.encode("", true), format, wrapped_key, wrapped_key.byteLength, key_gen_algorithm, key_gen_algo_metadata,
                 extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength, buf, buf.byteLength);
         }
         if (result < 0)
             return { data: null, err: new Error("Failed to unwrap key : " + String.UTF8.decode(buf.slice(0, -result))) };
 
-        return { data: key, err: null };
+        return { data: buf.slice(0, result), err: null };
     }
 
     static wrapKey(encryptionKeyName: string, algorithm: u32, algo_metadata: ArrayBuffer, key_name: string, format: u32): Result<ArrayBuffer, Error> {

@@ -7,6 +7,7 @@ import { Utils } from './index';
 import { Crypto, Result } from '../index';
 import { CryptoImpl, Key } from './crypto_impl';
 import * as idlV1 from './crypto_subtle_idl_v1';
+import { CryptoKey } from './crypto_subtle';
 import { JSON } from '@klave/as-json/assembly';
 
 export class KeyAES extends Key {
@@ -64,8 +65,9 @@ export class CryptoAES {
         if (saved.err)
             return { data: null, err: saved.err };
 
-        const keyData = key.data as Key;
-        const kAES = {name: keyData.name, length: 256} as KeyAES;
+        const keyInfo = String.UTF8.decode(key.data!, true);
+        let cryptoKey = JSON.parse<CryptoKey>(keyInfo);
+        const kAES = {name: cryptoKey.name, length: 256} as KeyAES;
         return { data: kAES, err: null };
     }
 }
