@@ -164,7 +164,7 @@ export const OrganisationMembers: FC = () => {
             We are fetching data about your organisation.<br />
             It will only take a moment...<br />
             <br />
-            <UilSpinner className='inline-block animate-spin' />
+            <UilSpinner className='inline-block animate-spin h-5' />
         </>;
 
     return <div className="flex flex-col w-full justify-start mb-7">

@@ -223,7 +223,7 @@ export const DomainListing: FC = () => {
             We are fetching data about your domains.<br />
             It will only take a moment...<br />
             <br />
-            <UilSpinner className='inline-block animate-spin' />
+            <UilSpinner className='inline-block animate-spin h-5' />
         </>;
 
     return <>

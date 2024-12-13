@@ -175,7 +175,7 @@ export const AppSettings: FC = () => {
             We are fetching data about your application.<br />
             It will only take a moment...<br />
             <br />
-            <UilSpinner className='inline-block animate-spin' />
+            <UilSpinner className='inline-block animate-spin h-5' />
         </>;
 
     const handleGitSignRequired: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -282,13 +282,13 @@ export const AppSettings: FC = () => {
         <div>
             <h1 className='font-bold text-xl mb-5'>Deployment</h1>
             <p>
-                <label className='flex items-center'><input type="checkbox" className="toggle toggle-sm mr-2" checked={deployCommitLedgers} onChange={handleDeployCommitLedgers} /><span className='pb-1'>Create an out-of-branch deployment for every commit push</span> {mutation.isPending ? <UilSpinner className='inline-block animate-spin' /> : null}</label>
+                <label className='flex items-center'><input type="checkbox" className="toggle toggle-sm mr-2" checked={deployCommitLedgers} onChange={handleDeployCommitLedgers} /><span className='pb-1'>Create an out-of-branch deployment for every commit push</span> {mutation.isPending ? <UilSpinner className='inline-block animate-spin h-5' /> : null}</label>
             </p>
         </div>
         <div>
             <h1 className='font-bold text-xl mb-5'>Security</h1>
             <p>
-                <label className='flex items-center'><input type="checkbox" className="toggle toggle-sm mr-2" checked={gitSignRequired} onChange={handleGitSignRequired} /><span className='pb-1'>Require valid Git signature prior to deployment</span> {mutation.isPending ? <UilSpinner className='inline-block animate-spin' /> : null}</label>
+                <label className='flex items-center'><input type="checkbox" className="toggle toggle-sm mr-2" checked={gitSignRequired} onChange={handleGitSignRequired} /><span className='pb-1'>Require valid Git signature prior to deployment</span> {mutation.isPending ? <UilSpinner className='inline-block animate-spin h-5' /> : null}</label>
             </p>
         </div>
         <div>
