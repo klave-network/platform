@@ -4,6 +4,7 @@
     "type": "module",
     "dependencies": {
         "@swc/helpers": "0.5.15",
-        "zod": "^3.23.8"
+        "zod": "^3.24.1",
+    "@klave/db": "1.0.0"
     }
 }
