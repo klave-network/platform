@@ -19,6 +19,11 @@ module.exports = {
             release: `klave@${JSON.stringify(version)}`
         }) : undefined
     ].filter(Boolean),
+    // Add extra external dependencies
+    external: [
+        '@sentry/node',
+        'winston-transport'
+    ],
     platform: 'node',
     loader: {
         // ensures .node binaries are copied to ./dist
