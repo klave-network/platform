@@ -46,7 +46,7 @@ export const AppSidebar: FC = () => {
 
     if (isPeronsalOrgLoading)
         return <>
-            <div className="text-xs text-gray-400 tracking-wider">ORGANISATIONS <UilSpinner className='inline-block animate-spin' /></div>
+            <div className="text-xs text-gray-400 tracking-wider">ORGANISATIONS <UilSpinner className='inline-block animate-spin h-5' /></div>
             <AccountSelector />
         </>;
 
@@ -54,7 +54,7 @@ export const AppSidebar: FC = () => {
         return <>
             <div className="text-xs text-gray-400 tracking-wider">ORGANISATIONS</div>
             <AccountSelector />
-            <div className="text-xs text-gray-400 tracking-wider">APPLICATIONS <UilSpinner className='inline-block animate-spin' /></div>
+            <div className="text-xs text-gray-400 tracking-wider">APPLICATIONS <UilSpinner className='inline-block animate-spin h-5' /></div>
         </>;
 
     return <>

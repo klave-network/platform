@@ -144,7 +144,7 @@ function Organisations() {
             </div>
             <div className="sm:px-7 sm:pt-7 px-4 py-4 flex flex-col w-full bg-white dark:bg-gray-900 dark:text-white dark:border-gray-800 sticky top-0">
                 <div className="flex w-full items-center">
-                    Loading... <UilSpinner className='inline-block animate-spin' />
+                    Loading... <UilSpinner className='inline-block animate-spin h-8' />
                 </div>
             </div>
         </>;

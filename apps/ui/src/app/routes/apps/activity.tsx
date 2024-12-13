@@ -67,7 +67,7 @@ export const ActivityRecordListing: FC = () => {
             We are fetching data about your application's activities.<br />
             It will only take a moment...<br />
             <br />
-            <UilSpinner className='inline-block animate-spin' />
+            <UilSpinner className='inline-block animate-spin h-5' />
         </>;
 
     return <div className="w-full mb-7">

@@ -141,7 +141,7 @@ export const Deployments: FC = () => {
             We are fetching data about your deployments.<br />
             It will only take a moment...<br />
             <br />
-            <UilSpinner className='inline-block animate-spin' />
+            <UilSpinner className='inline-block animate-spin h-5' />
         </>;
 
     return <>
