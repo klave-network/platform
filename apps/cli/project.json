@@ -38,6 +38,22 @@
                 "production": {}
             }
         },
+        "serve": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "npx tsx src/index.ts",
+                "cwd": "apps/cli"
+            }
+        },
+        "preview": {
+            "dependsOn": [
+                "build"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "node dist/apps/cli"
+            }
+        },
         "lint": {
             "executor": "@nx/eslint:lint",
             "outputs": [
