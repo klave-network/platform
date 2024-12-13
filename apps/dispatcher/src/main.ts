@@ -13,7 +13,7 @@ process.on('unhandledRejection', (reason, p) => {
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
-(async () => {
+const serverHandle = (async () => {
 
     await sentryOps.initialize();
 
@@ -67,3 +67,5 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3000;
         console.error(err);
         process.exit(1);
     });
+
+export default async () => await serverHandle;

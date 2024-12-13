@@ -12,11 +12,14 @@ export interface AppOptions { }
 export async function app(fastify: FastifyInstance) {
 
     fastify.log.info(endpoints, 'Preparing for enpoints');
+    const secrets = process.env.KLAVE_DISPATCH_SECRETS?.split(',') ?? [];
 
     fastify.get('/dev', { websocket: true }, (connection) => {
         connection.on('message', (data) => {
-            if (data.toString() === process.env.KLAVE_DISPATCH_SECRET) {
+            if (secrets.includes(data.toString())) {
                 const id = uuid();
+                (connection as any).id = id;
+                (connection as any).secret = data.toString();
                 connection.on('close', () => {
                     connectionPool.delete(id);
                 });
@@ -69,7 +72,11 @@ export async function app(fastify: FastifyInstance) {
             }));
         });
 
+        const familyMap: Record<string, true> = {};
         connectionPool.forEach((connection, id) => {
+            if (familyMap[(connection as any).secret])
+                return;
+            familyMap[(connection as any).secret] = true;
             responseRegister.push(new Promise(resolve => {
                 fastify.log.debug(undefined, `Dispatching to socket ${id}`);
                 try {
