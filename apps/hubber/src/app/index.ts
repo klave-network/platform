@@ -44,6 +44,8 @@ const { app, getWss } = ews(eapp, undefined, {
 
 export const start = async (port: number) => {
 
+    const __hostname = process.env['HOSTNAME'] ?? 'unknown';
+
     app.use(sentryRequestMiddleware);
     app.use(sentryTracingMiddleware);
     app.use(morganLoggerMiddleware);
@@ -57,6 +59,10 @@ export const start = async (port: number) => {
     // app.use(i18nextMiddleware);
     app.use(multer().none());
     app.disable('X-Powered-By');
+    app.use((__unusedReq, res, next) => {
+        res.setHeader('X-Klave-API-Node', __hostname);
+        next();
+    });
     app.use(helmet({
         // crossOriginEmbedderPolicy: false,
         // crossOriginResourcePolicy: false,
@@ -142,7 +148,8 @@ export const start = async (port: number) => {
     }
 
     app.get('/ping', (__unusedReq, res) => {
-        res.json({ pong: true });
+        res.setHeader('X-Klave-API-Status', 'ready');
+        res.json({ pong: true, node: __hostname });
     });
 
     app.use(session(sessionOptions));
