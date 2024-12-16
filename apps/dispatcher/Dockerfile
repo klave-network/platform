@@ -16,5 +16,8 @@ RUN addgroup --system dispatcher && \
 
 COPY dist/apps/dispatcher dispatcher
 RUN chown -R dispatcher:dispatcher .
+RUN cd dispatcher && yarn install
+
+EXPOSE 3000
 
 CMD [ "node", "dispatcher" ]
