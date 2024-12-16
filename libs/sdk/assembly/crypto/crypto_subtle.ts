@@ -22,20 +22,26 @@ export class CryptoKey {
 @json
 class keyPersistParams
 {
+    @alias("key_id")
     keyId!: string;
+    @alias("key_name")
     keyName!: string;
+    @alias("key_type")
     keyType!: string;
 }
 
 @json
 export class RsaHashedKeyGenParams {
+    @alias("modulus_length")
     modulusLength: u32 = 2048;
+    @alias("public_exponent")
     publicExponent: u32 = 65537;
     hash: string = 'SHA2-256'; // "SHA2-256", "SHA2-384", "SHA2-512"
 }
 
 @json
 export class EcKeyGenParams {
+    @alias("named_curve")
     namedCurve: string = 'P-256'; // "P-256", "P-384", "P-521"
 }
 
