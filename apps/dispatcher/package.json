@@ -1,6 +1,6 @@
 {
     "name": "@klave/dispatcher",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "license": "MIT",
     "type": "module",
     "dependencies": {
@@ -14,6 +14,6 @@
         "git-rev-sync": "3.0.2",
         "uuid": "^11.0.3",
         "ws": "8.18.0",
-    "@klave/constants": "1.0.1"
+        "@klave/constants": "1.0.2"
     }
 }
