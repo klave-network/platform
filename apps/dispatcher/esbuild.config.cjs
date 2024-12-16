@@ -32,6 +32,7 @@ module.exports = {
     outExtension: {
         '.js': '.js'
     },
+    bundle: true,
     define: {
         'process.env.NX_TASK_TARGET_PROJECT': JSON.stringify(process.env.NX_TASK_TARGET_PROJECT),
         'process.env.GIT_REPO_COMMIT': JSON.stringify(git.long('.')),
