@@ -118,7 +118,7 @@ export async function app(fastify: FastifyInstance) {
     });
 
     fastify.all('/version', async (__unusedReq, res) => {
-        await res.status(404).send({
+        await res.status(202).send({
             version: {
                 name: process.env.NX_TASK_TARGET_PROJECT,
                 commit: process.env.GIT_REPO_COMMIT?.substring(0, 8),
