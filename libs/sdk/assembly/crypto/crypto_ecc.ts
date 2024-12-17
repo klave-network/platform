@@ -61,7 +61,7 @@ export class CryptoECDSA {
 
         const keyInfo = String.UTF8.decode(key.data!, true);
         let cryptoKey = JSON.parse<CryptoKey>(keyInfo);
-        const kECC = { name: cryptoKey.name, namedCurve: "P-256" } as KeyECC;
+        const kECC = { name: cryptoKey.id, namedCurve: "P-256" } as KeyECC;
         return { data: kECC, err: null };
     }
 }

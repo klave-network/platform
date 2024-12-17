@@ -77,7 +77,7 @@ export class CryptoRSA {
 
         const keyInfo = String.UTF8.decode(key.data!, true);
         let cryptoKey = JSON.parse<CryptoKey>(keyInfo);
-        const rsaKey = { name: cryptoKey.name, moduluslength: 2048 } as KeyRSA;
+        const rsaKey = { name: cryptoKey.id, moduluslength: 2048 } as KeyRSA;
         return { data: rsaKey, err: null };
     }
 }

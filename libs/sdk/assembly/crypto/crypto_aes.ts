@@ -67,7 +67,7 @@ export class CryptoAES {
 
         const keyInfo = String.UTF8.decode(key.data!, true);
         let cryptoKey = JSON.parse<CryptoKey>(keyInfo);
-        const kAES = {name: cryptoKey.name, length: 256} as KeyAES;
+        const kAES = {name: cryptoKey.id, length: 256} as KeyAES;
         return { data: kAES, err: null };
     }
 }
