@@ -1680,7 +1680,7 @@
     picocolors "^1.0.0"
     sisteransi "^1.0.5"
 
-"@clack/prompts@^0.8.2":
+"@clack/prompts@^0.8.1":
   version "0.8.2"
   resolved "https://registry.yarnpkg.com/@clack/prompts/-/prompts-0.8.2.tgz#86287d2690dffb3e598d208737451865930d37ba"
   integrity sha512-6b9Ab2UiZwJYA9iMyboYyW9yJvAO9V753ZhS+DHKEjZRKAxPPOb7MXXu84lsPFG+vZt6FRFniZ8rXi+zCIw4yQ==
