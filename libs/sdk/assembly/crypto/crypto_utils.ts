@@ -15,12 +15,12 @@ export class KeyFormatWrapper
 export class CryptoUtil
 {
     static isValidAlgorithm(algorithm: string): boolean {
-        if (algorithm != 'sha2-256' && algorithm != 'sha2_256' && algorithm != 'sha256' &&
-            algorithm != 'sha2-384' && algorithm != 'sha2_384' && algorithm != 'sha384' &&
-            algorithm != 'sha2-512' && algorithm != 'sha2_512' && algorithm != 'sha512' &&
-            algorithm != 'sha3-256' && algorithm != 'sha3_256' &&
-            algorithm != 'sha3-384' && algorithm != 'sha3_384' &&
-            algorithm != 'sha3-512' && algorithm != 'sha3_512')
+        if (algorithm != 'sha2-256' && algorithm != 'SHA2-256' && algorithm != 'sha-256' && algorithm != 'SHA-256' && 
+            algorithm != 'sha2-384' && algorithm != 'SHA2-384' && algorithm != 'sha-384' && algorithm != 'SHA-384' &&
+            algorithm != 'sha2-512' && algorithm != 'SHA2-512' && algorithm != 'sha-512' && algorithm != 'SHA-512' &&
+            algorithm != 'sha3-256' && algorithm != 'SHA3-256' &&
+            algorithm != 'sha3-384' && algorithm != 'SHA3-384' &&
+            algorithm != 'sha3-512' && algorithm != 'SHA3-512')
             return false;
         return true;
     }
@@ -29,22 +29,25 @@ export class CryptoUtil
         switch (algorithm)
         {
             case 'sha3-256':
-            case 'sha3_256':
+            case 'SHA3-256':
             case 'sha2-256':
-            case 'sha2_256':
-            case 'sha256':
+            case 'SHA2-256':
+            case 'sha-256':
+            case 'SHA-256':
                 return 32;
             case 'sha3-384':
-            case 'sha3_384':
+            case 'SHA3-384':
             case 'sha2-384':
-            case 'sha2_384':
-            case 'sha384':
+            case 'SHA2-384':
+            case 'sha-384':
+            case 'SHA-384':
                 return 48;
             case 'sha3-512':
-            case 'sha3_512':
+            case 'SHA3-512':
             case 'sha2-512':
-            case 'sha2_512':
-            case 'sha512':
+            case 'SHA2-512':
+            case 'sha-512':
+            case 'SHA-512':
                 return 64;
             default:
                 break;
@@ -54,13 +57,13 @@ export class CryptoUtil
 
     static getShaMetadata(algorithm: string): Result<idlV1.sha_metadata, Error>
     {
-        if(algorithm == 'sha2-256' || algorithm == 'SHA2-256' || algorithm == 'sha256' || algorithm == 'SHA256')
+        if(algorithm == 'sha2-256' || algorithm == 'SHA2-256' || algorithm == 'sha-256' || algorithm == 'SHA-256')
         {
             return  {data: {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_256}, err: null};
-        }else if(algorithm == 'sha2-384' || algorithm == 'SHA2-384' || algorithm == 'sha384' || algorithm == 'SHA384')
+        }else if(algorithm == 'sha2-384' || algorithm == 'SHA2-384' || algorithm == 'sha-384' || algorithm == 'SHA-384')
         {
             return {data: {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_384}, err: null};
-        }else if(algorithm == 'sha2-512' || algorithm == 'SHA2-512' || algorithm == 'sha512' || algorithm == 'SHA512')
+        }else if(algorithm == 'sha2-512' || algorithm == 'SHA2-512' || algorithm == 'sha-512' || algorithm == 'SHA-512')
         {
             return {data: {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_512}, err: null};
         }else if(algorithm == 'sha3-256' || algorithm == 'SHA3-256')

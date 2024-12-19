@@ -5,6 +5,7 @@
 import { Result } from '../index';
 import { CryptoImpl, VerifySignResult, Key } from './crypto_impl';
 import * as idlV1 from './crypto_subtle_idl_v1';
+import { CryptoKey } from './crypto_subtle';
 import { PublicKey } from './crypto_keys';
 import { JSON } from '@klave/as-json/assembly';
 
@@ -58,8 +59,9 @@ export class CryptoECDSA {
         if (saved.err)
             return { data: null, err: saved.err };
 
-        const keyData = key.data as Key;
-        const kECC = { name: keyData.name, namedCurve: "P-256" } as KeyECC;
+        const keyInfo = String.UTF8.decode(key.data!, true);
+        let cryptoKey = JSON.parse<CryptoKey>(keyInfo);
+        const kECC = { name: cryptoKey.id, namedCurve: "P-256" } as KeyECC;
         return { data: kECC, err: null };
     }
 }

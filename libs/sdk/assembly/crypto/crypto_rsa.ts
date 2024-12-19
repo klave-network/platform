@@ -5,6 +5,7 @@
 import { Result } from '../index';
 import { CryptoImpl, Key, VerifySignResult } from './crypto_impl';
 import * as idlV1 from './crypto_subtle_idl_v1';
+import { CryptoKey } from './crypto_subtle';
 import { CryptoUtil } from './crypto_utils';
 import { PublicKey } from './crypto_keys';
 import { JSON } from '@klave/as-json/assembly';
@@ -74,8 +75,9 @@ export class CryptoRSA {
         if (saved.err)
             return { data: null, err: saved.err };
 
-        const keyData = key.data as Key;
-        const rsaKey = { name: keyData.name, moduluslength: 2048 } as KeyRSA;
+        const keyInfo = String.UTF8.decode(key.data!, true);
+        let cryptoKey = JSON.parse<CryptoKey>(keyInfo);
+        const rsaKey = { name: cryptoKey.id, moduluslength: 2048 } as KeyRSA;
         return { data: rsaKey, err: null };
     }
 }
