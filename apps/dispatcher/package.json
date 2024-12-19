@@ -14,6 +14,9 @@
         "git-rev-sync": "3.0.2",
         "uuid": "^11.0.3",
         "ws": "8.18.0",
-        "@klave/constants": "1.0.2"
+        "@klave/constants": "1.0.2",
+        "@sentry/node": "7.120.2",
+        "@sentry/types": "7.120.2",
+        "@sentry/profiling-node": "7.120.2"
     }
 }
