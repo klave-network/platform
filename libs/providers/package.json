@@ -10,7 +10,11 @@
         "winston": "3.17.0",
         "winston-transport": "4.9.0",
         "ws": "8.18.0",
-    "@klave/db": "1.0.1",
-    "@klave/constants": "1.0.1"
+        "@klave/db": "1.0.1",
+        "@klave/constants": "1.0.2",
+        "@sentry/core": "7.120.2",
+        "@secretarium/connector": "0.17.0",
+        "@sentry/profiling-node": "7.120.2",
+        "@secretarium/instrumentation": "0.5.0"
     }
 }
