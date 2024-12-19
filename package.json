@@ -41,7 +41,7 @@
         "**/ws": "^8"
     },
     "dependencies": {
-        "@clack/prompts": "^0.8.2",
+        "@clack/prompts": "^0.8.1",
         "@expo/spawn-async": "1.7.2",
         "@fastify/helmet": "13.0.0",
         "@fastify/rate-limit": "10.2.1",
