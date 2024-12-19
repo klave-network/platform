@@ -71,7 +71,7 @@
         "@sentry/esbuild-plugin": "2.22.7",
         "@sentry/profiling-node": "7.120.2",
         "@sentry/react": "7.120.2",
-        "@simplewebauthn/browser": "10.0.0",
+        "@simplewebauthn/browser": "13.0.0",
         "@simplewebauthn/server": "10.0.1",
         "@stripe/react-stripe-js": "3.1.0",
         "@stripe/stripe-js": "5.3.0",
