@@ -133,7 +133,7 @@
         "react-hook-form": "7.54.1",
         "react-markdown": "9.0.1",
         "react-qr-code": "2.0.15",
-        "react-router-dom": "6.28.0",
+        "react-router-dom": "7.0.2",
         "react-transition-group": "4.4.5",
         "react-use-websocket": "4.11.1",
         "regenerator-runtime": "0.14.1",
