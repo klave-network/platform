@@ -3,18 +3,14 @@
     "version": "1.0.0",
     "type": "module",
     "dependencies": {
-        "@sentry/node": "7.120.2",
+        "@klave/constants": "1.0.2",
+        "@klave/db": "1.0.1",
+        "@sentry/node": "7.120.3",
         "@swc/helpers": "0.5.15",
         "probot": "13.4.1",
         "strip-ansi": "7.1.0",
         "winston": "3.17.0",
         "winston-transport": "4.9.0",
-        "ws": "8.18.0",
-        "@klave/db": "1.0.1",
-        "@klave/constants": "1.0.2",
-        "@sentry/core": "7.120.2",
-        "@secretarium/connector": "0.17.0",
-        "@sentry/profiling-node": "7.120.2",
-        "@secretarium/instrumentation": "0.5.0"
+        "ws": "8.18.0"
     }
 }
