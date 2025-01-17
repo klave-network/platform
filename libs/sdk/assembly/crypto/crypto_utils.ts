@@ -161,4 +161,24 @@ export class CryptoUtil
         else
             return {data: null, err: new Error('Invalid or unsupported key format')};
     }
+
+    static getAesTagLength(tagLength: u32): Result<idlV1.aes_tag_length, Error>
+    {
+        switch(tagLength)
+        {
+            case 96:
+                return {data: idlV1.aes_tag_length.TAG_96, err: null};
+            case 104:
+                return {data: idlV1.aes_tag_length.TAG_104, err: null};
+            case 112:
+                return {data: idlV1.aes_tag_length.TAG_112, err: null};
+            case 120:
+                return {data: idlV1.aes_tag_length.TAG_120, err: null};
+            case 128:
+                return {data: idlV1.aes_tag_length.TAG_128, err: null};
+            default:
+                return {data: null, err: new Error('Invalid AES tag length')};
+        }
+    }
+
 }

@@ -161,7 +161,10 @@ export class SubtleCrypto {
         } else if (algorithm instanceof AesGcmParams) {
             const iv = Utils.convertToU8Array(Uint8Array.wrap(algorithm.iv));
             const additionalData = Utils.convertToU8Array(Uint8Array.wrap(algorithm.additionalData));
-            const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: algorithm.tagLength };
+            let tagLength = CryptoUtil.getAesTagLength(algorithm.tagLength);
+            if (tagLength.err || !tagLength.data)
+                return { data: null, err: tagLength.err };
+            const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: tagLength.data };
             return CryptoImpl.encrypt(key.id, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams), true), clear_text);
 
         } else
@@ -181,7 +184,10 @@ export class SubtleCrypto {
         } else if (algorithm instanceof AesGcmParams) {
             const iv = Utils.convertToU8Array(Uint8Array.wrap(algorithm.iv));
             const additionalData = Utils.convertToU8Array(Uint8Array.wrap(algorithm.additionalData));
-            const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: algorithm.tagLength };
+            let tagLength = CryptoUtil.getAesTagLength(algorithm.tagLength);
+            if (tagLength.err || !tagLength.data)
+                return { data: null, err: tagLength.err };
+            const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: tagLength.data };
             return CryptoImpl.decrypt(key.id, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams), true), cipher_text);
         } else
             return { data: null, err: new Error('Invalid algorithm') };
@@ -328,7 +334,10 @@ export class SubtleCrypto {
         } else if (wrapAlgo instanceof AesGcmParams) {
             const iv = Utils.convertToU8Array(Uint8Array.wrap(wrapAlgo.iv));
             const additionalData = Utils.convertToU8Array(Uint8Array.wrap(wrapAlgo.additionalData));
-            const wrappingInfo: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: wrapAlgo.tagLength };
+            let tagLength = CryptoUtil.getAesTagLength(wrapAlgo.tagLength);
+            if (tagLength.err || !tagLength.data)
+                return { data: null, err: tagLength.err };
+            const wrappingInfo: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: tagLength.data };
             return CryptoImpl.wrapKey(wrappingKey.id, idlV1.wrapping_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(wrappingInfo), true), key.id, formatData.format);
         } else if (wrapAlgo instanceof NamedAlgorithm) {
             if (wrapAlgo.name == 'AES-KW' || wrapAlgo.name == 'aes-kw') {
@@ -363,7 +372,10 @@ export class SubtleCrypto {
         } else if (unwrapAlgo instanceof AesGcmParams) {
             const iv = Utils.convertToU8Array(Uint8Array.wrap(unwrapAlgo.iv));
             const additionalData = Utils.convertToU8Array(Uint8Array.wrap(unwrapAlgo.additionalData));
-            const wrappingInfoAesGcm: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: unwrapAlgo.tagLength };
+            let tagLength = CryptoUtil.getAesTagLength(unwrapAlgo.tagLength);
+            if (tagLength.err || !tagLength.data)
+                return { data: null, err: tagLength.err };            
+            const wrappingInfoAesGcm: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: tagLength.data };
             wrappingInfo = String.UTF8.encode(JSON.stringify(wrappingInfoAesGcm), true);
             wrappingAlgo = idlV1.wrapping_algorithm.aes_gcm;
         } else if (unwrapAlgo instanceof NamedAlgorithm) {
