@@ -71,6 +71,15 @@
                     "cli:build"
                 ]
             }
+        },
+        "serve": {
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "apps/cli",
+                "commands": [
+                    "node --import=tsx src/index.ts"
+                ]
+            }
         }
     }
 }
