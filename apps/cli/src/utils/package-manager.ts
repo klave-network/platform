@@ -1,5 +1,5 @@
 import spawnAsync from '@expo/spawn-async';
-import { PackageManagerName } from '~/lib/resolve-package-manager';
+import { PackageManagerName } from './resolve-package-manager';
 
 export async function installDependencies(
     packageManager: PackageManagerName,

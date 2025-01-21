@@ -1,4 +1,3 @@
-import { Command } from 'commander';
 import path from 'node:path';
 import fs from 'node:fs';
 import { execFileSync } from 'child_process';
@@ -9,39 +8,36 @@ type Versions = {
     devDependencies: Record<string, string>;
 };
 
-export function info() {
-    const infoCmd = new Command('info');
+/**
+ * Print out environment information about the Klave project
+ */
+export default async function info() {
 
-    infoCmd.description('output info about Klave, Node.js, and package man');
-    infoCmd.action(() => {
-        const { dependencies, devDependencies } = getVersions();
+    const { dependencies, devDependencies } = getVersions();
 
-        console.log('Binaries:');
-        console.log(`   Node.js Version: ${process.versions.node}`);
-        console.log(`   npm Version: ${getBinaryVersion('npm')}`);
-        console.log(`   Yarn Version: ${getBinaryVersion('Yarn')}`);
-        console.log(`   pnpm Version: ${getBinaryVersion('pnpm')}`);
+    console.log('Binaries:');
+    console.log(`   Node.js Version: ${process.versions.node}`);
+    console.log(`   npm Version: ${getBinaryVersion('npm')}`);
+    console.log(`   Yarn Version: ${getBinaryVersion('Yarn')}`);
+    console.log(`   pnpm Version: ${getBinaryVersion('pnpm')}`);
 
-        // Filter dependencies starting with "@klave/"
-        const filterByScope = (deps: Record<string, string>) =>
-            Object.entries(deps).filter(([name]) => name.startsWith('@klave/'));
+    // Filter dependencies starting with "@klave/"
+    const filterByScope = (deps: Record<string, string>) =>
+        Object.entries(deps).filter(([name]) => name.startsWith('@klave/'));
 
-        const klaveDependencies = filterByScope(dependencies);
-        const klaveDevDependencies = filterByScope(devDependencies);
+    const klaveDependencies = filterByScope(dependencies);
+    const klaveDevDependencies = filterByScope(devDependencies);
 
-        console.log('\nKlave Packages:');
-        const formattedDeps = [...klaveDependencies, ...klaveDevDependencies]
-            .map(([ name, version ]) => `   ${name}: ${version}`)
-            .join('\n');
-        console.log(formattedDeps);
+    console.log('\nKlave Packages:');
+    const formattedDeps = [...klaveDependencies, ...klaveDevDependencies]
+        .map(([ name, version ]) => `   ${name}: ${version}`)
+        .join('\n');
+    console.log(formattedDeps);
 
-        console.log('\nOperating System:');
-        console.log(`   Platform: ${os.platform()}`);
-        console.log(`   Architecture: ${os.arch()}`);
-        console.log(`   OS Version: ${os.version()}`);
-    });
-
-    return infoCmd;
+    console.log('\nOperating System:');
+    console.log(`   Platform: ${os.platform()}`);
+    console.log(`   Architecture: ${os.arch()}`);
+    console.log(`   OS Version: ${os.version()}`);
 }
 
 function getVersions(): Versions {

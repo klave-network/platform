@@ -1,6 +1,5 @@
 import spawn from 'cross-spawn';
 import githubUsername from 'github-username';
-import { exec } from 'child_process';
 
 /**
  * Finds user's name by reading it from the git config.
@@ -46,18 +45,4 @@ export async function guessRepoUrl(authorUrl: string, slug: string) {
         return `${authorUrl}/${normalizedSlug}`;
     }
     return '';
-}
-
-/**
- * Opens a URL in the browser
- */
-export function openURL(url: string) {
-    const command = process.platform === 'win32' ? 'start' : process.platform === 'darwin' ? 'open' : 'xdg-open';
-    exec(`${command} ${url}`, (error) => {
-        if (error) {
-            console.error('Error opening URL:', error);
-        } else {
-            console.log('URL opened in the default browser');
-        }
-    });
 }
