@@ -5,6 +5,7 @@ import sensible from '@fastify/sensible';
 import websocket from '@fastify/websocket';
 import { app } from './app/app';
 import { sentryOps } from './utils/sentry';
+import { mongoOps } from './utils/mongo';
 
 process.on('unhandledRejection', (reason, p) => {
     console.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
@@ -16,6 +17,7 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 const serverHandle = (async () => {
 
     await sentryOps.initialize();
+    await mongoOps.initialize();
 
     // Instantiate Fastify with some config
     const server = Fastify({

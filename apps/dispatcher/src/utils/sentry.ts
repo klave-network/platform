@@ -13,7 +13,8 @@ export const sentryOps = {
                 environment: process.env['KLAVE_DISPATCH_SENTRY_ENV'] ?? process.env['NODE_ENV'] ?? 'development',
                 integrations: [
                     // enable HTTP calls tracing
-                    new Sentry.Integrations.Http({ tracing: true }) as Integration
+                    new Sentry.Integrations.Http({ tracing: true }) as Integration,
+                    new Sentry.Integrations.Mongo({ describeOperations: true }) as Integration
                 ].concat(process.env['NODE_ENV'] === 'development' ? [nodeProfilingIntegration()] : []),
                 // Set tracesSampleRate to 1.0 to capture 100%
                 // of transactions for performance monitoring.

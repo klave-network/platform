@@ -1,6 +1,7 @@
 import { FastifyInstance, RouteHandler } from 'fastify';
 import type { WebSocket } from 'ws';
 import { v4 as uuid } from 'uuid';
+import { collection } from '../utils/mongo';
 
 const definitions = process.env.KLAVE_DISPATCH_ENDPOINTS?.split(',') ?? [];
 const endpoints = definitions.map(def => def.split('#') as [string, string]).filter(def => def.length === 2);
@@ -113,8 +114,22 @@ export async function app(fastify: FastifyInstance) {
     fastify.all('/vcs/hook', hookMiddleware);
 
     fastify.all('/ingest/usage', async (__unusedReq, res) => {
-        // TODO: Implement kredit storage
-        await res.status(200).send({ ok: true });
+        let data: unknown = {};
+        try {
+            if (typeof __unusedReq.body !== 'string')
+                return await res.status(400).send({ ok: false });
+            data = JSON.parse(__unusedReq.body);
+        } catch (__unusedError) {
+            return await res.status(400).send({ ok: false });
+        }
+        if (!collection)
+            return await res.status(202).send({ ok: true });
+        collection?.insertOne({
+            type: 'usage',
+            timestamp: new Date().toISOString(),
+            data
+        });
+        return await res.status(201).send({ ok: true });
     });
 
     fastify.all('/version', async (__unusedReq, res) => {
