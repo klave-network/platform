@@ -1,4 +1,11 @@
 # Changelog
+## [1.1.1](https://github.com/klave-network/platform/compare/dispatcher@1.1.0...dispatcher@1.1.1) (2025-01-22)
+
+
+### Bug Fixes
+
+* **dispatcher:** Missing dependency for compilation ([2a63891](https://github.com/klave-network/platform/commit/2a638910bf7365c35a3e7dc0c83756c18b21ff98))
+
 ## [1.1.0](https://github.com/klave-network/platform/compare/dispatcher@1.0.1...dispatcher@1.1.0) (2025-01-22)
 
 ### Dependency Updates
