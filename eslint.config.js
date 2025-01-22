@@ -35,7 +35,11 @@ const javascriptRules = {
     '@/no-trailing-spaces': 'error',
     '@/no-unused-vars': [
         'error',
-        { args: 'after-used', varsIgnorePattern: '^__unused' }
+        {
+            args: 'after-used',
+            varsIgnorePattern: '^__unused',
+            caughtErrorsIgnorePattern: '^__unused'
+        }
     ],
     '@nx/enforce-module-boundaries': [
         'error',
@@ -218,7 +222,7 @@ for (const folder of projectsFolders) {
         },
 
         {
-            files: ['**/eslint.config.js'],
+            files: ['**/eslint.config.js', '**/eslint.config.mjs'],
             rules: {
                 '@nx/enforce-module-boundaries': 'off'
             }
