@@ -12,6 +12,8 @@ export interface AppOptions { }
 
 export async function app(fastify: FastifyInstance) {
 
+    const __hostname = process.env['HOSTNAME'] ?? 'unknown';
+
     fastify.log.info(endpoints, 'Preparing for enpoints');
     const secrets = process.env.KLAVE_DISPATCH_SECRETS?.split(',') ?? [];
 
@@ -105,6 +107,7 @@ export async function app(fastify: FastifyInstance) {
 
         const statusValues = Object.values(statuses);
 
+        res.headers({ 'X-Klave-API-Node': __hostname });
         await res.status(!statusValues.length ? 200 : statusValues.find(status => status === 200) ? 207 : 500)
             .send({ ok: true, statuses });
 
@@ -113,12 +116,20 @@ export async function app(fastify: FastifyInstance) {
     fastify.all('/hook', hookMiddleware);
     fastify.all('/vcs/hook', hookMiddleware);
 
-    fastify.all('/ingest/usage', async (__unusedReq, res) => {
+    fastify.all('/ingest/usage', async (req, res) => {
+
+        res.headers({ 'X-Klave-API-Node': __hostname });
+
+        // We assume that the request is not too long
+        // We assume that it is not a multipart request either
+        const rawContent = Uint8Array.from(req.raw.read() ?? []);
+
         let data: unknown = {};
         try {
-            if (typeof __unusedReq.body !== 'string')
+            const content = new TextDecoder('utf-8').decode(rawContent);
+            if (typeof content !== 'string')
                 return await res.status(400).send({ ok: false });
-            data = JSON.parse(__unusedReq.body);
+            data = JSON.parse(content);
         } catch (__unusedError) {
             return await res.status(400).send({ ok: false });
         }
@@ -133,13 +144,16 @@ export async function app(fastify: FastifyInstance) {
     });
 
     fastify.all('/version', async (__unusedReq, res) => {
+
+        res.headers({ 'X-Klave-API-Node': __hostname });
         await res.status(202).send({
             version: {
                 name: process.env.NX_TASK_TARGET_PROJECT,
                 commit: process.env.GIT_REPO_COMMIT?.substring(0, 8),
                 branch: process.env.GIT_REPO_BRANCH,
                 version: process.env.GIT_REPO_VERSION
-            }
+            },
+            node: __hostname
         });
     });
 }

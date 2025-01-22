@@ -28,6 +28,8 @@ const serverHandle = (async () => {
     // TODO: Enable when migrating to Sentry 8
     // Sentry.setupFastifyErrorHandler(server);
 
+    // This is to disable content type parsing
+    // It requires handling the raw payload from the request object going forward
     server.removeAllContentTypeParsers();
     server.addContentTypeParser('*', function (__unusedReq, __unusedPayload, done) {
         done(null);
