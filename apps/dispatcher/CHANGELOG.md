@@ -1,4 +1,14 @@
 # Changelog
+## [1.1.0](https://github.com/klave-network/platform/compare/dispatcher@1.0.1...dispatcher@1.1.0) (2025-01-22)
+
+### Dependency Updates
+
+* `constants` updated to version `1.0.1`
+
+### Features
+
+* **dispatcher:** Implement usage report recording ([86a1cef](https://github.com/klave-network/platform/commit/86a1cef1615497fa8474d80ee375ca9fa0db5a86))
+
 ## [1.0.1](https://github.com/klave-network/platform/compare/dispatcher@1.0.0...dispatcher@1.0.1) (2024-12-16)
 
 ### Dependency Updates
