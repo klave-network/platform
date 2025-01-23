@@ -54,7 +54,7 @@
         "@hookform/resolvers": "3.10.0",
         "@iconscout/react-unicons": "2.2.1",
         "@ideafast/idgen": "0.2.1",
-        "@klave/as-json": "^0.9.23",
+        "@klave/as-json": "^1.0.0-alpha.2",
         "@monaco-editor/react": "4.6.0",
         "@nivo/geo": "0.88.0",
         "@octokit/rest": "^21.1.0",

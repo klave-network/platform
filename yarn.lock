@@ -2774,13 +2774,10 @@
   dependencies:
     buffer "^6.0.3"
 
-"@klave/as-json@^0.9.23":
-  version "0.9.23"
-  resolved "https://registry.yarnpkg.com/@klave/as-json/-/as-json-0.9.23.tgz#677fca84c1224d85566c1424e4432bf0d37ffb4d"
-  integrity sha512-bgDBNenV6CjxHdyVVS1KOSw+VW2MCh1wdv7D9jxx400gwVUB9Qmj8xK9GXf8Na3KZ8h+JbPWyURchXbtcl662w==
-  dependencies:
-    as-virtual "^0.2.0"
-    chalk "^5.3.0"
+"@klave/as-json@^1.0.0-alpha.2":
+  version "1.0.0-alpha.2"
+  resolved "https://registry.yarnpkg.com/@klave/as-json/-/as-json-1.0.0-alpha.2.tgz#dc371aeac72d55d7553be2676ff8fb54a6edf8c3"
+  integrity sha512-dCZC6+eiccQQONl9Dx/NTgE6D4yAfidkFSPeAlqNbyJFhEw9LmeRvx26asanCRHpdT4SI8GuI0cmjYRHDS4X/Q==
 
 "@kwsites/file-exists@^1.1.1":
   version "1.1.1"
@@ -7731,11 +7728,6 @@ as-base64@0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/as-base64/-/as-base64-0.2.0.tgz#b4bed937c93bfb6524b932b517e1b8571a0dd518"
   integrity sha512-j6JxprAVN4SXUcZiSChuMBf0JJOCdh5OfrHAepluxmFWuDZZm+YjmfNSk8djUHRPEB+Ui5HGvrz46GLvTJf3ig==
-
-as-virtual@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/as-virtual/-/as-virtual-0.2.0.tgz#f498e22ba5291a61f7ce40cfd940e68c3dc587ab"
-  integrity sha512-zI+8VwD6BPUtXrxs4R7v2N+59OAIBRwiiv9nGIMwcQ/w/lspyaualMqM7yok3jMRglKqLkfOx+dCJimeflEJcA==
 
 asap@^2.0.0:
   version "2.0.6"

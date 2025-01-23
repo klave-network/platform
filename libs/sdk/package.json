@@ -23,7 +23,7 @@
         "stac": "./bin/stac.js"
     },
     "dependencies": {
-        "@klave/as-json": "^0.9.23",
+        "@klave/as-json": "^1.0.0-alpha.2",
         "@klave/compiler": "1.0.0",
         "as-base64": "0.2.0",
         "esbuild-node-externals": "1.16.0"
