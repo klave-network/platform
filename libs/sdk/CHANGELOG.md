@@ -1,4 +1,9 @@
 # Changelog
+## [0.14.2](https://github.com/klave-network/platform/compare/sdk@0.14.1...sdk@0.14.2) (2025-01-23)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.14.1`
 ## [0.14.1](https://github.com/klave-network/platform/compare/sdk@0.14.0...sdk@0.14.1) (2025-01-23)
 
 ### Dependency Updates
