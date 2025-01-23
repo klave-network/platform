@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
-import { readCachedProjectGraph } from '@nrwl/devkit';
+import { readCachedProjectGraph } from '@nx/devkit';
 
 const projectGraph = readCachedProjectGraph();
 
