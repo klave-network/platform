@@ -1,4 +1,33 @@
 # Changelog
+## [1.0.0](https://github.com/klave-network/platform/compare/hubber@0.3.4...hubber@1.0.0) (2025-01-23)
+
+### Dependency Updates
+
+* `db` updated to version `0.3.4`
+* `providers` updated to version `0.3.4`
+* `constants` updated to version `0.3.4`
+* `api` updated to version `0.3.4`
+* `pruner` updated to version `0.3.4`
+
+### ⚠ BREAKING CHANGES
+
+* Moving to pure ESM repo
+
+### Features
+
+* **ui,hubber,providers:** Filter node name through ([620d41b](https://github.com/klave-network/platform/commit/620d41b14324e777bf40fe275decbf890458954f))
+
+
+### Bug Fixes
+
+* **hubber:** Add explicit externals for ESBuild ([09d6847](https://github.com/klave-network/platform/commit/09d6847b35558dd12b75e4a4f74cfbe9bf08789b))
+* Package `git-rev-sync` relies on non-ESM features so we provide explicit location ([cee72ae](https://github.com/klave-network/platform/commit/cee72ae5cd5a2fe998c987864b060f039ddb939b))
+
+
+### Miscellaneous Chores
+
+* Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
+
 ## [0.3.4](https://github.com/klave-network/platform/compare/hubber@0.3.3...hubber@0.3.4) (2024-08-02)
 
 ### Dependency Updates
