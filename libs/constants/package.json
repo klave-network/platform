@@ -3,7 +3,6 @@
     "version": "1.0.3",
     "type": "module",
     "dependencies": {
-        "@klave/db": "1.0.2",
         "@swc/helpers": "0.5.15",
         "zod": "^3.24.1"
     }

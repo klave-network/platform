@@ -3,8 +3,6 @@
     "version": "1.1.0",
     "type": "module",
     "dependencies": {
-        "@klave/constants": "1.0.2",
-        "@klave/db": "1.0.1",
         "@sentry/node": "7.120.3",
         "@swc/helpers": "0.5.15",
         "probot": "13.4.1",
