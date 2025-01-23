@@ -477,18 +477,12 @@ const updateInstalledRepos = async (prisma: PrismaClient, octokit: Octokit) => {
         });
 
         const installationOctokit = await probot.auth(installation.id);
-        const reposData = await installationOctokit.paginate(
+        const repos = await installationOctokit.paginate(
             installationOctokit.apps.listReposAccessibleToInstallation,
             {
                 per_page: 100
             }
         );
-
-        // TODO - this is a hack to get around the fact that the type definition for the above call is wrong
-        // See bug report at https://github.com/octokit/plugin-paginate-rest.js/issues/350
-        const repos = Array.isArray(reposData) ? reposData as typeof reposData['repositories'] : [];
-        if (reposData.repositories)
-            repos.push(...reposData.repositories);
 
         for (const repo of repos) {
             await prisma.repository.upsert({
