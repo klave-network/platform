@@ -2,7 +2,7 @@
     "name": "create-on-klave",
     "version": "0.4.1",
     "private": false,
-    "description": "The tool to bootstrap trustless apps on Klave",
+    "description": "The tool to bootstrap honest apps on Klave",
     "license": "MIT",
     "author": {
         "name": "Florian Guitton",
@@ -10,6 +10,7 @@
     },
     "type": "module",
     "bin": {
+        "create-honest-app": "./bin/create-trustless-app.js",
         "create-on-klave": "./bin/create-on-klave.js",
         "create-trustless-app": "./bin/create-trustless-app.js"
     },
