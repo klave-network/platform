@@ -212,23 +212,23 @@ export const applicationRouter = createTRPCRouter({
                     description: 'Secretarium Task'
                 }, async () => {
                     try {
-                        await scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${appId}`, {
-                            app_id: appId
-                        }).send()
-                            .then(async (result) => {
-                                if (result.kredit === undefined)
-                                    throw (new Error('No credits returned'));
-                                return prisma.application.update({
-                                    where: {
-                                        id: appId
-                                    },
-                                    data: {
-                                        kredits: result.kredit
-                                    }
-                                });
-                            }).catch(() => {
-                                // Swallow this error
-                            });
+                        // await scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${appId}`, {
+                        //     app_id: appId
+                        // }).send()
+                        //     .then(async (result) => {
+                        //         if (result.kredit === undefined)
+                        //             throw (new Error('No credits returned'));
+                        //         return prisma.application.update({
+                        //             where: {
+                        //                 id: appId
+                        //             },
+                        //             data: {
+                        //                 kredits: result.kredit
+                        //             }
+                        //         });
+                        //     }).catch(() => {
+                        //         // Swallow this error
+                        //     });
                         await scp.newTx('wasm-manager', 'get_allowed_kredit_per_query', `klave-app-get-query-limit-${appId}`, {
                             app_id: appId
                         }).send()
@@ -378,22 +378,22 @@ export const applicationRouter = createTRPCRouter({
                     description: 'Secretarium Task'
                 }, async () => {
                     try {
-                        await scp.newTx<KlaveGetCreditResult>('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
-                            app_id: app.id
-                        }).send().then(async (result) => {
-                            if (result.kredit === undefined)
-                                throw (new Error('No credits returned'));
-                            return prisma.application.update({
-                                where: {
-                                    id: app.id
-                                },
-                                data: {
-                                    kredits: result.kredit
-                                }
-                            });
-                        }).catch(() => {
-                            // Swallow this error
-                        });
+                        // await scp.newTx<KlaveGetCreditResult>('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
+                        //     app_id: app.id
+                        // }).send().then(async (result) => {
+                        //     if (result.kredit === undefined)
+                        //         throw (new Error('No credits returned'));
+                        //     return prisma.application.update({
+                        //         where: {
+                        //             id: app.id
+                        //         },
+                        //         data: {
+                        //             kredits: result.kredit
+                        //         }
+                        //     });
+                        // }).catch(() => {
+                        //     // Swallow this error
+                        // });
                         await scp.newTx<KlaveGetCreditResult>('wasm-manager', 'get_allowed_kredit_per_query', `klave-app-get-query-limit-${app.id}`, {
                             app_id: app.id
                         }).send()
