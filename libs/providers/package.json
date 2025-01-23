@@ -1,6 +1,6 @@
 {
     "name": "@klave/providers",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "type": "module",
     "dependencies": {
         "@sentry/core": "7.120.3",
