@@ -898,7 +898,7 @@ export const applicationRouter = createTRPCRouter({
             if (!app)
                 throw (new Error('No application found'));
 
-            const limits = Object.fromEntries(Object.entries(input.limits).filter(([_, v]) => v !== undefined));;
+            const limits = Object.fromEntries(Object.entries(input.limits).filter(([_u, v]) => v !== undefined));
             const combinedLimits = {
                 ...app.limits,
                 ...limits

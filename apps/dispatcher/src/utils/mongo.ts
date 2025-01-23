@@ -9,7 +9,7 @@ const KreditConsumptionSchema = z.object({
     timestamp: z.number(),
     cpu_consumption: z.number(),
     native_calls_consumption: z.number()
-})
+});
 
 export const KreditConsumptionReportSchema = z.object({
     version: z.number(),

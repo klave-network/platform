@@ -38,7 +38,8 @@ const javascriptRules = {
         {
             args: 'after-used',
             varsIgnorePattern: '^__unused',
-            caughtErrorsIgnorePattern: '^__unused'
+            caughtErrorsIgnorePattern: '^__unused',
+            destructuredArrayIgnorePattern: '^_u'
         }
     ],
     '@nx/enforce-module-boundaries': [

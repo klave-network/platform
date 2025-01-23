@@ -1,29 +1,29 @@
 import { trace } from '@sentry/core';
 import { prisma, InstallationAccountType } from '@klave/db';
 import type { Probot } from 'probot';
-import type { components as OctokitComponents } from '@octokit/openapi-webhooks-types'
+import type { components as OctokitComponents } from '@octokit/openapi-webhooks-types';
 import { logger } from '@klave/providers';
 import { deployToSubstrate } from '@klave/api';
 
 function isUserAccount(account: unknown): account is OctokitComponents['schemas']['simple-user'] {
     if (!account || typeof account !== 'object')
-        return false
+        return false;
     return Object.hasOwn(account, 'email');
 }
 
 function isEnterpriseAccount(account: unknown): account is OctokitComponents['schemas']['enterprise'] {
     if (!account || typeof account !== 'object')
-        return false
+        return false;
     return !Object.hasOwn(account, 'email');
 }
 
 const accountName = (account: unknown): string => {
     return isUserAccount(account) ? account.login : isEnterpriseAccount(account) ? account.name : '';
-}
+};
 
 const accountType = (account: unknown): InstallationAccountType => {
     return isUserAccount(account) ? 'user' : isEnterpriseAccount(account) ? 'organization' : 'unknown';
-}
+};
 
 const probotApp = (app: Probot) => {
     app.on([
@@ -74,7 +74,7 @@ const probotApp = (app: Probot) => {
                     const { account } = payload.installation;
 
                     if (!account) {
-                        return
+                        return;
                     }
 
                     if (payload.action === 'created') {
@@ -127,7 +127,7 @@ const probotApp = (app: Probot) => {
                                 source_remoteId_account: {
                                     source: 'github',
                                     remoteId: `${payload.installation.id}`,
-                                    account: accountName(account),
+                                    account: accountName(account)
                                 }
                             }
                         });
@@ -150,7 +150,7 @@ const probotApp = (app: Probot) => {
                     const { account } = payload.installation;
 
                     if (!account) {
-                        return
+                        return;
                     }
 
                     if (payload.action === 'added') {
@@ -186,7 +186,7 @@ const probotApp = (app: Probot) => {
                                 await prisma.deployableRepo.updateMany({
                                     where: {
                                         fullName: repo.full_name,
-                                        owner: accountName(account),
+                                        owner: accountName(account)
                                     },
                                     data: {
                                         installationRemoteId: `${payload.installation.id}`
@@ -210,7 +210,7 @@ const probotApp = (app: Probot) => {
                                     fullName: {
                                         in: payload.repositories_removed.map(r => r.full_name)
                                     },
-                                    owner: accountName(account),
+                                    owner: accountName(account)
                                 },
                                 data: {
                                     installationRemoteId: ''
@@ -227,7 +227,7 @@ const probotApp = (app: Probot) => {
                     const { owner } = repository;
 
                     if (!sender || !owner) {
-                        return
+                        return;
                     }
 
                     deployToSubstrate({

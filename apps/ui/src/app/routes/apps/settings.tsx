@@ -113,7 +113,7 @@ const LimitEditor: FC<LimitEditorProps> = ({ type, kredits, application: { id } 
                 applicationId: id,
                 limits: {
                     queryCallSpend: type === 'query' ? BigInt(currentValue) : undefined,
-                    transactionCallSpend: type === 'transaction' ? BigInt(currentValue) : undefined,
+                    transactionCallSpend: type === 'transaction' ? BigInt(currentValue) : undefined
                 }
             });
             await appAPIUtils.getAll.invalidate();
