@@ -1,4 +1,10 @@
 # Changelog
+## [1.1.1](https://github.com/klave-network/platform/compare/api@1.1.0...api@1.1.1) (2025-01-23)
+
+### Dependency Updates
+
+* `constants` updated to version `1.1.0`
+* `providers` updated to version `1.1.0`
 ## [1.1.0](https://github.com/klave-network/platform/compare/api@1.0.0...api@1.1.0) (2025-01-23)
 
 ### Dependency Updates
