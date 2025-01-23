@@ -1,4 +1,15 @@
 # Changelog
+## [1.1.0](https://github.com/klave-network/platform/compare/providers@1.0.0...providers@1.1.0) (2025-01-23)
+
+### Dependency Updates
+
+* `constants` updated to version `1.0.0`
+* `db` updated to version `1.0.0`
+
+### Features
+
+* **ui,hubber,providers:** Filter node name through ([620d41b](https://github.com/klave-network/platform/commit/620d41b14324e777bf40fe275decbf890458954f))
+
 ## [1.0.0](https://github.com/klave-network/platform/compare/providers@0.2.1...providers@1.0.0) (2024-10-04)
 
 ### Dependency Updates
