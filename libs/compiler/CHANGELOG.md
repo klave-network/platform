@@ -1,4 +1,15 @@
 # Changelog
+## [1.0.0](https://github.com/klave-network/platform/compare/compiler@0.5.0...compiler@1.0.0) (2025-01-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* Moving to pure ESM repo
+
+### Miscellaneous Chores
+
+* Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
+
 ## [0.5.0](https://github.com/klave-network/platform/compare/compiler@0.4.0...compiler@0.5.0) (2024-06-06)
 
 
