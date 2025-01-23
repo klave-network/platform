@@ -1,4 +1,15 @@
 # Changelog
+## [0.14.1](https://github.com/klave-network/platform/compare/sdk@0.14.0...sdk@0.14.1) (2025-01-23)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.14.0`
+* `constants` updated to version `0.14.0`
+
+### Bug Fixes
+
+* **sdk:** Fixing up some ESLint configuration ([4bdb53e](https://github.com/klave-network/platform/commit/4bdb53e250aba6f694cf6dd14444bd361ccf432e))
+
 ## [0.14.0](https://github.com/klave-network/platform/compare/sdk@0.13.0...sdk@0.14.0) (2024-12-19)
 
 

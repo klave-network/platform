@@ -1,6 +1,6 @@
 {
     "name": "@klave/sdk",
-    "version": "0.14.0",
+    "version": "0.14.1",
     "private": false,
     "description": "Klave Honest Apps helpers and definitions",
     "repository": {
