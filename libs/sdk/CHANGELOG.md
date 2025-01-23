@@ -1,4 +1,11 @@
 # Changelog
+## [0.14.3](https://github.com/klave-network/platform/compare/sdk@0.14.2...sdk@0.14.3) (2025-01-23)
+
+
+### Bug Fixes
+
+* **sdk:** Missing dependency for compilation ([a1ee1c8](https://github.com/klave-network/platform/commit/a1ee1c8a9aa4d4c925a014185eac97675aeb3a51))
+
 ## [0.14.2](https://github.com/klave-network/platform/compare/sdk@0.14.1...sdk@0.14.2) (2025-01-23)
 
 ### Dependency Updates
