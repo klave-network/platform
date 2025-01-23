@@ -142,6 +142,31 @@ export const applicationRouter = createTRPCRouter({
             //             }).catch(() => {
             //                 // Swallow this error
             //             });
+            //             await scp.newTx('wasm-manager', 'get_allowed_kredit_per_query', `klave-app-get-query-limit-${appId}`, {
+            //                 app_id: appId
+            //             }).send()
+            //                 .then(async (result) => {
+            //                     if (result.kredit === undefined)
+            //                         throw (new Error('No credits returned'));
+            //                     return prisma.application.update({
+            //                         where: {
+            //                             id: appId
+            //                         },
+            //                         data: {
+            //                             limits: {
+            //                                 queryCallSpend: result.kredit ?? 0
+            //                             }
+            //                         }
+            //                     });
+            //                 }).catch(() => {
+            //                     // Swallow this error
+            //                 });
+            //                     } catch (e) {
+            //                         console.error(e);
+            //                         ///
+            //                     }
+            //                 });
+            //             }
             //             await scp.newTx('wasm-manager', 'get_allowed_kredit_per_transaction', `klave-app-get-transaction-limit-${appId}`, {
             //                 app_id: appId
             //             }).send()
@@ -199,6 +224,25 @@ export const applicationRouter = createTRPCRouter({
                                     },
                                     data: {
                                         kredits: result.kredit
+                                    }
+                                });
+                            }).catch(() => {
+                                // Swallow this error
+                            });
+                        await scp.newTx('wasm-manager', 'get_allowed_kredit_per_query', `klave-app-get-query-limit-${appId}`, {
+                            app_id: appId
+                        }).send()
+                            .then(async (result) => {
+                                if (result.kredit === undefined)
+                                    throw (new Error('No credits returned'));
+                                return prisma.application.update({
+                                    where: {
+                                        id: appId
+                                    },
+                                    data: {
+                                        limits: {
+                                            queryCallSpend: result.kredit ?? 0
+                                        }
                                     }
                                 });
                             }).catch(() => {
@@ -350,6 +394,25 @@ export const applicationRouter = createTRPCRouter({
                         }).catch(() => {
                             // Swallow this error
                         });
+                        await scp.newTx<KlaveGetCreditResult>('wasm-manager', 'get_allowed_kredit_per_query', `klave-app-get-query-limit-${app.id}`, {
+                            app_id: app.id
+                        }).send()
+                            .then(async (result) => {
+                                if (result.kredit === undefined)
+                                    throw (new Error('No credits returned'));
+                                return prisma.application.update({
+                                    where: {
+                                        id: app.id
+                                    },
+                                    data: {
+                                        limits: {
+                                            queryCallSpend: result.kredit ?? 0
+                                        }
+                                    }
+                                });
+                            }).catch(() => {
+                                // Swallow this error
+                            });
                         await scp.newTx<KlaveGetCreditResult>('wasm-manager', 'get_allowed_kredit_per_transaction', `klave-app-get-transaction-limit-${app.id}`, {
                             app_id: app.id
                         }).send()
@@ -835,7 +898,7 @@ export const applicationRouter = createTRPCRouter({
             if (!app)
                 throw (new Error('No application found'));
 
-            const { limits } = input;
+            const limits = Object.fromEntries(Object.entries(input.limits).filter(([_, v]) => v !== undefined));;
             const combinedLimits = {
                 ...app.limits,
                 ...limits

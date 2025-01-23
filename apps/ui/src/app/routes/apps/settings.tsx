@@ -80,11 +80,12 @@ const ApplicationDeletion = () => {
 };
 
 type LimitEditorProps = {
+    type: 'query' | 'transaction',
     kredits: bigint | number
     application: Partial<Application>
 };
 
-const LimitEditor: FC<LimitEditorProps> = ({ kredits, application: { id } }) => {
+const LimitEditor: FC<LimitEditorProps> = ({ type, kredits, application: { id } }) => {
 
     const kreditValue = useMemo(() => Number(kredits), [kredits]);
     const [isEditing, toggleEditing] = useToggle(false);
@@ -111,7 +112,8 @@ const LimitEditor: FC<LimitEditorProps> = ({ kredits, application: { id } }) => 
                 withSlug: false,
                 applicationId: id,
                 limits: {
-                    transactionCallSpend: BigInt(currentValue)
+                    queryCallSpend: type === 'query' ? BigInt(currentValue) : undefined,
+                    transactionCallSpend: type === 'transaction' ? BigInt(currentValue) : undefined,
                 }
             });
             await appAPIUtils.getAll.invalidate();
@@ -269,7 +271,8 @@ export const AppSettings: FC = () => {
             <h1 className='font-bold text-xl mb-5'>Limits</h1>
             <p>
                 {/* Query spending limit: <b>{application.limits.queryCallSpend.toString()}</b><br /> */}
-                Transaction spending limit: <LimitEditor kredits={application.limits.transactionCallSpend} application={application} /><br />
+                Query spending limit: <LimitEditor type="query" kredits={application.limits.queryCallSpend} application={application} /><br />
+                Transaction spending limit: <LimitEditor type="transaction" kredits={application.limits.transactionCallSpend} application={application} /><br />
             </p>
         </div>
         <div>
