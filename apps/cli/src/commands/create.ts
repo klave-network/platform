@@ -244,7 +244,7 @@ Read more ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', 'https://docs
     const nextSteps = `
 Build your application:
 
-    - Enter your project directory using ${KLAVE_LIGHT_BLUE(chalk.bold(`cd ${dir}`))}
+    - Enter your project directory using ${KLAVE_LIGHT_BLUE(chalk.bold(`cd ${projectDir}`))}
     ${installDeps ? 'EMPTY_LINE' : `- To install dependencies, run ${KLAVE_LIGHT_BLUE(chalk.bold(`${packageManager} install ${installLegacyDeps}`))}`}
     - To build your application, run ${KLAVE_LIGHT_BLUE(chalk.bold(`${packageManager} ${buildCmd}`))}
     - Log in to ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('Klave', KLAVE_PLATFORM_URL)))} to deploy your application
