@@ -1,4 +1,11 @@
 # Changelog
+## [0.14.4](https://github.com/klave-network/platform/compare/sdk@0.14.3...sdk@0.14.4) (2025-01-24)
+
+
+### Bug Fixes
+
+* Downgrade `chalk` because of incompatibility with `@klave/sdk` ([35c4e7b](https://github.com/klave-network/platform/commit/35c4e7bd2d8cf8c7634221ad0887edcd158c3c9b))
+
 ## [0.14.3](https://github.com/klave-network/platform/compare/sdk@0.14.2...sdk@0.14.3) (2025-01-23)
 
 
