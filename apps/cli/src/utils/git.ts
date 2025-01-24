@@ -1,6 +1,7 @@
 import spawn from 'cross-spawn';
 import githubUsername from 'github-username';
 import spawnAsync from '@expo/spawn-async';
+import path from 'node:path';
 import * as p from '@clack/prompts';
 /**
  * Finds user's name by reading it from the git config.
@@ -42,7 +43,16 @@ export async function findGitHubProfileUrl(email: string): Promise<string> {
  */
 export async function guessRepoUrl(authorUrl: string, slug: string) {
     if (/^https?:\/\/github.com\/[^/]+/.test(authorUrl)) {
-        const normalizedSlug = slug.replace(/^@/, '').replace(/\//g, '-');
+        //const normalizedSlug = slug.replace(/^@/, '').replace(/\//g, '-');
+        let normalizedSlug;
+        if (slug === '.' || slug === './') {
+            const parts = process.cwd().split(path.sep);
+            normalizedSlug = parts[parts.length - 1];
+        } else if (slug.startsWith('./') || slug.startsWith('../')) {
+            const parts = slug.split('/');
+            normalizedSlug = parts[parts.length - 1];
+        }
+
         return `${authorUrl}/${normalizedSlug}`;
     }
     return '';
