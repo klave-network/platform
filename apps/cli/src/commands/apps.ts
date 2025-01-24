@@ -6,7 +6,7 @@ import { KLAVE_APP } from '~/lib/constants';
 /**
  * Print out information about the Klave project
  */
-export default async function apps() {
+export const apps = async () => {
     const klaveConfigPath = path.join(process.cwd(), 'klave.json');
 
     // Read and parse the klave.json file
@@ -32,4 +32,4 @@ export default async function apps() {
         console.error(chalk.red('Error: Failed to read or parse klave.json.', error.message));
         process.exit(1);
     }
-}
+};
