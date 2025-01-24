@@ -1,6 +1,7 @@
 import { Command, Option } from 'commander';
 import { PACKAGE_DESCRIPTION, PACKAGE_VERSION } from './lib/constants';
 import { CreateOptions } from './lib/types';
+import { isKlaveProject } from './utils/is-klave-project';
 
 // commands
 import { info } from './commands/info';
@@ -25,6 +26,7 @@ export const runCli = async () => {
         .addOption(new Option('-t, --template <language>', 'choose a template').choices(['typescript', 'rust']))
         .addOption(new Option('-n, --name <name>', 'name of the app'))
         .action(async (options) => {
+            isKlaveProject();
             await add({
                 template: options.template,
                 name: options.name
@@ -55,6 +57,7 @@ export const runCli = async () => {
         .command('build')
         .description('Build a Klave application')
         .action(() => {
+            isKlaveProject();
             console.log('Building the Klave application...');
             // Implementation for building will go here
         });
@@ -73,6 +76,7 @@ export const runCli = async () => {
         .command('deploy')
         .description('Deploy a Klave application')
         .action(() => {
+            isKlaveProject();
             console.log('Deploying the Klave application...');
             // Implementation for deployment will go here
         });
@@ -82,6 +86,7 @@ export const runCli = async () => {
         .command('apps')
         .description('Print information about Klave apps in the current project')
         .action(async () => {
+            isKlaveProject();
             await apps();
         });
 
@@ -90,6 +95,7 @@ export const runCli = async () => {
         .command('info')
         .description('Print information about the system and project dependencies')
         .action(async () => {
+            isKlaveProject();
             await info();
         });
 
