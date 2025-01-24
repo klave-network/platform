@@ -6,9 +6,9 @@
     "dependencies": {
         "@quixo3/prisma-session-store": "3.1.13",
         "@sentry/core": "7.120.3",
-        "@sentry/esbuild-plugin": "3.0.0",
+        "@sentry/esbuild-plugin": "3.1.0",
         "@sentry/node": "7.120.3",
-        "@trpc/server": "11.0.0-rc.716",
+        "@trpc/server": "11.0.0-rc.724",
         "cors": "2.8.5",
         "esbuild-node-externals": "1.16.0",
         "expect-ct": "1.0.0",

@@ -7,7 +7,7 @@
         "@octokit/rest": "^21.1.0",
         "@sentry/node": "7.120.3",
         "@swc/helpers": "0.5.15",
-        "@trpc/server": "11.0.0-rc.716",
+        "@trpc/server": "11.0.0-rc.724",
         "stripe": "17.5.0",
         "superjson": "2.2.2",
         "ts-case-convert": "2.1.0",
