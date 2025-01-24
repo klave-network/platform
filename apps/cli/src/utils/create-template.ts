@@ -7,6 +7,7 @@ import latestVersion from 'latest-version';
 import { SubstitutionData } from '../lib/types';
 
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+const isDev = process.env.NODE_ENV === 'development';
 
 /**
  * Create template files.
@@ -16,7 +17,9 @@ export async function createTemplateAsync(targetDir: string, data: SubstitutionD
     const s = p.spinner();
     s.start('Creating template files');
 
-    const sourceDir = path.join(dirname, '../..', 'template', '.');
+    const sourceDir = isDev
+        ? path.join(dirname, '../..', 'template', '.')
+        : path.join(dirname, '../', 'template', '.');
     await fs.copy(sourceDir, targetDir, {
         filter: () => true,
         overwrite: false,
