@@ -44,6 +44,6 @@ if (process.argv[2] === 'compiler') {
     execSync(`git add "${path.normalize(cliPath)}"`);
     execSync(`git add "${path.normalize(createPath)}"`);
     execSync('git commit --amend --no-edit');
-    execSync(`git tag -a -m "chore(sdk): Release version ${sdkVersion}" -f compiler@${sdkVersion}`);
+    execSync(`git tag -a -m "chore(sdk): Release version ${sdkVersion}" -f sdk@${sdkVersion}`);
 
 }
