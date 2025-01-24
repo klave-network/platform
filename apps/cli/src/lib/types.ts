@@ -12,6 +12,16 @@ export type CommandOptions = {
 };
 
 /**
+ * Options for 'create' command
+ */
+export type CreateOptions = {
+    name?: string;
+    template?: 'rust' | 'typescript';
+    noGit?: boolean;
+    noInstall?: boolean;
+};
+
+/**
  * Represents an object that is passed to `ejs` when rendering the template.
  */
 export type SubstitutionData = {
