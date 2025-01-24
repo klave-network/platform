@@ -3,9 +3,19 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'node:url';
 import path from 'path';
 
+// Resolve the directory of the current file
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
-const packageJson = JSON.parse(readFileSync(path.resolve(dirname, '../../package.json'), 'utf-8'));
+
+const isDev = process.env.NODE_ENV === 'development';
+
+// Resolve the path to the package.json file
+const packageJsonPath = isDev
+    ? path.resolve(dirname, '../../package.json')
+    : path.resolve(dirname, '../package.json');
+
+// Read the package.json file
+const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
 
 export const PACKAGE_VERSION = packageJson.version;
 
