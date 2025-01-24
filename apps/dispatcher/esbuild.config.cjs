@@ -1,5 +1,6 @@
 const git = require('git-rev-sync');
 const { sentryEsbuildPlugin } = require('@sentry/esbuild-plugin');
+const { nodeExternalsPlugin } = require('esbuild-node-externals');
 const { version } = require('./package.json');
 
 const klaveDispatcherSentryURL = process.env.KLAVE_DISPATCH_SENTRY_DSN ? new URL(process.env.KLAVE_DISPATCH_SENTRY_DSN) : null;
@@ -8,6 +9,7 @@ const klaveDispatcherSentryURL = process.env.KLAVE_DISPATCH_SENTRY_DSN ? new URL
 module.exports = {
     sourcemap: process.env.NODE_ENV === 'development' ? 'inline' : 'external',
     plugins: [
+        nodeExternalsPlugin(),
         // Put the Sentry esbuild plugin after all other plugins
         klaveDispatcherSentryURL ? sentryEsbuildPlugin({
             url: `${klaveDispatcherSentryURL.protocol}//${klaveDispatcherSentryURL.host}`,
@@ -17,6 +19,11 @@ module.exports = {
             release: `dispatcher@${JSON.stringify(version)}`
         }) : undefined
     ].filter(Boolean),
+    // Add extra external dependencies
+    external: [
+        '@sentry/node',
+        'winston-transport'
+    ],
     platform: 'node',
     loader: {
         // ensures .node binaries are copied to ./dist
@@ -25,6 +32,7 @@ module.exports = {
     outExtension: {
         '.js': '.js'
     },
+    bundle: true,
     define: {
         'process.env.NX_TASK_TARGET_PROJECT': JSON.stringify(process.env.NX_TASK_TARGET_PROJECT),
         'process.env.GIT_REPO_COMMIT': JSON.stringify(git.long('.')),

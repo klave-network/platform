@@ -1,14 +1,58 @@
 # Changelog
+
+## [0.4.3](https://github.com/klave-network/platform/compare/create@0.4.2...create@0.4.3) (2025-01-24)
+
+### ⚠ BREAKING CHANGES
+
+* Realigning version with NPM latest published package
+
+### Dependency Updates
+
+* `sdk` updated to version `0.4.2`
+
+### Bug Fixes
+
+* Downgrade `chalk` because of incompatibility with `@klave/sdk` ([35c4e7b](https://github.com/klave-network/platform/commit/35c4e7bd2d8cf8c7634221ad0887edcd158c3c9b))
+
+## [0.4.2](https://github.com/klave-network/platform/compare/create@0.4.1...create@0.4.2) (2025-01-23)
+
+### Dependency Updates
+
+* `sdk` updated to version `0.4.1`
+
+## [0.4.1](https://github.com/klave-network/platform/compare/create@0.4.0...create@0.4.1) (2024-12-09)
+
+### Miscellaneous Chores
+
+* Format outro message ([7dd39c0](https://github.com/klave-network/platform/commit/7dd39c0a94a346c34e181f063036d3058ac147fd))
+
+## [0.4.0](https://github.com/klave-network/platform/compare/create@0.3.20...create@0.4.0) (2024-12-09)
+
+### ⚠ BREAKING CHANGES
+
+* Moving to pure ESM repo
+
+### Bug Fixes
+
+* Package `git-rev-sync` relies on non-ESM features so we provide explicit location ([cee72ae](https://github.com/klave-network/platform/commit/cee72ae5cd5a2fe998c987864b060f039ddb939b))
+* **sdk:** Fix [@json](https://github.com/json) decorator casing ([1bfdb6b](https://github.com/klave-network/platform/commit/1bfdb6be8b084a824d7c9470e2ed26aae54a3d79))
+
+### Miscellaneous Chores
+
+* Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
+
 ## [0.3.20](https://github.com/klave-network/platform/compare/create@0.3.19...create@0.3.20) (2024-05-02)
 
 ### Dependency Updates
 
 * `sdk` updated to version `0.3.19`
+
 ## [0.3.19](https://github.com/klave-network/platform/compare/create@0.3.18...create@0.3.19) (2024-04-08)
 
 ### Dependency Updates
 
 * `sdk` updated to version `0.3.18`
+
 ## [0.3.18](https://github.com/klave-network/platform/compare/create@0.3.17...create@0.3.18) (2023-12-12)
 
 ### Dependency Updates
@@ -20,7 +64,6 @@
 * **create:** Ensure new app folder is renamed correctly ([24040ee](https://github.com/klave-network/platform/commit/24040eea5f6ce3ad7ffc374220110cb0e4df1bd2))
 
 ## [0.3.17](https://github.com/klave-network/platform/compare/create@0.3.16...create@0.3.17) (2023-12-11)
-
 
 ### Bug Fixes
 
@@ -41,6 +84,7 @@
 ### Dependency Updates
 
 * `klave-sdk` updated to version `0.1.0`
+
 ## [0.3.14](///compare/klave-create@0.3.13...klave-create@0.3.14) (2023-06-02)
 
 ### Dependency Updates
@@ -56,11 +100,13 @@
 ### Dependency Updates
 
 * `klave-sdk` updated to version `0.6.2`
+
 ## [0.3.12](///compare/klave-create@0.3.11...klave-create@0.3.12) (2023-05-30)
 
 ### Dependency Updates
 
 * `klave-sdk` updated to version `0.6.1`
+
 ## [0.3.11](///compare/klave-create@0.3.10...klave-create@0.3.11) (2023-05-30)
 
 ### Dependency Updates
@@ -76,11 +122,13 @@
 ### Dependency Updates
 
 * `klave-sdk` updated to version `0.5.0`
+
 ## [0.3.9](///compare/klave-create@0.3.8...klave-create@0.3.9) (2023-05-16)
 
 ### Dependency Updates
 
 * `klave-sdk` updated to version `0.4.6`
+
 ## [0.3.8](///compare/trustless-app-creator@0.3.7...trustless-app-creator@0.3.8) (2023-05-11)
 
 ### Dependency Updates

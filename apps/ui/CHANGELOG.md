@@ -1,4 +1,24 @@
 # Changelog
+## [1.1.0](https://github.com/klave-network/platform/compare/ui@1.0.1...ui@1.1.0) (2025-01-23)
+
+### Dependency Updates
+
+* `constants` updated to version `1.0.1`
+* `db` updated to version `1.0.1`
+* `api` updated to version `1.0.1`
+
+### Features
+
+* **api,ui:** Adding support for setting query spending limits ([928392c](https://github.com/klave-network/platform/commit/928392c28f9d9db92482360befac7db9c6231745))
+* **ui,hubber,providers:** Filter node name through ([620d41b](https://github.com/klave-network/platform/commit/620d41b14324e777bf40fe275decbf890458954f))
+
+
+### Bug Fixes
+
+* **ui:** Correct impossible nesting ([ae2909f](https://github.com/klave-network/platform/commit/ae2909f0699a09e4f687e49255fd86f812486de3))
+* **ui:** Explicitly set spinner heights ([27a65bf](https://github.com/klave-network/platform/commit/27a65bfc8e2a966f064c0a5ffa961f31fab6fe97))
+* **ui:** Header new logo dimension ([06b8737](https://github.com/klave-network/platform/commit/06b8737b64e6883dc3da08cbe44fe40231ee6d75))
+
 ## [1.0.1](https://github.com/klave-network/platform/compare/ui@1.0.0...ui@1.0.1) (2024-10-04)
 
 ## [1.0.0](https://github.com/klave-network/platform/compare/ui@0.13.0...ui@1.0.0) (2024-10-04)

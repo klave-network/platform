@@ -28,7 +28,7 @@ import { usersRouter } from './routes';
 import { logger } from '@klave/providers';
 import { webLinkerMiddlware } from './middleware/webLinker';
 import { permissiblePeers } from '@klave/constants';
-import type Websocket from 'ws';
+import type { WebSocket, Server } from 'ws';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -44,6 +44,8 @@ const { app, getWss } = ews(eapp, undefined, {
 
 export const start = async (port: number) => {
 
+    const __hostname = process.env['HOSTNAME'] ?? 'unknown';
+
     app.use(sentryRequestMiddleware);
     app.use(sentryTracingMiddleware);
     app.use(morganLoggerMiddleware);
@@ -57,6 +59,10 @@ export const start = async (port: number) => {
     // app.use(i18nextMiddleware);
     app.use(multer().none());
     app.disable('X-Powered-By');
+    app.use((__unusedReq, res, next) => {
+        res.setHeader('X-Klave-API-Node', __hostname);
+        next();
+    });
     app.use(helmet({
         // crossOriginEmbedderPolicy: false,
         // crossOriginResourcePolicy: false,
@@ -101,10 +107,11 @@ export const start = async (port: number) => {
     // Plug Probot for GitHub Apps
     app.use('/hook', async (req, res, next) => {
         if (req.headers['x-github-event'])
-            return probotMiddleware(req, res, next);
-        if (req.headers['stripe-signature'])
-            return stripeMiddlware(req, res, next);
-        next();
+            probotMiddleware(req, res, next);
+        else if (req.headers['stripe-signature'])
+            stripeMiddlware(req, res, next);
+        else
+            next();
     });
 
     // const {
@@ -142,7 +149,8 @@ export const start = async (port: number) => {
     }
 
     app.get('/ping', (__unusedReq, res) => {
-        res.json({ pong: true });
+        res.setHeader('X-Klave-API-Status', 'ready');
+        res.json({ pong: true, node: __hostname });
     });
 
     app.use(session(sessionOptions));
@@ -194,7 +202,7 @@ export const start = async (port: number) => {
     // Contextualise user session, devices, tags, tokens
     app.use(webLinkerMiddlware);
 
-    app.ws('/bridge', (ws: Websocket, { session, sessionID, sessionStore }) => {
+    app.ws('/bridge', (ws: WebSocket, { session, sessionID, sessionStore }) => {
         type WsWithSession = typeof ws & { sessionID: string };
         type SessionWithLocator = typeof session & { locator?: string, localId?: string };
         (ws as WsWithSession).sessionID = sessionID;
@@ -231,7 +239,7 @@ export const start = async (port: number) => {
                         return;
                     (rsession as SessionWithLocator).localId = localId;
                     sessionStore.set(sid, rsession, () => {
-                        const browserTarget = Array.from((getWss() as Websocket.Server).clients.values()).find(w => (w as WsWithSession).sessionID === sid);
+                        const browserTarget = Array.from((getWss() as Server).clients.values()).find(w => (w as WsWithSession).sessionID === sid);
                         browserTarget?.send('confirmed');
                     });
                 });

@@ -183,7 +183,8 @@ export class HttpRequest {
 }
 @json
 export class HttpResponse {
-    status_code: i32 = 200;
+    @alias("status_code")
+    statusCode: i32 = 200;
     headers: string[][] = [];
     body: string = '';
 }

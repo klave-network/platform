@@ -4,7 +4,7 @@
 # Tip: Modify "docker-build" options in project.json to change docker build args.
 #
 # Run the container with `docker run -p 3000:3000 -t dispatcher`.
-FROM docker.io/node:20-alpine
+FROM docker.io/node:22-alpine
 
 ENV HOST=0.0.0.0
 ENV PORT=3000
@@ -16,5 +16,8 @@ RUN addgroup --system dispatcher && \
 
 COPY dist/apps/dispatcher dispatcher
 RUN chown -R dispatcher:dispatcher .
+RUN cd dispatcher && yarn install
+
+EXPOSE 3000
 
 CMD [ "node", "dispatcher" ]

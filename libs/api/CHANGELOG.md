@@ -1,4 +1,22 @@
 # Changelog
+## [1.1.1](https://github.com/klave-network/platform/compare/api@1.1.0...api@1.1.1) (2025-01-23)
+
+### Dependency Updates
+
+* `constants` updated to version `1.1.0`
+* `providers` updated to version `1.1.0`
+## [1.1.0](https://github.com/klave-network/platform/compare/api@1.0.0...api@1.1.0) (2025-01-23)
+
+### Dependency Updates
+
+* `constants` updated to version `1.0.0`
+* `db` updated to version `1.0.0`
+* `providers` updated to version `1.0.0`
+
+### Features
+
+* **api,ui:** Adding support for setting query spending limits ([928392c](https://github.com/klave-network/platform/commit/928392c28f9d9db92482360befac7db9c6231745))
+
 ## [1.0.0](https://github.com/klave-network/platform/compare/api@0.13.0...api@1.0.0) (2024-10-04)
 
 ### Dependency Updates

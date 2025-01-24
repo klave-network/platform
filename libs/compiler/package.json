@@ -1,6 +1,6 @@
 {
     "name": "@klave/compiler",
-    "version": "0.5.0",
+    "version": "1.0.3",
     "private": false,
     "repository": {
         "type": "git",
@@ -14,10 +14,10 @@
     },
     "type": "module",
     "dependencies": {
-        "@klave/as-json": "^0.9.23",
-        "assemblyscript": "^0.27.30",
-        "serialize-error": "11.0.3",
-        "typescript": "^5.6.3",
-        "uuid": "^10.0.0"
+        "@klave/as-json": "^1.0.0-alpha.2",
+        "assemblyscript": "^0.27.32",
+        "serialize-error": "12.0.0",
+        "typescript": "^5.7.3",
+        "uuid": "^11.0.5"
     }
 }

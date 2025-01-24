@@ -135,7 +135,7 @@ export const Index: FC = () => {
                             It will only take a moment...
                             <br />
                             <br />
-                            <UilSpinner className='inline-block animate-spin' />
+                            <UilSpinner className='inline-block animate-spin h-5' />
                         </div>
                     </div>
                 </div>

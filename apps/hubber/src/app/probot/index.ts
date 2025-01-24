@@ -1,8 +1,29 @@
 import { trace } from '@sentry/core';
-import { InstallationAccountType, prisma } from '@klave/db';
+import { prisma, InstallationAccountType } from '@klave/db';
 import type { Probot } from 'probot';
+import type { components as OctokitComponents } from '@octokit/openapi-webhooks-types';
 import { logger } from '@klave/providers';
 import { deployToSubstrate } from '@klave/api';
+
+function isUserAccount(account: unknown): account is OctokitComponents['schemas']['simple-user'] {
+    if (!account || typeof account !== 'object')
+        return false;
+    return Object.hasOwn(account, 'email');
+}
+
+function isEnterpriseAccount(account: unknown): account is OctokitComponents['schemas']['enterprise'] {
+    if (!account || typeof account !== 'object')
+        return false;
+    return !Object.hasOwn(account, 'email');
+}
+
+const accountName = (account: unknown): string => {
+    return isUserAccount(account) ? account.login : isEnterpriseAccount(account) ? account.name : '';
+};
+
+const accountType = (account: unknown): InstallationAccountType => {
+    return isUserAccount(account) ? 'user' : isEnterpriseAccount(account) ? 'organization' : 'unknown';
+};
 
 const probotApp = (app: Probot) => {
     app.on([
@@ -45,34 +66,44 @@ const probotApp = (app: Probot) => {
                         payload: context.payload as object
                     }
                 });
+
                 logger.info(`New record of hook '${context.name}' ${hook.id}`);
 
                 if (context.name === 'installation') {
                     const { payload } = context;
+                    const { account } = payload.installation;
+
+                    if (!account) {
+                        return;
+                    }
+
                     if (payload.action === 'created') {
                         // TODO: Move this to the TRPC router
                         logger.info(`Registering new GithubApp installation ${payload.installation.id}`);
-                        await prisma.installation.upsert({
-                            where: {
-                                source_remoteId_account: {
+
+                        if (account.name)
+
+                            await prisma.installation.upsert({
+                                where: {
+                                    source_remoteId_account: {
+                                        source: 'github',
+                                        remoteId: `${payload.installation.id}`,
+                                        account: account.name ?? ''
+                                    }
+                                },
+                                create: {
                                     source: 'github',
                                     remoteId: `${payload.installation.id}`,
-                                    account: payload.installation.account.login
+                                    account: accountName(account),
+                                    accountType: accountType(account),
+                                    hookPayload: payload as object
+                                },
+                                update: {
+                                    account: accountName(account),
+                                    accountType: accountType(account),
+                                    hookPayload: payload as object
                                 }
-                            },
-                            create: {
-                                source: 'github',
-                                remoteId: `${payload.installation.id}`,
-                                account: payload.installation.account.login,
-                                accountType: payload.installation.account.type.toLowerCase() as InstallationAccountType,
-                                hookPayload: payload as object
-                            },
-                            update: {
-                                account: payload.installation.account.login,
-                                accountType: payload.installation.account.type.toLowerCase() as InstallationAccountType,
-                                hookPayload: payload as object
-                            }
-                        });
+                            });
 
                         if (payload.repositories && payload.repositories.length > 0)
                             for (const repo of payload.repositories) {
@@ -82,7 +113,7 @@ const probotApp = (app: Probot) => {
                                         remoteId: `${repo.id}`,
                                         installationRemoteId: `${payload.installation.id}`,
                                         name: repo.name,
-                                        owner: payload.installation.account.login,
+                                        owner: accountName(account),
                                         fullName: repo.full_name,
                                         private: repo.private,
                                         installationPayload: repo
@@ -96,7 +127,7 @@ const probotApp = (app: Probot) => {
                                 source_remoteId_account: {
                                     source: 'github',
                                     remoteId: `${payload.installation.id}`,
-                                    account: payload.installation.account.login
+                                    account: accountName(account)
                                 }
                             }
                         });
@@ -114,7 +145,14 @@ const probotApp = (app: Probot) => {
                 }
 
                 if (context.name === 'installation_repositories') {
+
                     const { payload } = context;
+                    const { account } = payload.installation;
+
+                    if (!account) {
+                        return;
+                    }
+
                     if (payload.action === 'added') {
                         // TODO: Move this to the TRPC router
                         if (payload.repositories_added && payload.repositories_added.length > 0)
@@ -132,14 +170,14 @@ const probotApp = (app: Probot) => {
                                         remoteId: `${repo.id}`,
                                         installationRemoteId: `${payload.installation.id}`,
                                         name: repo.name,
-                                        owner: payload.installation.account.login,
+                                        owner: accountName(account),
                                         fullName: repo.full_name,
                                         private: repo.private,
                                         installationPayload: repo
                                     },
                                     update: {
                                         name: repo.name,
-                                        owner: payload.installation.account.login,
+                                        owner: accountName(account),
                                         fullName: repo.full_name,
                                         private: repo.private,
                                         installationPayload: repo
@@ -148,7 +186,7 @@ const probotApp = (app: Probot) => {
                                 await prisma.deployableRepo.updateMany({
                                     where: {
                                         fullName: repo.full_name,
-                                        owner: payload.installation.account.login
+                                        owner: accountName(account)
                                     },
                                     data: {
                                         installationRemoteId: `${payload.installation.id}`
@@ -172,7 +210,7 @@ const probotApp = (app: Probot) => {
                                     fullName: {
                                         in: payload.repositories_removed.map(r => r.full_name)
                                     },
-                                    owner: payload.installation.account.login
+                                    owner: accountName(account)
                                 },
                                 data: {
                                     installationRemoteId: ''
@@ -182,49 +220,62 @@ const probotApp = (app: Probot) => {
                     }
                 }
 
-                if (context.name === 'push')
+                if (context.name === 'push') {
+
+                    const { payload } = context;
+                    const { sender, repository } = payload;
+                    const { owner } = repository;
+
+                    if (!sender || !owner) {
+                        return;
+                    }
+
                     deployToSubstrate({
                         octokit: context.octokit,
                         class: context.name,
                         type: context.name,
                         forceDeploy: false,
                         repo: {
-                            url: context.payload.repository.html_url,
-                            owner: context.payload.repository.owner.login,
-                            name: context.payload.repository.name
+                            url: payload.repository.html_url,
+                            owner: owner.login,
+                            name: payload.repository.name
                         },
                         commit: {
-                            url: context.payload.repository.commits_url,
-                            ref: context.payload.ref,
-                            before: context.payload.before,
-                            after: context.payload.after
+                            url: payload.repository.commits_url,
+                            ref: payload.ref,
+                            before: payload.before,
+                            after: payload.after
                         },
                         headCommit: null,
                         pusher: {
-                            login: context.payload.sender.login,
-                            avatarUrl: context.payload.sender.avatar_url,
-                            htmlUrl: context.payload.sender.html_url
+                            login: sender.login,
+                            avatarUrl: sender.avatar_url,
+                            htmlUrl: sender.html_url
                         }
                     })
                         .catch(() => { return; });
+                }
 
                 if (context.name === 'repository') {
+
+                    const { payload } = context;
+
                     await prisma.repo.updateMany({
                         where: {
                             source: 'github',
-                            name: context.payload.repository.name,
-                            owner: context.payload.repository.owner.login
+                            name: payload.repository.name,
+                            owner: payload.repository.owner.login
                         },
                         data: {
-                            defaultBranch: context.payload.repository.default_branch
+                            defaultBranch: payload.repository.default_branch
                         }
                     });
                     await prisma.deployableRepo.updateMany({
                         where: {
-                            fullName: context.payload.repository.full_name
+                            fullName: payload.repository.full_name
                         },
                         data: {
-                            defaultBranch: context.payload.repository.default_branch
+                            defaultBranch: payload.repository.default_branch
                         }
                     });
                 }

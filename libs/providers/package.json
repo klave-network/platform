@@ -1,16 +1,18 @@
 {
     "name": "@klave/providers",
-    "version": "1.0.0",
+    "version": "1.1.1",
     "type": "module",
     "dependencies": {
-        "@klave/constants": "1.0.0",
-        "@klave/db": "1.0.0",
-        "@swc/helpers": "0.5.13",
-    "ws": "8.18.0",
-    "winston": "3.15.0",
-    "probot": "13.3.8",
-    "strip-ansi": "7.1.0",
-    "@sentry/node": "7.119.2",
-    "winston-transport": "4.8.0"
+        "@secretarium/connector": "0.17.0",
+        "@secretarium/instrumentation": "0.5.0",
+        "@sentry/profiling-node": "7.120.3",
+        "@sentry/core": "7.120.3",
+        "@sentry/node": "7.120.3",
+        "@swc/helpers": "0.5.15",
+        "probot": "14.0.0-full-esm.1",
+        "strip-ansi": "7.1.0",
+        "winston": "3.17.0",
+        "winston-transport": "4.9.0",
+        "ws": "8.18.0"
     }
 }

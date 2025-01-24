@@ -164,7 +164,7 @@ export const OrganisationMembers: FC = () => {
             We are fetching data about your organisation.<br />
             It will only take a moment...<br />
             <br />
-            <UilSpinner className='inline-block animate-spin' />
+            <UilSpinner className='inline-block animate-spin h-5' />
         </>;
 
     return <div className="flex flex-col w-full justify-start mb-7">
@@ -174,15 +174,17 @@ export const OrganisationMembers: FC = () => {
         </div>
         <table className='w-full col-span-3'>
             <thead className='bg-slate-100 border-slate-100 border rounded-sm '>
-                <th className='text-left p-3'>
-                    Name
-                </th>
-                <th className='text-left p-3'>
-                    Permission
-                </th>
-                <th className='text-right p-3'>
-                    Action
-                </th>
+                <tr>
+                    <th className='text-left p-3'>
+                        Name
+                    </th>
+                    <th className='text-left p-3'>
+                        Permission
+                    </th>
+                    <th className='text-right p-3'>
+                        Action
+                    </th>
+                </tr>
             </thead>
             <tbody>
                 {organisation.permissionGrants?.map((grant, i) =>

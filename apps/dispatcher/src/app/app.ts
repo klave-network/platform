@@ -1,6 +1,7 @@
 import { FastifyInstance, RouteHandler } from 'fastify';
 import type { WebSocket } from 'ws';
 import { v4 as uuid } from 'uuid';
+import { collection, ConsumptionReport, KreditConsumptionReportSchema } from '../utils/mongo';
 
 const definitions = process.env.KLAVE_DISPATCH_ENDPOINTS?.split(',') ?? [];
 const endpoints = definitions.map(def => def.split('#') as [string, string]).filter(def => def.length === 2);
@@ -11,12 +12,17 @@ export interface AppOptions { }
 
 export async function app(fastify: FastifyInstance) {
 
+    const __hostname = process.env['HOSTNAME'] ?? 'unknown';
+
     fastify.log.info(endpoints, 'Preparing for enpoints');
+    const secrets = process.env.KLAVE_DISPATCH_SECRETS?.split(',') ?? [];
 
     fastify.get('/dev', { websocket: true }, (connection) => {
         connection.on('message', (data) => {
-            if (data.toString() === process.env.KLAVE_DISPATCH_SECRET) {
+            if (secrets.includes(data.toString())) {
                 const id = uuid();
+                (connection as any).id = id;
+                (connection as any).secret = data.toString();
                 connection.on('close', () => {
                     connectionPool.delete(id);
                 });
@@ -69,7 +75,11 @@ export async function app(fastify: FastifyInstance) {
             }));
         });
 
+        const familyMap: Record<string, true> = {};
         connectionPool.forEach((connection, id) => {
+            if (familyMap[(connection as any).secret])
+                return;
+            familyMap[(connection as any).secret] = true;
             responseRegister.push(new Promise(resolve => {
                 fastify.log.debug(undefined, `Dispatching to socket ${id}`);
                 try {
@@ -97,6 +107,7 @@ export async function app(fastify: FastifyInstance) {
 
         const statusValues = Object.values(statuses);
 
+        res.headers({ 'X-Klave-API-Node': __hostname });
         await res.status(!statusValues.length ? 200 : statusValues.find(status => status === 200) ? 207 : 500)
             .send({ ok: true, statuses });
 
@@ -105,19 +116,44 @@ export async function app(fastify: FastifyInstance) {
     fastify.all('/hook', hookMiddleware);
     fastify.all('/vcs/hook', hookMiddleware);
 
-    fastify.all('/ingest/usage', async (__unusedReq, res) => {
-        // TODO: Implement kredit storage
-        await res.status(200).send({ ok: true });
+    fastify.all('/ingest/usage', async (req, res) => {
+
+        res.headers({ 'X-Klave-API-Node': __hostname });
+
+        // We assume that the request is not too long
+        // We assume that it is not a multipart request either
+        const rawContent = Uint8Array.from(req.raw.read() ?? []);
+
+        let data: ConsumptionReport;
+        try {
+            const content = new TextDecoder('utf-8').decode(rawContent);
+            if (typeof content !== 'string')
+                return await res.status(400).send({ ok: false });
+            data = KreditConsumptionReportSchema.parse(content);
+        } catch (__unusedError) {
+            return await res.status(400).send({ ok: false });
+        }
+        if (!collection)
+            return await res.status(202).send({ ok: true });
+        await collection?.insertOne({
+            type: 'usage',
+            timestamp: new Date().toISOString(),
+            data
+        });
+        return await res.status(201).send({ ok: true });
     });
 
     fastify.all('/version', async (__unusedReq, res) => {
-        await res.status(404).send({
+
+        res.headers({ 'X-Klave-API-Node': __hostname });
+        await res.status(202).send({
             version: {
                 name: process.env.NX_TASK_TARGET_PROJECT,
                 commit: process.env.GIT_REPO_COMMIT?.substring(0, 8),
                 branch: process.env.GIT_REPO_BRANCH,
                 version: process.env.GIT_REPO_VERSION
-            }
+            },
+            node: __hostname
         });
     });
 }

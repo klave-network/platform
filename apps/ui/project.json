@@ -49,20 +49,14 @@
             "executor": "@nx/vite:preview-server",
             "defaultConfiguration": "development",
             "options": {
-                "buildTarget": "ui:build",
+                "buildTarget": "ui:build:development",
                 "port": 4220
             },
             "configurations": {
-                "development": {
-                    "buildTarget": "ui:build:development"
-                },
                 "production": {
                     "buildTarget": "ui:build:production"
                 }
-            },
-            "dependsOn": [
-                "build"
-            ]
+            }
         },
         "lint": {
             "executor": "@nx/eslint:lint",

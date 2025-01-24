@@ -1,186 +1,201 @@
-import spawnAsync from '@expo/spawn-async';
-import chalk from 'chalk';
 import { Command } from 'commander';
-import fs from 'fs-extra';
+import chalk from 'chalk';
+import spawnAsync from '@expo/spawn-async';
+import * as p from '@clack/prompts';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import prompts from 'prompts';
+import fs from 'fs-extra';
 import { replaceInFile } from 'replace-in-file';
-import { getSlugPrompt, getSubstitutionDataPrompts } from './lib/prompts';
-import {
-    PackageManagerName,
-    resolvePackageManager
-} from './lib/resolvePackageManager';
-import type { CommandOptions, SubstitutionData } from './lib/types';
-import { newStep } from './lib/utils';
-import packageJson from '../package.json';
+import { findGitHubEmail, findGitHubProfileUrl, findMyName, guessRepoUrl, isEmpty, isValidName, createTerminalLink } from '~/lib/utils';
+import { resolvePackageManager } from '~/lib/resolve-package-manager';
 import latestVersion from 'latest-version';
-
-const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+import { DOCS_URL, KLAVE_PLATFORM_URL, DISCORD_URL } from '~/lib/constants';
+import { SubstitutionData } from '~/lib/types';
+import sanitize from 'sanitize-filename';
+import validateNpmPackage from 'validate-npm-package-name';
+import packageJson from '../package.json';
+import { KLAVE_CYAN_BG, KLAVE_LIGHT_BLUE } from '~/lib/constants';
 
 // `yarn run` may change the current working dir, then we should use `INIT_CWD` env.
 const CWD = process.env.INIT_CWD || process.cwd();
 
-// Docs URL
-const DOCS_URL = 'https://klave.com/docs';
+const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
-/**
- * The main function of the command.
- *
- * @param target Path to the directory where to create the module. Defaults to current working dir.
- * @param command An object from `commander`.
- */
-async function main(target: string | undefined, options: CommandOptions) {
-    const slug = await askForPackageSlugAsync(target);
-    const targetDir = path.join(CWD, target || slug);
+async function main() {
 
-    await fs.ensureDir(targetDir);
-    await confirmTargetDirAsync(targetDir);
+    console.log('\n');
+    p.intro(KLAVE_CYAN_BG(chalk.bold.black(' Klave - The honest-by-design platform ')));
+    p.note('Welcome to Klave. Let\'s create your honest application!');
 
-    options.target = targetDir;
+    const appInfo = await p.group(
+        {
+            // Ask for the directory to create the project in
+            dir: async () => p.text({
+                message: 'Where should we create your project?',
+                initialValue: './my-honest-app',
+                validate(value) {
+                    if (!value)
+                        return 'Please enter a path.';
 
-    const data = await askForSubstitutionDataAsync(slug);
-    // await askForSubstitutionDataAsync(slug);
+                    if (value[0] !== '.')
+                        return 'Please enter a relative path.';
 
-    // Make one line break between prompts and progress logs
-    console.log();
+                    if (!isEmpty(value))
+                        return 'Directory is not empty!';
 
-    const packageManager = await resolvePackageManager();
-    const packagePath = options.source
-        ? path.join(CWD, options.source)
-        // : await downloadPackageAsync(targetDir);
-        : await createTemplateAsync(targetDir, data);
+                    let normalizedSlug;
+                    if (value === '.' || value === './') {
+                        const parts = process.cwd().split(path.sep);
+                        normalizedSlug = parts[parts.length - 1];
+                    } else if (value.startsWith('./') || value.startsWith('../')) {
+                        const parts = value.split('/');
+                        normalizedSlug = parts[parts.length - 1];
+                    }
 
-    await newStep('Installing dependencies', async (step) => {
-        try {
-            await spawnAsync('yarn', [], {
-                cwd: targetDir,
-                stdio: 'ignore'
-            });
-            step.succeed('Installing dependencies');
-        } catch (e) {
-            step.fail(e?.toString());
-        }
-    });
+                    if (!isValidName(normalizedSlug ?? ''))
+                        return 'The name can only contain ASCII letters, digits, and the characters ., -, and _';
 
-    await newStep('Creating an empty Git repository', async (step) => {
-        try {
-            await spawnAsync('git', ['init'], {
-                cwd: targetDir,
-                stdio: 'ignore'
-            });
-            step.succeed('Created an empty Git repository');
-        } catch (e) {
-            step.fail(e?.toString());
-        }
-    });
-
-    if (!options.source) {
-        // Files in the downloaded tarball are wrapped in `package` dir.
-        // We should remove it after all.
-        await fs.remove(packagePath);
-    }
-    if (!options.withReadme) {
-        await fs.remove(path.join(targetDir, 'README.md'));
-    }
-    if (!options.withChangelog) {
-        await fs.remove(path.join(targetDir, 'CHANGELOG.md'));
-    }
-
-    console.log();
-    console.log('✅ Successfully created a Klave application');
-
-    options.example = true;
-    printFurtherInstructions(targetDir, packageManager, options.example);
-}
-
-/**
- * Create template files.
- */
-async function createTemplateAsync(targetDir: string, data: SubstitutionData): Promise<string> {
-    return await newStep('Creating template files', async (step) => {
-
-        const sourceDir = path.join(dirname, '..', 'template', '.');
-        await fs.copy(sourceDir, targetDir, {
-            filter: () => true,
-            overwrite: false,
-            errorOnExist: true
-        });
-
-        const gitignoreFile = path.join(targetDir, 'gitignore');
-        if (fs.existsSync(gitignoreFile)) {
-            fs.renameSync(gitignoreFile, path.join(targetDir, '.gitignore'));
-        }
-
-        await replaceInFile({
-            files: path.join(targetDir, 'klave.json'),
-            from: [/{{KLAVE_APP_SLUG}}/g, /{{KLAVE_APP_DESCRIPTION}}/g, /{{KLAVE_APP_VERSION}}/g],
-            to: [data.project.slug, data.project.description, data.project.version],
-            disableGlobs: true
-        });
-        await replaceInFile({
-            files: path.join(targetDir, 'package.json'),
-            from: [/{{KLAVE_APP_SLUG}}/g, /{{KLAVE_APP_DESCRIPTION}}/g, /{{KLAVE_APP_VERSION}}/g, /{{KLAVE_APP_AUTHOR}}/g, /{{KLAVE_APP_LICENSE}}/g, /{{KLAVE_APP_REPO}}/g],
-            to: [data.project.slug, data.project.description, data.project.version, data.author, data.license, data.repo],
-            disableGlobs: true
-        });
-
-        const latestSDK = await latestVersion('@klave/sdk');
-        await replaceInFile({
-            files: path.join(targetDir, 'package.json'),
-            from: [/{{KLAVE_SDK_CURRENT_VERSION}}/g],
-            to: [latestSDK ?? '*'],
-            disableGlobs: true
-        });
-
-        await fs.rename(path.join(targetDir, 'apps', 'hello_world'), path.join(targetDir, 'apps', data.project.slug));
-
-        step.succeed('Creating template files');
-
-        return path.join(targetDir, 'temp_dl_folder');
-    });
-}
-
-/**
- * Asks the user for the package slug (npm package name).
- */
-async function askForPackageSlugAsync(customTargetPath?: string): Promise<string> {
-    const { slug } = await prompts(getSlugPrompt(customTargetPath), {
-        onCancel: () => process.exit(0)
-    });
-    return slug;
-}
-
-/**
- * Asks the user for some data necessary to render the template.
- * Some values may already be provided by command options, the prompt is skipped in that case.
- */
-async function askForSubstitutionDataAsync(slug: string): Promise<SubstitutionData> {
-    const promptQueries = await getSubstitutionDataPrompts(slug);
-
-    // Stop the process when the user cancels/exits the prompt.
-    const onCancel = () => {
-        process.exit(0);
-    };
-
-    const {
-        description,
-        authorName,
-        authorEmail,
-        authorUrl,
-        repo
-    } = await prompts(promptQueries, { onCancel });
-
-    return {
-        project: {
-            slug,
-            version: '0.0.0',
-            description
+                    return;
+                }
+            }),
+            // Ask for the name of the project
+            name: async () => p.text({
+                message: 'What is the name of your honest application?',
+                initialValue: 'hello-world',
+                validate(value) {
+                    if (value.length === 0)
+                        return 'Project name is required';
+                    if (!validateNpmPackage(sanitize(value)).validForNewPackages)
+                        return 'The name can only contain ASCII letters, digits, and the characters ., -, and _';
+                    return;
+                }
+            }),
+            // Ask for the description of the project
+            description: async () => p.text({
+                message: 'How would you describe your honest application?',
+                initialValue: 'This is an honest application for the Klave Network',
+                validate(value) {
+                    if (value.length === 0)
+                        return 'Project description is required.';
+                    return;
+                }
+            }),
+            // Ask for the author name
+            authorName: async () => p.text({
+                message: 'What is the name of the author?',
+                initialValue: await findMyName(),
+                validate(value) {
+                    if (value.length === 0)
+                        return 'Author name is required.';
+                    return;
+                }
+            }),
+            // Ask for the author email
+            authorEmail: async () => p.text({
+                message: 'What is the email address of the author?',
+                initialValue: await findGitHubEmail(),
+                validate(value) {
+                    if (value.length === 0)
+                        return 'Author email is required.';
+                    return;
+                }
+            }),
+            // Ask for the author URL
+            authorUrl: async ({ results }) => p.text({
+                message: 'What is the URL to the author\'s GitHub profile?',
+                initialValue: await findGitHubProfileUrl(results.authorEmail as string),
+                validate(value) {
+                    if (value.length === 0)
+                        return 'Author URL is required.';
+                    return;
+                }
+            }),
+            // Ask for the repository URL
+            repo: async ({ results }) => p.text({
+                message: 'What is the URL for the repository?',
+                initialValue: await guessRepoUrl(results.authorUrl as string, results.dir as string),
+                validate(value) {
+                    if (value.length === 0)
+                        return 'Repository URL is required.';
+                    return;
+                }
+            }),
+            // Ask if the user wants to install dependencies
+            installDeps: async () => p.confirm({
+                message: 'Install dependencies?'
+            })
         },
-        author: `${authorName} <${authorEmail}> (${authorUrl})`,
+        {
+            // On Cancel callback that wraps the group
+            // So if the user cancels one of the prompts in the group this function will be called
+            onCancel: () => {
+                p.cancel('Operation cancelled.');
+                process.exit(0);
+            }
+        }
+    );
+
+    const { installDeps, dir, name, description, authorName, authorEmail, authorUrl, repo } = appInfo;
+
+    const targetDir = path.join(CWD, dir);
+    const packageManager = resolvePackageManager();
+
+    await fs.ensureDir(dir);
+    await confirmTargetDirAsync(dir);
+
+    // Create the project template
+    await createTemplateAsync(targetDir, {
+        project: {
+            slug: name as string,
+            version: '0.0.1',
+            description: description as string
+        },
+        author: `${authorName as string} <${authorEmail as string}> (${authorUrl as string})`,
         license: 'MIT',
-        repo
-    };
+        repo: repo as string
+    });
+
+    // Create the Git repository
+    await createGitRepoAsync(targetDir);
+
+    if (installDeps) {
+        const s = p.spinner();
+        s.start(`Installing via ${packageManager}`);
+
+        let args = ['install', '--legacy-peer-deps'];
+
+        if (packageManager === 'yarn') {
+            args = [];
+        } else if (packageManager === 'pnpm') {
+            args = [];
+        }
+
+        await spawnAsync(packageManager, args, {
+            cwd: targetDir,
+            stdio: 'ignore'
+        });
+
+        s.stop(`Installed via ${packageManager}`);
+    }
+
+    const buildCmd = packageManager === 'yarn' ? 'build' : 'run build';
+    const installLegacyDeps = packageManager === 'npm' ? '--legacy-peer-deps' : '';
+    const nextSteps = `
+Build your application:
+
+    - Enter your project directory using ${KLAVE_LIGHT_BLUE(chalk.bold(`cd ${dir}`))}
+    ${installDeps ? 'EMPTY_LINE' : `- To install dependencies, run ${KLAVE_LIGHT_BLUE(chalk.bold(`${packageManager} install ${installLegacyDeps}`))}`}
+    - To build your application, run ${KLAVE_LIGHT_BLUE(chalk.bold(`${packageManager} ${buildCmd}`))}
+    - Log in to ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('Klave', KLAVE_PLATFORM_URL)))} to deploy your application
+
+Documentation
+
+    - Learn more about Klave ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', DOCS_URL)))}
+    `.replace(/EMPTY_LINE\n?/g, ''); // Remove unnecessary blank lines;
+
+    p.note(nextSteps, KLAVE_CYAN_BG(chalk.bold.black(' Next steps ')));
+
+    p.outro(`Stuck? Reach out to us on ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('Discord', DISCORD_URL)))}`);
 }
 
 /**
@@ -192,47 +207,74 @@ async function confirmTargetDirAsync(targetDir: string): Promise<void> {
     if (files.length === 0) {
         return;
     }
-    const { shouldContinue } = await prompts(
-        {
-            type: 'confirm',
-            name: 'shouldContinue',
-            message: `The target directory ${chalk.magenta(
-                targetDir
-            )} is not empty, do you want to continue anyway?`,
-            initial: true
-        },
-        {
-            onCancel: () => false
-        }
-    );
-    if (!shouldContinue) {
-        process.exit(0);
-    }
+    const shouldContinue = await p.confirm({
+        message: `The target directory ${chalk.magenta(
+            targetDir
+        )} is not empty, do you want to continue anyway?`
+    });
+
+    if (p.isCancel(shouldContinue)) return process.exit();
 }
 
 /**
- * Prints how the user can follow up once the script finishes creating the module.
+ * Create an empty Git repository.
  */
-function printFurtherInstructions(
-    targetDir: string,
-    packageManager: PackageManagerName,
-    includesExample: boolean
-) {
-    if (includesExample) {
-        const commands = [
-            `cd ${path.relative(CWD, targetDir)}`,
-            `${packageManager} install`,
-            'code .'
-        ];
+async function createGitRepoAsync(targetDir: string) {
+    const s = p.spinner();
+    s.start('Creating an empty Git repository');
 
-        console.log();
-        console.log(
-            'To start developing your honest application, navigate to the directory and open your favorite editor'
-        );
-        commands.forEach((command) => console.log(chalk.gray('>'), chalk.bold(command)));
-        console.log();
+    await spawnAsync('git', ['init'], {
+        cwd: targetDir,
+        stdio: 'ignore'
+    });
+
+    s.stop('Created an empty Git repository');
+}
+
+/**
+ * Create template files.
+ */
+async function createTemplateAsync(targetDir: string, data: SubstitutionData) {
+    const s = p.spinner();
+    s.start('Creating template files');
+
+    const sourceDir = path.join(dirname, '..', 'template', '.');
+    await fs.copy(sourceDir, targetDir, {
+        filter: () => true,
+        overwrite: false,
+        errorOnExist: true
+    });
+
+    const gitignoreFile = path.join(targetDir, 'gitignore');
+    if (fs.existsSync(gitignoreFile)) {
+        fs.renameSync(gitignoreFile, path.join(targetDir, '.gitignore'));
     }
-    console.log(`Visit ${chalk.blue.bold(DOCS_URL)} for the documentation on Klave`);
+
+    await replaceInFile({
+        files: path.join(targetDir, 'klave.json'),
+        from: [/{{KLAVE_APP_SLUG}}/g, /{{KLAVE_APP_DESCRIPTION}}/g, /{{KLAVE_APP_VERSION}}/g],
+        to: [data.project.slug, data.project.description, data.project.version],
+        disableGlobs: true
+    });
+
+    await replaceInFile({
+        files: path.join(targetDir, 'package.json'),
+        from: [/{{KLAVE_APP_SLUG}}/g, /{{KLAVE_APP_DESCRIPTION}}/g, /{{KLAVE_APP_VERSION}}/g, /{{KLAVE_APP_AUTHOR}}/g, /{{KLAVE_APP_LICENSE}}/g, /{{KLAVE_APP_REPO}}/g],
+        to: [data.project.slug, data.project.description, data.project.version, data.author, data.license, data.repo],
+        disableGlobs: true
+    });
+
+    const latestSDK = await latestVersion('@klave/sdk');
+
+    await replaceInFile({
+        files: path.join(targetDir, 'package.json'),
+        from: [/{{KLAVE_SDK_CURRENT_VERSION}}/g],
+        to: [latestSDK ?? '*'],
+        disableGlobs: true
+    });
+
+    await fs.rename(path.join(targetDir, 'apps', 'hello_world'), path.join(targetDir, 'apps', data.project.slug));
+    s.stop('Template files created successfully');
 }
 
 const program = new Command();

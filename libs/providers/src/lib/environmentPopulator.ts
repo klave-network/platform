@@ -1,3 +1,4 @@
+import os from 'node:os';
 import { prisma } from '@klave/db';
 import { logger } from './logger';
 
@@ -32,5 +33,7 @@ export const envOps = {
                         });
                     }
             }));
+        if (!process.env['HOSTNAME'] || process.env['HOSTNAME'] === 'unknown')
+            process.env['HOSTNAME'] = os.hostname() ?? 'unknown';
     }
 };
