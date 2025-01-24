@@ -77,7 +77,7 @@
             "options": {
                 "cwd": "apps/cli",
                 "commands": [
-                    "node --import=tsx src/index.ts"
+                    "NODE_ENV=development node --import=tsx src/index.ts"
                 ]
             }
         }
