@@ -1,6 +1,6 @@
 {
     "name": "@klave/sdk",
-    "version": "0.14.4",
+    "version": "0.14.5",
     "private": false,
     "description": "Klave Honest Apps helpers and definitions",
     "repository": {
@@ -24,7 +24,7 @@
     },
     "dependencies": {
         "@klave/as-json": "^1.0.0-alpha.2",
-        "@klave/compiler": "1.0.2",
+        "@klave/compiler": "1.0.3",
         "as-base64": "0.2.0",
         "chalk": "^4.1.2",
         "esbuild-node-externals": "1.16.0",

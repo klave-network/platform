@@ -1,13 +1,16 @@
 # Changelog
+
 ## [0.14.4](https://github.com/klave-network/platform/compare/sdk@0.14.3...sdk@0.14.4) (2025-01-24)
 
+### ⚠ BREAKING CHANGES
+
+* Realigning version with NPM latest published package
 
 ### Bug Fixes
 
 * Downgrade `chalk` because of incompatibility with `@klave/sdk` ([35c4e7b](https://github.com/klave-network/platform/commit/35c4e7bd2d8cf8c7634221ad0887edcd158c3c9b))
 
 ## [0.14.3](https://github.com/klave-network/platform/compare/sdk@0.14.2...sdk@0.14.3) (2025-01-23)
-
 
 ### Bug Fixes
 
@@ -18,6 +21,7 @@
 ### Dependency Updates
 
 * `compiler` updated to version `0.14.1`
+
 ## [0.14.1](https://github.com/klave-network/platform/compare/sdk@0.14.0...sdk@0.14.1) (2025-01-23)
 
 ### Dependency Updates
@@ -31,7 +35,6 @@
 
 ## [0.14.0](https://github.com/klave-network/platform/compare/sdk@0.13.0...sdk@0.14.0) (2024-12-19)
 
-
 ### ⚠ BREAKING CHANGES
 
 * Moving to pure ESM repo
@@ -77,7 +80,6 @@
 * **sdk:** Update return type of unwrap_key, generate_key and import_key ([c887075](https://github.com/klave-network/platform/commit/c887075aeb3a98e6976bed809057240a13c3de81))
 * **sdk:** Use new result-based native calls ([ea08eb9](https://github.com/klave-network/platform/commit/ea08eb937cbcc46219780f9081a540432b4ed531))
 
-
 ### Bug Fixes
 
 * **sdk:** Add missing type in Object declaration, Remove useless import ([36de49a](https://github.com/klave-network/platform/commit/36de49a28e69b8cdc7b777d5240e538d35bc1675))
@@ -93,7 +95,6 @@
 * **sdk:** Remove debug notification ([5fa2806](https://github.com/klave-network/platform/commit/5fa2806db39ef6ecb401def4dc64026bffa86879))
 * **sdk:** Remove useless algoName in Crypto.Subtle ([2364c48](https://github.com/klave-network/platform/commit/2364c4854c2202903a1f4115d0434ca2f6ce2efc))
 * **sdk:** Revert configuration change leading to failed package ([cef5f1b](https://github.com/klave-network/platform/commit/cef5f1b3970ded0ba3a6e377638a02a1fbe37a65))
-
 
 ### Miscellaneous Chores
 
@@ -101,7 +102,6 @@
 
 ## [0.13.0](https://github.com/klave-network/platform/compare/sdk@0.12.0...sdk@0.13.0) (2024-12-19)
 
-
 ### ⚠ BREAKING CHANGES
 
 * Moving to pure ESM repo
@@ -147,7 +147,6 @@
 * **sdk:** Update return type of unwrap_key, generate_key and import_key ([c887075](https://github.com/klave-network/platform/commit/c887075aeb3a98e6976bed809057240a13c3de81))
 * **sdk:** Use new result-based native calls ([ea08eb9](https://github.com/klave-network/platform/commit/ea08eb937cbcc46219780f9081a540432b4ed531))
 
-
 ### Bug Fixes
 
 * **sdk:** Add missing type in Object declaration, Remove useless import ([36de49a](https://github.com/klave-network/platform/commit/36de49a28e69b8cdc7b777d5240e538d35bc1675))
@@ -163,7 +162,6 @@
 * **sdk:** Remove debug notification ([5fa2806](https://github.com/klave-network/platform/commit/5fa2806db39ef6ecb401def4dc64026bffa86879))
 * **sdk:** Remove useless algoName in Crypto.Subtle ([2364c48](https://github.com/klave-network/platform/commit/2364c4854c2202903a1f4115d0434ca2f6ce2efc))
 * **sdk:** Revert configuration change leading to failed package ([cef5f1b](https://github.com/klave-network/platform/commit/cef5f1b3970ded0ba3a6e377638a02a1fbe37a65))
-
 
 ### Miscellaneous Chores
 
@@ -171,7 +169,6 @@
 
 ## [0.13.0](https://github.com/klave-network/platform/compare/sdk@0.12.0...sdk@0.13.0) (2024-12-19)
 
-
 ### ⚠ BREAKING CHANGES
 
 * Moving to pure ESM repo
@@ -217,7 +214,6 @@
 * **sdk:** Update return type of unwrap_key, generate_key and import_key ([c887075](https://github.com/klave-network/platform/commit/c887075aeb3a98e6976bed809057240a13c3de81))
 * **sdk:** Use new result-based native calls ([ea08eb9](https://github.com/klave-network/platform/commit/ea08eb937cbcc46219780f9081a540432b4ed531))
 
-
 ### Bug Fixes
 
 * **sdk:** Add missing type in Object declaration, Remove useless import ([36de49a](https://github.com/klave-network/platform/commit/36de49a28e69b8cdc7b777d5240e538d35bc1675))
@@ -233,7 +229,6 @@
 * **sdk:** Remove debug notification ([5fa2806](https://github.com/klave-network/platform/commit/5fa2806db39ef6ecb401def4dc64026bffa86879))
 * **sdk:** Remove useless algoName in Crypto.Subtle ([2364c48](https://github.com/klave-network/platform/commit/2364c4854c2202903a1f4115d0434ca2f6ce2efc))
 * **sdk:** Revert configuration change leading to failed package ([cef5f1b](https://github.com/klave-network/platform/commit/cef5f1b3970ded0ba3a6e377638a02a1fbe37a65))
-
 
 ### Miscellaneous Chores
 
@@ -241,7 +236,7 @@
 
 # **Changelog**
 
-## [**0.13.0**](https://github.com/klave-network/platform/compare/sdk@0.12.0...sdk@0.13.0)** (2024-11-12)**
+## [**0.13.0**](https://github.com/klave-network/platform/compare/sdk@0.12.0...sdk@0.13.0)**(2024-11-12)**
 
 ### **⚠ BREAKING CHANGES**
 
@@ -343,7 +338,7 @@
 
 * Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
 
-## [**0.12.0**](https://github.com/klave-network/platform/compare/sdk@0.11.0...sdk@0.12.0)** (2024-06-06)**
+## [**0.12.0**](https://github.com/klave-network/platform/compare/sdk@0.11.0...sdk@0.12.0)**(2024-06-06)**
 
 ### **Dependency Updates**
 
@@ -379,7 +374,7 @@
 
 * **sdk:** Return empty u8[]instead of null in digest method ([bb36ca0](https://github.com/klave-network/platform/commit/bb36ca0be15e0727d2ad71e629a0d3804024b87a))
 
-## [**0.11.0**](https://github.com/klave-network/platform/compare/sdk@0.10.2...sdk@0.11.0)** (2024-05-08)**
+## [**0.11.0**](https://github.com/klave-network/platform/compare/sdk@0.10.2...sdk@0.11.0)**(2024-05-08)**
 
 ### **Dependency Updates**
 
@@ -389,7 +384,7 @@
 
 * **compiler,sdk,api:** Bring ASC and compiler versions forward ([520ae67](https://github.com/klave-network/platform/commit/520ae67a6ae630e9c2d9c75d05ea13a175bf7273))
 
-## [**0.10.2**](https://github.com/klave-network/platform/compare/sdk@0.10.1...sdk@0.10.2)** (2024-05-08)**
+## [**0.10.2**](https://github.com/klave-network/platform/compare/sdk@0.10.1...sdk@0.10.2)**(2024-05-08)**
 
 ### **Dependency Updates**
 
@@ -399,13 +394,13 @@
 
 * **compiler:** Update `@klave/as-json` to solve private member issue ([4483859](https://github.com/klave-network/platform/commit/4483859f96de8174041e23856f0078282589d11d))
 
-## [**0.10.1**](https://github.com/klave-network/platform/compare/sdk@0.10.0...sdk@0.10.1)** (2024-05-02)**
+## [**0.10.1**](https://github.com/klave-network/platform/compare/sdk@0.10.0...sdk@0.10.1)**(2024-05-02)**
 
 ### **Bug Fixes**
 
 * **sdk:** Missing usage parameter length for `generate_key` calls ([016b67e](https://github.com/klave-network/platform/commit/016b67e6083631055d5aa1abd7c2e52e60d83c86))
 
-## [**0.10.0**](https://github.com/klave-network/platform/compare/sdk@0.9.3...sdk@0.10.0)** (2024-05-02)**
+## [**0.10.0**](https://github.com/klave-network/platform/compare/sdk@0.9.3...sdk@0.10.0)**(2024-05-02)**
 
 ### **Dependency Updates**
 
@@ -417,13 +412,13 @@
 
 * **sdk:** Add `import_key` function to the crypto SDK ([0a7190c](https://github.com/klave-network/platform/commit/0a7190cb7240864bcb08fc49c004765615582f43))
 
-## [**0.9.3**](https://github.com/klave-network/platform/compare/sdk@0.9.2...sdk@0.9.3)** (2024-04-08)**
+## [**0.9.3**](https://github.com/klave-network/platform/compare/sdk@0.9.2...sdk@0.9.3)**(2024-04-08)**
 
 ### **Reverts**
 
 * Revert "fix(sdk): Embed SWC helpers" ([75196d2](https://github.com/klave-network/platform/commit/75196d24dc09d384359d61ab371a15ae6664a466))
 
-## [**0.9.2**](https://github.com/klave-network/platform/compare/sdk@0.9.1...sdk@0.9.2)** (2024-04-08)**
+## [**0.9.2**](https://github.com/klave-network/platform/compare/sdk@0.9.1...sdk@0.9.2)**(2024-04-08)**
 
 ### **Dependency Updates**
 
@@ -433,13 +428,13 @@
 
 * **sdk:** Embed SWC helpers ([88cb152](https://github.com/klave-network/platform/commit/88cb152e696b3ee97bc5ec7b57adafdc463618ee))
 
-## [**0.9.1**](https://github.com/klave-network/platform/compare/sdk@0.9.0...sdk@0.9.1)** (2024-04-08)**
+## [**0.9.1**](https://github.com/klave-network/platform/compare/sdk@0.9.0...sdk@0.9.1)**(2024-04-08)**
 
 ### **Bug Fixes**
 
 * **sdk:** Treating constants package as internal ([82c26a1](https://github.com/klave-network/platform/commit/82c26a1c5e2ecbc538bcc4191fd43829eaf2e642))
 
-## [**0.9.0**](https://github.com/klave-network/platform/compare/sdk@0.8.3...sdk@0.9.0)** (2024-04-05)**
+## [**0.9.0**](https://github.com/klave-network/platform/compare/sdk@0.8.3...sdk@0.9.0)**(2024-04-05)**
 
 ### **Dependency Updates**
 
@@ -451,13 +446,13 @@
 
 * **sdk:** Add abort_transaction() method in SDK ([ea26482](https://github.com/klave-network/platform/commit/ea264823c8f4f7e91d5f9648bc59650df6efa6e7))
 
-## [**0.8.3**](https://github.com/klave-network/platform/compare/sdk@0.8.2...sdk@0.8.3)** (2023-12-12)**
+## [**0.8.3**](https://github.com/klave-network/platform/compare/sdk@0.8.2...sdk@0.8.3)**(2023-12-12)**
 
 ### **Dependency Updates**
 
 * `compiler` updated to version `0.8.2`
 
-## [**0.8.2**](https://github.com/klave-network/platform/compare/sdk@0.8.1...sdk@0.8.2)** (2023-12-08)**
+## [**0.8.2**](https://github.com/klave-network/platform/compare/sdk@0.8.1...sdk@0.8.2)**(2023-12-08)**
 
 ### **Dependency Updates**
 
@@ -467,7 +462,7 @@
 
 * Revert dependencies to prevent an assemblyscript failure ([6c251f1](https://github.com/klave-network/platform/commit/6c251f15d1235e11c0bf8f9cd75ac9ebbc6ea46d))
 
-## [**0.8.1**](https://///compare/klave-sdk@0.8.0...klave-sdk@0.8.1)** (2023-09-07)**
+## [**0.8.1**](https://///compare/klave-sdk@0.8.0...klave-sdk@0.8.1)**(2023-09-07)**
 
 ### **Dependency Updates**
 
@@ -477,7 +472,7 @@
 
 * Revert change to package.json generation until Nx 17 0d72132
 
-## [**0.8.0**](https://///compare/klave-sdk@0.7.0...klave-sdk@0.8.0)** (2023-09-04)**
+## [**0.8.0**](https://///compare/klave-sdk@0.7.0...klave-sdk@0.8.0)**(2023-09-04)**
 
 ### **Dependency Updates**
 
@@ -495,7 +490,7 @@
 
 * **sdk,create:** Linking, compilation and target issues d0da049
 
-## [**0.7.0**](https://///compare/klave-sdk@0.6.4...klave-sdk@0.7.0)** (2023-08-02)**
+## [**0.7.0**](https://///compare/klave-sdk@0.6.4...klave-sdk@0.7.0)**(2023-08-02)**
 
 ### **Dependency Updates**
 
@@ -507,9 +502,9 @@
 
 * **sdk:** Finalising Crypto SDK exposition 1de0c79
 
-## [**0.6.4**](https://///compare/klave-sdk@0.6.3...klave-sdk@0.6.4)** (2023-06-12)**
+## [**0.6.4**](https://///compare/klave-sdk@0.6.3...klave-sdk@0.6.4)**(2023-06-12)**
 
-## [**0.6.3**](https://///compare/klave-sdk@0.6.2...klave-sdk@0.6.3)** (2023-06-02)**
+## [**0.6.3**](https://///compare/klave-sdk@0.6.2...klave-sdk@0.6.3)**(2023-06-02)**
 
 ### **Dependency Updates**
 
@@ -519,19 +514,19 @@
 
 * **sdk:** Use synchronous file writing to prevent incomplete writes 5f58df3
 
-## [**0.6.2**](https://///compare/klave-sdk@0.6.1...klave-sdk@0.6.2)** (2023-05-31)**
+## [**0.6.2**](https://///compare/klave-sdk@0.6.1...klave-sdk@0.6.2)**(2023-05-31)**
 
 ### **Dependency Updates**
 
 * `klave-compiler` updated to version `0.2.0`
 
-## [**0.6.1**](https://///compare/klave-sdk@0.6.0...klave-sdk@0.6.1)** (2023-05-30)**
+## [**0.6.1**](https://///compare/klave-sdk@0.6.0...klave-sdk@0.6.1)**(2023-05-30)**
 
 ### **Bug Fixes**
 
 * **sdk:** Correcting Table getArrayBuffer export 10d21fb
 
-## [**0.6.0**](https://///compare/klave-sdk@0.5.0...klave-sdk@0.6.0)** (2023-05-30)**
+## [**0.6.0**](https://///compare/klave-sdk@0.5.0...klave-sdk@0.6.0)**(2023-05-30)**
 
 ### **Dependency Updates**
 
@@ -541,7 +536,7 @@
 
 * **sdk:** Add Utils API, Context API and extend Notifier API 370c746
 
-## [**0.5.0**](https://///compare/klave-sdk@0.4.6...klave-sdk@0.5.0)** (2023-05-30)**
+## [**0.5.0**](https://///compare/klave-sdk@0.4.6...klave-sdk@0.5.0)**(2023-05-30)**
 
 ### **Dependency Updates**
 
@@ -551,15 +546,15 @@
 
 * **api,compiler,deployer:** Include JSON transformer for AS compilation ed72c2b
 
-## [**0.4.6**](https://///compare/klave-sdk@0.4.5...klave-sdk@0.4.6)** (2023-05-16)**
+## [**0.4.6**](https://///compare/klave-sdk@0.4.5...klave-sdk@0.4.6)**(2023-05-16)**
 
 ### **Dependency Updates**
 
 * `klave-compiler` updated to version `0.0.4`
 
-## [**0.4.5**](https://///compare/trustless-app-sdk@0.4.4...trustless-app-sdk@0.4.5)** (2023-05-11)**
+## [**0.4.5**](https://///compare/trustless-app-sdk@0.4.4...trustless-app-sdk@0.4.5)**(2023-05-11)**
 
-## [**0.4.4**](https://///compare/trustless-app-sdk@0.4.3...trustless-app-sdk@0.4.4)** (2023-05-11)**
+## [**0.4.4**](https://///compare/trustless-app-sdk@0.4.3...trustless-app-sdk@0.4.4)**(2023-05-11)**
 
 ### **Dependency Updates**
 
@@ -571,25 +566,25 @@
 
 * **klave-compiler:** Ensure proper export of ESM bindings 147aa09
 
-## [**0.4.3**](https://///compare/trustless-app-sdk@0.4.2...trustless-app-sdk@0.4.3)** (2023-05-11)**
+## [**0.4.3**](https://///compare/trustless-app-sdk@0.4.2...trustless-app-sdk@0.4.3)**(2023-05-11)**
 
 ### **Dependency Updates**
 
 * `klave-compiler` updated to version `0.0.2`
 
-## [**0.4.2**](https://///compare/trustless-app-sdk@0.4.1...trustless-app-sdk@0.4.2)** (2023-05-10)**
+## [**0.4.2**](https://///compare/trustless-app-sdk@0.4.1...trustless-app-sdk@0.4.2)**(2023-05-10)**
 
 ### **Bug Fixes**
 
 * **klave-sdk:** Fixing crash on file absence b3c3535
 
-## [**0.4.1**](https://///compare/trustless-app-sdk@0.4.0...trustless-app-sdk@0.4.1)** (2023-05-10)**
+## [**0.4.1**](https://///compare/trustless-app-sdk@0.4.0...trustless-app-sdk@0.4.1)**(2023-05-10)**
 
 ### **Dependency Updates**
 
 * `klave-compiler` updated to version `0.0.1`
 
-## [**0.4.0**](https://///compare/trustless-app-sdk@0.3.2...trustless-app-sdk@0.4.0)** (2023-05-10)**
+## [**0.4.0**](https://///compare/trustless-app-sdk@0.3.2...trustless-app-sdk@0.4.0)**(2023-05-10)**
 
 ### **Dependency Updates**
 
@@ -599,15 +594,15 @@
 
 * **klave-compiler:** Split off the wasm compiler into separate library package 36e1f02
 
-## [**0.3.2**](https://///compare/trustless-app-sdk@0.3.1...trustless-app-sdk@0.3.2)** (2023-02-24)**
+## [**0.3.2**](https://///compare/trustless-app-sdk@0.3.1...trustless-app-sdk@0.3.2)**(2023-02-24)**
 
 ### **Bug Fixes**
 
 * **klave-sdk:** Comply with asbuild stricter type checking edd5a20
 
-## [**0.3.1**](https://///compare/trustless-app-sdk@0.3.0...trustless-app-sdk@0.3.1)** (2023-02-24)**
+## [**0.3.1**](https://///compare/trustless-app-sdk@0.3.0...trustless-app-sdk@0.3.1)**(2023-02-24)**
 
-## [**0.3.0**](https://///compare/trustless-app-sdk@0.2.1...trustless-app-sdk@0.3.0)** (2023-02-24)**
+## [**0.3.0**](https://///compare/trustless-app-sdk@0.2.1...trustless-app-sdk@0.3.0)**(2023-02-24)**
 
 ### **⚠ BREAKING CHANGES**
 
@@ -621,7 +616,7 @@
 
 * Replace SDK structure be5add9
 
-## [**0.2.1**](https://///compare/trustless-app-sdk@0.2.0...trustless-app-sdk@0.2.1)** (2023-02-08)**
+## [**0.2.1**](https://///compare/trustless-app-sdk@0.2.0...trustless-app-sdk@0.2.1)**(2023-02-08)**
 
 ### **Bug Fixes**
 
