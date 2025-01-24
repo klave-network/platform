@@ -257,4 +257,3 @@ for (const folder of projectsFolders) {
     base.push(...projectConfig);
 }
 
-export default base;
