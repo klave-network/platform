@@ -1,6 +1,7 @@
 import spawn from 'cross-spawn';
 import githubUsername from 'github-username';
-
+import spawnAsync from '@expo/spawn-async';
+import * as p from '@clack/prompts';
 /**
  * Finds user's name by reading it from the git config.
  */
@@ -45,4 +46,19 @@ export async function guessRepoUrl(authorUrl: string, slug: string) {
         return `${authorUrl}/${normalizedSlug}`;
     }
     return '';
+}
+
+/**
+ * Create an empty Git repository.
+ */
+export async function createGitRepoAsync(targetDir: string) {
+    const s = p.spinner();
+    s.start('Creating an empty Git repository');
+
+    await spawnAsync('git', ['init'], {
+        cwd: targetDir,
+        stdio: 'ignore'
+    });
+
+    s.stop('Created an empty Git repository');
 }
