@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 
-export const help = () => {
+export default function help() {
     console.log(`
   ${chalk.bold('klave')} [options] <command | path>
 
@@ -14,4 +14,4 @@ export const help = () => {
     --version, -v   Show version
     --name          Specify a name for the app
     `);
-};
+}

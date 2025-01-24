@@ -11,7 +11,7 @@ type Versions = {
 /**
  * Print out environment information about the Klave project
  */
-export default async function info() {
+export const info = async () => {
 
     const { dependencies, devDependencies } = getVersions();
 
@@ -38,7 +38,7 @@ export default async function info() {
     console.log(`   Platform: ${os.platform()}`);
     console.log(`   Architecture: ${os.arch()}`);
     console.log(`   OS Version: ${os.version()}`);
-}
+};
 
 function getVersions(): Versions {
     try {
