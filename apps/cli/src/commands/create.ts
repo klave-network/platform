@@ -185,9 +185,7 @@ Read more ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', 'https://docs
 
     const projectDir = (dir ?? directory) as string;
     const projectName = name ?? appName;
-    const projectTemplate = template ?? appInfo.template;
-
-    console.log(projectTemplate);
+    // const projectTemplate = template ?? appInfo.template;
 
     const targetDir = path.join(CWD, projectDir);
     const packageManager = resolvePackageManager();
