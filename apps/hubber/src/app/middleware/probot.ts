@@ -13,7 +13,7 @@ export const probotMiddleware: RequestHandler = async (req, res, next) => {
         });
 
     if (middlewareReference)
-        return middlewareReference(req, res, next);
+        middlewareReference(req, res, next);
     else
-        return next();
+        next();
 };

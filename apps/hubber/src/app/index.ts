@@ -107,10 +107,11 @@ export const start = async (port: number) => {
     // Plug Probot for GitHub Apps
     app.use('/hook', async (req, res, next) => {
         if (req.headers['x-github-event'])
-            return probotMiddleware(req, res, next);
-        if (req.headers['stripe-signature'])
-            return stripeMiddlware(req, res, next);
-        next();
+            probotMiddleware(req, res, next);
+        else if (req.headers['stripe-signature'])
+            stripeMiddlware(req, res, next);
+        else
+            next();
     });
 
     // const {

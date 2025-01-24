@@ -66,6 +66,7 @@ const javascriptRules = {
 const typescriptRules = {
     ...javascriptRules,
     '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-unused-vars': javascriptRules['@/no-unused-vars'],
     '@typescript-eslint/no-non-null-assertion': 'error',
     '@typescript-eslint/no-floating-promises': 'warn',
     '@typescript-eslint/promise-function-async': 'warn',
@@ -212,16 +213,20 @@ for (const folder of projectsFolders) {
             },
             rules: {
                 ...jsonRules,
-                '@nx/dependency-checks': folder !== '.' ? ['error', {
+                '@nx/dependency-checks': rootFolder !== '' ? ['error', {
+                    checkObsoleteDependencies: false,
+                    includeTransitiveDependencies: false,
                     ignoredDependencies: [
-                        '@nx/*',
+                        '@klave/api',
+                        '@klave/constants',
+                        '@klave/db',
+                        '@klave/providers',
                         '@total-typescript/ts-reset',
                         'git-rev-sync'
                     ]
                 }] : 'off'
             }
         },
-
         {
             files: ['**/eslint.config.js', '**/eslint.config.mjs'],
             rules: {

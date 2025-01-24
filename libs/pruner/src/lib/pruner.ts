@@ -147,8 +147,8 @@ async function cancelUpdatingDeployments() {
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-// eslint-disable-next-line @/no-unused-vars
-async function reconcileApplicationKredits() {
+
+async function __unusedReconcileApplicationKredits() {
 
     const applicationsWithDeployments = await prisma.application.findMany({
         where: {

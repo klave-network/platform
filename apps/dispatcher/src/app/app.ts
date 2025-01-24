@@ -135,7 +135,7 @@ export async function app(fastify: FastifyInstance) {
         }
         if (!collection)
             return await res.status(202).send({ ok: true });
-        collection?.insertOne({
+        await collection?.insertOne({
             type: 'usage',
             timestamp: new Date().toISOString(),
             data
