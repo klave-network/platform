@@ -37,18 +37,16 @@ export const runCli = async () => {
     program
         .command('create')
         .description('Scaffold a new Klave project')
-        .argument('<directory>', 'directory to create the project in')
         .addOption(new Option('-t, --template <language>', 'choose a template').choices(['typescript', 'rust']))
         .addOption(new Option('-n, --name <name>', 'name of the app'))
         .option('--noInstall', 'skip installing dependencies', false)
         .option('--noGit', 'skip initializing a new git repo in the project', false)
-        .action(async (name: string, options: CreateOptions) => {
+        .action(async (_name: string, options: CreateOptions) => {
             await create({
                 name: options.name,
                 template: options.template,
                 noGit: options.noGit,
-                noInstall: options.noInstall,
-                dir: name
+                noInstall: options.noInstall
             });
         });
 
