@@ -16,10 +16,10 @@ export const info = async () => {
     const { dependencies, devDependencies } = getVersions();
 
     console.log('Binaries:');
-    console.log(`   Node.js Version: ${process.versions.node}`);
-    console.log(`   npm Version: ${getBinaryVersion('npm')}`);
-    console.log(`   Yarn Version: ${getBinaryVersion('Yarn')}`);
-    console.log(`   pnpm Version: ${getBinaryVersion('pnpm')}`);
+    console.log(`   Node: ${process.versions.node}`);
+    console.log(`   npm: ${getBinaryVersion('npm')}`);
+    console.log(`   Yarn: ${getBinaryVersion('yarn')}`);
+    console.log(`   pnpm: ${getBinaryVersion('pnpm')}`);
 
     // Filter dependencies starting with "@klave/"
     const filterByScope = (deps: Record<string, string>) =>
@@ -28,13 +28,13 @@ export const info = async () => {
     const klaveDependencies = filterByScope(dependencies);
     const klaveDevDependencies = filterByScope(devDependencies);
 
-    console.log('\nKlave Packages:');
+    console.log('Klave Packages:');
     const formattedDeps = [...klaveDependencies, ...klaveDevDependencies]
         .map(([ name, version ]) => `   ${name}: ${version}`)
         .join('\n');
     console.log(formattedDeps);
 
-    console.log('\nOperating System:');
+    console.log('Operating System:');
     console.log(`   Platform: ${os.platform()}`);
     console.log(`   Architecture: ${os.arch()}`);
     console.log(`   OS Version: ${os.version()}`);
@@ -42,7 +42,7 @@ export const info = async () => {
 
 function getVersions(): Versions {
     try {
-    // Check if package.json exists
+        // Check if package.json exists
         const packageJsonPath = path.resolve(process.cwd(), 'package.json');
         if (!fs.existsSync(packageJsonPath)) {
             console.error('Error: package.json not found in the current directory.');
