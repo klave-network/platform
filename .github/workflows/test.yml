@@ -66,7 +66,10 @@ jobs:
         with:
           path: |
             ~/.cache/ms-playwright
+            **/node_modules/playwright
           key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
 
       - name: Install Playwright with dependencies
         if: steps.playwright-cache.outputs.cache-hit != 'true'
@@ -86,4 +89,4 @@ jobs:
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
           CI: true
-        run: yarn nx affected --target=e2e --parallel=1 --base=${{ env.NX_BASE }} --head=${{ env.NX_HEAD }}
+        run: yarn nx affected --target=e2e --parallel=1 --base=${{ env.NX_BASE }} --head=${{ env.NX_HEAD }} --verbose
