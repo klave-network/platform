@@ -1,10 +1,13 @@
 [package]
 name = "klave"
 version = "0.1.0"
-authors = ["Jeremie Labbe <jeremie@secretarium.org>", "Etienne Bosse <etienne@secretarium.org>"]
-license = "Unsure"
+authors = [
+    "Jeremie Labbe <jeremie@secretarium.org>",
+    "Etienne Bosse <etienne@secretarium.org>",
+]
+license = "MIT"
 edition = "2021"
-repository = "https://github.com/klave-network/klave-rust-sdk"
+repository = "https://github.com/klave-network/platform.git"
 homepage = "https://klave.com/"
 documentation = "https://docs.klave.com/sdk/latest"
 readme = "README.md"

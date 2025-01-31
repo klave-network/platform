@@ -6,11 +6,18 @@
     ],
     "targets": {
         "build": {
-            "command": "cargo build -p klave --target-dir crates/klave/target --release",
+            "command": "cargo component build -p klave --target-dir crates/klave/target --release",
             "cache": true,
             "outputs": [
                 "{projectRoot}/target"
             ]
+        },
+        "publish": {
+            "dependsOn": [
+                "^build"
+            ],
+            "command": "cargo publish -p klave",
+            "cache": false
         }
     }
 }
