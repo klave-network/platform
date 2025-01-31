@@ -46,6 +46,7 @@ testem.log
 *.orig.*
 web-build/
 logs
+*.lock
 
 # System Files
 .DS_Store
