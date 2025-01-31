@@ -86,4 +86,4 @@ jobs:
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
           CI: true
-        run: yarn nx affected --target=e2e --parallel=1 --base=${{ env.NX_BASE }} --head=${{ env.NX_HEAD }}
+        run: yarn nx affected --target=e2e --parallel=1 --base=${{ env.NX_BASE }} --head=${{ env.NX_HEAD }} --verbose
