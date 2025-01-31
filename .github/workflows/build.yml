@@ -58,6 +58,20 @@ jobs:
             echo "$RUNNER_OS not supported"
             exit 0
           fi
+          
+      - name: Cache Cargo artifacts
+        uses: actions/cache@v4
+        id: rust-cache
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            **/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
 
       - name: Install repo dependencies
         run: yarn install --network-timeout 1000000 --forzen-lockfile
