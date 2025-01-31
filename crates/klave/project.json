@@ -5,12 +5,26 @@
         "crate"
     ],
     "targets": {
+        "deps": {
+            "command": "cargo install --locked cargo-component",
+            "cache": false
+        },
         "build": {
-            "command": "cargo build -p klave --target-dir crates/klave/target --release",
+            "dependsOn": [
+                "deps"
+            ],
+            "command": "cargo component build -p klave --target-dir crates/klave/target --release",
             "cache": true,
             "outputs": [
                 "{projectRoot}/target"
             ]
+        },
+        "publish": {
+            "dependsOn": [
+                "build"
+            ],
+            "command": "cargo publish -p klave",
+            "cache": false
         }
     }
 }

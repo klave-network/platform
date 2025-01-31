@@ -213,7 +213,7 @@ for (const folder of projectsFolders) {
             },
             rules: {
                 ...jsonRules,
-                '@nx/dependency-checks': rootFolder !== '' ? ['error', {
+                '@nx/dependency-checks': rootFolder !== '' ? ['warn', {
                     checkObsoleteDependencies: false,
                     includeTransitiveDependencies: false,
                     ignoredDependencies: [

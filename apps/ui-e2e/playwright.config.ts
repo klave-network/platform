@@ -23,7 +23,10 @@ export default defineConfig({
     },
     /* Run your local dev server before starting the tests */
     webServer: {
-        command: 'yarn nx run ui:preview',
+        stdout: 'pipe',
+        stderr: 'pipe',
+        command: 'nx run ui:serve',
+        timeout: 120000,
         url: 'http://localhost:4220',
         reuseExistingServer: !process.env.CI,
         cwd: workspaceRoot

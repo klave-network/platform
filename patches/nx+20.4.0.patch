@@ -1,0 +1,16 @@
+diff --git a/node_modules/nx/src/tasks-runner/run-command.js b/node_modules/nx/src/tasks-runner/run-command.js
+index 8383a0b..70d46b0 100644
+--- a/node_modules/nx/src/tasks-runner/run-command.js
++++ b/node_modules/nx/src/tasks-runner/run-command.js
+@@ -599,10 +599,5 @@ function getRunnerOptions(runner, nxJson, nxArgs, isCloudDefault) {
+     return result;
+ }
+ function isCustomRunnerPath(modulePath) {
+-    return ![
+-        'nx-cloud',
+-        '@nrwl/nx-cloud',
+-        'nx/tasks-runners/default',
+-        defaultTasksRunnerPath,
+-    ].includes(modulePath);
++    return false;
+ }

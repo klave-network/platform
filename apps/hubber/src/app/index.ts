@@ -1,10 +1,8 @@
-import ip from 'ip';
 import url from 'url';
 import path from 'node:path';
 import expectCt from 'expect-ct';
 import express from 'express';
 import session from 'express-session';
-import ews from 'express-ws';
 import helmet from 'helmet';
 import multer from 'multer';
 import cors from 'cors';
@@ -25,24 +23,14 @@ import { trcpMiddlware } from './middleware/trpc';
 // import { i18nextMiddleware } from './middleware/i18n';
 // import { getDriverSubstrate } from '../utils/db';
 import { usersRouter } from './routes';
-import { logger } from '@klave/providers';
 import { webLinkerMiddlware } from './middleware/webLinker';
 import { permissiblePeers } from '@klave/constants';
-import type { WebSocket, Server } from 'ws';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-const eapp = express();
-const { app, getWss } = ews(eapp, undefined, {
-    // leaveRouterUntouched: true,
-    wsOptions: {
-        path: '/bridge',
-        // noServer: true,
-        clientTracking: true
-    }
-});
+const app = express();
 
-export const start = async (port: number) => {
+export const start = async () => {
 
     const __hostname = process.env['HOSTNAME'] ?? 'unknown';
 
@@ -114,16 +102,6 @@ export const start = async (port: number) => {
             next();
     });
 
-    // const {
-    //     generateToken,
-    //     csrfSynchronisedProtection
-    // } = csrfSync();
-
-    // const mongoOptions = {
-    //     client: getDriverSubstrate(),
-    //     collectionName: 'sessions'
-    // };
-
     const sessionOptions: session.SessionOptions = {
         secret: process.env.KLAVE_EXPRESS_SESSION_SECRETS?.split(',') ?? [],
         // Don't save session if unmodified
@@ -160,93 +138,8 @@ export const start = async (port: number) => {
     app.use(passport.initialize());
     app.use(passport.session());
 
-
-    // passport.serializeUser((user, done) => {
-    //     logger.debug(`serializeUser ${typeof user} >> ${JSON.stringify(user)}`);
-    //     process.nextTick(function () {
-    //         done(null, user.id);
-    //     });
-    // });
-
-    // passport.deserializeUser((id: string, done) => {
-    //     logger.debug(`deserializeUser ${typeof id} >> ${id}`);
-    //     prisma.user.findUnique({ where: { id } })
-    //         .then((user) => {
-    //             process.nextTick(function () {
-    //                 done(null, user);
-    //             });
-    //         })
-    //         .catch((err) => {
-    //             process.nextTick(function () {
-    //                 done(err, null);
-    //             });
-    //         });
-    // });
-
-    // passport.use(new LocalStrategy({
-    //     passReqToCallback: true
-    // }, (req, username, password, done) => {
-    //     const { web, session, user } = req;
-    //     prisma.user.findUnique({ where: { id: user?.id } })
-    //         .then((user) => {
-    //             if (!user) return done(null, false);
-    //             if (password !== (user as any).password) {
-    //                 return done(null, false);
-    //             } else {
-    //                 return done(null, user);
-    //             }
-    //         })
-    //         .catch((err) => { return done(err); });
-    // }));
-
     // Contextualise user session, devices, tags, tokens
     app.use(webLinkerMiddlware);
-
-    app.ws('/bridge', (ws: WebSocket, { session, sessionID, sessionStore }) => {
-        type WsWithSession = typeof ws & { sessionID: string };
-        type SessionWithLocator = typeof session & { locator?: string, localId?: string };
-        (ws as WsWithSession).sessionID = sessionID;
-        ws.on('connection', (ws) => {
-            ws.isAlive = true;
-            logger.info('PLR: Client is alive !');
-        });
-        ws.on('upgrade', () => {
-            logger.info('PLR: Client is upgrading ...');
-        });
-        ws.on('message', (msg) => {
-            const [verb, ...data] = msg.toString().split('#');
-            if (verb === 'request') {
-                logger.info('New Pocket login bridge client request ...');
-                const [locator] = data;
-                (session as SessionWithLocator).locator = locator;
-                session.save(() => {
-                    ws.send(`sid#${sessionID}#ws://${ip.address('public')}:${port}/bridge`);
-                });
-                return;
-            } else if (verb === 'confirm') {
-                logger.info('PLR: New remote device confirmation ...');
-                const [sid, locator, localId] = data;
-                if (sid !== sessionID)
-                    return;
-                sessionStore.get(sid, (err, rsession) => {
-                    if (err) {
-                        logger.error(`Pocket API bridge experienced an issue: ${err}`);
-                        return;
-
-                    } if (!rsession)
-                        return;
-                    if ((rsession as SessionWithLocator).locator !== locator)
-                        return;
-                    (rsession as SessionWithLocator).localId = localId;
-                    sessionStore.set(sid, rsession, () => {
-                        const browserTarget = Array.from((getWss() as Server).clients.values()).find(w => (w as WsWithSession).sessionID === sid);
-                        browserTarget?.send('confirmed');
-                    });
-                });
-            }
-            ws.send(msg);
-        });
-    });
 
     app.use(passportLoginCheckMiddleware);
     app.use('/trpc', trcpMiddlware);

@@ -1,14 +1,36 @@
 [package]
 name = "klave"
-version = "0.0.3"
-edition = "2021"
-description = "This crate provides tools for building and using Klave-based applications"
+version = "0.1.0"
+authors = [
+    "Jeremie Labbe <jeremie@secretarium.org>",
+    "Etienne Bosse <etienne@secretarium.org>",
+]
 license = "MIT"
-homepage = "https://klave.com"
-documentation = "https://klave.com/docs"
+edition = "2021"
 repository = "https://github.com/klave-network/platform.git"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+homepage = "https://klave.com/"
+documentation = "https://docs.klave.com/sdk/latest"
+readme = "README.md"
+resolver = "2"
+description = "A Rust SDK for the Klave network."
 
 [dependencies]
-secretarium = { version = "0.0.2" }
+wit-bindgen-rt = { version = "0.36.0", features = ["bitflags"] }
+serde_json = "1.0.117"
+serde = { version = "1.0.217", features = ["derive"] }
+component = "0.1.1"
+http = "1.2.0"
+anyhow = "1.0.95"
+base64 = "0.22.1"
+
+[package.metadata.component]
+package = "component:klave-sdk"
+
+[package.metadata.component.target.dependencies]
+"klave:sdk" = { path = "./wit/sdk" }
+
+[profile.release]
+lto = true
+# Tell `rustc` to optimize for small code size.
+opt-level = "s"
+strip = true

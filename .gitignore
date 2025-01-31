@@ -28,7 +28,6 @@ node_modules
 /.nx
 /.cache
 /.sass-cache
-/connect.lock
 /coverage
 /libpeerconnection.log
 npm-debug.log
@@ -46,6 +45,7 @@ testem.log
 *.orig.*
 web-build/
 logs
+*.lock
 
 # System Files
 .DS_Store
