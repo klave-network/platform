@@ -159,11 +159,6 @@ export const Login: FC = () => {
             <div className="p-5 min-w-[300px] bg-slate-100 dark:bg-gray-800 rounded-md">
                 <LoginSecKey />
             </div>
-            {/*
-            <div className="p-5 min-w-[300px] bg-slate-100 dark:bg-gray-800 rounded-md">
-                <LoginQR />
-            </div>
-             */}
         </div>
 
     </div>;
