@@ -42,12 +42,17 @@ pub enum Protocol {
 }
 
 /// Send a http request
-pub fn request_impl(request: &Request<&str>, protocol: Option<Protocol>) -> Result<Response<String>, Box<dyn std::error::Error>>
+pub fn request_impl(request: &Request<String>, protocol: Option<Protocol>) -> Result<Response<String>, Box<dyn std::error::Error>>
 {
+    let port = match request.uri().port() {
+        Some(port) => port.as_u16(),
+        None => 443
+    };
+
     let http_request = HttpRequest {
         method: request.method().as_str().to_string(),
         hostname: request.uri().host().unwrap().to_string(),
-        port: i32::from(request.uri().port().unwrap().as_u16()),
+        port: i32::from(port),
         path: request.uri().path().to_string(),
         version: format!("{:?}", request.version()),
         headers: request.headers().iter().map(|(name, value)| vec![name.as_str().to_string(), value.to_str().unwrap().to_string()]).collect(),
@@ -94,7 +99,7 @@ pub fn request_impl(request: &Request<&str>, protocol: Option<Protocol>) -> Resu
 }
 
 /// Send a http request
-pub fn request(request: &Request<&str>) -> Result<Response<String>, Box<dyn std::error::Error>>
+pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn std::error::Error>>
 {
     return request_impl(request, Some(Protocol::Https));
 }
