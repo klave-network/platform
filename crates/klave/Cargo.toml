@@ -1,6 +1,6 @@
 [package]
 name = "klave"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
     "Jeremie Labbe <jeremie@secretarium.org>",
     "Etienne Bosse <etienne@secretarium.org>",
