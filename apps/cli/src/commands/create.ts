@@ -47,7 +47,7 @@ Read more ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', 'https://docs
             ...(!dir && {
                 directory: async () => p.text({
                     message: 'Where should we create your project?',
-                    initialValue: './my-honest-app',
+                    placeholder: './my-honest-app',
                     validate(value) {
                         if (!value)
                             return 'Please enter a path.';
@@ -88,7 +88,7 @@ Read more ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', 'https://docs
             ...(!name && {
                 appName: async () => p.text({
                     message: 'What is the name of your honest application?',
-                    initialValue: 'hello-world',
+                    placeholder: 'hello-world',
                     validate(value) {
                         if (value.length === 0)
                             return 'Project name is required';
@@ -101,7 +101,7 @@ Read more ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', 'https://docs
             // Ask for the description of the project
             description: async () => p.text({
                 message: 'How would you describe your honest application?',
-                initialValue: 'This is an honest application for the Klave Network',
+                placeholder: 'This is an honest application for the Klave Network',
                 validate(value) {
                     if (value.length === 0)
                         return 'Project description is required.';
@@ -111,7 +111,7 @@ Read more ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', 'https://docs
             // Ask for the author name
             authorName: async () => p.text({
                 message: 'What is the name of the author?',
-                initialValue: await findMyName(),
+                placeholder: await findMyName(),
                 validate(value) {
                     if (value.length === 0)
                         return 'Author name is required.';
@@ -121,7 +121,7 @@ Read more ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', 'https://docs
             // Ask for the author email
             authorEmail: async () => p.text({
                 message: 'What is the email address of the author?',
-                initialValue: await findGitHubEmail(),
+                placeholder: await findGitHubEmail(),
                 validate(value) {
                     if (value.length === 0)
                         return 'Author email is required.';
@@ -131,7 +131,7 @@ Read more ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', 'https://docs
             // Ask for the author URL
             authorUrl: async ({ results }) => p.text({
                 message: 'What is the URL to the author\'s GitHub profile?',
-                initialValue: await findGitHubProfileUrl(results.authorEmail as string),
+                placeholder: await findGitHubProfileUrl(results.authorEmail as string),
                 validate(value) {
                     if (value.length === 0)
                         return 'Author URL is required.';
@@ -141,7 +141,7 @@ Read more ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', 'https://docs
             // Ask for the repository URL
             repo: async ({ results }) => p.text({
                 message: 'What is the URL for the repository?',
-                initialValue: await guessRepoUrl(results.authorUrl as string, (dir ?? results.directory) as string),
+                placeholder: await guessRepoUrl(results.authorUrl as string, (dir ?? results.directory) as string),
                 validate(value) {
                     if (value.length === 0)
                         return 'Repository URL is required.';
