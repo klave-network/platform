@@ -80,6 +80,15 @@
                     "NODE_ENV=development node --import=tsx src/index.ts"
                 ]
             }
+        },
+        "compile": {
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "apps/cli",
+                "commands": [
+                    "bun build --compile src/index.ts --outfile klave"
+                ]
+            }
         }
     }
 }
