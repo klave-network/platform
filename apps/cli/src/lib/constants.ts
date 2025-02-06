@@ -1,27 +1,11 @@
 import chalk from 'chalk';
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'node:url';
-import path from 'path';
+import pkg from '../../package.json';
 
-// Resolve the directory of the current file
-const filename = fileURLToPath(import.meta.url);
-const dirname = path.dirname(filename);
+export const PACKAGE_VERSION = pkg.version;
 
-const isDev = process.env.NODE_ENV === 'development';
+export const PACKAGE_NAME = pkg.name;
 
-// Resolve the path to the package.json file
-const packageJsonPath = isDev
-    ? path.resolve(dirname, '../../package.json')
-    : path.resolve(dirname, '../package.json');
-
-// Read the package.json file
-const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
-
-export const PACKAGE_VERSION = packageJson.version;
-
-export const PACKAGE_NAME = packageJson.name;
-
-export const PACKAGE_DESCRIPTION = packageJson.description;
+export const PACKAGE_DESCRIPTION = pkg.description;
 
 export const KLAVE_CYAN = chalk.hex('#00FFD5');
 
