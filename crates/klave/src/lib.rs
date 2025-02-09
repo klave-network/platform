@@ -5,7 +5,6 @@ use bindings::klave::sdk::sdk;
 
 pub mod router;
 pub mod https;
-pub mod http;
 pub mod ledger;
 pub mod context;
 pub mod notifier;

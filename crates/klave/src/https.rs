@@ -36,13 +36,8 @@ impl Display for HttpResponse<String> {
     }
 }
 
-pub enum Protocol {
-    Http,
-    Https
-}
-
 /// Send a http request
-pub fn request_impl(request: &Request<String>, protocol: Option<Protocol>) -> Result<Response<String>, Box<dyn std::error::Error>>
+pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn std::error::Error>>
 {
     let port = match request.uri().port() {
         Some(port) => port.as_u16(),
@@ -65,21 +60,10 @@ pub fn request_impl(request: &Request<String>, protocol: Option<Protocol>) -> Re
         Err(e) => return Err(e.into())
     };
 
-    let response: String;    
-    match protocol {        
-        Some(Protocol::Http) => {
-            response = match sdk::http_query(&http_request_str){
-                Ok(response) => response,
-                Err(err) => return Err(err.into())
-            };
-        }
-        _ => {
-            response = match sdk::https_query(&http_request_str){
-                Ok(response) => response,
-                Err(err) => return Err(err.into())
-            };
-        }
-    }
+    let response = match sdk::https_query(&http_request_str){
+        Ok(response) => response,
+        Err(err) => return Err(err.into())
+    };
     
     let http_response: HttpResponse<String> = match serde_json::from_str(&response){
         Ok(http_response) => http_response,
@@ -96,10 +80,4 @@ pub fn request_impl(request: &Request<String>, protocol: Option<Protocol>) -> Re
 
     let response = Response::from_parts(parts, http_response.body);
     Ok(response)
-}
-
-/// Send a http request
-pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn std::error::Error>>
-{
-    return request_impl(request, Some(Protocol::Https));
 }
