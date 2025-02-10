@@ -198,7 +198,7 @@
         "@testing-library/jest-dom": "6.6.3",
         "@testing-library/react": "16.2.0",
         "@testing-library/user-event": "14.6.1",
-        "@types/chrome": "0.0.300",
+        "@types/chrome": "0.0.304",
         "@types/cors": "2.8.17",
         "@types/cross-spawn": "6.0.6",
         "@types/express": "5.0.0",
