@@ -69,3 +69,11 @@ updates:
     target-branch: "develop"
     labels:
       - "docker"
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "develop"
+    labels:
+      - "dependencies"
+      - "rust"
