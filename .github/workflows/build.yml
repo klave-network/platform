@@ -38,6 +38,9 @@ jobs:
           echo "BASE: ${{ env.NX_BASE }}"
           echo "HEAD: ${{ env.NX_HEAD }}"
 
+      - name: Setting up Cargo
+        run: rustup --version && rustup show && cargo --version && cargo install --list
+          
       - name: Use Node.js ${{ matrix.node }}
         uses: actions/setup-node@v4
         with:

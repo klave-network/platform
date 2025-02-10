@@ -6,7 +6,7 @@
     ],
     "targets": {
         "deps": {
-            "command": "cargo install --locked cargo-component",
+            "command": "cargo install --locked cargo-component --force",
             "cache": true,
             "inputs": [
                 "{workspaceRoot}/Cargo.toml",
