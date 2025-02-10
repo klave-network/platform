@@ -6,14 +6,19 @@
     ],
     "targets": {
         "deps": {
-            "command": "cargo install --locked cargo-component --force",
-            "cache": false
+            "command": "cargo install --locked cargo-component",
+            "cache": true,
+            "inputs": [
+                "{workspaceRoot}/Cargo.toml",
+                "{workspaceRoot}/Cargo.lock",
+                "{projectRoot}/Cargo.toml"
+            ]
         },
         "build": {
             "dependsOn": [
                 "deps"
             ],
-            "command": "cargo component build -p klave --target-dir crates/klave/target --release",
+            "command": "rimraf target && cargo component build -p klave --target-dir crates/klave/target --release",
             "cache": true,
             "outputs": [
                 "{projectRoot}/target"

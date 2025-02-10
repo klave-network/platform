@@ -65,6 +65,12 @@
                 "{workspaceRoot}/.eslintrc.json"
             ],
             "cache": true
+        },
+        "test": {
+            "cache": true
+        },
+        "lint": {
+            "cache": true
         }
     },
     "namedInputs": {
@@ -112,13 +118,6 @@
         "default": {
             "runner": "@pellegrims/nx-remotecache-s3",
             "options": {
-                "cacheableOperations": [
-                    "compile",
-                    "build",
-                    "test",
-                    "lint",
-                    "e2e"
-                ],
                 "endpoint": "https://s3.uk.io.cloud.ovh.net/",
                 "bucket": "nx-build-cache",
                 "region": "uk",
