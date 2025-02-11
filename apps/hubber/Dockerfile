@@ -17,7 +17,7 @@ COPY libs/db/src/prisma hubber/prisma
 
 RUN chown -R hubber:hubber .
 
-RUN cd hubber && yarn install
+RUN cd hubber && yarn install --no-cache && yarn cache clean
 
 FROM builder AS db
 

@@ -16,7 +16,7 @@ RUN addgroup --system dispatcher && \
 
 COPY dist/apps/dispatcher dispatcher
 RUN chown -R dispatcher:dispatcher .
-RUN cd dispatcher && yarn install
+RUN cd dispatcher && yarn install --no-cache && yarn cache clean
 
 EXPOSE 3000
 
