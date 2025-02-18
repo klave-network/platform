@@ -2674,7 +2674,7 @@ simple-digest\x01%\x01@\x01\x03lenz\0\x06\x04\0\x10get-random-bytes\x01&\x01@\x0
 ng\x01(\x04\0\x0estop-recording\x01(\x04\0\x12cancel-transaction\x01(\x03\0\x0dk\
 lave:sdk/sdk\x05\0\x04\0\x1dcomponent:klave-sdk/klave-sdk\x04\0\x0b\x0f\x01\0\x09\
 klave-sdk\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.\
-220.1\x10wit-bindgen-rust\x060.36.0";
+220.0\x10wit-bindgen-rust\x060.36.0";
 #[inline(never)]
 #[doc(hidden)]
 pub fn __link_custom_section_describing_imports() {
