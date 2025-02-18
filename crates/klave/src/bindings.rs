@@ -2484,61 +2484,6 @@ pub mod klave {
                 }
             }
             #[allow(unused_unsafe, clippy::all)]
-            pub fn http_query(request: &str) -> Result<_rt::String, _rt::String> {
-                unsafe {
-                    #[repr(align(4))]
-                    struct RetArea([::core::mem::MaybeUninit<u8>; 12]);
-                    let mut ret_area = RetArea([::core::mem::MaybeUninit::uninit(); 12]);
-                    let vec0 = request;
-                    let ptr0 = vec0.as_ptr().cast::<u8>();
-                    let len0 = vec0.len();
-                    let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
-                    #[cfg(target_arch = "wasm32")]
-                    #[link(wasm_import_module = "klave:sdk/sdk")]
-                    extern "C" {
-                        #[link_name = "http-query"]
-                        fn wit_import(_: *mut u8, _: usize, _: *mut u8);
-                    }
-                    #[cfg(not(target_arch = "wasm32"))]
-                    fn wit_import(_: *mut u8, _: usize, _: *mut u8) {
-                        unreachable!()
-                    }
-                    wit_import(ptr0.cast_mut(), len0, ptr1);
-                    let l2 = i32::from(*ptr1.add(0).cast::<u8>());
-                    match l2 {
-                        0 => {
-                            let e = {
-                                let l3 = *ptr1.add(4).cast::<*mut u8>();
-                                let l4 = *ptr1.add(8).cast::<usize>();
-                                let len5 = l4;
-                                let bytes5 = _rt::Vec::from_raw_parts(
-                                    l3.cast(),
-                                    len5,
-                                    len5,
-                                );
-                                _rt::string_lift(bytes5)
-                            };
-                            Ok(e)
-                        }
-                        1 => {
-                            let e = {
-                                let l6 = *ptr1.add(4).cast::<*mut u8>();
-                                let l7 = *ptr1.add(8).cast::<usize>();
-                                let len8 = l7;
-                                let bytes8 = _rt::Vec::from_raw_parts(
-                                    l6.cast(),
-                                    len8,
-                                    len8,
-                                );
-                                _rt::string_lift(bytes8)
-                            };
-                            Err(e)
-                        }
-                        _ => _rt::invalid_enum_discriminant(),
-                    }
-                }
-            }
-            #[allow(unused_unsafe, clippy::all)]
             /// Subscription
             pub fn start_recording() {
                 unsafe {
@@ -2684,9 +2629,9 @@ mod _rt {
 #[cfg(target_arch = "wasm32")]
 #[link_section = "component-type:wit-bindgen:0.36.0:component:klave-sdk:klave-sdk:encoded world"]
 #[doc(hidden)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 2230] = *b"\
-\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xb6\x10\x01A\x02\x01\
-A\x02\x01BT\x01@\x01\x0aquery-names\x01\0\x04\0\x0eadd-user-query\x01\0\x01@\x01\
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 2215] = *b"\
+\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xa7\x10\x01A\x02\x01\
+A\x02\x01BS\x01@\x01\x0aquery-names\x01\0\x04\0\x0eadd-user-query\x01\0\x01@\x01\
 \x10transaction-names\x01\0\x04\0\x14add-user-transaction\x01\x01\x01@\x01\x03ms\
 gs\x01\0\x04\0\x06notify\x01\x02\x04\0\x0cnotify-error\x01\x02\x04\0\x11on-succe\
 ss-notify\x01\x02\x01j\x01s\x01s\x01@\x01\x05params\0\x03\x04\0\x0dquery-context\
@@ -2725,11 +2670,11 @@ y-names\x0acipher-txt\x05\0\x06\x04\0\x0esimple-decrypt\x01\"\x01@\x02\x08key-na
 mes\x03txt\x05\0\x06\x04\0\x0bsimple-sign\x01#\x01@\x03\x08key-names\x03txt\x05\x09\
 signature\x05\0\x10\x04\0\x0dsimple-verify\x01$\x01@\x01\x03txt\x05\0\x06\x04\0\x0d\
 simple-digest\x01%\x01@\x01\x03lenz\0\x06\x04\0\x10get-random-bytes\x01&\x01@\x01\
-\x07requests\0\x03\x04\0\x0bhttps-query\x01'\x04\0\x0ahttp-query\x01'\x01@\0\x01\
-\0\x04\0\x0fstart-recording\x01(\x04\0\x0estop-recording\x01(\x04\0\x12cancel-tr\
-ansaction\x01(\x03\0\x0dklave:sdk/sdk\x05\0\x04\0\x1dcomponent:klave-sdk/klave-s\
-dk\x04\0\x0b\x0f\x01\0\x09klave-sdk\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\
-\x0dwit-component\x070.220.0\x10wit-bindgen-rust\x060.36.0";
+\x07requests\0\x03\x04\0\x0bhttps-query\x01'\x01@\0\x01\0\x04\0\x0fstart-recordi\
+ng\x01(\x04\0\x0estop-recording\x01(\x04\0\x12cancel-transaction\x01(\x03\0\x0dk\
+lave:sdk/sdk\x05\0\x04\0\x1dcomponent:klave-sdk/klave-sdk\x04\0\x0b\x0f\x01\0\x09\
+klave-sdk\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.\
+220.1\x10wit-bindgen-rust\x060.36.0";
 #[inline(never)]
 #[doc(hidden)]
 pub fn __link_custom_section_describing_imports() {
