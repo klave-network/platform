@@ -92,7 +92,7 @@ pub fn get_rsa_metadata(params: &RsaHashedKeyGenParams) -> Result<RsaMetadata, B
         return Err("Invalid hash algorithm".into());
     }
 
-    let Ok(rsa_bitsize) = rsa_bitsize(params.modulusLength) else {
+    let Ok(rsa_bitsize) = rsa_bitsize(params.modulus_length) else {
         return Err("Invalid RSA modulus length".into());
     };
 
@@ -102,13 +102,13 @@ pub fn get_rsa_metadata(params: &RsaHashedKeyGenParams) -> Result<RsaMetadata, B
 
     Ok(RsaMetadata {
         modulus: rsa_bitsize,
-        public_exponent: params.publicExponent,
+        public_exponent: params.public_exponent,
         sha_metadata: sha_metadata,
     })
 }
 
 pub fn get_secpr1_metadata(params: &EcKeyGenParams) -> Result<SecpR1Metadata, Box<dyn Error>> {
-    match params.namedCurve.as_str() {
+    match params.named_curve.as_str() {
         "P-256" => Ok(SecpR1Metadata {
             length: SecpR1KeyBitsize::SecpR1256,
         }),
@@ -123,7 +123,7 @@ pub fn get_secpr1_metadata(params: &EcKeyGenParams) -> Result<SecpR1Metadata, Bo
 }
 
 pub fn get_secpk1_metadata(params: &EcKeyGenParams) -> Result<SecpK1Metadata, Box<dyn Error>> {
-    match params.namedCurve.as_str() {
+    match params.named_curve.as_str() {
         "secp256k1" | "SECP256K1" => Ok(SecpK1Metadata {
             length: SecpK1KeyBitsize::SecpK1256,
         }),
