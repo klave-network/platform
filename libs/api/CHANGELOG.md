@@ -1,4 +1,6 @@
 # Changelog
+## [1.1.3](https://github.com/klave-network/platform/compare/api@1.1.2...api@1.1.3) (2025-02-20)
+
 ## [1.1.2](https://github.com/klave-network/platform/compare/api@1.1.1...api@1.1.2) (2025-02-20)
 
 ### Dependency Updates
