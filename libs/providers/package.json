@@ -1,6 +1,6 @@
 {
     "name": "@klave/providers",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "type": "module",
     "dependencies": {
         "@secretarium/connector": "0.17.0",
