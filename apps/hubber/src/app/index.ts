@@ -126,9 +126,18 @@ export const start = async () => {
         sessionOptions.cookie = { secure: true }; // serve secure cookies
     }
 
-    app.get('/ping', (__unusedReq, res) => {
+    app.use('/version', async (__unusedReq, res) => {
+
         res.setHeader('X-Klave-API-Status', 'ready');
-        res.json({ pong: true, node: __hostname });
+        await res.status(202).send({
+            version: {
+                name: process.env.NX_TASK_TARGET_PROJECT,
+                commit: process.env.GIT_REPO_COMMIT?.substring(0, 8),
+                branch: process.env.GIT_REPO_BRANCH,
+                version: process.env.GIT_REPO_VERSION
+            },
+            node: __hostname
+        });
     });
 
     app.use(session(sessionOptions));
@@ -145,7 +154,6 @@ export const start = async () => {
     app.use('/trpc', trcpMiddlware);
     app.use(usersRouter);
     app.use(sentryErrorMiddleware);
-
     app.all('*', (req, res) => {
         res.json({
             path: req.path,
