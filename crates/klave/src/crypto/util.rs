@@ -120,7 +120,7 @@ pub fn get_rsa_metadata(params: &RsaHashedKeyGenParams) -> Result<RsaMetadata, B
     Ok(RsaMetadata {
         modulus: rsa_bitsize,
         public_exponent: params.public_exponent,
-        sha_metadata,
+        sha_metadata: sha_metadata,
     })
 }
 
