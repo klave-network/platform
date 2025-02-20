@@ -1,4 +1,62 @@
 # Changelog
+## [1.1.3](https://github.com/klave-network/platform/compare/api@1.1.2...api@1.1.3) (2025-02-20)
+
+## [1.1.2](https://github.com/klave-network/platform/compare/api@1.1.1...api@1.1.2) (2025-02-20)
+
+### Dependency Updates
+
+* `db` updated to version `1.1.1`
+* `constants` updated to version `1.1.1`
+* `providers` updated to version `1.1.1`
+## [1.1.1](https://github.com/klave-network/platform/compare/api@1.1.0...api@1.1.1) (2025-01-23)
+
+### Dependency Updates
+
+* `constants` updated to version `1.1.0`
+* `providers` updated to version `1.1.0`
+## [1.1.0](https://github.com/klave-network/platform/compare/api@1.0.0...api@1.1.0) (2025-01-23)
+
+### Dependency Updates
+
+* `constants` updated to version `1.0.0`
+* `db` updated to version `1.0.0`
+* `providers` updated to version `1.0.0`
+
+### Features
+
+* **api,ui:** Adding support for setting query spending limits ([928392c](https://github.com/klave-network/platform/commit/928392c28f9d9db92482360befac7db9c6231745))
+
+## [1.0.0](https://github.com/klave-network/platform/compare/api@0.13.0...api@1.0.0) (2024-10-04)
+
+### Dependency Updates
+
+* `constants` updated to version `0.13.0`
+* `db` updated to version `0.13.0`
+* `providers` updated to version `0.13.0`
+
+### ⚠ BREAKING CHANGES
+
+* Moving to pure ESM repo
+
+### Miscellaneous Chores
+
+* Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
+
+## [0.13.0](https://github.com/klave-network/platform/compare/api@0.12.0...api@0.13.0) (2024-08-02)
+
+
+### Features
+
+* **api,ui:** Add the ability to add a custom cluster ([fcc3c5f](https://github.com/klave-network/platform/commit/fcc3c5f0f9b76f4e8a5a7826ef64327061b1d096))
+* **api,ui:** Allow editing of permission grants for organisations ([e2bd7d2](https://github.com/klave-network/platform/commit/e2bd7d2097b773e2a7151594ee837950298cfe2d)), closes [#KN-232](https://github.com/klave-network/platform/issues/KN-232)
+
+
+### Bug Fixes
+
+* **api:** Ensure permission checks on org deletion ([ee905eb](https://github.com/klave-network/platform/commit/ee905eb9daf4981741d4d7f5f0eab7e45176ddc8))
+* **api:** Ensure to query apps based on accessible orgs ([97932cf](https://github.com/klave-network/platform/commit/97932cfd0f9cf66be70a72531e4f80f6cd9bf281))
+* **api:** Guarantee app fetch over accessible organisations ([259d666](https://github.com/klave-network/platform/commit/259d6660abb9b472469a5c72f83de7764eeafe02))
+
 ## [0.12.0](https://github.com/klave-network/platform/compare/api@0.11.0...api@0.12.0) (2024-07-25)
 
 ### Dependency Updates
