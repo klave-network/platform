@@ -6,11 +6,11 @@
     "dependencies": {
         "@quixo3/prisma-session-store": "3.1.13",
         "@sentry/core": "7.120.3",
-        "@sentry/esbuild-plugin": "3.1.2",
+        "@sentry/esbuild-plugin": "3.2.0",
         "@sentry/node": "7.120.3",
-        "@trpc/server": "11.0.0-rc.755",
+        "@trpc/server": "11.0.0-rc.795",
         "cors": "2.8.5",
-        "esbuild-node-externals": "1.16.0",
+        "esbuild-node-externals": "1.18.0",
         "expect-ct": "1.0.0",
         "express": "4.21.2",
         "express-session": "1.18.1",
@@ -26,7 +26,7 @@
         "rate-limiter-flexible": "5.0.5",
         "stripe": "17.6.0",
         "unique-names-generator": "4.7.1",
-        "uuid": "^11.0.5",
+        "uuid": "^11.1.0",
         "ws": "8.18.0"
     }
 }

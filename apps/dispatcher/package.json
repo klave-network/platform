@@ -8,16 +8,16 @@
         "@fastify/rate-limit": "10.2.2",
         "@fastify/sensible": "6.0.3",
         "@fastify/websocket": "11.0.2",
-        "@sentry/esbuild-plugin": "3.1.2",
+        "@sentry/esbuild-plugin": "3.2.0",
         "@sentry/node": "7.120.3",
         "@sentry/profiling-node": "7.120.3",
         "@sentry/types": "7.120.3",
-        "esbuild-node-externals": "1.16.0",
+        "esbuild-node-externals": "1.18.0",
         "fastify": "~5.2.1",
         "git-rev-sync": "3.0.2",
         "mongodb": "6.13.0",
-        "uuid": "^11.0.5",
+        "uuid": "^11.1.0",
         "ws": "8.18.0",
-        "zod": "3.24.1"
+        "zod": "3.24.2"
     }
 }
