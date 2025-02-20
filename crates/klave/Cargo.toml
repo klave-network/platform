@@ -29,9 +29,3 @@ package = "component:klave-sdk"
 
 [package.metadata.component.target.dependencies]
 "klave:sdk" = { path = "./wit/sdk" }
-
-[profile.release]
-lto = true
-# Tell `rustc` to optimize for small code size.
-opt-level = "s"
-strip = true

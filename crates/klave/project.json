@@ -6,7 +6,7 @@
     ],
     "targets": {
         "deps": {
-            "command": "cargo install --locked cargo-component --force",
+            "command": "(is-ci && cargo install cargo-component --force) || cargo install cargo-component",
             "cache": true,
             "inputs": [
                 "{workspaceRoot}/Cargo.toml",
@@ -28,8 +28,11 @@
             "dependsOn": [
                 "build"
             ],
-            "command": "cargo publish -p klave",
-            "cache": false
+            "command": "cargo publish --no-verify -p klave",
+            "cache": true,
+            "outputs": [
+                "{workspaceRoot}/target"
+            ]
         }
     }
 }
