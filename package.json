@@ -261,7 +261,7 @@
         "nx": "20.4.5",
         "patch-package": "^8.0.0",
         "postcss": "8.5.3",
-        "prettier": "^3.5.1",
+        "prettier": "^3.5.2",
         "prisma": "6.4.0",
         "react-refresh": "^0.16.0",
         "react-test-renderer": "19.0.0",
