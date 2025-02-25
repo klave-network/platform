@@ -495,7 +495,7 @@ pub fn verify(algorithm: &SignAlgorithm, key: &CryptoKey, data: &[u8], signature
             let metadata = RsaPssSignatureMetadata { 
                 salt_length: params.salt_length as u64
             };
-            let result = match CryptoImpl::verify(&key_name, SigningAlgorithm::RsaPss as u32, &serde_json::to_string(&metadata).unwrap(), &signature, &data) {
+            let result = match CryptoImpl::verify(&key_name, SigningAlgorithm::RsaPss as u32, &serde_json::to_string(&metadata).unwrap(), &data, &signature) {
                 Ok(result) => result,
                 Err(e) => return Err(e.into())
             };
@@ -509,7 +509,7 @@ pub fn verify(algorithm: &SignAlgorithm, key: &CryptoKey, data: &[u8], signature
             let metadata = EcdsaSignatureMetadata { 
                 sha_metadata: sha_metadata
             };
-            let result = match CryptoImpl::verify(&key_name, SigningAlgorithm::Ecdsa as u32, &serde_json::to_string(&metadata).unwrap(), &signature, &data) {
+            let result = match CryptoImpl::verify(&key_name, SigningAlgorithm::Ecdsa as u32, &serde_json::to_string(&metadata).unwrap(), &data, &signature) {
                 Ok(result) => result,
                 Err(e) => return Err(e.into())
             };
