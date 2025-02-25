@@ -2,7 +2,7 @@ use crate::sdk;
 use serde::Serialize;
 
 pub fn send_string(param: &str) {
-    sdk::notify(param);
+    sdk::notify(&param);
 }
 
 pub fn send_json<T: Serialize>(value: &T) -> Result<(), Box<dyn std::error::Error>> {
@@ -12,5 +12,5 @@ pub fn send_json<T: Serialize>(value: &T) -> Result<(), Box<dyn std::error::Erro
 }
 
 pub fn on_success_notify(message: &str) {
-    sdk::on_success_notify(message);
+    sdk::on_success_notify(&message);
 }
