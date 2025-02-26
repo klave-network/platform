@@ -1,5 +1,4 @@
 use crate::sdk;
-use anyhow::Result;
 
 pub fn load_lightgbm_model(name: &str, model: &str) -> Result<(), Box<dyn std::error::Error>> {
     match sdk::load_lightgbm_model(&name, &model) {

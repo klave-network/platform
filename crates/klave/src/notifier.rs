@@ -1,5 +1,4 @@
 use crate::sdk;
-use anyhow::Result;
 use serde::Serialize;
 
 pub fn send_string(param: &str) {
