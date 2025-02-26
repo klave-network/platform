@@ -94,14 +94,6 @@ impl Default for EcKeyGenParams {
     }
 }
 
-impl Default for RsaOaepEncryptionMetadata {
-    fn default() -> Self {
-        RsaOaepEncryptionMetadata {
-            label: vec![]
-        }
-    }
-}
-
 #[derive(Deserialize, Serialize)]
 pub struct AesGcmParams {
     pub iv: Vec<u8>,
