@@ -1,0 +1,19 @@
+{
+    "name": "@klave/ui-kit",
+    "version": "0.0.1",
+    "main": "./index.js",
+    "types": "./index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./index.mjs",
+            "require": "./index.js"
+        }
+    },
+    "dependencies": {
+        "@react-email/components": "^0.0.33",
+        "@react-email/render": "^1.0.5",
+        "@react-email/tailwind": "^1.0.4",
+        "react": "19.0.0",
+        "react-email": "3.0.7"
+    }
+}
