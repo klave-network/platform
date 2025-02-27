@@ -75,7 +75,7 @@ pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn st
         header[0].parse::<http::header::HeaderName>().unwrap(),
         header[1].parse::<http::header::HeaderValue>().unwrap()
     )).collect();
-    parts.status = StatusCode::from_u16(http_response.status_code as u16).unwrap();
+    parts.status = StatusCode::from_u16(http_response.status_code as u16)?;
     parts.version = request.version();
 
     let response = Response::from_parts(parts, http_response.body);

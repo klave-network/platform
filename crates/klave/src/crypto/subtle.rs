@@ -292,13 +292,13 @@ pub fn generate_key(algorithm: &GenAlgorithm, extractable: bool, usages: &[&str]
                 Err(e) => return Err(e.into())
             };
 
-            let key = match CryptoImpl::generate_key("", KeyAlgorithm::Rsa as u32, &serde_json::to_string(&rsa_metadata).unwrap(), extractable, &usages) {
+            let key = match CryptoImpl::generate_key("", KeyAlgorithm::Rsa as u32, &serde_json::to_string(&rsa_metadata)?, extractable, &usages) {
                 Ok(key) => key,
                 Err(e) => return Err(e.into())
             };
 
-            let crypto_key_json = String::from_utf8(key).unwrap();
-            let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json).unwrap();
+            let crypto_key_json = String::from_utf8(key)?;
+            let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json)?;
             Ok(crypto_key)
         }
         GenAlgorithm::EcKeyGenParams(params) => {
@@ -317,7 +317,7 @@ pub fn generate_key(algorithm: &GenAlgorithm, extractable: bool, usages: &[&str]
                         Ok(key) => key,
                         Err(e) => return Err(e.into()),
                     };
-                    let crypto_key_json = String::from_utf8(key).unwrap();
+                    let crypto_key_json = String::from_utf8(key)?;
                     let crypto_key: CryptoKey = match serde_json::from_str(&crypto_key_json) {
                         Ok(crypto_key) => crypto_key,
                         Err(e) => return Err(e.into()),
@@ -339,8 +339,8 @@ pub fn generate_key(algorithm: &GenAlgorithm, extractable: bool, usages: &[&str]
                         Ok(key) => key,
                         Err(e) => return Err(e.into()),
                     };
-                    let crypto_key_json = String::from_utf8(key).unwrap();
-                    let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json).unwrap();
+                    let crypto_key_json = String::from_utf8(key)?;
+                    let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json)?;
                     Ok(crypto_key)
                 }
                 _ => Err("Invalid curve name".into())
@@ -359,8 +359,8 @@ pub fn generate_key(algorithm: &GenAlgorithm, extractable: bool, usages: &[&str]
                 Ok(key) => key,
                 Err(e) => return Err(e.into()),
             };
-            let crypto_key_json = String::from_utf8(key).unwrap();
-            let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json).unwrap();
+            let crypto_key_json = String::from_utf8(key)?;
+            let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json)?;
             Ok(crypto_key)
         }
     }
@@ -379,7 +379,7 @@ pub fn encrypt(algorithm: &EncryptAlgorithm, key: &CryptoKey, clear_text: &[u8])
             let result = match CryptoImpl::encrypt(
                     &key_name, 
                     EncryptionAlgorithm::RsaOaep as u32, 
-                    &serde_json::to_string(&metadata).unwrap(), 
+                    &serde_json::to_string(&metadata)?, 
                     &clear_text) {
                 Ok(result) => result,
                 Err(e) => return Err(e.into())
@@ -399,7 +399,7 @@ pub fn encrypt(algorithm: &EncryptAlgorithm, key: &CryptoKey, clear_text: &[u8])
             let result = match CryptoImpl::encrypt(
                     &key_name, 
                     EncryptionAlgorithm::AesGcm as u32, 
-                    &serde_json::to_string(&metadata).unwrap(), 
+                    &serde_json::to_string(&metadata)?, 
                     &clear_text) {
                 Ok(result) => result,
                 Err(e) => return Err(e.into())
@@ -419,7 +419,7 @@ pub fn decrypt(algorithm: &EncryptAlgorithm, key: &CryptoKey, cipher_text: &[u8]
             let metadata = RsaOaepEncryptionMetadata { 
                 label: params.label.clone()
             };
-            let result = match CryptoImpl::decrypt(&key_name, EncryptionAlgorithm::RsaOaep as u32, &serde_json::to_string(&metadata).unwrap(), &cipher_text) {
+            let result = match CryptoImpl::decrypt(&key_name, EncryptionAlgorithm::RsaOaep as u32, &serde_json::to_string(&metadata)?, &cipher_text) {
                 Ok(result) => result,
                 Err(e) => return Err(e.into())
             };
@@ -435,7 +435,7 @@ pub fn decrypt(algorithm: &EncryptAlgorithm, key: &CryptoKey, cipher_text: &[u8]
                 additional_data: params.additional_data.clone(), 
                 tag_length: tag_length
             };
-            let result = match CryptoImpl::decrypt(&key_name, EncryptionAlgorithm::AesGcm as u32, &serde_json::to_string(&metadata).unwrap(), &cipher_text) {
+            let result = match CryptoImpl::decrypt(&key_name, EncryptionAlgorithm::AesGcm as u32, &serde_json::to_string(&metadata)?, &cipher_text) {
                 Ok(result) => result,
                 Err(e) => return Err(e.into())
             };
@@ -454,7 +454,7 @@ pub fn sign(algorithm: &SignAlgorithm, key: &CryptoKey, data: &[u8]) -> Result<V
             let metadata = RsaPssSignatureMetadata { 
                 salt_length: params.salt_length as u64
             };
-            let result = match CryptoImpl::sign(&key_name, SigningAlgorithm::RsaPss as u32, &serde_json::to_string(&metadata).unwrap(), &data) {
+            let result = match CryptoImpl::sign(&key_name, SigningAlgorithm::RsaPss as u32, &serde_json::to_string(&metadata)?, &data) {
                 Ok(result) => result,
                 Err(e) => return Err(e.into())
             };
@@ -468,7 +468,7 @@ pub fn sign(algorithm: &SignAlgorithm, key: &CryptoKey, data: &[u8]) -> Result<V
             let metadata = EcdsaSignatureMetadata { 
                 sha_metadata: sha_metadata
             };
-            let result = match CryptoImpl::sign(&key_name, SigningAlgorithm::Ecdsa as u32, &serde_json::to_string(&metadata).unwrap(), &data) {
+            let result = match CryptoImpl::sign(&key_name, SigningAlgorithm::Ecdsa as u32, &serde_json::to_string(&metadata)?, &data) {
                 Ok(result) => result,
                 Err(e) => return Err(e.into())
             };
@@ -487,7 +487,7 @@ pub fn verify(algorithm: &SignAlgorithm, key: &CryptoKey, data: &[u8], signature
             let metadata = RsaPssSignatureMetadata { 
                 salt_length: params.salt_length as u64
             };
-            let result = match CryptoImpl::verify(&key_name, SigningAlgorithm::RsaPss as u32, &serde_json::to_string(&metadata).unwrap(), &data, &signature) {
+            let result = match CryptoImpl::verify(&key_name, SigningAlgorithm::RsaPss as u32, &serde_json::to_string(&metadata)?, &data, &signature) {
                 Ok(result) => result,
                 Err(e) => return Err(e.into())
             };
@@ -501,7 +501,7 @@ pub fn verify(algorithm: &SignAlgorithm, key: &CryptoKey, data: &[u8], signature
             let metadata = EcdsaSignatureMetadata { 
                 sha_metadata: sha_metadata
             };
-            let result = match CryptoImpl::verify(&key_name, SigningAlgorithm::Ecdsa as u32, &serde_json::to_string(&metadata).unwrap(), &data, &signature) {
+            let result = match CryptoImpl::verify(&key_name, SigningAlgorithm::Ecdsa as u32, &serde_json::to_string(&metadata)?, &data, &signature) {
                 Ok(result) => result,
                 Err(e) => return Err(e.into())
             };
@@ -518,7 +518,7 @@ pub fn digest(algorithm: &str, data: &[u8]) -> Result<Vec<u8>, Box<dyn std::erro
         Ok(sha_metadata) => sha_metadata,
         Err(e) => return Err(e.into())
     };
-    let result = match CryptoImpl::digest(HashAlgorithm::Sha as u32, &serde_json::to_string(&sha_metadata).unwrap(), &data) {
+    let result = match CryptoImpl::digest(HashAlgorithm::Sha as u32, &serde_json::to_string(&sha_metadata)?, &data) {
         Ok(result) => result,
         Err(e) => return Err(e.into())
     };
@@ -544,7 +544,7 @@ pub fn import_key(format: &str, key_data: &[u8], algorithm: &GenAlgorithm, extra
                 Ok(rsa_metadata) => rsa_metadata,
                 Err(e) => return Err(e.into())
             };
-            algo_metadata = serde_json::to_string(&rsa_metadata).unwrap();
+            algo_metadata = serde_json::to_string(&rsa_metadata)?;
             algo_id = KeyAlgorithm::Rsa;
         }
         GenAlgorithm::EcKeyGenParams(params) => {
@@ -555,7 +555,7 @@ pub fn import_key(format: &str, key_data: &[u8], algorithm: &GenAlgorithm, extra
                         Ok(secpr1_metadata) => secpr1_metadata,
                         Err(e) => return Err(e.into())
                     };
-                    algo_metadata = serde_json::to_string(&secpr1_metadata).unwrap();
+                    algo_metadata = serde_json::to_string(&secpr1_metadata)?;
                     algo_id = KeyAlgorithm::SecpR1;
                 },
                 "secp256k1" | "SECP256K1" => {
@@ -563,7 +563,7 @@ pub fn import_key(format: &str, key_data: &[u8], algorithm: &GenAlgorithm, extra
                         Ok(secpk1_metadata) => secpk1_metadata,
                         Err(e) => return Err(e.into())
                     };
-                    algo_metadata = serde_json::to_string(&secpk1_metadata).unwrap();
+                    algo_metadata = serde_json::to_string(&secpk1_metadata)?;
                     algo_id = KeyAlgorithm::SecpK1;
                 }
                 _ => return Err("Invalid curve name".into())
@@ -574,7 +574,7 @@ pub fn import_key(format: &str, key_data: &[u8], algorithm: &GenAlgorithm, extra
                 Ok(aes_metadata) => aes_metadata,
                 Err(e) =>  {    return Err(e.into()); }
             };
-            algo_metadata = serde_json::to_string(&aes_metadata).unwrap();
+            algo_metadata = serde_json::to_string(&aes_metadata)?;
             algo_id = KeyAlgorithm::Aes;
         }                
     }
@@ -584,8 +584,8 @@ pub fn import_key(format: &str, key_data: &[u8], algorithm: &GenAlgorithm, extra
         Err(e) => return Err(e.into())
     };
 
-    let crypto_key_json = String::from_utf8(result).unwrap();
-    let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json).unwrap();
+    let crypto_key_json = String::from_utf8(result)?;
+    let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json)?;
     Ok(crypto_key)
 }
 
@@ -609,7 +609,7 @@ pub fn wrap_key(format: &str, key: &CryptoKey, wrapping_key: &CryptoKey, algorit
             let result = match CryptoImpl::wrap_key(
                     &wrapping_key_name, 
                     EncryptionAlgorithm::RsaOaep as u32, 
-                    &serde_json::to_string(&metadata).unwrap(),
+                    &serde_json::to_string(&metadata)?,
                     &key_name,
                     key_format as u32) {
                 Ok(result) => result,
@@ -630,7 +630,7 @@ pub fn wrap_key(format: &str, key: &CryptoKey, wrapping_key: &CryptoKey, algorit
             let result = match CryptoImpl::wrap_key(
                     &wrapping_key_name, 
                     EncryptionAlgorithm::AesGcm as u32, 
-                    &serde_json::to_string(&metadata).unwrap(),
+                    &serde_json::to_string(&metadata)?,
                     &key_name,
                     key_format as u32) {
                 Ok(result) => result,
@@ -646,7 +646,7 @@ pub fn wrap_key(format: &str, key: &CryptoKey, wrapping_key: &CryptoKey, algorit
                     let result = match CryptoImpl::wrap_key(
                             &wrapping_key_name, 
                             WrappingAlgorithm::AesKw as u32, 
-                            &serde_json::to_string(&metadata).unwrap(),
+                            &serde_json::to_string(&metadata)?,
                             &key_name,
                             key_format as u32) {
                         Ok(result) => result,
@@ -692,7 +692,7 @@ pub fn unwrap_key(
             let metadata = RsaOaepEncryptionMetadata { 
                 label: params.label.clone()
             };
-            wrapping_algo_metadata = serde_json::to_string(&metadata).unwrap();
+            wrapping_algo_metadata = serde_json::to_string(&metadata)?;
             wrapping_algo_id = WrappingAlgorithm::RsaOaep;
         }
         WrapAlgorithm::AesGcmParams(params) => {
@@ -705,7 +705,7 @@ pub fn unwrap_key(
                 additional_data: params.additional_data.clone(), 
                 tag_length: tag_length
             };
-            wrapping_algo_metadata = serde_json::to_string(&metadata).unwrap();
+            wrapping_algo_metadata = serde_json::to_string(&metadata)?;
             wrapping_algo_id = WrappingAlgorithm::AesGcm;
         }
         WrapAlgorithm::NamedAlgorithm(params) => {
@@ -713,7 +713,7 @@ pub fn unwrap_key(
             match algo_name {
                 "AES-KW" | "aes-kw" => {
                     let metadata = AesKwWrappingMetadata { with_padding: true };
-                    wrapping_algo_metadata = serde_json::to_string(&metadata).unwrap();
+                    wrapping_algo_metadata = serde_json::to_string(&metadata)?;
                     wrapping_algo_id = WrappingAlgorithm::AesKw;
                 }
                 _ => return Err("Invalid algorithm".into())
@@ -730,7 +730,7 @@ pub fn unwrap_key(
                 Ok(rsa_metadata) => rsa_metadata,
                 Err(e) => return Err(e.into())
             };
-            key_gen_algo_metadata = serde_json::to_string(&rsa_metadata).unwrap();
+            key_gen_algo_metadata = serde_json::to_string(&rsa_metadata)?;
             key_gen_algo_id = KeyAlgorithm::Rsa;
         }
         GenAlgorithm::EcKeyGenParams(params) => {
@@ -741,7 +741,7 @@ pub fn unwrap_key(
                         Ok(secpr1_metadata) => secpr1_metadata,
                         Err(e) => return Err(e.into())
                     };
-                    key_gen_algo_metadata = serde_json::to_string(&secpr1_metadata).unwrap();
+                    key_gen_algo_metadata = serde_json::to_string(&secpr1_metadata)?;
                     key_gen_algo_id = KeyAlgorithm::SecpR1;
                 },
                 "secp256k1" | "SECP256K1" => {
@@ -749,7 +749,7 @@ pub fn unwrap_key(
                         Ok(secpk1_metadata) => secpk1_metadata,
                         Err(e) => return Err(e.into())
                     };
-                    key_gen_algo_metadata = serde_json::to_string(&secpk1_metadata).unwrap();
+                    key_gen_algo_metadata = serde_json::to_string(&secpk1_metadata)?;
                     key_gen_algo_id = KeyAlgorithm::SecpK1;
                 }
                 _ => return Err("Invalid curve name".into())
@@ -760,7 +760,7 @@ pub fn unwrap_key(
                 Ok(aes_metadata) => aes_metadata,
                 Err(e) =>  {    return Err(e.into()); }
             };
-            key_gen_algo_metadata = serde_json::to_string(&aes_metadata).unwrap();
+            key_gen_algo_metadata = serde_json::to_string(&aes_metadata)?;
             key_gen_algo_id = KeyAlgorithm::Aes;
         }
     }
@@ -778,8 +778,8 @@ pub fn unwrap_key(
         Ok(result) => result,
         Err(e) => return Err(e.into())
     };
-    let crypto_key_json = String::from_utf8(result).unwrap();
-    let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json).unwrap();
+    let crypto_key_json = String::from_utf8(result)?;
+    let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json)?;
     Ok(crypto_key)
 
 }
@@ -838,14 +838,14 @@ pub fn derive_key(derivation_algorithm: &DerivAlgorithm, base_key: &CryptoKey, d
     match derivation_algorithm {
         DerivAlgorithm::EcdhDerivParams(params) => {
             derivation_algo_metadata = match util::get_ecdh_metadata(params) {
-                Ok(result) => serde_json::to_string(&result).unwrap(),
+                Ok(result) => serde_json::to_string(&result)?,
                 Err(e) => return Err(e.into())
             };
             derivation_algo_id = DerivationAlgorithm::Ecdh;
         }
         DerivAlgorithm::HkdfDerivParams(params) => {
             derivation_algo_metadata = match util::get_hkdf_metadata(params) {
-                Ok(result) => serde_json::to_string(&result).unwrap(),
+                Ok(result) => serde_json::to_string(&result)?,
                 Err(e) => return Err(e.into())
             };
             derivation_algo_id = DerivationAlgorithm::Hkdf;
@@ -873,7 +873,7 @@ pub fn derive_key(derivation_algorithm: &DerivAlgorithm, base_key: &CryptoKey, d
         Err(e) => return Err(e.into())
     };
     
-    let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json).unwrap();
+    let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json)?;
     Ok(crypto_key)
 }
 
@@ -898,7 +898,7 @@ pub fn save_key(key: &CryptoKey, key_persisted_name: &str) -> Result<(), Box<dyn
         key_name: key_persisted_name.to_string(),
         key_type: key.key_type.clone()
     };                
-    match CryptoImpl::persist_key(&serde_json::to_string(&params).unwrap().into_bytes() ) {
+    match CryptoImpl::persist_key(&serde_json::to_string(&params)?.into_bytes() ) {
         Ok(_) => (),
         Err(e) => return Err(e.into())
     };
@@ -913,6 +913,6 @@ pub fn load_key(key_name: &str) -> Result<CryptoKey, Box<dyn std::error::Error>>
         Ok(result) => result,
         Err(e) => return Err(e.into())
     };
-    let crypto_key: CryptoKey = serde_json::from_str(&key_json).unwrap();
+    let crypto_key: CryptoKey = serde_json::from_str(&key_json)?;
     Ok(crypto_key)
 }

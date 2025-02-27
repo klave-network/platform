@@ -47,7 +47,7 @@ impl KeyAES
             tag_length: AesTagLength::Tag96
         };
     
-        match CryptoImpl::encrypt(&self.key.name(), EncryptionAlgorithm::AesGcm as u32, &serde_json::to_string(&aes_gcm_params).unwrap(), &data) {
+        match CryptoImpl::encrypt(&self.key.name(), EncryptionAlgorithm::AesGcm as u32, &serde_json::to_string(&aes_gcm_params)?, &data) {
             Ok(result) => {
                 //Prepend iv to the result
                 let result = iv.to_vec().into_iter().chain(result.into_iter()).collect::<Vec<u8>>();                
@@ -66,7 +66,7 @@ impl KeyAES
             tag_length: AesTagLength::Tag96
         };
 
-        match CryptoImpl::decrypt(&self.key.name(), EncryptionAlgorithm::AesGcm as u32, &serde_json::to_string(&aes_gcm_params).unwrap(), &data.to_vec()) {
+        match CryptoImpl::decrypt(&self.key.name(), EncryptionAlgorithm::AesGcm as u32, &serde_json::to_string(&aes_gcm_params)?, &data.to_vec()) {
             Ok(result) => Ok(result),
             Err(err) => Err(err)
         }
@@ -97,7 +97,7 @@ pub fn generate_key(name: &str) -> Result<KeyAES, Box<dyn Error>> {
     }
 
     let metadata = AesKeyGenParams { length: 256 };
-    let key = match CryptoImpl::generate_key(name, KeyAlgorithm::Aes as u32, &serde_json::to_string(&metadata).unwrap(), true, &["encrypt", "decrypt"]) {
+    let key = match CryptoImpl::generate_key(name, KeyAlgorithm::Aes as u32, &serde_json::to_string(&metadata)?, true, &["encrypt", "decrypt"]) {
         Ok(result) => result,
         Err(e) => return Err(e)
     };
@@ -107,7 +107,7 @@ pub fn generate_key(name: &str) -> Result<KeyAES, Box<dyn Error>> {
         Err(e) => return Err(e.into())
     };
 
-    match serde_json::from_str::<CryptoKey>(&String::from_utf8(key).unwrap()) {
+    match serde_json::from_str::<CryptoKey>(&String::from_utf8(key)?) {
         Ok(_) => (),
         Err(e) => return Err(e.into())
     };
