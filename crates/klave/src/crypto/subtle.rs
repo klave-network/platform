@@ -111,30 +111,14 @@ impl Default for AesGcmParams {
     }
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Default, Deserialize, Serialize)]
 pub struct RsaOaepParams {
     pub label: Vec<u8>
 }
 
-impl Default for RsaOaepParams {
-    fn default() -> Self {
-        RsaOaepParams {
-            label: vec![]
-        }
-    }
-}
-
-#[derive(Deserialize, Serialize)]
+#[derive(Default, Deserialize, Serialize)]
 pub struct RsaPssParams {
     pub salt_length: u32
-}
-
-impl Default for RsaPssParams {
-    fn default() -> Self {
-        RsaPssParams {
-            salt_length: 0
-        }
-    }
 }
 
 #[derive(Deserialize, Serialize)]
