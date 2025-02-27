@@ -10,6 +10,8 @@ import { type startRegistration, type startAuthentication } from '@simplewebauth
 import { Utils } from '@secretarium/connector';
 // import * as passport from 'passport';
 import { z } from 'zod';
+import { render } from '@react-email/components';
+import { VerificationCodeEmail, RegistrationFollowUpEmail } from '@klave/ui-kit';
 
 const mailGuard = new FakeMailGuard({
     allowDisposable: false,
@@ -80,6 +82,29 @@ export const authRouter = createTRPCRouter({
                     slug: newSlug
                 }
             });
+
+            const transporter = createTransport(process.env['KLAVE_SMTP_HOST']);
+            const [keySelector, domainName] = (process.env['KLAVE_DKIM_DOMAIN'] ?? '@').split('@');
+            const followUpEmail = await render(RegistrationFollowUpEmail({ slug: newSlug }));
+
+            if (!keySelector || !domainName)
+                throw new Error('DKIM domain not set');
+
+            await Sentry.startSpan({
+                name: 'Email Transport',
+                op: 'mailer.send',
+                description: 'Email Transport'
+            }, async () => transporter.sendMail({
+                from: process.env['KLAVE_NOREPLY_ADDRESS'],
+                to: user.emails[0], // unsure if we should send email to all addresses
+                subject: 'Welcome to Klave',
+                html: followUpEmail,
+                dkim: {
+                    domainName,
+                    keySelector,
+                    privateKey: process.env['KLAVE_DKIM_PRIVATE_KEY'] ?? ''
+                }
+            }));
 
             await new Promise<void>((resolve, reject) => {
                 session.save(() => {
@@ -209,6 +234,11 @@ export const authRouter = createTRPCRouter({
                 const [keySelector, domainName] = (process.env['KLAVE_DKIM_DOMAIN'] ?? '@').split('@');
                 if (!keySelector || !domainName)
                     throw new Error('DKIM domain not set');
+
+                const verificationCodeEmail = await render(VerificationCodeEmail({
+                    code: temporaryCode.substring(0, 3) + '-' + temporaryCode.substring(3, 6) + '-' + temporaryCode.substring(6, 9),
+                    title: 'Your login code for Klave'
+                }));
                 await Sentry.startSpan({
                     name: 'Email Transport',
                     op: 'mailer.send',
@@ -216,8 +246,8 @@ export const authRouter = createTRPCRouter({
                 }, async () => transporter.sendMail({
                     from: process.env['KLAVE_NOREPLY_ADDRESS'],
                     to: email,
-                    subject: 'Login code',
-                    text: `Your Klave login code is: ${temporaryCode.substring(0, 3)}-${temporaryCode.substring(3, 6)}-${temporaryCode.substring(6, 9)}`,
+                    subject: 'Klave login code',
+                    html: verificationCodeEmail,
                     dkim: {
                         domainName,
                         keySelector,
