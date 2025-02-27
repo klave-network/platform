@@ -4,6 +4,9 @@ import { createTRPCRouter, publicProcedure } from '../trpc';
 import { Organisation } from '@klave/db';
 import { scp } from '@klave/providers';
 import { reservedNames } from '@klave/constants';
+import { createTransport } from 'nodemailer';
+import { render } from '@react-email/components';
+import { OrganisationConfirmationEmail } from '@klave/ui-kit';
 
 export const organisationRouter = createTRPCRouter({
     getPersonal: publicProcedure
@@ -204,6 +207,42 @@ export const organisationRouter = createTRPCRouter({
                     }
                 }
             });
+
+            const fetchedUser = await prisma.user.findFirst({
+                where: {
+                    id: user.id
+                },
+                select: {
+                    emails: true,
+                    slug: true
+                }
+            });
+
+            if (!fetchedUser)
+                throw new Error('User does not exist');
+
+            const transporter = createTransport(process.env['KLAVE_SMTP_HOST']);
+            const [keySelector, domainName] = (process.env['KLAVE_DKIM_DOMAIN'] ?? '@').split('@');
+            const confirmationEmail = await render(OrganisationConfirmationEmail({ userSlug: fetchedUser.slug, orgSlug: slug }));
+
+            if (!keySelector || !domainName)
+                throw new Error('DKIM domain not set');
+
+            await Sentry.startSpan({
+                name: 'Email Transport',
+                op: 'mailer.send',
+                description: 'Email Transport'
+            }, async () => transporter.sendMail({
+                from: process.env['KLAVE_NOREPLY_ADDRESS'],
+                to: fetchedUser.emails[0], // unsure if we should send email to all addresses
+                subject: 'Your organisation is now live on Klave',
+                html: confirmationEmail,
+                dkim: {
+                    domainName,
+                    keySelector,
+                    privateKey: process.env['KLAVE_DKIM_PRIVATE_KEY'] ?? ''
+                }
+            }));
 
             return org;
 
