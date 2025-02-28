@@ -15,10 +15,14 @@ WORKDIR /app
 RUN addgroup --system ui && \
     adduser --system -G ui ui
 
-COPY apps/ui/tools/kube_inject.sh .
-COPY dist/apps/ui ui
-RUN chown -R ui:ui .
+COPY --chown=ui:ui apps/ui/tools/kube_inject.sh .
+COPY --chown=ui:ui dist/apps/ui ui
 
-RUN yarn add serve
+RUN yarn add serve && yarn cache clean && rm -rf /var/cache/yarn
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3000/ || exit 1
 
 CMD [ "sh", "./kube_inject.sh" ]
