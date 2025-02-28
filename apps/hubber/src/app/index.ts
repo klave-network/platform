@@ -142,6 +142,10 @@ export const start = async (port: number) => {
     app.get('/ping', (__unusedReq, res) => {
         res.json({ pong: true });
     });
+    
+    app.get('/version', (__unusedReq, res) => {
+        res.json({ pong: true });
+    });
 
     app.use(session(sessionOptions));
     app.use('/', express.static(path.join(__dirname, 'public')));
