@@ -70,7 +70,15 @@ const getBackendVersions = async () => {
         secretariumVersionUpdateTimer = setTimeout(() => { getBackendVersions().catch(() => { return; }); }, 300000);
 };
 
+client.onError((error) => {
+    logger.error(`Connection to Secretarium errored: ${error}`);
+    lastSCPState = Constants.ConnectionState.closed;
+    planReconnection()
+        .catch(() => { return; });
+});
+
 client.onStateChange((state) => {
+    logger.info(`Connection to Secretarium's state changed from ${lastSCPState} to ${state}`);
     lastSCPState = state;
     if (lastSCPState !== Constants.ConnectionState.secure && lastSCPState !== Constants.ConnectionState.connecting)
         planReconnection()
