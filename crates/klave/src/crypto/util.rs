@@ -9,18 +9,6 @@ struct KeyFormatWrapper {
     pub format: KeyFormat,    
 }
 
-pub fn key_format_to_string(format: KeyFormat) -> String {
-    let key_format_wrapper = KeyFormatWrapper {
-        format: format,
-    };
-    serde_json::to_string(&key_format_wrapper).unwrap()
-}
-
-pub fn string_to_key_format(format_str: &str) -> KeyFormat {
-    let key_format_wrapper: KeyFormatWrapper = serde_json::from_str(format_str).unwrap();
-    key_format_wrapper.format
-}
-
 pub fn is_valid_hash_algorithm(algorithm: &str) -> bool {
     match algorithm {
         "sha-256"  | "sha-384"  | "sha-512" => true,
@@ -154,7 +142,7 @@ pub fn get_hkdf_metadata(params: &HkdfDerivParams) -> Result<HkdfMetadata, Box<d
     Ok(HkdfMetadata{ 
         salt: params.salt.clone(),
         info: params.info.clone(),
-        hash_info: get_sha_metadata(&params.hash).unwrap(),
+        hash_info: get_sha_metadata(&params.hash)?,
     })
 }
 
