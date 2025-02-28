@@ -46,7 +46,7 @@ pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn st
 
     let http_request = HttpRequest {
         method: request.method().as_str().to_string(),
-        hostname: request.uri().host().unwrap().to_string(),
+        hostname: request.uri().host().ok_or("Missing host in URI")?.to_string(),
         port: i32::from(port),
         path: request.uri().path().to_string(),
         version: format!("{:?}", request.version()),
@@ -54,27 +54,28 @@ pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn st
         body: request.body().to_string()
     };
 
+    let http_request_str = serde_json::to_string(&http_request)?;
 
-    let http_request_str = match serde_json::to_string(&http_request) {
-        Ok(http_request_str) => http_request_str,
-        Err(e) => return Err(e.into())
-    };
+    let response = sdk::https_query(&http_request_str)?;
 
-    let response = match sdk::https_query(&http_request_str){
-        Ok(response) => response,
-        Err(err) => return Err(err.into())
-    };
-    
-    let http_response: HttpResponse<String> = match serde_json::from_str(&response){
-        Ok(http_response) => http_response,
-        Err(e) => return Err(e.into())
-    };
+    let http_response: HttpResponse<String> = serde_json::from_str(&response)?;
 
     let mut parts = Response::new(String::new()).into_parts().0;
-    parts.headers = http_response.headers.iter().map(|header| (
-        header[0].parse::<http::header::HeaderName>().unwrap(),
-        header[1].parse::<http::header::HeaderValue>().unwrap()
-    )).collect();
+
+    parts.headers = http_response.headers.iter()
+        .map(|header| {
+            match (header.get(0), header.get(1)) {
+                (Some(name), Some(value)) => {
+                    let parsed_name = name.parse::<http::header::HeaderName>()
+                        .map_err(|e| format!("Failed to parse header name '{}': {}", name, e))?;
+                    let parsed_value = value.parse::<http::header::HeaderValue>()
+                        .map_err(|e| format!("Failed to parse header value '{}': {}", value, e))?;
+                    Ok((parsed_name, parsed_value))
+                },
+                _ => Err::<_, String>("Malformed header entry: missing name or value".into())
+            }
+        }).collect::<Result<http::HeaderMap, _>>()?;
+    
     parts.status = StatusCode::from_u16(http_response.status_code as u16)?;
     parts.version = request.version();
 
