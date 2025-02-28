@@ -9,18 +9,6 @@ struct KeyFormatWrapper {
     pub format: KeyFormat,    
 }
 
-pub fn key_format_to_string(format: KeyFormat) -> String {
-    let key_format_wrapper = KeyFormatWrapper {
-        format: format,
-    };
-    serde_json::to_string(&key_format_wrapper).unwrap()
-}
-
-pub fn string_to_key_format(format_str: &str) -> KeyFormat {
-    let key_format_wrapper: KeyFormatWrapper = serde_json::from_str(format_str).unwrap();
-    key_format_wrapper.format
-}
-
 pub fn is_valid_hash_algorithm(algorithm: &str) -> bool {
     match algorithm {
         "sha-256"  | "sha-384"  | "sha-512" => true,
@@ -92,7 +80,7 @@ pub fn get_rsa_metadata(params: &RsaHashedKeyGenParams) -> Result<RsaMetadata, B
         return Err("Invalid hash algorithm".into());
     }
 
-    let Ok(rsa_bitsize) = rsa_bitsize(params.modulusLength) else {
+    let Ok(rsa_bitsize) = rsa_bitsize(params.modulus_length) else {
         return Err("Invalid RSA modulus length".into());
     };
 
@@ -102,13 +90,13 @@ pub fn get_rsa_metadata(params: &RsaHashedKeyGenParams) -> Result<RsaMetadata, B
 
     Ok(RsaMetadata {
         modulus: rsa_bitsize,
-        public_exponent: params.publicExponent,
+        public_exponent: params.public_exponent,
         sha_metadata: sha_metadata,
     })
 }
 
 pub fn get_secpr1_metadata(params: &EcKeyGenParams) -> Result<SecpR1Metadata, Box<dyn Error>> {
-    match params.namedCurve.as_str() {
+    match params.named_curve.as_str() {
         "P-256" => Ok(SecpR1Metadata {
             length: SecpR1KeyBitsize::SecpR1256,
         }),
@@ -123,7 +111,7 @@ pub fn get_secpr1_metadata(params: &EcKeyGenParams) -> Result<SecpR1Metadata, Bo
 }
 
 pub fn get_secpk1_metadata(params: &EcKeyGenParams) -> Result<SecpK1Metadata, Box<dyn Error>> {
-    match params.namedCurve.as_str() {
+    match params.named_curve.as_str() {
         "secp256k1" | "SECP256K1" => Ok(SecpK1Metadata {
             length: SecpK1KeyBitsize::SecpK1256,
         }),
@@ -154,7 +142,7 @@ pub fn get_hkdf_metadata(params: &HkdfDerivParams) -> Result<HkdfMetadata, Box<d
     Ok(HkdfMetadata{ 
         salt: params.salt.clone(),
         info: params.info.clone(),
-        hash_info: get_sha_metadata(&params.hash).unwrap(),
+        hash_info: get_sha_metadata(&params.hash)?,
     })
 }
 

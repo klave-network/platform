@@ -46,7 +46,7 @@ pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn st
 
     let http_request = HttpRequest {
         method: request.method().as_str().to_string(),
-        hostname: request.uri().host().unwrap().to_string(),
+        hostname: request.uri().host().ok_or("Missing host in URI")?.to_string(),
         port: i32::from(port),
         path: request.uri().path().to_string(),
         version: format!("{:?}", request.version()),
@@ -71,11 +71,19 @@ pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn st
     };
 
     let mut parts = Response::new(String::new()).into_parts().0;
-    parts.headers = http_response.headers.iter().map(|header| (
-        header[0].parse::<http::header::HeaderName>().unwrap(),
-        header[1].parse::<http::header::HeaderValue>().unwrap()
-    )).collect();
-    parts.status = StatusCode::from_u16(http_response.status_code as u16).unwrap();
+    
+    parts.headers = http_response.headers.iter().filter_map(|header| {
+        match (header.get(0), header.get(1)) {
+            (Some(name), Some(value)) => {
+                let parsed_name = name.parse::<http::header::HeaderName>().ok()?;
+                let parsed_value = value.parse::<http::header::HeaderValue>().ok()?;
+                Some((parsed_name, parsed_value))
+            },
+            _ => None
+        }
+    }).collect();
+    
+    parts.status = StatusCode::from_u16(http_response.status_code as u16)?;
     parts.version = request.version();
 
     let response = Response::from_parts(parts, http_response.body);

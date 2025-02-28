@@ -45,11 +45,10 @@ impl CryptoKey {
 }
 
 #[derive(Deserialize, Serialize)]
-#[allow(non_snake_case)]
 pub struct KeyPersistParams {
-    keyId: String,
-    keyName: String,
-    keyType: String
+    key_id: String,
+    key_name: String,
+    key_type: String
 }
 
 #[derive(Deserialize, Serialize)]
@@ -66,75 +65,60 @@ impl Default for AesKeyGenParams {
 }
 
 #[derive(Deserialize, Serialize)]
-#[allow(non_snake_case)]
 pub struct RsaHashedKeyGenParams {
-    pub modulusLength: u32,
-    pub publicExponent: u32,
+    pub modulus_length: u32,
+    pub public_exponent: u32,
     pub hash: String
 }
 
 impl Default for RsaHashedKeyGenParams {
     fn default() -> Self {
         RsaHashedKeyGenParams {
-            modulusLength: 2048,
-            publicExponent: 65537,
+            modulus_length: 2048,
+            public_exponent: 65537,
             hash: "SHA-256".to_string()
         }
     }
 }
 
 #[derive(Deserialize, Serialize)]
-#[allow(non_snake_case)]
 pub struct EcKeyGenParams {
-    pub namedCurve: String
+    pub named_curve: String
 }
 
 impl Default for EcKeyGenParams {
     fn default() -> Self {
         EcKeyGenParams {
-            namedCurve: "P-256".to_string()
-        }
-    }
-}
-
-impl Default for RsaOaepEncryptionMetadata {
-    fn default() -> Self {
-        RsaOaepEncryptionMetadata {
-            label: vec![]
+            named_curve: "P-256".to_string()
         }
     }
 }
 
 #[derive(Deserialize, Serialize)]
-#[allow(non_snake_case)]
 pub struct AesGcmParams {
     pub iv: Vec<u8>,
-    pub additionalData: Vec<u8>,
-    pub tagLength: u32
+    pub additional_data: Vec<u8>,
+    pub tag_length: u32
 }
 
 impl Default for AesGcmParams {
     fn default() -> Self {
         AesGcmParams {
             iv: vec![],
-            additionalData: vec![],
-            tagLength: 128
+            additional_data: vec![],
+            tag_length: 128
         }
     }
 }
 
-#[derive(Deserialize, Serialize)]
-#[allow(non_snake_case)]
+#[derive(Default, Deserialize, Serialize)]
+pub struct RsaOaepParams {
+    pub label: Vec<u8>
+}
+
+#[derive(Default, Deserialize, Serialize)]
 pub struct RsaPssParams {
-    pub saltLength: u32
-}
-
-impl Default for RsaPssParams {
-    fn default() -> Self {
-        RsaPssParams {
-            saltLength: 0
-        }
-    }
+    pub salt_length: u32
 }
 
 #[derive(Deserialize, Serialize)]
@@ -151,95 +135,29 @@ impl Default for EcdsaParams {
 }
 
 #[derive(Deserialize, Serialize)]
-pub struct NamedAlgorithm {
-    pub name: String
+pub enum KeyGenAlgorithm {
+    Rsa(RsaHashedKeyGenParams),
+    Ecc(EcKeyGenParams),
+    Aes(AesKeyGenParams),
 }
-
-#[derive(Deserialize, Serialize)]
-pub enum GenAlgorithm {
-    RsaHashedKeyGenParams(RsaHashedKeyGenParams),
-    EcKeyGenParams(EcKeyGenParams),
-    AesKeyGenParams(AesKeyGenParams),
-}
-
-impl From<EcKeyGenParams> for GenAlgorithm {
-    fn from(params: EcKeyGenParams) -> Self {
-        GenAlgorithm::EcKeyGenParams(params)
-    }
-}
-
-impl From<AesKeyGenParams> for GenAlgorithm {
-    fn from(params: AesKeyGenParams) -> Self {
-        GenAlgorithm::AesKeyGenParams(params)
-    }
-}
-
-impl From<RsaHashedKeyGenParams> for GenAlgorithm {
-    fn from(params: RsaHashedKeyGenParams) -> Self {
-        GenAlgorithm::RsaHashedKeyGenParams(params)
-    }
-}
-
 
 #[derive(Deserialize, Serialize)]
 pub enum EncryptAlgorithm {
-    RsaOaepEncryptionMetadata(RsaOaepEncryptionMetadata),
-    AesGcmParams(AesGcmParams),
-}
-
-impl From<RsaOaepEncryptionMetadata> for EncryptAlgorithm {
-    fn from(params: RsaOaepEncryptionMetadata) -> Self {
-        EncryptAlgorithm::RsaOaepEncryptionMetadata(params)
-    }
-}
-
-impl From<AesGcmParams> for EncryptAlgorithm {
-    fn from(params: AesGcmParams) -> Self {
-        EncryptAlgorithm::AesGcmParams(params)
-    }
+    RsaOaep(RsaOaepParams),
+    AesGcm(AesGcmParams),
 }
 
 #[derive(Deserialize, Serialize)]
 pub enum SignAlgorithm {
-    EcdsaParams(EcdsaParams),
-    RsaPssParams(RsaPssParams),
-}
-
-impl From<EcdsaParams> for SignAlgorithm {
-    fn from(params: EcdsaParams) -> Self {
-        SignAlgorithm::EcdsaParams(params)
-    }
-}
-
-impl From<RsaPssParams> for SignAlgorithm {
-    fn from(params: RsaPssParams) -> Self {
-        SignAlgorithm::RsaPssParams(params)
-    }
+    Ecdsa(EcdsaParams),
+    RsaPss(RsaPssParams),
 }
 
 #[derive(Deserialize, Serialize)]
-pub enum WrapAlgorithm {
-    RsaOaepEncryptionMetadata(RsaOaepEncryptionMetadata),
-    AesGcmParams(AesGcmParams),
-    NamedAlgorithm(NamedAlgorithm),
-}
-
-impl From<RsaOaepEncryptionMetadata> for WrapAlgorithm {
-    fn from(params: RsaOaepEncryptionMetadata) -> Self {
-        WrapAlgorithm::RsaOaepEncryptionMetadata(params)
-    }
-}
-
-impl From<AesGcmParams> for WrapAlgorithm {
-    fn from(params: AesGcmParams) -> Self {
-        WrapAlgorithm::AesGcmParams(params)
-    }
-}
-
-impl From<NamedAlgorithm> for WrapAlgorithm {
-    fn from(params: NamedAlgorithm) -> Self {
-        WrapAlgorithm::NamedAlgorithm(params)
-    }
+pub enum KeyWrapAlgorithm {
+    RsaOaep(RsaOaepParams),
+    AesGcm(AesGcmParams),
+    AesKw,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -255,54 +173,35 @@ pub struct HkdfDerivParams {
 }
 
 #[derive(Deserialize, Serialize)]
-pub enum DerivAlgorithm {
-    EcdhDerivParams(EcdhDerivParams),
-    HkdfDerivParams(HkdfDerivParams),
-}
-
-impl From<EcdhDerivParams> for DerivAlgorithm {
-    fn from(params: EcdhDerivParams) -> Self {
-        DerivAlgorithm::EcdhDerivParams(params)
-    }
-}
-
-impl From<HkdfDerivParams> for DerivAlgorithm {
-    fn from(params: HkdfDerivParams) -> Self {
-        DerivAlgorithm::HkdfDerivParams(params)
-    }
+pub enum KeyDerivationAlgorithm {
+    Ecdh(EcdhDerivParams),
+    Hkdf(HkdfDerivParams),
 }
 
 #[derive(Deserialize, Serialize)]
-pub enum DerivKeyAlgorithm {
-    AesKeyGenParams(AesKeyGenParams),
+pub enum DerivedKeyAlgorithm {
+    Aes(AesKeyGenParams),
 }
 
-
-impl From<AesKeyGenParams> for DerivKeyAlgorithm {
-    fn from(params: AesKeyGenParams) -> Self {
-        DerivKeyAlgorithm::AesKeyGenParams(params)
-    }
-}
-
-pub fn generate_key(algorithm: &GenAlgorithm, extractable: bool, usages: &[&str]) -> Result<CryptoKey, Box<dyn std::error::Error>> {
+pub fn generate_key(algorithm: &KeyGenAlgorithm, extractable: bool, usages: &[&str]) -> Result<CryptoKey, Box<dyn std::error::Error>> {
     match algorithm {
-        GenAlgorithm::RsaHashedKeyGenParams(params) => {
+        KeyGenAlgorithm::Rsa(params) => {
             let rsa_metadata = match util::get_rsa_metadata(&params) {
                 Ok(rsa_metadata) => rsa_metadata,
                 Err(e) => return Err(e.into())
             };
 
-            let key = match CryptoImpl::generate_key("", KeyAlgorithm::Rsa as u32, &serde_json::to_string(&rsa_metadata).unwrap(), extractable, &usages) {
+            let key = match CryptoImpl::generate_key("", KeyAlgorithm::Rsa as u32, &serde_json::to_string(&rsa_metadata)?, extractable, &usages) {
                 Ok(key) => key,
                 Err(e) => return Err(e.into())
             };
 
-            let crypto_key_json = String::from_utf8(key).unwrap();
-            let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json).unwrap();
+            let crypto_key_json = String::from_utf8(key)?;
+            let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json)?;
             Ok(crypto_key)
         }
-        GenAlgorithm::EcKeyGenParams(params) => {
-            let named_curve = params.namedCurve.as_str();
+        KeyGenAlgorithm::Ecc(params) => {
+            let named_curve = params.named_curve.as_str();
             match named_curve {
                 "P-256" | "P-384" | "P-521" => {
                     let secpr1_metadata = match util::get_secpr1_metadata(&params) {
@@ -317,7 +216,7 @@ pub fn generate_key(algorithm: &GenAlgorithm, extractable: bool, usages: &[&str]
                         Ok(key) => key,
                         Err(e) => return Err(e.into()),
                     };
-                    let crypto_key_json = String::from_utf8(key).unwrap();
+                    let crypto_key_json = String::from_utf8(key)?;
                     let crypto_key: CryptoKey = match serde_json::from_str(&crypto_key_json) {
                         Ok(crypto_key) => crypto_key,
                         Err(e) => return Err(e.into()),
@@ -339,14 +238,14 @@ pub fn generate_key(algorithm: &GenAlgorithm, extractable: bool, usages: &[&str]
                         Ok(key) => key,
                         Err(e) => return Err(e.into()),
                     };
-                    let crypto_key_json = String::from_utf8(key).unwrap();
-                    let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json).unwrap();
+                    let crypto_key_json = String::from_utf8(key)?;
+                    let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json)?;
                     Ok(crypto_key)
                 }
                 _ => Err("Invalid curve name".into())
             }
         }
-        GenAlgorithm::AesKeyGenParams(params) => {
+        KeyGenAlgorithm::Aes(params) => {
             let aes_metadata = match util::get_aes_metadata(&params) {
                 Ok(aes_metadata) => aes_metadata,
                 Err(e) =>  {    return Err(e.into()); }
@@ -359,8 +258,8 @@ pub fn generate_key(algorithm: &GenAlgorithm, extractable: bool, usages: &[&str]
                 Ok(key) => key,
                 Err(e) => return Err(e.into()),
             };
-            let crypto_key_json = String::from_utf8(key).unwrap();
-            let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json).unwrap();
+            let crypto_key_json = String::from_utf8(key)?;
+            let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json)?;
             Ok(crypto_key)
         }
     }
@@ -372,31 +271,34 @@ pub fn encrypt(algorithm: &EncryptAlgorithm, key: &CryptoKey, clear_text: &[u8])
     }
     let key_name = &key.id;
     match algorithm {
-        EncryptAlgorithm::RsaOaepEncryptionMetadata(params) => {
+        EncryptAlgorithm::RsaOaep(params) => {
+            let metadata = RsaOaepEncryptionMetadata { 
+                label: params.label.clone()
+            };
             let result = match CryptoImpl::encrypt(
                     &key_name, 
                     EncryptionAlgorithm::RsaOaep as u32, 
-                    &serde_json::to_string(&params).unwrap(), 
+                    &serde_json::to_string(&metadata)?, 
                     &clear_text) {
                 Ok(result) => result,
                 Err(e) => return Err(e.into())
             };
             Ok(result)
         }
-        EncryptAlgorithm::AesGcmParams(params) => {
-            let tag_length = match util::get_aes_tag_length(&params.tagLength) {
+        EncryptAlgorithm::AesGcm(params) => {
+            let tag_length = match util::get_aes_tag_length(&params.tag_length) {
                 Ok(tag_length) => tag_length,
                 Err(e) => return Err(e.into())
             };
             let metadata = AesGcmEncryptionMetadata { 
                 iv: params.iv.clone(), 
-                additional_data: params.additionalData.clone(), 
+                additional_data: params.additional_data.clone(), 
                 tag_length: tag_length
             };
             let result = match CryptoImpl::encrypt(
                     &key_name, 
                     EncryptionAlgorithm::AesGcm as u32, 
-                    &serde_json::to_string(&metadata).unwrap(), 
+                    &serde_json::to_string(&metadata)?, 
                     &clear_text) {
                 Ok(result) => result,
                 Err(e) => return Err(e.into())
@@ -412,24 +314,27 @@ pub fn decrypt(algorithm: &EncryptAlgorithm, key: &CryptoKey, cipher_text: &[u8]
     }
     let key_name = &key.id;
     match algorithm {
-        EncryptAlgorithm::RsaOaepEncryptionMetadata(params) => {
-            let result = match CryptoImpl::decrypt(&key_name, EncryptionAlgorithm::RsaOaep as u32, &serde_json::to_string(&params).unwrap(), &cipher_text) {
+        EncryptAlgorithm::RsaOaep(params) => {
+            let metadata = RsaOaepEncryptionMetadata { 
+                label: params.label.clone()
+            };
+            let result = match CryptoImpl::decrypt(&key_name, EncryptionAlgorithm::RsaOaep as u32, &serde_json::to_string(&metadata)?, &cipher_text) {
                 Ok(result) => result,
                 Err(e) => return Err(e.into())
             };
             Ok(result)
         }
-        EncryptAlgorithm::AesGcmParams(params) => {
-            let tag_length = match util::get_aes_tag_length(&params.tagLength) {
+        EncryptAlgorithm::AesGcm(params) => {
+            let tag_length = match util::get_aes_tag_length(&params.tag_length) {
                 Ok(tag_length) => tag_length,
                 Err(e) => return Err(e.into())
             };
             let metadata = AesGcmEncryptionMetadata { 
                 iv: params.iv.clone(), 
-                additional_data: params.additionalData.clone(), 
+                additional_data: params.additional_data.clone(), 
                 tag_length: tag_length
             };
-            let result = match CryptoImpl::decrypt(&key_name, EncryptionAlgorithm::AesGcm as u32, &serde_json::to_string(&metadata).unwrap(), &cipher_text) {
+            let result = match CryptoImpl::decrypt(&key_name, EncryptionAlgorithm::AesGcm as u32, &serde_json::to_string(&metadata)?, &cipher_text) {
                 Ok(result) => result,
                 Err(e) => return Err(e.into())
             };
@@ -444,17 +349,17 @@ pub fn sign(algorithm: &SignAlgorithm, key: &CryptoKey, data: &[u8]) -> Result<V
     }
     let key_name = &key.id;
     match algorithm {
-        SignAlgorithm::RsaPssParams(params) => {
+        SignAlgorithm::RsaPss(params) => {
             let metadata = RsaPssSignatureMetadata { 
-                salt_length: params.saltLength as u64
+                salt_length: params.salt_length as u64
             };
-            let result = match CryptoImpl::sign(&key_name, SigningAlgorithm::RsaPss as u32, &serde_json::to_string(&metadata).unwrap(), &data) {
+            let result = match CryptoImpl::sign(&key_name, SigningAlgorithm::RsaPss as u32, &serde_json::to_string(&metadata)?, &data) {
                 Ok(result) => result,
                 Err(e) => return Err(e.into())
             };
             Ok(result)
         }
-        SignAlgorithm::EcdsaParams(params) => {
+        SignAlgorithm::Ecdsa(params) => {
             let sha_metadata = match util::get_sha_metadata(&params.hash) {
                 Ok(sha_metadata) => sha_metadata,
                 Err(e) => return Err(e.into())
@@ -462,7 +367,7 @@ pub fn sign(algorithm: &SignAlgorithm, key: &CryptoKey, data: &[u8]) -> Result<V
             let metadata = EcdsaSignatureMetadata { 
                 sha_metadata: sha_metadata
             };
-            let result = match CryptoImpl::sign(&key_name, SigningAlgorithm::Ecdsa as u32, &serde_json::to_string(&metadata).unwrap(), &data) {
+            let result = match CryptoImpl::sign(&key_name, SigningAlgorithm::Ecdsa as u32, &serde_json::to_string(&metadata)?, &data) {
                 Ok(result) => result,
                 Err(e) => return Err(e.into())
             };
@@ -471,23 +376,23 @@ pub fn sign(algorithm: &SignAlgorithm, key: &CryptoKey, data: &[u8]) -> Result<V
     }
 }
 
-pub fn verify(algorithm: &SignAlgorithm, key: &CryptoKey, signature: &[u8], data: &[u8]) -> Result<VerifySignResult, Box<dyn std::error::Error>> {
+pub fn verify(algorithm: &SignAlgorithm, key: &CryptoKey, data: &[u8], signature: &[u8]) -> Result<VerifySignResult, Box<dyn std::error::Error>> {
     if signature.is_empty() || data.is_empty() {
         return Err("Invalid signature or data".into());
     }
     let key_name = &key.id;
     match algorithm {
-        SignAlgorithm::RsaPssParams(params) => {
+        SignAlgorithm::RsaPss(params) => {
             let metadata = RsaPssSignatureMetadata { 
-                salt_length: params.saltLength as u64
+                salt_length: params.salt_length as u64
             };
-            let result = match CryptoImpl::verify(&key_name, SigningAlgorithm::RsaPss as u32, &serde_json::to_string(&metadata).unwrap(), &signature, &data) {
+            let result = match CryptoImpl::verify(&key_name, SigningAlgorithm::RsaPss as u32, &serde_json::to_string(&metadata)?, &data, &signature) {
                 Ok(result) => result,
                 Err(e) => return Err(e.into())
             };
             Ok(result)
         }
-        SignAlgorithm::EcdsaParams(params) => {
+        SignAlgorithm::Ecdsa(params) => {
             let sha_metadata = match util::get_sha_metadata(&params.hash) {
                 Ok(sha_metadata) => sha_metadata,
                 Err(e) => return Err(e.into())
@@ -495,7 +400,7 @@ pub fn verify(algorithm: &SignAlgorithm, key: &CryptoKey, signature: &[u8], data
             let metadata = EcdsaSignatureMetadata { 
                 sha_metadata: sha_metadata
             };
-            let result = match CryptoImpl::verify(&key_name, SigningAlgorithm::Ecdsa as u32, &serde_json::to_string(&metadata).unwrap(), &signature, &data) {
+            let result = match CryptoImpl::verify(&key_name, SigningAlgorithm::Ecdsa as u32, &serde_json::to_string(&metadata)?, &data, &signature) {
                 Ok(result) => result,
                 Err(e) => return Err(e.into())
             };
@@ -512,14 +417,14 @@ pub fn digest(algorithm: &str, data: &[u8]) -> Result<Vec<u8>, Box<dyn std::erro
         Ok(sha_metadata) => sha_metadata,
         Err(e) => return Err(e.into())
     };
-    let result = match CryptoImpl::digest(HashAlgorithm::Sha as u32, &serde_json::to_string(&sha_metadata).unwrap(), &data) {
+    let result = match CryptoImpl::digest(HashAlgorithm::Sha as u32, &serde_json::to_string(&sha_metadata)?, &data) {
         Ok(result) => result,
         Err(e) => return Err(e.into())
     };
     Ok(result)
 }
 
-pub fn import_key(format: &str, key_data: &[u8], algorithm: &GenAlgorithm, extractable: bool, usages: &[&str]) -> Result<CryptoKey, Box<dyn std::error::Error>> {
+pub fn import_key(format: &str, key_data: &[u8], algorithm: &KeyGenAlgorithm, extractable: bool, usages: &[&str]) -> Result<CryptoKey, Box<dyn std::error::Error>> {
     let algo_metadata: String;
     let algo_id: KeyAlgorithm;
 
@@ -533,23 +438,23 @@ pub fn import_key(format: &str, key_data: &[u8], algorithm: &GenAlgorithm, extra
     }
 
     match algorithm {
-        GenAlgorithm::RsaHashedKeyGenParams(params) => {
+        KeyGenAlgorithm::Rsa(params) => {
             let rsa_metadata = match util::get_rsa_metadata(&params) {
                 Ok(rsa_metadata) => rsa_metadata,
                 Err(e) => return Err(e.into())
             };
-            algo_metadata = serde_json::to_string(&rsa_metadata).unwrap();
+            algo_metadata = serde_json::to_string(&rsa_metadata)?;
             algo_id = KeyAlgorithm::Rsa;
         }
-        GenAlgorithm::EcKeyGenParams(params) => {
-            let named_curve = params.namedCurve.as_str();
+        KeyGenAlgorithm::Ecc(params) => {
+            let named_curve = params.named_curve.as_str();
             match named_curve {
                 "P-256" | "P-384" | "P-521" => {
                     let secpr1_metadata = match util::get_secpr1_metadata(&params) {
                         Ok(secpr1_metadata) => secpr1_metadata,
                         Err(e) => return Err(e.into())
                     };
-                    algo_metadata = serde_json::to_string(&secpr1_metadata).unwrap();
+                    algo_metadata = serde_json::to_string(&secpr1_metadata)?;
                     algo_id = KeyAlgorithm::SecpR1;
                 },
                 "secp256k1" | "SECP256K1" => {
@@ -557,18 +462,18 @@ pub fn import_key(format: &str, key_data: &[u8], algorithm: &GenAlgorithm, extra
                         Ok(secpk1_metadata) => secpk1_metadata,
                         Err(e) => return Err(e.into())
                     };
-                    algo_metadata = serde_json::to_string(&secpk1_metadata).unwrap();
+                    algo_metadata = serde_json::to_string(&secpk1_metadata)?;
                     algo_id = KeyAlgorithm::SecpK1;
                 }
                 _ => return Err("Invalid curve name".into())
             }
         }    
-        GenAlgorithm::AesKeyGenParams(params) => {
+        KeyGenAlgorithm::Aes(params) => {
             let aes_metadata = match util::get_aes_metadata(&params) {
                 Ok(aes_metadata) => aes_metadata,
                 Err(e) =>  {    return Err(e.into()); }
             };
-            algo_metadata = serde_json::to_string(&aes_metadata).unwrap();
+            algo_metadata = serde_json::to_string(&aes_metadata)?;
             algo_id = KeyAlgorithm::Aes;
         }                
     }
@@ -578,12 +483,12 @@ pub fn import_key(format: &str, key_data: &[u8], algorithm: &GenAlgorithm, extra
         Err(e) => return Err(e.into())
     };
 
-    let crypto_key_json = String::from_utf8(result).unwrap();
-    let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json).unwrap();
+    let crypto_key_json = String::from_utf8(result)?;
+    let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json)?;
     Ok(crypto_key)
 }
 
-pub fn wrap_key(format: &str, key: &CryptoKey, wrapping_key: &CryptoKey, algorithm: &WrapAlgorithm) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+pub fn wrap_key(format: &str, key: &CryptoKey, wrapping_key: &CryptoKey, algorithm: &KeyWrapAlgorithm) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
     let key_format = match util::get_key_format(&format) {
         Ok(key_format) => key_format,
         Err(e) => return Err(e.into())
@@ -596,11 +501,14 @@ pub fn wrap_key(format: &str, key: &CryptoKey, wrapping_key: &CryptoKey, algorit
     }
 
     match algorithm {
-        WrapAlgorithm::RsaOaepEncryptionMetadata(params) => {
+        KeyWrapAlgorithm::RsaOaep(params) => {
+            let metadata = RsaOaepEncryptionMetadata { 
+                label: params.label.clone()
+            };
             let result = match CryptoImpl::wrap_key(
                     &wrapping_key_name, 
                     EncryptionAlgorithm::RsaOaep as u32, 
-                    &serde_json::to_string(&params).unwrap(),
+                    &serde_json::to_string(&metadata)?,
                     &key_name,
                     key_format as u32) {
                 Ok(result) => result,
@@ -608,20 +516,20 @@ pub fn wrap_key(format: &str, key: &CryptoKey, wrapping_key: &CryptoKey, algorit
             };
             Ok(result)
         }
-        WrapAlgorithm::AesGcmParams(params) => {
-            let tag_length = match util::get_aes_tag_length(&params.tagLength) {
+        KeyWrapAlgorithm::AesGcm(params) => {
+            let tag_length = match util::get_aes_tag_length(&params.tag_length) {
                 Ok(tag_length) => tag_length,
                 Err(e) => return Err(e.into())
             };
             let metadata = AesGcmEncryptionMetadata { 
                 iv: params.iv.clone(), 
-                additional_data: params.additionalData.clone(), 
+                additional_data: params.additional_data.clone(), 
                 tag_length: tag_length
             };
             let result = match CryptoImpl::wrap_key(
                     &wrapping_key_name, 
                     EncryptionAlgorithm::AesGcm as u32, 
-                    &serde_json::to_string(&metadata).unwrap(),
+                    &serde_json::to_string(&metadata)?,
                     &key_name,
                     key_format as u32) {
                 Ok(result) => result,
@@ -629,24 +537,18 @@ pub fn wrap_key(format: &str, key: &CryptoKey, wrapping_key: &CryptoKey, algorit
             };
             Ok(result)
         }
-        WrapAlgorithm::NamedAlgorithm(params) => {
-            let algo_name = params.name.as_str();
-            match algo_name {
-                "AES-KW" | "aes-kw" => {
-                    let metadata = AesKwWrappingMetadata { with_padding: true };
-                    let result = match CryptoImpl::wrap_key(
-                            &wrapping_key_name, 
-                            WrappingAlgorithm::AesKw as u32, 
-                            &serde_json::to_string(&metadata).unwrap(),
-                            &key_name,
-                            key_format as u32) {
-                        Ok(result) => result,
-                        Err(e) => return Err(e.into())
-                    };
-                    Ok(result)
-                }
-                _ => Err("Invalid algorithm".into())
-            }
+        KeyWrapAlgorithm::AesKw => {
+            let metadata = AesKwWrappingMetadata { with_padding: true };
+            let result = match CryptoImpl::wrap_key(
+                    &wrapping_key_name, 
+                    WrappingAlgorithm::AesKw as u32, 
+                    &serde_json::to_string(&metadata)?,
+                    &key_name,
+                    key_format as u32) {
+                Ok(result) => result,
+                Err(e) => return Err(e.into())
+            };
+            Ok(result)
         }
         
     }
@@ -656,8 +558,8 @@ pub fn unwrap_key(
         format: &str, 
         wrapped_key: &[u8], 
         unwrapping_key: &CryptoKey, 
-        unwrap_algorithm: &WrapAlgorithm, 
-        unwrapped_key_algorithm: &GenAlgorithm,
+        unwrap_algorithm: &KeyWrapAlgorithm, 
+        unwrapped_key_algorithm: &KeyGenAlgorithm,
         extractable: bool, 
         usages: &[&str]) -> Result<CryptoKey, Box<dyn std::error::Error>> 
 {
@@ -679,33 +581,30 @@ pub fn unwrap_key(
     let wrapping_algo_id: WrappingAlgorithm;
 
     match unwrap_algorithm {
-        WrapAlgorithm::RsaOaepEncryptionMetadata(params) => {
-            wrapping_algo_metadata = serde_json::to_string(&params).unwrap();
+        KeyWrapAlgorithm::RsaOaep(params) => {
+            let metadata = RsaOaepEncryptionMetadata { 
+                label: params.label.clone()
+            };
+            wrapping_algo_metadata = serde_json::to_string(&metadata)?;
             wrapping_algo_id = WrappingAlgorithm::RsaOaep;
         }
-        WrapAlgorithm::AesGcmParams(params) => {
-            let tag_length = match util::get_aes_tag_length(&params.tagLength) {
+        KeyWrapAlgorithm::AesGcm(params) => {
+            let tag_length = match util::get_aes_tag_length(&params.tag_length) {
                 Ok(tag_length) => tag_length,
                 Err(e) => return Err(e.into())
             };
             let metadata = AesGcmEncryptionMetadata { 
                 iv: params.iv.clone(), 
-                additional_data: params.additionalData.clone(), 
+                additional_data: params.additional_data.clone(), 
                 tag_length: tag_length
             };
-            wrapping_algo_metadata = serde_json::to_string(&metadata).unwrap();
+            wrapping_algo_metadata = serde_json::to_string(&metadata)?;
             wrapping_algo_id = WrappingAlgorithm::AesGcm;
         }
-        WrapAlgorithm::NamedAlgorithm(params) => {
-            let algo_name = params.name.as_str();
-            match algo_name {
-                "AES-KW" | "aes-kw" => {
-                    let metadata = AesKwWrappingMetadata { with_padding: true };
-                    wrapping_algo_metadata = serde_json::to_string(&metadata).unwrap();
-                    wrapping_algo_id = WrappingAlgorithm::AesKw;
-                }
-                _ => return Err("Invalid algorithm".into())
-            }
+        KeyWrapAlgorithm::AesKw => {
+            let metadata = AesKwWrappingMetadata { with_padding: true };
+            wrapping_algo_metadata = serde_json::to_string(&metadata)?;
+            wrapping_algo_id = WrappingAlgorithm::AesKw;
         }
     }
 
@@ -713,23 +612,23 @@ pub fn unwrap_key(
     let key_gen_algo_id: KeyAlgorithm;
 
     match unwrapped_key_algorithm {
-        GenAlgorithm::RsaHashedKeyGenParams(params) => {
+        KeyGenAlgorithm::Rsa(params) => {
             let rsa_metadata = match util::get_rsa_metadata(&params) {
                 Ok(rsa_metadata) => rsa_metadata,
                 Err(e) => return Err(e.into())
             };
-            key_gen_algo_metadata = serde_json::to_string(&rsa_metadata).unwrap();
+            key_gen_algo_metadata = serde_json::to_string(&rsa_metadata)?;
             key_gen_algo_id = KeyAlgorithm::Rsa;
         }
-        GenAlgorithm::EcKeyGenParams(params) => {
-            let named_curve = params.namedCurve.as_str();
+        KeyGenAlgorithm::Ecc(params) => {
+            let named_curve = params.named_curve.as_str();
             match named_curve {
                 "P-256" | "P-384" | "P-521" => {
                     let secpr1_metadata = match util::get_secpr1_metadata(&params) {
                         Ok(secpr1_metadata) => secpr1_metadata,
                         Err(e) => return Err(e.into())
                     };
-                    key_gen_algo_metadata = serde_json::to_string(&secpr1_metadata).unwrap();
+                    key_gen_algo_metadata = serde_json::to_string(&secpr1_metadata)?;
                     key_gen_algo_id = KeyAlgorithm::SecpR1;
                 },
                 "secp256k1" | "SECP256K1" => {
@@ -737,18 +636,18 @@ pub fn unwrap_key(
                         Ok(secpk1_metadata) => secpk1_metadata,
                         Err(e) => return Err(e.into())
                     };
-                    key_gen_algo_metadata = serde_json::to_string(&secpk1_metadata).unwrap();
+                    key_gen_algo_metadata = serde_json::to_string(&secpk1_metadata)?;
                     key_gen_algo_id = KeyAlgorithm::SecpK1;
                 }
                 _ => return Err("Invalid curve name".into())
             }
         }
-        GenAlgorithm::AesKeyGenParams(params) => {
+        KeyGenAlgorithm::Aes(params) => {
             let aes_metadata = match util::get_aes_metadata(&params) {
                 Ok(aes_metadata) => aes_metadata,
                 Err(e) =>  {    return Err(e.into()); }
             };
-            key_gen_algo_metadata = serde_json::to_string(&aes_metadata).unwrap();
+            key_gen_algo_metadata = serde_json::to_string(&aes_metadata)?;
             key_gen_algo_id = KeyAlgorithm::Aes;
         }
     }
@@ -766,8 +665,8 @@ pub fn unwrap_key(
         Ok(result) => result,
         Err(e) => return Err(e.into())
     };
-    let crypto_key_json = String::from_utf8(result).unwrap();
-    let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json).unwrap();
+    let crypto_key_json = String::from_utf8(result)?;
+    let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json)?;
     Ok(crypto_key)
 
 }
@@ -814,7 +713,7 @@ pub fn get_public_key(key: &CryptoKey) -> Result<CryptoKey, Box<dyn std::error::
     Ok(crypto_key)
 }
 
-pub fn derive_key(derivation_algorithm: &DerivAlgorithm, base_key: &CryptoKey, derived_key_algorithm: &DerivKeyAlgorithm, extractable: bool, usages: &[&str]) -> Result<CryptoKey, Box<dyn std::error::Error>> {
+pub fn derive_key(derivation_algorithm: &KeyDerivationAlgorithm, base_key: &CryptoKey, derived_key_algorithm: &DerivedKeyAlgorithm, extractable: bool, usages: &[&str]) -> Result<CryptoKey, Box<dyn std::error::Error>> {
     if base_key.id.is_empty() {
         return Err("Invalid key".into());
     }
@@ -824,16 +723,16 @@ pub fn derive_key(derivation_algorithm: &DerivAlgorithm, base_key: &CryptoKey, d
     let derivation_algo_id: DerivationAlgorithm;
 
     match derivation_algorithm {
-        DerivAlgorithm::EcdhDerivParams(params) => {
+        KeyDerivationAlgorithm::Ecdh(params) => {
             derivation_algo_metadata = match util::get_ecdh_metadata(params) {
-                Ok(result) => serde_json::to_string(&result).unwrap(),
+                Ok(result) => serde_json::to_string(&result)?,
                 Err(e) => return Err(e.into())
             };
             derivation_algo_id = DerivationAlgorithm::Ecdh;
         }
-        DerivAlgorithm::HkdfDerivParams(params) => {
+        KeyDerivationAlgorithm::Hkdf(params) => {
             derivation_algo_metadata = match util::get_hkdf_metadata(params) {
-                Ok(result) => serde_json::to_string(&result).unwrap(),
+                Ok(result) => serde_json::to_string(&result)?,
                 Err(e) => return Err(e.into())
             };
             derivation_algo_id = DerivationAlgorithm::Hkdf;
@@ -843,7 +742,7 @@ pub fn derive_key(derivation_algorithm: &DerivAlgorithm, base_key: &CryptoKey, d
     let derived_key_algo_metadata: String;
     let derived_key_algo_id: DerivedKeyUsageAlgorithm;
     match derived_key_algorithm {
-        DerivKeyAlgorithm::AesKeyGenParams(params) => {
+        DerivedKeyAlgorithm::Aes(params) => {
             let aes_metadata = match util::get_aes_metadata(&params) {
                 Ok(aes_metadata) => aes_metadata,
                 Err(e) =>  {    return Err(e.into()); }
@@ -861,7 +760,7 @@ pub fn derive_key(derivation_algorithm: &DerivAlgorithm, base_key: &CryptoKey, d
         Err(e) => return Err(e.into())
     };
     
-    let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json).unwrap();
+    let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json)?;
     Ok(crypto_key)
 }
 
@@ -882,11 +781,11 @@ pub fn save_key(key: &CryptoKey, key_persisted_name: &str) -> Result<(), Box<dyn
     }
 
     let params = KeyPersistParams {
-        keyId: key.id.clone(),
-        keyName: key_persisted_name.to_string(),
-        keyType: key.key_type.clone()
+        key_id: key.id.clone(),
+        key_name: key_persisted_name.to_string(),
+        key_type: key.key_type.clone()
     };                
-    match CryptoImpl::persist_key(&serde_json::to_string(&params).unwrap().into_bytes() ) {
+    match CryptoImpl::persist_key(&serde_json::to_string(&params)?.into_bytes() ) {
         Ok(_) => (),
         Err(e) => return Err(e.into())
     };
@@ -901,6 +800,21 @@ pub fn load_key(key_name: &str) -> Result<CryptoKey, Box<dyn std::error::Error>>
         Ok(result) => result,
         Err(e) => return Err(e.into())
     };
-    let crypto_key: CryptoKey = serde_json::from_str(&key_json).unwrap();
+    let crypto_key: CryptoKey = serde_json::from_str(&key_json)?;
     Ok(crypto_key)
+}
+
+pub fn delete_key(key: &CryptoKey) -> Result<(), Box<dyn std::error::Error>> {
+    if let Some(alias) = &key.alias {
+        if alias.is_empty() {
+            return Err("Invalid key name: cannot be null or empty".into());
+        }
+        match CryptoImpl::delete_key(&alias) {
+            Ok(_) => (),
+            Err(e) => return Err(e.into())
+        };
+        Ok(())
+    }else{
+        return Err("Invalid key name: cannot be null or empty".into());
+    }
 }

@@ -182,7 +182,7 @@ impl CryptoImpl
     }
 
     pub fn persist_key(key_persist_data: &[u8]) -> Result<(), Box<dyn Error>> {
-        match sdk::persist_key(&String::from_utf8(key_persist_data.to_vec()).unwrap()) {
+        match sdk::persist_key(&String::from_utf8(key_persist_data.to_vec())?) {
             Ok(_) => Ok(()),
             Err(err) => Err(err.into())
         }

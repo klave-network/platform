@@ -39,7 +39,7 @@ impl KeyECC
     pub fn sign(&self, data: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
         let hash_algo = ShaMetadata { algo_id: ShaAlgorithm::Sha2, length: ShaDigestBitsize::Sha256 };
         let signature_metadata = EcdsaSignatureMetadata { sha_metadata: hash_algo };        
-        match CryptoImpl::sign(&self.key.name(), SigningAlgorithm::Ecdsa as u32, &serde_json::to_string(&signature_metadata).unwrap(), &data) {
+        match CryptoImpl::sign(&self.key.name(), SigningAlgorithm::Ecdsa as u32, &serde_json::to_string(&signature_metadata)?, &data) {
             Ok(result) => Ok(result),
             Err(err) => Err(err.into())
         }
@@ -48,7 +48,7 @@ impl KeyECC
     pub fn verify(&self, data: &[u8], signature: &[u8]) -> Result<VerifySignResult, Box<dyn Error>> {
         let hash_algo = ShaMetadata { algo_id: ShaAlgorithm::Sha2, length: ShaDigestBitsize::Sha256 };
         let signature_metadata = EcdsaSignatureMetadata { sha_metadata: hash_algo };        
-        match CryptoImpl::verify(&self.key.name(), SigningAlgorithm::Ecdsa as u32,  &serde_json::to_string(&signature_metadata).unwrap(), &data, &signature) {
+        match CryptoImpl::verify(&self.key.name(), SigningAlgorithm::Ecdsa as u32,  &serde_json::to_string(&signature_metadata)?, &data, &signature) {
             Ok(result) => Ok(result),
             Err(err) => Err(err)
         }
@@ -83,7 +83,7 @@ pub fn generate_key(name: &str) -> Result<KeyECC, Box<dyn Error>> {
         Err(e) => return Err(e)
     }
 
-    let metadata = serde_json::to_string(&SecpR1Metadata { length: SecpR1KeyBitsize::SecpR1256 }).unwrap();
+    let metadata = serde_json::to_string(&SecpR1Metadata { length: SecpR1KeyBitsize::SecpR1256 })?;
     let key: Vec<u8>;
     match CryptoImpl::generate_key(name, KeyAlgorithm::SecpR1 as u32, &metadata, true, &["sign"]) {
         Ok(result) => {
@@ -97,7 +97,7 @@ pub fn generate_key(name: &str) -> Result<KeyECC, Box<dyn Error>> {
         Err(e) => return Err(e.into())
     };
 
-    match serde_json::from_str::<CryptoKey>(&String::from_utf8(key).unwrap()) {
+    match serde_json::from_str::<CryptoKey>(&String::from_utf8(key)?) {
         Ok(_) => (),
         Err(e) => return Err(e.into())
     };

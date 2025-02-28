@@ -41,7 +41,7 @@ impl KeyRSA
         let rsa_oaep_encryption_metadata = RsaOaepEncryptionMetadata { 
             label: vec![]
         };
-        match CryptoImpl::encrypt(&self.key.name(), EncryptionAlgorithm::RsaOaep as u32, &serde_json::to_string(&rsa_oaep_encryption_metadata).unwrap(), &data) {
+        match CryptoImpl::encrypt(&self.key.name(), EncryptionAlgorithm::RsaOaep as u32, &serde_json::to_string(&rsa_oaep_encryption_metadata)?, &data) {
             Ok(result) => Ok(result),
             Err(err) => Err(err)
         }
@@ -51,7 +51,7 @@ impl KeyRSA
         let rsa_oaep_encryption_metadata = RsaOaepEncryptionMetadata { 
             label: vec![]
         };
-        match CryptoImpl::decrypt(&self.key.name(), EncryptionAlgorithm::RsaOaep as u32, &serde_json::to_string(&rsa_oaep_encryption_metadata).unwrap(), &data.to_vec()) {
+        match CryptoImpl::decrypt(&self.key.name(), EncryptionAlgorithm::RsaOaep as u32, &serde_json::to_string(&rsa_oaep_encryption_metadata)?, &data.to_vec()) {
             Ok(result) => Ok(result),
             Err(err) => Err(err)
         }
@@ -60,7 +60,7 @@ impl KeyRSA
     pub fn sign(&self, data: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
         let salt_length = 32;
         let signature_metadata = RsaPssSignatureMetadata { salt_length: salt_length };        
-        match CryptoImpl::sign(&self.key.name(), SigningAlgorithm::RsaPss as u32, &serde_json::to_string(&signature_metadata).unwrap(), &data) {
+        match CryptoImpl::sign(&self.key.name(), SigningAlgorithm::RsaPss as u32, &serde_json::to_string(&signature_metadata)?, &data) {
             Ok(result) => Ok(result),
             Err(err) => Err(err)
         }
@@ -69,7 +69,7 @@ impl KeyRSA
     pub fn verify(&self, data: &[u8], signature: &[u8]) -> Result<VerifySignResult, Box<dyn Error>> {
         let salt_length = 32;
         let signature_metadata = RsaPssSignatureMetadata { salt_length: salt_length };        
-        match CryptoImpl::verify(&self.key.name(), SigningAlgorithm::RsaPss as u32,  &serde_json::to_string(&signature_metadata).unwrap(), &data, &signature) {
+        match CryptoImpl::verify(&self.key.name(), SigningAlgorithm::RsaPss as u32,  &serde_json::to_string(&signature_metadata)?, &data, &signature) {
             Ok(result) => Ok(result),
             Err(err) => Err(err)
         }
@@ -110,7 +110,7 @@ pub fn generate_key(name: &str) -> Result<KeyRSA, Box<dyn Error>> {
         Err(e) => return Err(e.into())
     };
     let metadata = RsaMetadata { modulus: RsaKeyBitsize::Rsa2048, public_exponent: 0, sha_metadata: sha_metadata };
-    let key = match CryptoImpl::generate_key(name, KeyAlgorithm::Rsa as u32, &serde_json::to_string(&metadata).unwrap(), true, &["sign", "decrypt"]) {
+    let key = match CryptoImpl::generate_key(name, KeyAlgorithm::Rsa as u32, &serde_json::to_string(&metadata)?, true, &["sign", "decrypt"]) {
         Ok(result) => result,
         Err(e) => return Err(e)
     };
@@ -120,7 +120,7 @@ pub fn generate_key(name: &str) -> Result<KeyRSA, Box<dyn Error>> {
         Err(e) => return Err(e.into())
     };
 
-    match serde_json::from_str::<CryptoKey>(&String::from_utf8(key).unwrap()) {
+    match serde_json::from_str::<CryptoKey>(&String::from_utf8(key)?) {
         Ok(_) => (),
         Err(e) => return Err(e.into())
     };
