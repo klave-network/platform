@@ -70,6 +70,27 @@ const getBackendVersions = async () => {
         secretariumVersionUpdateTimer = setTimeout(() => { getBackendVersions().catch(() => { return; }); }, 300000);
 };
 
+const getKreditPipelineInformation = async () => {
+    if (client.isConnected()) {
+        await client.newTx('wasm-manager', 'configure_kredit_reporting', 'configure_kredit_reporting', {
+            report_url: process.env['KLAVE_KREDIT_REPORTING_URL']
+        }).send().catch((e) => {
+            console.error(e);
+        });
+        const kreditReportPK = (await client.newTx('wasm-manager', 'get_kredit_pk', 'get_kredit_pk', '').send().catch((e) => {
+            console.error(e);
+        }))?.pk;
+        const kreditCosts = (await client.newTx('wasm-manager', 'get_kredit_costs', 'get_kredit_costs', '').send().catch((e) => {
+            console.error(e);
+        }))?.kredit_costs;
+
+        if (kreditReportPK)
+            logger.info(`Kredit Reporting PK ${kreditReportPK}`);
+        if (kreditCosts)
+            logger.info(`Kredit Costs ${kreditCosts}`);
+    }
+};
+
 client.onError((error) => {
     logger.error(`Connection to Secretarium errored: ${error}`);
     lastSCPState = Constants.ConnectionState.closed;
@@ -118,6 +139,7 @@ export const scpOps = {
             logger.info(`CS ${cryptoContext.type} (${cryptoContext.version})`);
             logger.info(`PK ${await connectionKey.getRawPublicKeyHex()}`);
             await getBackendVersions();
+            await getKreditPipelineInformation();
             reconnectAttempt = 0;
             return;
         } catch (e) {
