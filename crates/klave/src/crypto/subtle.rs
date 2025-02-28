@@ -809,12 +809,12 @@ pub fn delete_key(key: &CryptoKey) -> Result<(), Box<dyn std::error::Error>> {
         if alias.is_empty() {
             return Err("Invalid key name: cannot be null or empty".into());
         }
-        match CryptoImpl::delete_key(alias) {
+        match CryptoImpl::delete_key(&alias) {
             Ok(_) => (),
-            Err(e) => return Err(e),
+            Err(e) => return Err(e.into())
         };
         Ok(())
-    } else {
-        Err("Invalid key name: cannot be null or empty".into())
+    }else{
+        return Err("Invalid key name: cannot be null or empty".into());
     }
 }

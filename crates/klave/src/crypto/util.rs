@@ -1,53 +1,28 @@
-use super::subtle::{
-    AesKeyGenParams, EcKeyGenParams, EcdhDerivParams, HkdfDerivParams, RsaHashedKeyGenParams,
-};
-use super::subtle_idl_v1::{
-    AesMetadata, EcdhMetadata, HkdfMetadata, RsaMetadata, SecpK1Metadata, SecpR1Metadata,
-    ShaMetadata,
-};
-use super::subtle_idl_v1_enums::{
-    AesKeyBitsize, AesTagLength, KeyFormat, RsaKeyBitsize, SecpK1KeyBitsize, SecpR1KeyBitsize,
-    ShaAlgorithm, ShaDigestBitsize,
-};
 use serde::{Deserialize, Serialize};
+use super::subtle_idl_v1::{AesMetadata, EcdhMetadata, HkdfMetadata, RsaMetadata, SecpK1Metadata, SecpR1Metadata, ShaMetadata};
+use super::subtle_idl_v1_enums::{AesKeyBitsize, AesTagLength, KeyFormat, RsaKeyBitsize, SecpK1KeyBitsize, SecpR1KeyBitsize, ShaAlgorithm, ShaDigestBitsize};
+use super::subtle::{ AesKeyGenParams, EcKeyGenParams, RsaHashedKeyGenParams, EcdhDerivParams, HkdfDerivParams };
 use std::error::Error;
 
 #[derive(Deserialize, Serialize)]
 struct KeyFormatWrapper {
-    pub format: KeyFormat,
+    pub format: KeyFormat,    
 }
 
 pub fn is_valid_hash_algorithm(algorithm: &str) -> bool {
-    matches!(
-        algorithm,        
-              "sha-256"
-            | "sha-384"
-            | "sha-512"
-            | "sha2-256"
-            | "sha2-384"
-            | "sha2-512"
-            | "sha3-256"
-            | "sha3-384"
-            | "sha3-512"
-            | "SHA-256"
-            | "SHA-384"
-            | "SHA-512"
-            | "SHA2-256"
-            | "SHA2-384"
-            | "SHA2-512"
-            | "SHA3-256"
-            | "SHA3-384"
-            | "SHA3-512"
-            | "sha1"
-            | "SHA1"
-            | "sha1-160"
-            | "SHA1-160"
-    )
+    match algorithm {
+        "sha-256"  | "sha-384"  | "sha-512" => true,
+        "sha2-256" | "sha2-384" | "sha2-512" => true,
+        "sha3-256" | "sha3-384" | "sha3-512" => true,
+        "SHA-256"  | "SHA-384"  | "SHA-512" => true,
+        "SHA2-256" | "SHA2-384" | "SHA2-512" => true,
+        "SHA3-256" | "SHA3-384" | "SHA3-512" => true,
+        _ => false,
+    }
 }
 
 pub fn digest_size(algorithm: &str) -> usize {
     match algorithm {
-        "sha1" | "SHA1" | "sha1-160" | "SHA1-160" => 20,
         "sha-256" | "SHA-256" | "sha2-256" | "SHA2-256" | "sha3-256" | "SHA3-256" => 32,
         "sha-384" | "SHA-384" | "sha2-384" | "SHA2-384" | "sha3-384" | "SHA3-384" => 48,
         "sha-512" | "SHA-512" | "sha2-512" | "SHA2-512" | "sha3-512" | "SHA3-512" => 64,
@@ -57,10 +32,6 @@ pub fn digest_size(algorithm: &str) -> usize {
 
 pub fn get_sha_metadata(algorithm: &str) -> Result<ShaMetadata, Box<dyn Error>> {
     match algorithm {
-        "sha1" | "SHA1" | "sha1-160" | "SHA1-160" => Ok(ShaMetadata {
-            algo_id: ShaAlgorithm::Sha2,
-            length: ShaDigestBitsize::Sha1,
-        }),
         "sha-256" | "SHA-256" | "sha2-256" | "SHA2-256" => Ok(ShaMetadata {
             algo_id: ShaAlgorithm::Sha2,
             length: ShaDigestBitsize::Sha256,
@@ -164,13 +135,11 @@ pub fn get_aes_metadata(params: &AesKeyGenParams) -> Result<AesMetadata, Box<dyn
 }
 
 pub fn get_ecdh_metadata(params: &EcdhDerivParams) -> Result<EcdhMetadata, Box<dyn Error>> {
-    Ok(EcdhMetadata {
-        public_key: params.public.clone(),
-    })
+    Ok(EcdhMetadata{ public_key : params.public.clone() })
 }
 
 pub fn get_hkdf_metadata(params: &HkdfDerivParams) -> Result<HkdfMetadata, Box<dyn Error>> {
-    Ok(HkdfMetadata {
+    Ok(HkdfMetadata{ 
         salt: params.salt.clone(),
         info: params.info.clone(),
         hash_info: get_sha_metadata(&params.hash)?,
@@ -179,10 +148,10 @@ pub fn get_hkdf_metadata(params: &HkdfDerivParams) -> Result<HkdfMetadata, Box<d
 
 pub fn get_key_format(format: &str) -> Result<KeyFormat, Box<dyn Error>> {
     match format {
-        "raw" | "RAW" => Ok(KeyFormat::Raw),
+        "raw"   | "RAW"   => Ok(KeyFormat::Raw),
         "pkcs8" | "PKCS8" => Ok(KeyFormat::Pkcs8),
-        "spki" | "SPKI" => Ok(KeyFormat::Spki),
-        "sec1" | "SEC1" => Ok(KeyFormat::Sec1),
+        "spki"  | "SPKI"  => Ok(KeyFormat::Spki),
+        "sec1"  | "SEC1"  => Ok(KeyFormat::Sec1),
         "pkcs1" | "PKCS1" => Ok(KeyFormat::Pkcs1),
         _ => Err("Invalid key format".into()),
     }
@@ -194,7 +163,7 @@ pub fn get_aes_tag_length(tag_length: &u32) -> Result<AesTagLength, Box<dyn Erro
         104 => Ok(AesTagLength::Tag104),
         112 => Ok(AesTagLength::Tag112),
         120 => Ok(AesTagLength::Tag120),
-        128 => Ok(AesTagLength::Tag128),
+        128 => Ok(AesTagLength::Tag128),            
         _ => Err("Invalid tag length".into()),
     }
 }
