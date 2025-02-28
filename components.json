@@ -1,0 +1,21 @@
+{
+    "$schema": "https://ui.shadcn.com/schema.json",
+    "style": "new-york",
+    "rsc": false,
+    "tsx": true,
+    "tailwind": {
+        "config": "libs/util/src/tailwind/tailwind.config.ts",
+        "css": "libs/util/src/styles/globals.css",
+        "baseColor": "neutral",
+        "cssVariables": true,
+        "prefix": ""
+    },
+    "aliases": {
+        "components": "@klave/ui-kit/components",
+        "utils": "@klave/lib/utils",
+        "ui": "@klave/ui-kit/components/ui",
+        "lib": "@klave/lib",
+        "hooks": "@klave/ui-kit/hooks"
+    },
+    "iconLibrary": "lucide"
+}
