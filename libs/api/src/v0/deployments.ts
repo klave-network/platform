@@ -21,21 +21,39 @@ export const deploymentRouter = createTRPCRouter({
                 where: {
                     application: {
                         id: appId,
-                        permissionGrants: {
-                            some: {
-                                userId: user.id,
-                                AND: {
+                        OR: [{
+                            organisation: {
+                                permissionGrants: {
+                                    some: {
+                                        userId: user?.id
+                                        , OR: [{
+                                            read: true
+                                        },
+                                        {
+                                            write: true
+                                        },
+                                        {
+                                            admin: true
+                                        }]
+                                    }
+                                }
+                            }
+                        }, {
+                            permissionGrants: {
+                                some: {
+                                    userId: user?.id,
                                     OR: [{
                                         read: true
-                                    }, {
+                                    },
+                                    {
                                         write: true
-                                    }, {
+                                    },
+                                    {
                                         admin: true
                                     }]
                                 }
                             }
-
-                        }
+                        }]
                     }
                 },
                 select: {
@@ -87,20 +105,39 @@ export const deploymentRouter = createTRPCRouter({
                 where: {
                     id: deploymentId,
                     application: {
-                        permissionGrants: {
-                            some: {
-                                userId: user.id,
-                                AND: {
+                        OR: [{
+                            organisation: {
+                                permissionGrants: {
+                                    some: {
+                                        userId: user?.id
+                                        , OR: [{
+                                            read: true
+                                        },
+                                        {
+                                            write: true
+                                        },
+                                        {
+                                            admin: true
+                                        }]
+                                    }
+                                }
+                            }
+                        }, {
+                            permissionGrants: {
+                                some: {
+                                    userId: user?.id,
                                     OR: [{
                                         read: true
-                                    }, {
+                                    },
+                                    {
                                         write: true
-                                    }, {
+                                    },
+                                    {
                                         admin: true
                                     }]
                                 }
                             }
-                        }
+                        }]
                     }
                 },
                 select: {
@@ -149,21 +186,39 @@ export const deploymentRouter = createTRPCRouter({
             const deploymentList = await prisma.deployment.findMany({
                 where: {
                     application: {
-                        permissionGrants: {
-                            some: {
-                                userId: user.id,
-                                AND: {
+                        OR: [{
+                            organisation: {
+                                permissionGrants: {
+                                    some: {
+                                        userId: user?.id
+                                        , OR: [{
+                                            read: true
+                                        },
+                                        {
+                                            write: true
+                                        },
+                                        {
+                                            admin: true
+                                        }]
+                                    }
+                                }
+                            }
+                        }, {
+                            permissionGrants: {
+                                some: {
+                                    userId: user?.id,
                                     OR: [{
                                         read: true
-                                    }, {
+                                    },
+                                    {
                                         write: true
-                                    }, {
+                                    },
+                                    {
                                         admin: true
                                     }]
                                 }
                             }
-
-                        }
+                        }]
                     }
                 },
                 select: {
@@ -217,20 +272,39 @@ export const deploymentRouter = createTRPCRouter({
                 where: {
                     id: deploymentId,
                     application: {
-                        permissionGrants: {
-                            some: {
-                                userId: user.id,
-                                AND: {
+                        OR: [{
+                            organisation: {
+                                permissionGrants: {
+                                    some: {
+                                        userId: user?.id
+                                        , OR: [{
+                                            read: true
+                                        },
+                                        {
+                                            write: true
+                                        },
+                                        {
+                                            admin: true
+                                        }]
+                                    }
+                                }
+                            }
+                        }, {
+                            permissionGrants: {
+                                some: {
+                                    userId: user?.id,
                                     OR: [{
                                         read: true
-                                    }, {
+                                    },
+                                    {
                                         write: true
-                                    }, {
+                                    },
+                                    {
                                         admin: true
                                     }]
                                 }
                             }
-                        }
+                        }]
                     }
                 },
                 select: {
@@ -253,16 +327,27 @@ export const deploymentRouter = createTRPCRouter({
                 where: {
                     id: deploymentId,
                     application: override !== '__system_post_deploy' && override !== '__system_pruner_cleaner' ? {
-                        permissionGrants: {
-                            some: {
-                                userId: user?.id,
-                                AND: {
+                        OR: [{
+                            organisation: {
+                                permissionGrants: {
+                                    some: {
+                                        userId: user?.id
+                                        , OR: [{
+                                            admin: true
+                                        }]
+                                    }
+                                }
+                            }
+                        }, {
+                            permissionGrants: {
+                                some: {
+                                    userId: user?.id,
                                     OR: [{
                                         admin: true
                                     }]
                                 }
                             }
-                        }
+                        }]
                     } : undefined
                 }
             });
@@ -281,18 +366,27 @@ export const deploymentRouter = createTRPCRouter({
                 where: {
                     id: deploymentId,
                     application: override !== '__system_pruner_terminator' ? {
-                        permissionGrants: {
-                            some: {
-                                userId: user?.id,
-                                AND: {
+                        OR: [{
+                            organisation: {
+                                permissionGrants: {
+                                    some: {
+                                        userId: user?.id
+                                        , OR: [{
+                                            admin: true
+                                        }]
+                                    }
+                                }
+                            }
+                        }, {
+                            permissionGrants: {
+                                some: {
+                                    userId: user?.id,
                                     OR: [{
-                                        write: true
-                                    }, {
                                         admin: true
                                     }]
                                 }
                             }
-                        }
+                        }]
                     } : undefined
                 },
                 data: {
@@ -342,18 +436,33 @@ export const deploymentRouter = createTRPCRouter({
                 where: {
                     id: deploymentId,
                     application: {
-                        permissionGrants: {
-                            some: {
-                                userId: user.id,
-                                AND: {
+                        OR: [{
+                            organisation: {
+                                permissionGrants: {
+                                    some: {
+                                        userId: user?.id
+                                        , OR: [{
+                                            write: true
+                                        },
+                                        {
+                                            admin: true
+                                        }]
+                                    }
+                                }
+                            }
+                        }, {
+                            permissionGrants: {
+                                some: {
+                                    userId: user?.id,
                                     OR: [{
                                         write: true
-                                    }, {
+                                    },
+                                    {
                                         admin: true
                                     }]
                                 }
                             }
-                        }
+                        }]
                     }
                 },
                 select: {

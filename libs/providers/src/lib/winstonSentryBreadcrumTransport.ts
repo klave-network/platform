@@ -6,7 +6,7 @@ import type { Logform } from 'winston';
 export class SentryBreadcrumb extends TransportStream {
     override log(info: Logform.TransformableInfo, next: () => void) {
 
-        const level = stripAnsi(info[Symbol.for('level')]);
+        const level = stripAnsi(`${info[Symbol.for('level')]}`);
         if (level === 'http')
             return next();
 
@@ -16,9 +16,9 @@ export class SentryBreadcrumb extends TransportStream {
             type: level === 'error' ? 'error' : 'debug',
             category: data?.[0]?.parent,
             data,
-            message: stripAnsi(info.message),
+            message: stripAnsi(`${info.message}`),
             level: level as SeverityLevel,
-            timestamp: info['timestamp'] ?? Date.now()
+            timestamp: (info['timestamp']) ?? Date.now()
         });
 
         next();

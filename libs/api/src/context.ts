@@ -76,7 +76,7 @@ export const createContext = async (opts: CreateExpressContextOptions) => {
 };
 
 
-export type Context = inferAsyncReturnType<typeof createContext>
+export type Context = inferAsyncReturnType<typeof createContext>;
 export type SystemOverideContext = | (Pick<Context, 'prisma'> & {
     session: unknown;
     override: string;

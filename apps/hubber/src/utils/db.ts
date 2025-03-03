@@ -40,7 +40,7 @@ export const dbOps = {
             await client.$disconnect();
             return;
         } catch (e) {
-            //
+            console.error(e?.toString());
         }
     }
 };

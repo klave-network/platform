@@ -37,6 +37,7 @@ export const systemRouter = createTRPCRouter({
                         const url = new URL(normValue);
                         env[key] = url.protocol + '//' + url.host + url.pathname;
                     } catch (e) {
+                        console.error(e?.toString());
                         env[key] = '***';
                     }
                     return;
