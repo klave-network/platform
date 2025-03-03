@@ -1,10 +1,9 @@
+use serde::de::{self, Visitor};
 /**
  * Environment definitions for compiling Klave Trustless Applications.
  * @module klave/sdk/crypto
  */
-
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use serde::de::{self, Visitor};
 use std::fmt;
 
 macro_rules! serialize_copy {
@@ -26,14 +25,14 @@ macro_rules! deserialize_copy {
     ($($type:ty, $visitor:ident, $($matcher:pat $(if $pred:expr)* => $result:expr),*);*) => {
         $(
             struct $visitor;
-            
+
             impl<'de> Visitor<'de> for $visitor {
                 type Value = $type;
-            
+
                 fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
                     formatter.write_str("a valid $type variant")
                 }
-            
+
                 fn visit_u32<E>(self, value: u32) -> Result<$type, E>
                 where
                     E: de::Error,
@@ -43,7 +42,7 @@ macro_rules! deserialize_copy {
                     }
                 }
             }
-            
+
             impl<'de> Deserialize<'de> for $type {
                 fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
                 where
@@ -51,7 +50,7 @@ macro_rules! deserialize_copy {
                 {
                     deserializer.deserialize_u32($visitor)
                 }
-            }            
+            }
         )*
     }
 }
@@ -61,12 +60,12 @@ pub enum KeyAlgorithm {
     SecpR1 = 0,
     SecpK1 = 1,
     Aes = 2,
-    Rsa = 3
+    Rsa = 3,
 }
 
 serialize_copy!(KeyAlgorithm);
-deserialize_copy!(KeyAlgorithm,        
-    KeyAlgorithmVisitor,                 
+deserialize_copy!(KeyAlgorithm,
+    KeyAlgorithmVisitor,
     0 => Ok(KeyAlgorithm::SecpR1),
     1 => Ok(KeyAlgorithm::SecpK1),
     2 => Ok(KeyAlgorithm::Aes),
@@ -78,11 +77,11 @@ deserialize_copy!(KeyAlgorithm,
 pub enum EncryptionAlgorithm {
     AesGcm,
     RsaOaep,
-    RsaPkcs1V1_5
+    RsaPkcs1V1_5,
 }
 serialize_copy!(EncryptionAlgorithm);
-deserialize_copy!(EncryptionAlgorithm,        
-    EncryptionAlgorithmVisitor,                 
+deserialize_copy!(EncryptionAlgorithm,
+    EncryptionAlgorithmVisitor,
     0 => Ok(EncryptionAlgorithm::AesGcm),
     1 => Ok(EncryptionAlgorithm::RsaOaep),
     2 => Ok(EncryptionAlgorithm::RsaPkcs1V1_5),
@@ -94,11 +93,11 @@ pub enum WrappingAlgorithm {
     AesKw,
     AesGcm,
     RsaOaep,
-    RsaPkcs1V1_5
+    RsaPkcs1V1_5,
 }
 serialize_copy!(WrappingAlgorithm);
-deserialize_copy!(WrappingAlgorithm,        
-    WrappingAlgorithmVisitor,                 
+deserialize_copy!(WrappingAlgorithm,
+    WrappingAlgorithmVisitor,
     0 => Ok(WrappingAlgorithm::AesKw),
     1 => Ok(WrappingAlgorithm::AesGcm),
     2 => Ok(WrappingAlgorithm::RsaOaep),
@@ -110,11 +109,11 @@ deserialize_copy!(WrappingAlgorithm,
 pub enum SigningAlgorithm {
     Ecdsa,
     Schnorr,
-    RsaPss
+    RsaPss,
 }
 serialize_copy!(SigningAlgorithm);
-deserialize_copy!(SigningAlgorithm,        
-    SigningAlgorithmVisitor,                 
+deserialize_copy!(SigningAlgorithm,
+    SigningAlgorithmVisitor,
     0 => Ok(SigningAlgorithm::Ecdsa),
     1 => Ok(SigningAlgorithm::Schnorr),
     2 => Ok(SigningAlgorithm::RsaPss),
@@ -128,8 +127,8 @@ pub enum DerivationAlgorithm {
 }
 
 serialize_copy!(DerivationAlgorithm);
-deserialize_copy!(DerivationAlgorithm,        
-    DerivationAlgorithmVisitor,                 
+deserialize_copy!(DerivationAlgorithm,
+    DerivationAlgorithmVisitor,
     0 => Ok(DerivationAlgorithm::Ecdh),
     1 => Ok(DerivationAlgorithm::Hkdf),
     _ => Err(de::Error::custom("invalid DerivationAlgorithm variant"))
@@ -141,55 +140,52 @@ pub enum DerivedKeyUsageAlgorithm {
 }
 
 serialize_copy!(DerivedKeyUsageAlgorithm);
-deserialize_copy!(DerivedKeyUsageAlgorithm,        
-    DerivedKeyUsageAlgorithmVisitor,                 
+deserialize_copy!(DerivedKeyUsageAlgorithm,
+    DerivedKeyUsageAlgorithmVisitor,
     0 => Ok(DerivedKeyUsageAlgorithm::Aes),
     _ => Err(de::Error::custom("invalid DerivedKeyUsageAlgorithm variant"))
 );
 
-
 #[derive(Debug, Clone)]
 pub enum HashAlgorithm {
     Sha = 0,
-    Tagged = 1
+    Tagged = 1,
 }
 
 serialize_copy!(HashAlgorithm);
-deserialize_copy!(HashAlgorithm,        
-    HashAlgorithmVisitor,                 
+deserialize_copy!(HashAlgorithm,
+    HashAlgorithmVisitor,
     0 => Ok(HashAlgorithm::Sha),
     1 => Ok(HashAlgorithm::Tagged),
     _ => Err(de::Error::custom("invalid HashAlgorithm variant"))
 );
 
-
 #[derive(Debug, Clone)]
 pub enum ShaAlgorithm {
     None = 0,
     Sha2 = 1,
-    Sha3 = 2
+    Sha3 = 2,
 }
 
 serialize_copy!(ShaAlgorithm);
-deserialize_copy!(ShaAlgorithm,        
-    ShaAlgorithmVisitor,                 
+deserialize_copy!(ShaAlgorithm,
+    ShaAlgorithmVisitor,
     0 => Ok(ShaAlgorithm::None),
     1 => Ok(ShaAlgorithm::Sha2),
     2 => Ok(ShaAlgorithm::Sha3),
     _ => Err(de::Error::custom("invalid ShaAlgorithm variant"))
 );
 
-
 #[derive(Debug, Clone)]
 pub enum TaggedShaAlgorithm {
     None = 0,
     Sha2 = 1,
-    Sha3 = 2
+    Sha3 = 2,
 }
 
 serialize_copy!(TaggedShaAlgorithm);
-deserialize_copy!(TaggedShaAlgorithm,        
-    TaggedShaAlgorithmVisitor,                 
+deserialize_copy!(TaggedShaAlgorithm,
+    TaggedShaAlgorithmVisitor,
     0 => Ok(TaggedShaAlgorithm::None),
     1 => Ok(TaggedShaAlgorithm::Sha2),
     2 => Ok(TaggedShaAlgorithm::Sha3),
@@ -200,12 +196,12 @@ deserialize_copy!(TaggedShaAlgorithm,
 pub enum ShaDigestBitsize {
     Sha256 = 256,
     Sha384 = 384,
-    Sha512 = 512
+    Sha512 = 512,
 }
 
 serialize_copy!(ShaDigestBitsize);
-deserialize_copy!(ShaDigestBitsize,        
-    ShaDigestBitsizeVisitor,                 
+deserialize_copy!(ShaDigestBitsize,
+    ShaDigestBitsizeVisitor,
     256 => Ok(ShaDigestBitsize::Sha256),
     384 => Ok(ShaDigestBitsize::Sha384),
     512 => Ok(ShaDigestBitsize::Sha512),
@@ -216,12 +212,12 @@ deserialize_copy!(ShaDigestBitsize,
 pub enum SecpR1KeyBitsize {
     SecpR1256 = 256,
     SecpR1384 = 384,
-    SecpR1521 = 521
+    SecpR1521 = 521,
 }
 
 serialize_copy!(SecpR1KeyBitsize);
-deserialize_copy!(SecpR1KeyBitsize,        
-    SecpR1KeyBitsizeVisitor,                 
+deserialize_copy!(SecpR1KeyBitsize,
+    SecpR1KeyBitsizeVisitor,
     256 => Ok(SecpR1KeyBitsize::SecpR1256),
     384 => Ok(SecpR1KeyBitsize::SecpR1384),
     521 => Ok(SecpR1KeyBitsize::SecpR1521),
@@ -230,12 +226,12 @@ deserialize_copy!(SecpR1KeyBitsize,
 
 #[derive(Debug, Clone)]
 pub enum SecpK1KeyBitsize {
-    SecpK1256 = 256
+    SecpK1256 = 256,
 }
 
 serialize_copy!(SecpK1KeyBitsize);
-deserialize_copy!(SecpK1KeyBitsize,        
-    SecpK1KeyBitsizeVisitor,                 
+deserialize_copy!(SecpK1KeyBitsize,
+    SecpK1KeyBitsizeVisitor,
     256 => Ok(SecpK1KeyBitsize::SecpK1256),
     _ => Err(de::Error::custom("invalid SecpK1KeyBitsize variant"))
 );
@@ -244,12 +240,12 @@ deserialize_copy!(SecpK1KeyBitsize,
 pub enum AesKeyBitsize {
     Aes128 = 128,
     Aes192 = 192,
-    Aes256 = 256
+    Aes256 = 256,
 }
 
-serialize_copy!(AesKeyBitsize); 
-deserialize_copy!(AesKeyBitsize,        
-    AesKeyBitsizeVisitor,                 
+serialize_copy!(AesKeyBitsize);
+deserialize_copy!(AesKeyBitsize,
+    AesKeyBitsizeVisitor,
     128 => Ok(AesKeyBitsize::Aes128),
     192 => Ok(AesKeyBitsize::Aes192),
     256 => Ok(AesKeyBitsize::Aes256),
@@ -260,12 +256,12 @@ deserialize_copy!(AesKeyBitsize,
 pub enum RsaKeyBitsize {
     Rsa2048 = 2048,
     Rsa3072 = 3072,
-    Rsa4096 = 4096
+    Rsa4096 = 4096,
 }
 
 serialize_copy!(RsaKeyBitsize);
-deserialize_copy!(RsaKeyBitsize,        
-    RsaKeyBitsizeVisitor,                 
+deserialize_copy!(RsaKeyBitsize,
+    RsaKeyBitsizeVisitor,
     2048 => Ok(RsaKeyBitsize::Rsa2048),
     3072 => Ok(RsaKeyBitsize::Rsa3072),
     4096 => Ok(RsaKeyBitsize::Rsa4096),
@@ -281,12 +277,12 @@ pub enum SubtleKeyUsage {
     DeriveKey = 4,
     DeriveBits = 5,
     WrapKey = 6,
-    UnwrapKey = 7
+    UnwrapKey = 7,
 }
 
 serialize_copy!(SubtleKeyUsage);
-deserialize_copy!(SubtleKeyUsage,        
-    SubtleKeyUsageVisitor,                 
+deserialize_copy!(SubtleKeyUsage,
+    SubtleKeyUsageVisitor,
     0 => Ok(SubtleKeyUsage::Encrypt),
     1 => Ok(SubtleKeyUsage::Decrypt),
     2 => Ok(SubtleKeyUsage::Sign),
@@ -304,12 +300,12 @@ pub enum AesTagLength {
     Tag104 = 13,
     Tag112 = 14,
     Tag120 = 15,
-    Tag128 = 16
+    Tag128 = 16,
 }
 
 serialize_copy!(AesTagLength);
-deserialize_copy!(AesTagLength,        
-    AesTagLengthVisitor,                 
+deserialize_copy!(AesTagLength,
+    AesTagLengthVisitor,
     12 => Ok(AesTagLength::Tag96),
     13 => Ok(AesTagLength::Tag104),
     14 => Ok(AesTagLength::Tag112),
@@ -328,12 +324,12 @@ pub enum KeyUsage {
     DeriveKey = 16,
     DeriveBits = 32,
     WrapKey = 64,
-    UnwrapKey = 128
+    UnwrapKey = 128,
 }
 
 serialize_copy!(KeyUsage);
-deserialize_copy!(KeyUsage,        
-    KeyUsageVisitor,                 
+deserialize_copy!(KeyUsage,
+    KeyUsageVisitor,
     0 => Ok(KeyUsage::None),
     1 => Ok(KeyUsage::Encrypt),
     2 => Ok(KeyUsage::Decrypt),
@@ -353,12 +349,12 @@ pub enum KeyFormat {
     Pkcs8 = 2,
     Jwk = 3,
     Sec1 = 4,
-    Pkcs1 = 5
+    Pkcs1 = 5,
 }
 
 serialize_copy!(KeyFormat);
-deserialize_copy!(KeyFormat,        
-    KeyFormatVisitor,                 
+deserialize_copy!(KeyFormat,
+    KeyFormatVisitor,
     0 => Ok(KeyFormat::Raw),
     1 => Ok(KeyFormat::Spki),
     2 => Ok(KeyFormat::Pkcs8),

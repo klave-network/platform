@@ -1,15 +1,15 @@
-mod sdk_wrapper;
-mod subtle_idl_v1_enums;
-mod subtle_idl_v1;
-mod util;
 mod keys;
+mod sdk_wrapper;
+mod subtle_idl_v1;
+mod subtle_idl_v1_enums;
+mod util;
 
-pub mod subtle;
-pub mod random;
 pub mod aes;
 pub mod ecc;
+pub mod random;
 pub mod rsa;
 pub mod sha;
+pub mod subtle;
 
+pub use keys::{PrivateKey, PublicKey};
 pub use sdk_wrapper::VerifySignResult;
-pub use keys::{PublicKey, PrivateKey};

@@ -1,6 +1,6 @@
 use crate::sdk;
+use serde::{de::DeserializeOwned, Serialize};
 use std::error::Error;
-use serde::{Serialize, de::DeserializeOwned};
 
 pub struct Table {
     name: String,
