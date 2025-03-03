@@ -4,6 +4,7 @@ import helmet from '@fastify/helmet';
 import sensible from '@fastify/sensible';
 import websocket from '@fastify/websocket';
 import { app } from './app/app';
+import { logger } from './utils/logger';
 
 process.on('unhandledRejection', (reason, p) => {
     console.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
@@ -15,6 +16,7 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 (async () => {
     // Instantiate Fastify with some config
     const server = Fastify({
+        disableRequestLogging: true,
         logger: true,
         bodyLimit: 10485760
     });
@@ -29,6 +31,8 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3000;
         max: 100,
         timeWindow: '1 minute'
     });
+
+    await server.register(logger);
     await server.register(helmet);
     await server.register(sensible);
     await server.register(websocket);
