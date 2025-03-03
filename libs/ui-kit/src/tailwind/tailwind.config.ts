@@ -90,6 +90,5 @@ module.exports = {
             }
         }
     },
-    plugins: [TailwindAnimate],
-    darkMode: ['class']
+    plugins: [TailwindAnimate]
 };
