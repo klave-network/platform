@@ -10,7 +10,7 @@ export class SentryBreadcrumb extends TransportStream {
         if (level === 'http')
             return next();
 
-        const data = info[Symbol.for('splat')] as any;
+        const data = info[Symbol.for('splat')];
 
         addBreadcrumb({
             type: level === 'error' ? 'error' : 'debug',
@@ -18,7 +18,7 @@ export class SentryBreadcrumb extends TransportStream {
             data,
             message: stripAnsi(`${info.message}`),
             level: level as SeverityLevel,
-            timestamp: (info['timestamp'] as any) ?? Date.now()
+            timestamp: (info['timestamp']) ?? Date.now()
         });
 
         next();

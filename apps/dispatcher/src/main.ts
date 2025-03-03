@@ -6,6 +6,7 @@ import websocket from '@fastify/websocket';
 import { app } from './app/app';
 import { sentryOps } from './utils/sentry';
 import { mongoOps } from './utils/mongo';
+import { logger } from './utils/logger';
 
 process.on('unhandledRejection', (reason, p) => {
     console.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
@@ -21,6 +22,7 @@ const serverHandle = (async () => {
 
     // Instantiate Fastify with some config
     const server = Fastify({
+        disableRequestLogging: true,
         logger: true,
         bodyLimit: 10485760
     });
@@ -40,6 +42,8 @@ const serverHandle = (async () => {
         max: 100,
         timeWindow: '1 minute'
     });
+
+    await server.register(logger);
     await server.register(helmet);
     await server.register(sensible);
     await server.register(websocket);
