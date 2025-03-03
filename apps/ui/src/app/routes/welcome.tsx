@@ -64,7 +64,7 @@ function Welcome() {
             <span className='inline-block h-8 w-8 -ml-1 mt-10 mb-3 border rounded-full font-bold text-center'>3</span>
             <h2 className='mt-0'>Move to the application directory and get your code ready</h2>
             Check out Klave documentation to know more about the available APIs.<br />
-            <a href='https://klave.com/docs' target='_blank'>https://klave.com/docs</a>
+            <a href='https://docs.klave.com' target='_blank'>https://docs.klave.com</a>
             <br />
             <span className='inline-block h-8 w-8 -ml-1 mt-10 mb-3 border rounded-full font-bold text-center'>4</span>
             <h2 className='mt-0'>Push your application repository on Github</h2>

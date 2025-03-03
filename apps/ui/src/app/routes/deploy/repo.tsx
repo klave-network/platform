@@ -179,7 +179,7 @@ export const RepoAppSelect: FC = () => {
                     {deployableRepo.configError ? <>
                         <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mx-auto" role="alert">
                             We noticed some errors in your <code>klave.json</code> file.<br />
-                            Checkout our documentation at <a href="https://klave.com/docs" target='_blank' >https://klave.com/docs</a> to fix them.<br />
+                            Checkout our documentation at <a href="https://docs.klave.com" target='_blank' >https://docs.klave.com</a> to fix them.<br />
                         </div>
                         <br />
                     </> : null}

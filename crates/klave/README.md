@@ -30,7 +30,16 @@ Deploy your app on [Klave](https://klave.com).
 
 ## Usage
 
-For detailed usage instructions and SDK reference, please refer to the [documentation](https://klave.com/docs).
+For detailed usage instructions and SDK reference, please refer to the [documentation](https://docs.klave.com).
+```rust
+use klave::SCP;
+
+fn main() {
+    // Example code demonstrating usage of Secretarium crate
+    let secure_channel = SCP::new("gw.klave.network:443");
+    // Your code here...
+}
+```
 
 ## Contributing
 
