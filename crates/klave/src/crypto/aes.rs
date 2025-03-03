@@ -19,7 +19,7 @@ pub struct KeyAES {
 impl Default for KeyAES {
     fn default() -> Self {
         KeyAES {
-            key: Key::new(&""),
+            key: Key::new(""),
             length: 256,
         }
     }
@@ -40,15 +40,12 @@ impl KeyAES {
     pub fn new(name: &str, length: u32) -> KeyAES {
         KeyAES {
             key: Key::new(name),
-            length: length,
+            length,
         }
     }
 
     pub fn encrypt(&self, data: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
-        let iv = match random::get_random_bytes(12) {
-            Ok(iv) => iv,
-            Err(e) => return Err(e.into()),
-        };
+        let iv = random::get_random_bytes(12)?;
         let aes_gcm_params = AesGcmEncryptionMetadata {
             iv: iv.clone(),
             additional_data: vec![],
@@ -59,15 +56,11 @@ impl KeyAES {
             &self.key.name(),
             EncryptionAlgorithm::AesGcm as u32,
             &serde_json::to_string(&aes_gcm_params)?,
-            &data,
+            data,
         ) {
             Ok(result) => {
                 //Prepend iv to the result
-                let result = iv
-                    .to_vec()
-                    .into_iter()
-                    .chain(result.into_iter())
-                    .collect::<Vec<u8>>();
+                let result = iv.iter().copied().chain(result).collect::<Vec<u8>>();
                 Ok(result)
             }
             Err(err) => Err(err),
@@ -87,7 +80,7 @@ impl KeyAES {
             &self.key.name(),
             EncryptionAlgorithm::AesGcm as u32,
             &serde_json::to_string(&aes_gcm_params)?,
-            &data.to_vec(),
+            data,
         ) {
             Ok(result) => Ok(result),
             Err(err) => Err(err),
@@ -109,7 +102,7 @@ pub fn generate_key(name: &str) -> Result<KeyAES, Box<dyn Error>> {
 
     match CryptoImpl::key_exists(name) {
         Ok(exists) => {
-            if exists == true {
+            if exists {
                 return Err(format!("Invalid key name: key name {} already exists", name).into());
             }
         }
@@ -117,20 +110,17 @@ pub fn generate_key(name: &str) -> Result<KeyAES, Box<dyn Error>> {
     }
 
     let metadata = AesKeyGenParams { length: 256 };
-    let key = match CryptoImpl::generate_key(
+    let key = CryptoImpl::generate_key(
         name,
         KeyAlgorithm::Aes as u32,
         &serde_json::to_string(&metadata)?,
         true,
         &["encrypt", "decrypt"],
-    ) {
-        Ok(result) => result,
-        Err(e) => return Err(e),
-    };
+    )?;
 
     match CryptoImpl::save_key(name) {
         Ok(_) => (),
-        Err(e) => return Err(e.into()),
+        Err(e) => return Err(e),
     };
 
     match serde_json::from_str::<CryptoKey>(&String::from_utf8(key)?) {

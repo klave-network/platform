@@ -20,7 +20,7 @@ pub struct KeyECC {
 impl Default for KeyECC {
     fn default() -> Self {
         KeyECC {
-            key: Key::new(&String::from("")),
+            key: Key::new(""),
             named_curve: String::from("P-256"),
         }
     }
@@ -57,10 +57,10 @@ impl KeyECC {
             &self.key.name(),
             SigningAlgorithm::Ecdsa as u32,
             &serde_json::to_string(&signature_metadata)?,
-            &data,
+            data,
         ) {
             Ok(result) => Ok(result),
-            Err(err) => Err(err.into()),
+            Err(err) => Err(err),
         }
     }
 
@@ -80,8 +80,8 @@ impl KeyECC {
             &self.key.name(),
             SigningAlgorithm::Ecdsa as u32,
             &serde_json::to_string(&signature_metadata)?,
-            &data,
-            &signature,
+            data,
+            signature,
         ) {
             Ok(result) => Ok(result),
             Err(err) => Err(err),
@@ -110,7 +110,7 @@ pub fn generate_key(name: &str) -> Result<KeyECC, Box<dyn Error>> {
 
     match CryptoImpl::key_exists(name) {
         Ok(exists) => {
-            if exists == true {
+            if exists {
                 return Err(format!("Invalid key name: key name {} already exists", name).into());
             }
         }
@@ -120,23 +120,17 @@ pub fn generate_key(name: &str) -> Result<KeyECC, Box<dyn Error>> {
     let metadata = serde_json::to_string(&SecpR1Metadata {
         length: SecpR1KeyBitsize::SecpR1256,
     })?;
-    let key: Vec<u8>;
-    match CryptoImpl::generate_key(
+    let key: Vec<u8> = CryptoImpl::generate_key(
         name,
         KeyAlgorithm::SecpR1 as u32,
         &metadata,
         true,
         &["sign"],
-    ) {
-        Ok(result) => {
-            key = result;
-        }
-        Err(e) => return Err(e),
-    }
+    )?;
 
     match CryptoImpl::save_key(name) {
         Ok(_) => (),
-        Err(e) => return Err(e.into()),
+        Err(e) => return Err(e),
     };
 
     match serde_json::from_str::<CryptoKey>(&String::from_utf8(key)?) {

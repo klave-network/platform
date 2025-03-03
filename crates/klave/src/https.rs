@@ -78,7 +78,7 @@ pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn st
     parts.headers = http_response
         .headers
         .iter()
-        .map(|header| match (header.get(0), header.get(1)) {
+        .map(|header| match (header.first(), header.get(1)) {
             (Some(name), Some(value)) => {
                 let parsed_name = name
                     .parse::<http::header::HeaderName>()
