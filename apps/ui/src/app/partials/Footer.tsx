@@ -53,7 +53,7 @@ const Footer: FC = () => {
                         <h6 className="text-gray-800 dark:text-gray-500 font-medium mb-2">Resources</h6>
                         <ul className="text-sm">
                             <li className="mb-2">
-                                <a href="https://klave.com/docs" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 transition duration-150 ease-in-out">Documentation</a>
+                                <a href="https://docs.klave.com" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 transition duration-150 ease-in-out">Documentation</a>
                             </li>
                             {session?.me?.globalAdmin ? <li className="mb-2">
                                 <Link to="/system" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 transition duration-150 ease-in-out">System Management</Link>
