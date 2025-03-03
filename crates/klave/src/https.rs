@@ -1,19 +1,17 @@
-
-use serde::{Deserialize, Serialize};
-use http::{Request, Response, StatusCode};
-use std::fmt::Display;
 use crate::sdk;
+use http::{Request, Response, StatusCode};
+use serde::{Deserialize, Serialize};
+use std::fmt::Display;
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct HttpRequest<T>
-{
+pub struct HttpRequest<T> {
     method: String,
     hostname: String,
     port: i32,
     path: String,
     version: String,
     headers: Vec<Vec<String>>,
-    body: T
+    body: T,
 }
 
 impl Display for HttpRequest<String> {
@@ -23,59 +21,81 @@ impl Display for HttpRequest<String> {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct HttpResponse<T>
-{
+pub struct HttpResponse<T> {
     status_code: i32,
     headers: Vec<Vec<String>>,
-    body: T
+    body: T,
 }
 
 impl Display for HttpResponse<String> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "HttpResponse: status_code: {}, headers: {:?}, body: {}", self.status_code, self.headers, self.body)
+        write!(
+            f,
+            "HttpResponse: status_code: {}, headers: {:?}, body: {}",
+            self.status_code, self.headers, self.body
+        )
     }
 }
 
 /// Send a http request
-pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn std::error::Error>>
-{
+pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn std::error::Error>> {
     let port = match request.uri().port() {
         Some(port) => port.as_u16(),
-        None => 443
+        None => 443,
     };
 
     let http_request = HttpRequest {
         method: request.method().as_str().to_string(),
-        hostname: request.uri().host().unwrap().to_string(),
+        hostname: request
+            .uri()
+            .host()
+            .ok_or("Missing host in URI")?
+            .to_string(),
         port: i32::from(port),
         path: request.uri().path().to_string(),
         version: format!("{:?}", request.version()),
-        headers: request.headers().iter().map(|(name, value)| vec![name.as_str().to_string(), value.to_str().unwrap().to_string()]).collect(),
-        body: request.body().to_string()
+        headers: request
+            .headers()
+            .iter()
+            .map(|(name, value)| {
+                Ok::<Vec<String>, Box<dyn std::error::Error>>(vec![
+                    name.as_str().to_string(),
+                    value
+                        .to_str()
+                        .map_err(|e| format!("Invalid header value: {}", e))?
+                        .to_string(),
+                ])
+            })
+            .collect::<Result<Vec<_>, _>>()?,
+        body: request.body().to_string(),
     };
 
+    let http_request_str = serde_json::to_string(&http_request)?;
 
-    let http_request_str = match serde_json::to_string(&http_request) {
-        Ok(http_request_str) => http_request_str,
-        Err(e) => return Err(e.into())
-    };
+    let response = sdk::https_query(&http_request_str)?;
 
-    let response = match sdk::https_query(&http_request_str){
-        Ok(response) => response,
-        Err(err) => return Err(err.into())
-    };
-    
-    let http_response: HttpResponse<String> = match serde_json::from_str(&response){
-        Ok(http_response) => http_response,
-        Err(e) => return Err(e.into())
-    };
+    let http_response: HttpResponse<String> = serde_json::from_str(&response)?;
 
     let mut parts = Response::new(String::new()).into_parts().0;
-    parts.headers = http_response.headers.iter().map(|header| (
-        header[0].parse::<http::header::HeaderName>().unwrap(),
-        header[1].parse::<http::header::HeaderValue>().unwrap()
-    )).collect();
-    parts.status = StatusCode::from_u16(http_response.status_code as u16).unwrap();
+
+    parts.headers = http_response
+        .headers
+        .iter()
+        .map(|header| match (header.first(), header.get(1)) {
+            (Some(name), Some(value)) => {
+                let parsed_name = name
+                    .parse::<http::header::HeaderName>()
+                    .map_err(|e| format!("Failed to parse header name '{}': {}", name, e))?;
+                let parsed_value = value
+                    .parse::<http::header::HeaderValue>()
+                    .map_err(|e| format!("Failed to parse header value '{}': {}", value, e))?;
+                Ok((parsed_name, parsed_value))
+            }
+            _ => Err::<_, String>("Malformed header entry: missing name or value".into()),
+        })
+        .collect::<Result<http::HeaderMap, _>>()?;
+
+    parts.status = StatusCode::from_u16(http_response.status_code as u16)?;
     parts.version = request.version();
 
     let response = Response::from_parts(parts, http_response.body);

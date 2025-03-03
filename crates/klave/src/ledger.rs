@@ -1,60 +1,60 @@
 use crate::sdk;
-use serde_json::Value;
-use anyhow::Result;
+use serde::{de::DeserializeOwned, Serialize};
+use std::error::Error;
 
 pub struct Table {
-    // Define the fields for the Table struct
-    name: String
+    name: String,
 }
 
 impl Table {
-    // Constructor to create a new Table
+    /// Create a new Table instance
     pub fn new(name: &str) -> Self {
-        Table {
-            name: name.to_string()
+        Self {
+            name: name.to_string(),
         }
     }
 
-    // Method to set a key-value pair into the table
-    pub fn set(&mut self, key: &str, value: &str) -> Result<(), Box<dyn std::error::Error>> {
-        match sdk::write_ledger(&self.name, key.as_bytes(), value.as_bytes()) {
-            Ok(_) => Ok(()),
-            Err(err) => Err(err.into())
-        }
+    /// Insert or update a key-value pair with raw bytes
+    pub fn set(&self, key: &str, value: &[u8]) -> Result<(), Box<dyn Error>> {
+        sdk::write_ledger(&self.name, key.as_bytes(), value).map_err(Into::into)
     }
 
-    pub fn set_from_json(&mut self, cmd: &str) -> Result<(), Box<dyn std::error::Error>> {
-        let Ok(v) = serde_json::from_str::<Value>(&cmd) else {            
-            return Err(format!("failed to parse '{}' as json", cmd).into());
-        };
-
-        let key = v["key"].as_str().expect("key is required");
-        let value = v["value"].as_str().expect("value is required");
-
-        match self.set(key, value) {
-            Ok(_) => Ok(()),
-            Err(err) => Err(err.into())
-        }
+    /// Insert or update a key-value pair with a string value
+    pub fn set_string(&self, key: &str, value: &str) -> Result<(), Box<dyn Error>> {
+        self.set(key, value.as_bytes())
     }
 
-
-    // Method to get a value by key from the table
-    pub fn get(&self, key: &str) -> Result<String, Box<dyn std::error::Error>> {
-        match sdk::read_ledger(&self.name, key.as_bytes()) {
-            Ok(result) => Ok(String::from_utf8(result).unwrap()),
-            Err(err) => Err(err.into())
-        }
+    /// Insert an object as a JSON string
+    pub fn set_json<T: Serialize>(&self, key: &str, value: &T) -> Result<(), Box<dyn Error>> {
+        let json = serde_json::to_string(value)?;
+        self.set_string(key, &json)
     }
 
-    // Method to remove a key-value pair from the table
-    pub fn remove(&mut self, key: &str) -> Result<(), Box<dyn std::error::Error>> {
-        match sdk::remove_from_ledger(&self.name, key.as_bytes()) {
-            Ok(_) => Ok(()),
-            Err(err) => Err(err.into())
-        }
+    /// Retrieve a value as raw bytes
+    pub fn get(&self, key: &str) -> Result<Vec<u8>, Box<dyn Error>> {
+        sdk::read_ledger(&self.name, key.as_bytes()).map_err(Into::into)
+    }
+
+    /// Retrieve a value as a UTF-8 string
+    pub fn get_string(&self, key: &str) -> Result<String, Box<dyn Error>> {
+        let bytes = self.get(key)?;
+        String::from_utf8(bytes).map_err(Into::into)
+    }
+
+    /// Retrieve an object by deserializing from JSON
+    pub fn get_json<T: DeserializeOwned>(&self, key: &str) -> Result<T, Box<dyn Error>> {
+        let json = self.get_string(key)?;
+        let obj = serde_json::from_str(&json)?;
+        Ok(obj)
+    }
+
+    /// Remove a key-value pair from the table
+    pub fn remove(&self, key: &str) -> Result<(), Box<dyn Error>> {
+        sdk::remove_from_ledger(&self.name, key.as_bytes()).map_err(Into::into)
     }
 }
 
+/// Retrieve a Table instance
 pub fn get_table(table: &str) -> Table {
     Table::new(table)
 }
