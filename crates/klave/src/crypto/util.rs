@@ -18,15 +18,27 @@ struct KeyFormatWrapper {
 }
 
 pub fn is_valid_hash_algorithm(algorithm: &str) -> bool {
-    match algorithm {
-        "sha-256" | "sha-384" | "sha-512" => true,
-        "sha2-256" | "sha2-384" | "sha2-512" => true,
-        "sha3-256" | "sha3-384" | "sha3-512" => true,
-        "SHA-256" | "SHA-384" | "SHA-512" => true,
-        "SHA2-256" | "SHA2-384" | "SHA2-512" => true,
-        "SHA3-256" | "SHA3-384" | "SHA3-512" => true,
-        _ => false,
-    }
+    matches!(
+        algorithm,
+        "sha-256"
+            | "sha-384"
+            | "sha-512"
+            | "sha2-256"
+            | "sha2-384"
+            | "sha2-512"
+            | "sha3-256"
+            | "sha3-384"
+            | "sha3-512"
+            | "SHA-256"
+            | "SHA-384"
+            | "SHA-512"
+            | "SHA2-256"
+            | "SHA2-384"
+            | "SHA2-512"
+            | "SHA3-256"
+            | "SHA3-384"
+            | "SHA3-512"
+    )
 }
 
 pub fn digest_size(algorithm: &str) -> usize {
@@ -99,7 +111,7 @@ pub fn get_rsa_metadata(params: &RsaHashedKeyGenParams) -> Result<RsaMetadata, B
     Ok(RsaMetadata {
         modulus: rsa_bitsize,
         public_exponent: params.public_exponent,
-        sha_metadata: sha_metadata,
+        sha_metadata,
     })
 }
 
