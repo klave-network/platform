@@ -1,4 +1,3 @@
-/// <reference types='vitest' />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
@@ -44,5 +43,14 @@ export default defineConfig({
             // External packages that should not be bundled into your library.
             external: ['react', 'react-dom', 'react/jsx-runtime']
         }
+    },
+    test: {
+        reporters: ['default'],
+        globals: true,
+        passWithNoTests: true,
+        environment: 'jsdom',
+        watch: false,
+        include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+        includeSource: ['src/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}']
     }
 });

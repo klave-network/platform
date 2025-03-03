@@ -10,7 +10,9 @@
         },
         "build": {
             "executor": "@nx/vite:build",
-            "outputs": ["{options.outputPath}"],
+            "outputs": [
+                "{options.outputPath}"
+            ],
             "defaultConfiguration": "production",
             "options": {
                 "outputPath": "dist/libs/ui-kit"
@@ -33,6 +35,32 @@
             "executor": "nx:run-commands",
             "options": {
                 "command": "yarn email dev --dir='libs/ui-kit/src/email-templates'"
+            }
+        },
+        "test": {
+            "executor": "@nx/vite:test",
+            "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+            ]
+        },
+        "sync-deps": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "node tools/scripts/syncDepVersion.mjs ui-kit"
+            }
+        },
+        "version": {
+            "executor": "@jscutlery/semver:version",
+            "options": {
+                "preset": "conventional",
+                "trackDeps": true,
+                "changelogHeader": "# Changelog",
+                "tagPrefix": "{projectName}@",
+                "commitMessageFormat": "chore({projectName}): Release version ${version}",
+                "postTargets": [
+                    "sdk:build",
+                    "sdk:sync-deps"
+                ]
             }
         }
     },

@@ -20,10 +20,10 @@
         "**/*.test.jsx"
     ],
     "include": [
-        "vite.config.ts", 
-        "src/**/*.js", 
-        "src/**/*.jsx", 
-        "src/**/*.ts", 
+        "reset.d.ts",
+        "src/**/*.js",
+        "src/**/*.jsx",
+        "src/**/*.ts",
         "src/**/*.tsx"
     ]
 }
