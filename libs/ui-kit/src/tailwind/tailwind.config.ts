@@ -1,13 +1,16 @@
 const { join } = require('path');
 
 const TailwindAnimate = require('tailwindcss-animate');
+const { createGlobPatternsForDependencies } = require('@nx/react/tailwind');
 
 module.exports = {
     content: [
         // relative path by consumer app
-        './{src,app,pages,components}/**/*.{js,jsx,ts,tsx}',
+        // './{src,pages,components,app}/**/*.{ts,tsx,html}',
+        // join(__dirname, '../../../../apps/ui/src/**/*.{js,jsx,ts,tsx,html}'),
         // path to ui-kit components (relative to current dir)
-        join(__dirname, '../../../ui/**/*.{js,jsx,ts,tsx}')
+        join(__dirname, '../{components}/**/*.{ts,tsx}'),
+        ...createGlobPatternsForDependencies(__dirname)
     ],
     theme: {
         extend: {
