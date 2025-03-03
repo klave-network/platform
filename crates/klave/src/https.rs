@@ -58,12 +58,15 @@ pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn st
             .headers()
             .iter()
             .map(|(name, value)| {
-                vec![
+                Ok::<Vec<String>, Box<dyn std::error::Error>>(vec![
                     name.as_str().to_string(),
-                    value.to_str().unwrap().to_string(),
-                ]
+                    value
+                        .to_str()
+                        .map_err(|e| format!("Invalid header value: {}", e))?
+                        .to_string(),
+                ])
             })
-            .collect(),
+            .collect::<Result<Vec<_>, _>>()?,
         body: request.body().to_string(),
     };
 
