@@ -1,4 +1,11 @@
 # Changelog
+
+## [1.1.0](https://github.com/klave-network/platform/compare/hubber@0.3.3...hubber@1.1.0) (2025-03-03)
+
+### ⚠ BREAKING CHANGES
+
+* Short-circuiting the `develop` track to provide release for non-compilable ESM format
+
 ## [0.3.3](https://github.com/klave-network/platform/compare/hubber@0.3.2...hubber@0.3.3) (2024-07-25)
 
 ### Dependency Updates
@@ -8,6 +15,7 @@
 * `constants` updated to version `0.3.2`
 * `api` updated to version `0.3.2`
 * `pruner` updated to version `0.3.2`
+
 ## [0.3.2](https://github.com/klave-network/platform/compare/hubber@0.3.1...hubber@0.3.2) (2024-07-24)
 
 ### Dependency Updates
@@ -31,6 +39,7 @@
 * `constants` updated to version `0.3.0`
 * `api` updated to version `0.3.0`
 * `pruner` updated to version `0.3.0`
+
 ## [0.3.0](https://github.com/klave-network/platform/compare/hubber@0.2.5...hubber@0.3.0) (2024-05-31)
 
 ### Dependency Updates
@@ -46,7 +55,6 @@
 * **api,compiler,hubber:** Do compilation over full repo clone ([d68d7dd](https://github.com/klave-network/platform/commit/d68d7ddc26815900489d529b502f30495546f0b5))
 * **api,hubber:** Add Rust compilation support ([66b2a1d](https://github.com/klave-network/platform/commit/66b2a1de8ca5f660c09086c4c163fb4994638f4d))
 
-
 ### Bug Fixes
 
 * **api,hubber:** Message streaming and Dockerfile Rust setup ([a66676f](https://github.com/klave-network/platform/commit/a66676fdc66a92002e5b8f6e02a15eba946e64b9))
@@ -58,18 +66,21 @@
 
 * `api` updated to version `0.2.5`
 * `pruner` updated to version `0.2.5`
+
 ## [0.2.5](https://github.com/klave-network/platform/compare/hubber@0.2.4...hubber@0.2.5) (2024-05-08)
 
 ### Dependency Updates
 
 * `api` updated to version `0.2.4`
 * `pruner` updated to version `0.2.4`
+
 ## [0.2.4](https://github.com/klave-network/platform/compare/hubber@0.2.3...hubber@0.2.4) (2024-05-02)
 
 ### Dependency Updates
 
 * `api` updated to version `0.2.3`
 * `pruner` updated to version `0.2.3`
+
 ## [0.2.3](https://github.com/klave-network/platform/compare/hubber@0.2.2...hubber@0.2.3) (2024-04-25)
 
 ### Dependency Updates
@@ -79,12 +90,14 @@
 * `constants` updated to version `0.2.2`
 * `api` updated to version `0.2.2`
 * `pruner` updated to version `0.2.2`
+
 ## [0.2.2](https://github.com/klave-network/platform/compare/hubber@0.2.1...hubber@0.2.2) (2024-03-19)
 
 ### Dependency Updates
 
 * `api` updated to version `0.2.1`
 * `pruner` updated to version `0.2.1`
+
 ## [0.2.1](https://github.com/klave-network/platform/compare/hubber@0.2.0...hubber@0.2.1) (2024-03-19)
 
 ### Dependency Updates
@@ -115,7 +128,6 @@
 * **api,hubber,ui:** Provide versions at compile time ([da280b5](https://github.com/klave-network/platform/commit/da280b518d945b29c519341bc3a0755e13e2d836))
 * **db,constants,api,ui:** Add tracking of commit signatures ([a39311d](https://github.com/klave-network/platform/commit/a39311d03d2f8fa50983958d4a829ec3ab09565f))
 * **providers,hubber:** Guarantee a constant SCP Key ([025fae2](https://github.com/klave-network/platform/commit/025fae25c4dd6059ab9fbf86cb5d16a57c23389e))
-
 
 ### Bug Fixes
 
@@ -156,6 +168,7 @@
 * `instrumentation` updated to version `0.1.3`
 * `klave-api` updated to version `0.1.3`
 * `pruner` updated to version `0.1.3`
+
 ## [0.1.3](///compare/hubber@0.1.2...hubber@0.1.3) (2023-06-13)
 
 ### Dependency Updates
@@ -176,6 +189,7 @@
 * `klave-db` updated to version `0.1.0`
 * `providers` updated to version `0.1.0`
 * `klave-api` updated to version `0.3.0`
+
 ## [0.1.1](///compare/hubber@0.1.0...hubber@0.1.1) (2023-06-06)
 
 ### Dependency Updates
@@ -213,7 +227,6 @@
 * New Instrumentation package with Sentry compat 3fbde7d
 * **pruner,hubber:** Adding garbage collection background task c5033e5
 
-
 ### Bug Fixes
 
 * Catch exception of the octokit compare c788bcb
@@ -224,7 +237,6 @@
 * **hubber:** Fix Prisma details printed on start d5d9fd2
 * **hubber:** Revert configuration change for sigstore prep 24829f4
 * **hubber:** Solve typescript not present for runtime DTS analysis d60fa6b
-
 
 ### Reverts
 
