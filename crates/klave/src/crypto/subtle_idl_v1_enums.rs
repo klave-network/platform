@@ -165,7 +165,6 @@ pub enum ShaAlgorithm {
     None = 0,
     Sha2 = 1,
     Sha3 = 2,
-    Sha1 = 3,
 }
 
 serialize_copy!(ShaAlgorithm);
@@ -174,7 +173,6 @@ deserialize_copy!(ShaAlgorithm,
     0 => Ok(ShaAlgorithm::None),
     1 => Ok(ShaAlgorithm::Sha2),
     2 => Ok(ShaAlgorithm::Sha3),
-    3 => Ok(ShaAlgorithm::Sha1),
     _ => Err(de::Error::custom("invalid ShaAlgorithm variant"))
 );
 
@@ -199,7 +197,6 @@ pub enum ShaDigestBitsize {
     Sha256 = 256,
     Sha384 = 384,
     Sha512 = 512,
-    Sha1 = 160,
 }
 
 serialize_copy!(ShaDigestBitsize);
@@ -208,7 +205,6 @@ deserialize_copy!(ShaDigestBitsize,
     256 => Ok(ShaDigestBitsize::Sha256),
     384 => Ok(ShaDigestBitsize::Sha384),
     512 => Ok(ShaDigestBitsize::Sha512),
-    160 => Ok(ShaDigestBitsize::Sha1),
     _ => Err(de::Error::custom("invalid ShaDigestBitsize variant"))
 );
 

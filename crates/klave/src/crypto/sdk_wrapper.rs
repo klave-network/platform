@@ -23,11 +23,10 @@ impl Key {
                 };
             };
             Key {
-                name: rand.iter().fold(String::new(), |mut acc, b| {
-                    use std::fmt::Write;
-                    write!(acc, "{:02x}", b).unwrap();
-                    acc
-                }),
+                name: rand
+                    .iter()
+                    .map(|b| format!("{:02x}", b))
+                    .collect::<String>(),
             }
         }
     }
@@ -81,7 +80,7 @@ impl CryptoImpl {
     }
 
     pub fn key_exists(key_name: &str) -> Result<bool, Box<dyn Error>> {
-        match sdk::key_exists(key_name) {
+        match sdk::key_exists(&key_name) {
             Ok(result) => Ok(result),
             Err(err) => Err(err.into()),
         }
@@ -95,9 +94,9 @@ impl CryptoImpl {
         usages: &[&str],
     ) -> Result<Vec<u8>, Box<dyn Error>> {
         match sdk::generate_key(
-            key_name,
+            &key_name,
             algorithm as i32,
-            algo_metadata,
+            &algo_metadata,
             extractable as i32,
             &CryptoImpl::process_usages(usages),
         ) {
@@ -112,7 +111,7 @@ impl CryptoImpl {
         algo_metadata: &str,
         clear_text: &[u8],
     ) -> Result<Vec<u8>, Box<dyn Error>> {
-        match sdk::encrypt(key_name, algorithm as i32, algo_metadata, clear_text) {
+        match sdk::encrypt(&key_name, algorithm as i32, &algo_metadata, &clear_text) {
             Ok(result) => Ok(result),
             Err(err) => Err(err.into()),
         }
@@ -124,7 +123,7 @@ impl CryptoImpl {
         algo_metadata: &str,
         cipher_text: &[u8],
     ) -> Result<Vec<u8>, Box<dyn Error>> {
-        match sdk::decrypt(key_name, algorithm as i32, algo_metadata, cipher_text) {
+        match sdk::decrypt(&key_name, algorithm as i32, &algo_metadata, &cipher_text) {
             Ok(result) => Ok(result),
             Err(err) => Err(err.into()),
         }
@@ -136,7 +135,7 @@ impl CryptoImpl {
         algo_metadata: &str,
         data: &[u8],
     ) -> Result<Vec<u8>, Box<dyn Error>> {
-        match sdk::sign(key_name, algorithm as i32, algo_metadata, data) {
+        match sdk::sign(&key_name, algorithm as i32, &algo_metadata, &data) {
             Ok(result) => Ok(result),
             Err(err) => Err(err.into()),
         }
@@ -149,14 +148,20 @@ impl CryptoImpl {
         data: &[u8],
         signature: &[u8],
     ) -> Result<VerifySignResult, Box<dyn Error>> {
-        match sdk::verify(key_name, algorithm as i32, algo_metadata, data, signature) {
+        match sdk::verify(
+            &key_name,
+            algorithm as i32,
+            &algo_metadata,
+            &data,
+            &signature,
+        ) {
             Ok(result) => Ok(VerifySignResult { is_valid: result }),
             Err(err) => Err(err.into()),
         }
     }
 
     pub fn digest(algorithm: u32, hash_info: &str, text: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
-        match sdk::digest(algorithm as i32, hash_info, text) {
+        match sdk::digest(algorithm as i32, &hash_info, &text) {
             Ok(result) => Ok(result),
             Err(err) => Err(err.into()),
         }
@@ -172,11 +177,11 @@ impl CryptoImpl {
         key_name: &str,
     ) -> Result<Vec<u8>, Box<dyn Error>> {
         match sdk::import_key(
-            key_name,
+            &key_name,
             format as i32,
-            key_data,
+            &key_data,
             algorithm as i32,
-            algo_metadata,
+            &algo_metadata,
             extractable as i32,
             &CryptoImpl::process_usages(usages),
         ) {
@@ -186,7 +191,7 @@ impl CryptoImpl {
     }
 
     pub fn export_key(key_name: &str, format: u32) -> Result<Vec<u8>, Box<dyn Error>> {
-        match sdk::export_key(key_name, format as i32) {
+        match sdk::export_key(&key_name, format as i32) {
             Ok(result) => Ok(result),
             Err(err) => Err(err.into()),
         }
@@ -204,14 +209,14 @@ impl CryptoImpl {
         usages: &[&str],
     ) -> Result<Vec<u8>, Box<dyn Error>> {
         match sdk::unwrap_key(
-            decryption_key_name,
+            &decryption_key_name,
             unwrap_algo_id as i32,
-            unwrap_metadata,
+            &unwrap_metadata,
             "",
             format as i32,
-            wrapped_key,
+            &wrapped_key,
             key_gen_algorithm as i32,
-            key_gen_algo_metadata,
+            &key_gen_algo_metadata,
             extractable as i32,
             &CryptoImpl::process_usages(usages),
         ) {
@@ -228,11 +233,11 @@ impl CryptoImpl {
         format: u32,
     ) -> Result<Vec<u8>, Box<dyn Error>> {
         match sdk::wrap_key(
-            key_name,
+            &key_name,
             format as i32,
-            encryption_key_name,
+            &encryption_key_name,
             algorithm as i32,
-            algo_metadata,
+            &algo_metadata,
         ) {
             Ok(result) => Ok(result),
             Err(err) => Err(err.into()),
@@ -240,7 +245,7 @@ impl CryptoImpl {
     }
 
     pub fn get_public_key(key_name: &str) -> Result<Vec<u8>, Box<dyn Error>> {
-        match sdk::get_public_key(key_name) {
+        match sdk::get_public_key(&key_name) {
             Ok(result) => Ok(result),
             Err(err) => Err(err.into()),
         }
@@ -263,11 +268,11 @@ impl CryptoImpl {
         key_name: &str,
     ) -> Result<String, Box<dyn Error>> {
         match sdk::derive_key(
-            key_name,
+            &key_name,
             derivation_algorithm as i32,
-            derivation_metadata,
+            &derivation_metadata,
             derived_key_algorithm as i32,
-            derived_key_metadata,
+            &derived_key_metadata,
             extractable as i32,
             &CryptoImpl::process_usages(usages),
         ) {
@@ -277,7 +282,7 @@ impl CryptoImpl {
     }
 
     pub fn save_key(key_name: &str) -> Result<(), Box<dyn Error>> {
-        match sdk::save_key(key_name) {
+        match sdk::save_key(&key_name) {
             Ok(_) => Ok(()),
             Err(err) => Err(err.into()),
         }
@@ -291,14 +296,14 @@ impl CryptoImpl {
     }
 
     pub fn load_key(key_name: &str) -> Result<String, Box<dyn Error>> {
-        match sdk::load_key(key_name) {
+        match sdk::load_key(&key_name) {
             Ok(result) => Ok(result),
             Err(err) => Err(err.into()),
         }
     }
 
     pub fn delete_key(key_name: &str) -> Result<(), Box<dyn Error>> {
-        match sdk::delete_key(key_name) {
+        match sdk::delete_key(&key_name) {
             Ok(_) => Ok(()),
             Err(err) => Err(err.into()),
         }
