@@ -9,7 +9,7 @@ module.exports = {
         // './{src,pages,components,app}/**/*.{ts,tsx,html}',
         // join(__dirname, '../../../../apps/ui/src/**/*.{js,jsx,ts,tsx,html}'),
         // path to ui-kit components (relative to current dir)
-        join(__dirname, '../{components}/**/*.{ts,tsx}'),
+        join(__dirname, '../components/**/*.{ts,tsx}'),
         ...createGlobPatternsForDependencies(__dirname)
     ],
     theme: {
