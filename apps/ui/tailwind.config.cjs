@@ -1,13 +1,13 @@
 const { join } = require('path');
 const { createGlobPatternsForDependencies } = require('@nx/react/tailwind');
+const twBaseConfig = require('../../libs/ui-kit/src/tailwind/tailwind.config');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+    ...twBaseConfig,
     content: [
-        join(
-            __dirname,
-            '{src,pages,components,app}/**/*!(*.stories|*.spec).{ts,tsx,html}'
-        ),
+        ...twBaseConfig.content,
+        join(__dirname, '{src,pages,components,app}/**/*!(*.stories|*.spec).{ts,tsx,html}'),
         ...createGlobPatternsForDependencies(__dirname)
     ],
     darkMode: process.env.NODE_ENV === 'development' ? 'media' : 'class',
@@ -18,7 +18,8 @@ module.exports = {
                 'klave-dark-blue': '#00021A',
                 'klave-light-blue': '#00BFFF',
                 'klave-cyan': '#00FFD5'
-            }
+            },
+            ...twBaseConfig.theme?.extend
         }
     },
     daisyui: process.env.NODE_ENV === 'development' ? {
