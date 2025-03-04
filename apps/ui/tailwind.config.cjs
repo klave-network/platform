@@ -14,19 +14,6 @@ module.exports = {
     important: true,
     theme: {
         extend: {
-            colors: {
-                'klave-dark-blue': '#00021A',
-                'klave-light-blue': '#00BFFF',
-                'klave-cyan': '#00FFD5',
-                'klave-off-black': '#0E1218',
-                'klave-dark-grey': '#13161D',
-                'klave-mid-grey': '#2F363E',
-                'klave-light-grey': '#808080',
-                'klave-off-white': '#E5E5E5',
-                'klave-red': '#D97873',
-                'klave-peach': '#FCA870',
-                'klave-purple': '#B291ED'
-            },
             ...twBaseConfig.theme?.extend
         }
     },
