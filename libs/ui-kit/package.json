@@ -10,6 +10,7 @@
     "main": "./index.js",
     "types": "./index.d.ts",
     "dependencies": {
+        "@radix-ui/react-label": "^2.1.2",
         "@radix-ui/react-slot": "^1.1.2",
         "@react-email/components": "^0.0.36",
         "@react-email/render": "^1.0.6",
