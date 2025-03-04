@@ -4,8 +4,8 @@
     "rsc": false,
     "tsx": true,
     "tailwind": {
-        "config": "libs/ui-kit/src/tailwind/tailwind.config.ts",
-        "css": "libs/ui-kit/src/styles/globals.css",
+        "config": "src/tailwind/tailwind.config.ts",
+        "css": "src/styles/globals.css",
         "baseColor": "neutral",
         "cssVariables": true,
         "prefix": ""
