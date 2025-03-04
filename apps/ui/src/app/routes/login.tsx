@@ -153,15 +153,11 @@ export const Login: FC = () => {
         </div>;
     }
 
-    return <div id="login">
-
-        <div className="flex flex-col sm:flex-row max-w-6xl mx-auto gap-12 px-4 sm:px-6">
-            <div className="p-5 min-w-[300px] bg-slate-100 dark:bg-gray-800 rounded-md">
-                <LoginSecKey />
-            </div>
+    return (
+        <div id="login">
+            <LoginSecKey />
         </div>
-
-    </div>;
+    );
 };
 
 export default Login;

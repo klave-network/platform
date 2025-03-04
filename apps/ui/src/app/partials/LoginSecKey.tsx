@@ -1,10 +1,26 @@
 import { FC, useState, useEffect, useCallback, ChangeEvent, MouseEvent } from 'react';
 import { platformAuthenticatorIsAvailable, browserSupportsWebAuthn, startAuthentication, startRegistration } from '@simplewebauthn/browser';
 import api from '../utils/api';
+import { AlertCircle, Info } from 'lucide-react';
 import { UilSpinner } from '@iconscout/react-unicons';
 import { useLocalForage } from '../useLocalStorage';
 import { useDebounceValue } from 'usehooks-ts';
 import { useLocation, useNavigate } from 'react-router-dom';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle
+} from '@klave/ui-kit/components/ui/card';
+import { Label } from '@klave/ui-kit/components/ui/label';
+import { Input } from '@klave/ui-kit/components/ui/input';
+import { Button } from '@klave/ui-kit/components/ui/button';
+import {
+    Alert,
+    AlertDescription,
+    AlertTitle
+} from '@klave/ui-kit/components/ui/alert';
 
 export const LoginSecKey: FC = () => {
 
@@ -277,47 +293,118 @@ export const LoginSecKey: FC = () => {
         getLoginCode();
     }, [getLoginCode]);
 
-    return <div className="text-center pb-12 md:pb-16">
-        <br />
-        <div className='pb-5' >
-            {isWebauthAvailable && screen === 'start'
-                ? <>
-                    <h1 className='text-xl font-bold'>Secure Key</h1>
-                    <span>Connect with your secure key.</span>
-                </>
-                : <>
-                    <h1 className='text-xl font-bold'>Email Code</h1>
-                    <span>Connect via an email code.</span>
-                </>
-            }
-            <br />
-            <br />
-            <br />
-        </div >
-        <form className='relative'>
-            {screen === 'start' ? <>
-                <input key='emailField' value={email} onInput={onChangeEmail} alt='email' placeholder='Email address' type='email' className='input input-bordered text-center rounded-md text-black dark:text-white' />
-                <div className='h-8'>
-                    {emailHintError?.data || emailHint?.sucess === false
-                        ? <span className="block mt-1 text-xs text-red-700 leading-tight">{emailHintError?.message ?? emailHint?.message ?? 'We encountered a problem.'}<br />&nbsp;</span>
-                        : emailHint?.message
-                            ? <span className="block mt-1 text-xs text-green-700 leading-tight">{emailHint?.message}</span>
-                            : isCheckingEmailHint
-                                ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-full' /><br />&nbsp;</span>
-                                : <span className="block mt-1 text-xs leading-tight">&nbsp;<br />&nbsp;</span>}
-                </div>
-                <button disabled={isLoading || emailHint?.sucess === false} onClick={handleLoginSubmit} onSubmit={handleLoginSubmit} type='submit' className='btn btn-sm bg-blue-600 text-white hover:bg-blue-500 disabled:bg-slate-300 rounded-md'>{isLoading ? <UilSpinner className='inline-block animate-spin h-5' /> : isWebauthAvailable ? 'Log in with secure key' : 'Log in with email code'}</button><br />
-                <button disabled={isLoading || emailHint?.sucess === false} onClick={handleLoginCodeSubmit} className='btn btn-sm bg-transparent border-0 shadow-none font-normal text-sm text-blue-600 disabled:text-slate-400 hover:text-blue-300 hover:cursor-pointer'>Use email code instead</button>
-            </> : screen === 'code' ? <>
-                <input key='codeField' value={code} onInput={onChangeCode} alt='code' placeholder='Code' type='text' className='input input-bordered text-center rounded-md text-black dark:text-white' />
-                <br />
-                <br />
-                <button disabled={isLoading} onClick={verifyEmailCode} onSubmit={verifyEmailCode} type='submit' className='btn btn-sm mx-1 rounded-md bg-blue-600 text-white hover:bg-blue-500'>{isLoading ? <UilSpinner className='inline-block animate-spin h-5' /> : 'Next'}</button>
-                <button onClick={resetLogin} type='button' className='btn btn-sm mx-1 rounded-md bg-gray-500 text-white hover:bg-gray-400'>Cancel</button>
-            </> : null}
-            {error ? <><br /><br /><div className='bg-red-200 p-2 w-full'>{error}</div></> : null}
-        </form>
-    </div >;
+    return (
+        <div className="flex flex-col gap-6 w-[320px]">
+            <Card className="">
+                <CardHeader className="text-center">
+                    {isWebauthAvailable && screen === 'start'
+                        ? <>
+                            <CardTitle className="text-xl">Secure Key</CardTitle>
+                            <CardDescription>Connect with your secure key.</CardDescription>
+                        </>
+                        : <>
+                            <CardTitle className="text-xl">Email Code</CardTitle>
+                            <CardDescription>Connect via an email code.</CardDescription>
+                        </>
+                    }
+                </CardHeader>
+                <CardContent>
+                    <form className='relative'>
+                        {screen === 'start' ? <div className="flex flex-col gap-6">
+                            <div className="grid gap-2">
+                                <Label htmlFor='emailField'>Email address</Label>
+                                <Input
+                                    key='emailField'
+                                    value={email}
+                                    onInput={onChangeEmail}
+                                    alt='email'
+                                    placeholder='Email address'
+                                    type='email'
+                                    required
+                                />
+                            </div>
+                            <Button
+                                disabled={isLoading || emailHint?.sucess === false}
+                                onClick={handleLoginSubmit}
+                                onSubmit={handleLoginSubmit}
+                                type='submit'
+                                className='disabled:bg-slate-300'
+                            >
+                                {isLoading
+                                    ? <UilSpinner className='inline-block animate-spin h-5' />
+                                    : isWebauthAvailable
+                                        ? 'Log in with secure key'
+                                        : 'Log in with email code'}
+                            </Button>
+                            <Button
+                                variant="secondary"
+                                disabled={isLoading || emailHint?.sucess === false}
+                                onClick={handleLoginCodeSubmit}
+                                className='disabled:text-slate-400'
+                            >
+                                Use email code instead
+                            </Button>
+                        </div> : screen === 'code' ? <div className="flex flex-col gap-6">
+                            <div className="grid gap-2">
+                                <Label htmlFor='emailField'>Email code</Label>
+                                <Input
+                                    key='codeField'
+                                    value={code}
+                                    onInput={onChangeCode}
+                                    alt='code'
+                                    placeholder='Code'
+                                    type='text'
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                <Button
+                                    variant="outline"
+                                    onClick={resetLogin}
+                                    type='button'
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    disabled={isLoading}
+                                    onClick={verifyEmailCode}
+                                    onSubmit={verifyEmailCode}
+                                    type='submit'
+                                >
+                                    {isLoading ? <UilSpinner className='inline-block animate-spin h-5' /> : 'Next'}
+                                </Button>
+                            </div>
+                        </div> : null}
+                    </form>
+                </CardContent>
+            </Card>
+            {emailHintError?.data || emailHint?.sucess === false
+                ? <Alert variant="destructive" className="bg-klave-red/10">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>
+                        {emailHintError?.message ?? emailHint?.message ?? 'We encountered a problem.'}
+                    </AlertDescription>
+                </Alert>
+                : emailHint?.message
+                    ? <Alert>
+                        <Info className="h-4 w-4" />
+                        <AlertTitle>Info</AlertTitle>
+                        <AlertDescription>
+                            {emailHint?.message}
+                        </AlertDescription>
+                    </Alert>
+                    : isCheckingEmailHint
+                        ? <UilSpinner className='mx-auto animate-spin h-1/2 w-1/2' />
+                        : null}
+            {error && <Alert variant="destructive" className="bg-klave-red/10">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>
+                    {error}
+                </AlertDescription>
+            </Alert>}
+        </div>
+    );
 };
 
 export default LoginSecKey;
