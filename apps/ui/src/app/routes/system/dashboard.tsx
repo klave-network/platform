@@ -7,7 +7,7 @@ export const SysDashboard: FC = () => {
 
     const outlet = useOutlet();
 
-    return <div className="bg-gray-100 dark:bg-gray-900 dark:text-white text-gray-600 flex-grow flex overflow-hidden text-sm border-t dark:border-gray-800">
+    return <div className="bg-gray-100 dark:bg-gray-900 dark:text-white text-gray-600 flex-grow flex overflow-hidden text-sm">
         {/*
         <div className="bg-white dark:bg-gray-900 dark:border-gray-800 w-20 flex-shrink-0 border-r border-gray-200 flex-col hidden sm:flex">
             <div className="flex mx-auto flex-grow mt-4 flex-col text-gray-400 space-y-4">
