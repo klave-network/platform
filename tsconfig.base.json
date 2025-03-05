@@ -37,7 +37,7 @@
             "@klave/ui-kit/components": ["libs/ui-kit/src/components"],
             "@klave/ui-kit/components/ui": ["libs/ui-kit/src/components/ui"],
             "@klave/ui-kit/components/ui/*": ["libs/ui-kit/src/components/ui/*"],
-            "@klave/ui-kit/hooks": ["libs/ui-kit/src/hooks"],
+            "@klave/ui-kit/hooks/*": ["libs/ui-kit/src/hooks/*"],
             "@klave/ui-kit/lib": ["libs/ui-kit/src/lib"],
             "@klave/ui-kit/lib/*": ["libs/ui-kit/src/lib/*"],
             "@klave/ui-kit/styles/*": ["libs/ui-kit/src/styles/*"]
