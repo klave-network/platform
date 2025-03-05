@@ -4,6 +4,7 @@ const TailwindAnimate = require('tailwindcss-animate');
 const { createGlobPatternsForDependencies } = require('@nx/react/tailwind');
 
 module.exports = {
+    darkMode: ['class'],
     content: [
         // relative path by consumer app
         // './{src,pages,components,app}/**/*.{ts,tsx,html}',
@@ -63,11 +64,9 @@ module.exports = {
                     'DEFAULT': 'hsl(var(--sidebar-background))',
                     'foreground': 'hsl(var(--sidebar-foreground))',
                     'primary': 'hsl(var(--sidebar-primary))',
-                    'primary-foreground':
-                        'hsl(var(--sidebar-primary-foreground))',
+                    'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
                     'accent': 'hsl(var(--sidebar-accent))',
-                    'accent-foreground':
-                        'hsl(var(--sidebar-accent-foreground))',
+                    'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
                     'border': 'hsl(var(--sidebar-border))',
                     'ring': 'hsl(var(--sidebar-ring))'
                 }
