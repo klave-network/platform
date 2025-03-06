@@ -4,6 +4,7 @@ import { UilGithub, UilSpinner } from '@iconscout/react-unicons';
 import api from '../../utils/api';
 import { getFinalParseConfig } from '@klave/constants';
 import qs from 'query-string';
+import { Button } from '@klave/ui-kit/components/ui/button';
 
 export const Select: FC = () => {
 
@@ -46,31 +47,33 @@ export const Select: FC = () => {
     const isWorking = isLoading || isFetching || isRefetching;
 
     if (isWorking)
-        return <>
-            <div className='pb-5' >
-                <h1 className='text-xl font-bold'>Looking for your best work</h1>
-            </div>
-            <div className='relative'>
-                We are looking for repositories you can deploy on the Klave network.<br />
-                It will only take a moment...
-                <br />
-                <br />
+        return (
+            <div className="flex flex-col gap-6 text-center">
+                <h1 className="text-xl font-bold">Looking for your best work</h1>
+                <p>
+                    We are looking for repositories you can deploy on the Klave network.<br />
+                    It will only take a moment...
+                </p>
                 <UilSpinner className='inline-block animate-spin h-5' />
             </div>
-        </>;
+        );
 
     if (isError) {
-        return <>
-            <div className='pb-5' >
-                <h1 className='text-xl font-bold'>Oops! Something went wrong...</h1>
+        return (
+            <div className="flex flex-col gap-6 text-center">
+                <h1 className="text-xl font-bold">Oops! Something went wrong...</h1>
+                <p>
+                    Error message: {error.message}
+                </p>
+                <Button
+                    variant="secondary"
+                    disabled={isWorking}
+                    onClick={rescanRepos}
+                >
+                    Rescan
+                </Button>
             </div>
-            <div className='relative'>
-                Error message: {error.message}
-                <br />
-                <br />
-                <button disabled={isWorking} onClick={rescanRepos} className='btn btn-sm disabled:text-gray-300'>Rescan</button>
-            </div>
-        </>;
+        );
     }
 
     const state = JSON.stringify({
@@ -82,22 +85,21 @@ export const Select: FC = () => {
     const githubAppInstall = new URL('https://github.com/apps/klave-network/installations/new');
     githubAppInstall.searchParams.append('state', state);
 
-    return <>
-        <div className='pb-5'>
-            <h1 className='text-xl font-bold'>{deployables?.length ? 'We found some gems' : 'Nothing to see'}</h1>
-        </div>
-        <div className='relative'>
+    return (
+        <div className="flex flex-col gap-6 text-center">
+            <h1 className="text-xl font-bold">{deployables?.length ? 'We found some gems' : 'Nothing to see'}</h1>
             {deployables?.length ? <>
-                Here are the repositories we found could be deployed.<br />
-                Select one to continue...<br />
-                <br />
-                <div className='grid gap-3 grid-cols-3'>
+                <p>
+                    Here are the repositories we found could be deployed.<br />
+                    Select one to continue...<br />
+                </p>
+                <div className="grid gap-3 grid-cols-3">
                     {deployables.map((repo) => {
                         const fullName = `${repo.owner}/${repo.name}`;
                         const isReachableByApp = repo.installationRemoteId !== '';
                         const configParseResult = getFinalParseConfig(repo.config);
                         const config = configParseResult.success ? configParseResult.data : undefined;
-                        const insides = <div className={`w-full border-slate-200 border rounded-lg py-3 px-4 text-left ${isReachableByApp ? ((config?.applications?.length ?? 0) === 0 ? 'opacity-30' : 'hover:border-slate-400 hover:cursor-pointer') : 'opacity-50 bg-yellow-100 hover:bg-yellow-200 text-yellow-700'}`}>
+                        const insides = <div className={`w-full border-border border rounded-lg py-3 px-4 text-left ${isReachableByApp ? ((config?.applications?.length ?? 0) === 0 ? 'opacity-30' : 'hover:border-primary hover:cursor-pointer') : 'opacity-50 bg-yellow-100 hover:bg-yellow-200 text-yellow-700'}`}>
                             <span className='flex flex-row gap-2 items-center'><UilGithub className='inline-block h-5 w-5' /><span>{repo.owner}/<b>{repo.name}</b></span></span>
                             {isReachableByApp
                                 ? <i className='text-sm'>We found {config?.applications?.length ?? 0} application{(config?.applications?.length ?? 0) > 1 ? 's' : ''}</i>
@@ -112,28 +114,50 @@ export const Select: FC = () => {
                             </Link>;
                     })}
                 </div>
-                <br />
-                <br />
-                <br />
-                Is your repository private ?<br />
-                You will need to allow Klave to see it first by installing it on your repo.<br /> <br />
-                <a href={githubAppInstall.toString()} className='btn btn-sm bg-blue-600 text-white hover:bg-blue-500 rounded-md disabled:text-gray-300'>Install Klave now</a>
-                <br />
-                <br />
-                Not finding what you are looking for ?<br />
-                Make sure your repository contains a <code>klave.json</code> file.<br />
-                Try rescanning your repositories after.
-                <br />
-                <br />
-                <button disabled={isWorking} onClick={rescanRepos} className='btn btn-sm bg-blue-600 text-white hover:bg-blue-500 rounded-md disabled:text-gray-300'>Rescan</button>
-            </> : <>
-                We looked hard but could not find anyting to deploy.<br />
-                Perhaps try to rescan your repositories<br />
-                <br />
-                <button disabled={isWorking} onClick={rescanRepos} className='btn btn-sm bg-blue-600 text-white hover:bg-blue-500 rounded-md disabled:text-gray-300'>Rescan</button>
-            </>}
+                <div className="flex flex-col gap-2">
+                    <p>
+                        Is your repository private?<br />
+                        You will need to allow Klave to see it first by installing it on your repo.
+                    </p>
+                    <Button className="w-auto self-center" asChild>
+                        <a
+                            href={githubAppInstall.toString()}
+                        >
+                            Install Klave now
+                        </a>
+                    </Button>
+                </div>
+                <div className="flex flex-col gap-2">
+                    <p>
+                        Not finding what you are looking for?<br />
+                        Make sure your repository contains a <code>klave.json</code> file.<br />
+                        Try rescanning your repositories after.
+                    </p>
+                    <Button
+                        variant="secondary"
+                        disabled={isWorking}
+                        onClick={rescanRepos}
+                        className="w-auto self-center"
+                    >
+                        Rescan
+                    </Button>
+                </div>
+            </> : <div className="flex flex-col gap-2">
+                <p>
+                    We looked hard but could not find anyting to deploy.<br />
+                    Perhaps try to rescan your repositories<br />
+                </p>
+                <Button
+                    variant="secondary"
+                    disabled={isWorking}
+                    onClick={rescanRepos}
+                    className="w-auto self-center"
+                >
+                    Rescan
+                </Button>
+            </div>}
         </div>
-    </>;
+    );
 };
 
 export default Select;

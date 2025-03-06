@@ -2,6 +2,14 @@ import { FC, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UilGithub, UilGitlab } from '@iconscout/react-unicons';
 import api from '../../utils/api';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle
+} from '@klave/ui-kit/components/ui/card';
+import { Button } from '@klave/ui-kit/components/ui/button';
 
 export const Index: FC = () => {
 
@@ -35,16 +43,36 @@ export const Index: FC = () => {
     gitlabAuth.searchParams.append('state', state);
     gitlabAuth.searchParams.append('redirect_uri', encodeURI(window.klaveFrontConfig.KLAVE_AUTH__));
 
-    return <>
-        <div className='pb-5'>
-            <h1 className='text-xl font-bold'>Look for your code</h1>
-            <p>To deploy a new Project, import an existing Git repository</p>
+    return (
+        <div className="flex flex-col gap-6 w-[320px]">
+            <Card className="">
+                <CardHeader className="text-center">
+                    <CardTitle className="text-xl">
+                        Look for your code
+                    </CardTitle>
+                    <CardDescription>
+                        To deploy a new Project, import an existing Git repository.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex flex-col gap-6">
+                        <Button variant="outline" className="w-full" asChild>
+                            <a href={githubAuth.toString()}>
+                                <UilGithub color='black' />
+                                Connect to GitHub
+                            </a>
+                        </Button>
+                        <Button variant="outline" className="w-full hidden" asChild>
+                            <a href={gitlabAuth.toString()}>
+                                <UilGitlab color='black' />
+                                Connect to GitLab
+                            </a>
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
-        <div className='relative h-[300px]'>
-            <a href={githubAuth.toString()} className='btn btn-sm mb-3 rounded-full bg-black hover:bg-gray-900 text-white'><UilGithub color='white' />&nbsp;Connect to GitHub</a><br />
-            <a href={gitlabAuth.toString()} className='btn btn-sm rounded-full bg-[#db7130] hover:bg-[#bb472d] text-white hidden'><UilGitlab color='white' />&nbsp;Connect to GitLab</a>
-        </div>
-    </>;
+    );
 };
 
 export default Index;
