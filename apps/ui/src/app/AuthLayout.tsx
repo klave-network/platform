@@ -31,9 +31,9 @@ export const AuthLayout = () => {
             <Header />
             <ContentWrapper>
                 <div className='pb-5' >
-                    <h1 className='text-xl font-bold'>Loading...</h1>
+                    <h1 className='text-xl font-bold text-center'>Loading...</h1>
                 </div>
-                <div className='relative h-[300px]'>
+                <div className='relative h-[300px] text-center'>
                     <p>Give us one moment</p>
                 </div>
             </ContentWrapper>
@@ -45,9 +45,9 @@ export const AuthLayout = () => {
                     <Header />
                     <ContentWrapper>
                         <div className='pb-5' >
-                            <h1 className='text-xl font-bold'>Oops!</h1>
+                            <h1 className='text-xl font-bold text-center'>Oops!</h1>
                         </div>
-                        <div className='relative h-[300px]'>
+                        <div className='relative h-[300px] text-center'>
                             <p>Something went wrong!</p>
                         </div>
                     </ContentWrapper>
