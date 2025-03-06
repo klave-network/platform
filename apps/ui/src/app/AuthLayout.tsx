@@ -56,9 +56,9 @@ export const AuthLayout = () => {
                 }
                 children={(user: Awaited<typeof userPromise>) =>
                     <AuthProvider userData={user}>
-                        <div className="flex flex-col">
+                        <div className="flex flex-col min-h-screen">
                             <Header />
-                            <main className="flex pt-12">
+                            <main className="flex flex-grow pt-12">
                                 {outlet}
                             </main>
                             <Footer />
