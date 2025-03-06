@@ -122,25 +122,27 @@ export const AppSidebar: FC = () => {
                 <SidebarGroup>
                     <SidebarGroupLabel>APPLICATIONS</SidebarGroupLabel>
                     <SidebarGroupContent>
-                        <SidebarMenu>
+                        <SidebarMenu className="gap-4">
                             {sortedApplications.map((app, index) => {
                                 const deployedCount = app.deployments?.filter(d => d.status === 'deployed').length ?? 0;
                                 const terminatedCount = app.deployments?.filter(d => d.status === 'terminated').length ?? 0;
                                 const erroredCount = app.deployments?.filter(d => d.status === 'errored').length ?? 0;
                                 const destPath = lastMatch.params['appSlug'] ? lastMatch.pathname.split('/').filter(Boolean).slice(0, 3).join('/').replace(lastMatch.params['appSlug'], app.slug) : `/${orgSlug}/${app.slug}`;
                                 return <SidebarMenuItem>
-                                    <SidebarMenuButton asChild>
-                                        <NavLink to={destPath} key={index} className={({ isActive }) => `${isActive ? 'shadow-lg relative ring-2 ring-klave-light-blue hover:ring-klave-cyan focus:outline-none' : ''} bg-white p-3 w-full flex flex-col rounded-md dark:bg-gray-800 shadow hover:bg-gray-100 dark:hover:bg-gray-700`}>
-                                            <div className="flex flex-row items-start font-medium text-gray-900 dark:text-white pb-2 mb-2 xl:border-b border-gray-200 border-opacity-75 dark:border-gray-700 w-full">
-                                                {app.slug}&nbsp;{(app.deployments?.filter(d => d.status === 'created' || d.status === 'deploying').length ?? 0) ? <UilFlask className="inline-block animate-pulse h-5 text-blue-500" /> : <>&nbsp;</>}
-                                            </div>
-                                            <div className="flex flex-col items-start justify-start flex-grow-0 gap-2 w-full">
-                                                {deployedCount ? <div className="text-xs py-1 px-2 leading-none dark:bg-gray-900 bg-green-100 text-green-600 rounded-md">{deployedCount} active deployments</div> : null}
-                                                {terminatedCount ? <div className="text-xs py-1 px-2 leading-none dark:bg-gray-900 bg-yellow-100 dark:text-yellow-400 text-yellow-600 rounded-md">{terminatedCount} terminated deployments</div> : null}
-                                                {erroredCount ? <div className="text-xs py-1 px-2 leading-none dark:bg-gray-900 bg-red-100 text-red-600 rounded-md">{erroredCount} errors</div> : null}
-                                            </div>
-                                        </NavLink>
-                                    </SidebarMenuButton>
+                                    <NavLink
+                                        to={destPath}
+                                        key={index}
+                                        className={({ isActive }) => `${isActive ? 'ring-2 ring-klave-light-blue focus:outline-none' : 'hover:bg-card hover:border-klave-light-blue'} duration-200 transition-colors bg-background p-3 w-full flex flex-col rounded-md border border-border`}
+                                    >
+                                        <div className="flex flex-row items-start font-medium pb-2 mb-2 xl:border-b border-border w-full">
+                                            {app.slug}&nbsp;{(app.deployments?.filter(d => d.status === 'created' || d.status === 'deploying').length ?? 0) ? <UilFlask className="inline-block animate-pulse h-5 text-blue-500" /> : <>&nbsp;</>}
+                                        </div>
+                                        <div className="flex flex-col items-start justify-start flex-grow-0 gap-2 w-full">
+                                            {deployedCount ? <div className="text-xs py-1 px-2 leading-none dark:bg-gray-900 bg-green-100 text-green-600 rounded-md">{deployedCount} active deployments</div> : null}
+                                            {terminatedCount ? <div className="text-xs py-1 px-2 leading-none dark:bg-gray-900 bg-yellow-100 dark:text-yellow-400 text-yellow-600 rounded-md">{terminatedCount} terminated deployments</div> : null}
+                                            {erroredCount ? <div className="text-xs py-1 px-2 leading-none dark:bg-gray-900 bg-red-100 text-red-600 rounded-md">{erroredCount} errors</div> : null}
+                                        </div>
+                                    </NavLink>
                                 </SidebarMenuItem>;
                             })}
                         </SidebarMenu>
