@@ -26,7 +26,8 @@ export const dbOps = {
             await client.$runCommandRaw({
                 count: 'deployment'
             });
-            logger.info(`Connected to Mongo via Prisma ${process.env['KLAVE_MONGODB_URL']}`);
+            const sanitizedUrl = process.env['KLAVE_MONGODB_URL']?.replace(/\/\/.*@/, '//***@');
+            logger.info(`Connected to Mongo via Prisma ${sanitizedUrl}`);
             reconnectAttempt = 0;
             return;
         } catch (error: unknown) {
