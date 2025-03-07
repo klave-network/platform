@@ -151,16 +151,16 @@ const ClusterRecord: FC<ClusterRecordProps> = ({ cluster }) => {
     const { id, name, fqdn, updatedAt } = cluster;
 
     return <tr>
-        <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 md:table-cell hidden">
+        <td className="sm:p-3 py-2 px-1 border-b border-border md:table-cell hidden">
             <div className="flex items-center">
                 <UilGlobe className='inline-block h-5' />
             </div>
         </td>
-        <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800">{name}</td>
-        <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800">{id}</td>
-        <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800">{fqdn}</td>
-        {/* <td className={`sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 ${verified ? 'text-green-500' : 'text-red-500'}`}>{verified ? <UilCheckCircle className='h-5' /> : <UilTimesCircle className='h-5' />}</td> */}
-        <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 md:table-cell hidden">
+        <td className="sm:p-3 py-2 px-1 border-b border-border">{name}</td>
+        <td className="sm:p-3 py-2 px-1 border-b border-border">{id}</td>
+        <td className="sm:p-3 py-2 px-1 border-b border-border">{fqdn}</td>
+        {/* <td className={`sm:p-3 py-2 px-1 border-b border-border ${verified ? 'text-green-500' : 'text-red-500'}`}>{verified ? <UilCheckCircle className='h-5' /> : <UilTimesCircle className='h-5' />}</td> */}
+        <td className="sm:p-3 py-2 px-1 border-b border-border md:table-cell hidden">
             <div className="flex items-center">
                 <div className="sm:flex hidden flex-col" title={updatedAt.toDateString()}>
                     {formatTimeAgo(updatedAt)}
@@ -168,7 +168,7 @@ const ClusterRecord: FC<ClusterRecordProps> = ({ cluster }) => {
                 </div>
             </div>
         </td>
-        <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 text-right">
+        <td className="sm:p-3 py-2 px-1 border-b border-border text-right">
             <div className='flex flex-row flex-nowrap justify-end'>
                 <ClusterDeletion cluster={cluster} />
             </div>
@@ -198,12 +198,12 @@ export const ClusterListing: FC = () => {
         <table className="w-full text-left">
             <thead>
                 <tr className="text-gray-400">
-                    <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800 hidden md:table-cell"></th>
-                    <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800">Name</th>
-                    <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800">Cluster</th>
-                    <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800">FQDN</th>
-                    <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800 hidden md:table-cell">Last update</th>
-                    <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800 sm:text-gray-400 text-white text-right">Action</th>
+                    <th className="font-normal px-3 pt-0 pb-3 border-b border-border hidden md:table-cell"></th>
+                    <th className="font-normal px-3 pt-0 pb-3 border-b border-border">Name</th>
+                    <th className="font-normal px-3 pt-0 pb-3 border-b border-border">Cluster</th>
+                    <th className="font-normal px-3 pt-0 pb-3 border-b border-border">FQDN</th>
+                    <th className="font-normal px-3 pt-0 pb-3 border-b border-border hidden md:table-cell">Last update</th>
+                    <th className="font-normal px-3 pt-0 pb-3 border-b border-border sm:text-gray-400 text-white text-right">Action</th>
                 </tr>
             </thead>
             <tbody className="text-gray-600 dark:text-gray-100">

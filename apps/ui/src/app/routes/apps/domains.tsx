@@ -75,14 +75,14 @@ const DomainRecord: FC<DomainRecordProps> = ({ domain }) => {
     };
 
     return <tr>
-        <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 md:table-cell hidden">
+        <td className="sm:p-3 py-2 px-1 border-b border-border md:table-cell hidden">
             <div className="flex items-center">
                 <UilGlobe className='inline-block h-5' />
             </div>
         </td>
-        <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800">{fqdn}</td>
-        <td className={`sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 ${verified ? 'text-green-500' : 'text-red-500'}`}>{verified ? <UilCheckCircle className='h-5' /> : <UilTimesCircle className='h-5' />}</td>
-        <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 md:table-cell hidden">
+        <td className="sm:p-3 py-2 px-1 border-b border-border">{fqdn}</td>
+        <td className={`sm:p-3 py-2 px-1 border-b border-border ${verified ? 'text-green-500' : 'text-red-500'}`}>{verified ? <UilCheckCircle className='h-5' /> : <UilTimesCircle className='h-5' />}</td>
+        <td className="sm:p-3 py-2 px-1 border-b border-border md:table-cell hidden">
             <div className="flex items-center">
                 <div className="sm:flex hidden flex-col" title={updatedAt.toDateString()}>
                     {formatTimeAgo(updatedAt)}
@@ -90,7 +90,7 @@ const DomainRecord: FC<DomainRecordProps> = ({ domain }) => {
                 </div>
             </div>
         </td>
-        <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 text-right">
+        <td className="sm:p-3 py-2 px-1 border-b border-border text-right">
             <div className='flex flex-row flex-nowrap justify-end'>
                 <button className="btn btn-sm h-8 inline-flex items-center justify-center font-normal text-gray-400 ml-auto" onClick={() => validate(id)}>
                     {mutation.isPending ? <UilSpinner className='inline-block animate-spin h-4 w-4' /> : 'Revalidate'}
@@ -229,7 +229,7 @@ export const DomainListing: FC = () => {
     return <>
         <div className="flex flex-col w-full items-center mb-7">
             <div className='w-full mb-5'>
-                <button onClick={() => setAddingDomain(true)} className="btn btn-sm inline-flex mr-3 items-center h-8 pl-2.5 pr-2 rounded-md shadow text-white dark:text-klave-dark-blue bg-blue-500 hover:bg-blue-400 dark:bg-klave-light-blue dark:hover:bg-blue-800 dark:border-gray-800 border border-gray-200 leading-none py-0">
+                <button onClick={() => setAddingDomain(true)} className="btn btn-sm inline-flex mr-3 items-center h-8 pl-2.5 pr-2 rounded-md shadow text-white dark:text-klave-dark-blue bg-blue-500 hover:bg-blue-400 dark:bg-klave-light-blue dark:hover:bg-blue-800 dark:border-gray-800 border border-border leading-none py-0">
                     <UilPlus className='inline-block h-5 text-white dark:text-klave-dark-blue' />Add a domain
                 </button>
             </div>
@@ -241,11 +241,11 @@ export const DomainListing: FC = () => {
         <table className="w-full text-left">
             <thead>
                 <tr className="text-gray-400">
-                    <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800 hidden md:table-cell"></th>
-                    <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800">Domain</th>
-                    <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800">Status</th>
-                    <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800 hidden md:table-cell">Last update</th>
-                    <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800 sm:text-gray-400 text-white text-right">Action</th>
+                    <th className="font-normal px-3 pt-0 pb-3 border-b border-border hidden md:table-cell"></th>
+                    <th className="font-normal px-3 pt-0 pb-3 border-b border-border">Domain</th>
+                    <th className="font-normal px-3 pt-0 pb-3 border-b border-border">Status</th>
+                    <th className="font-normal px-3 pt-0 pb-3 border-b border-border hidden md:table-cell">Last update</th>
+                    <th className="font-normal px-3 pt-0 pb-3 border-b border-border sm:text-gray-400 text-white text-right">Action</th>
                 </tr>
             </thead>
             <tbody className="text-gray-600 dark:text-gray-100">

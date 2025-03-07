@@ -121,7 +121,7 @@ function Users() {
 
     if (isLoading) {
         return <>
-            <div className="sm:px-7 sm:pt-7 px-4 py-4 flex flex-col w-full border-b border-gray-200 bg-white dark:bg-gray-900 dark:text-white dark:border-gray-800 sticky top-0">
+            <div className="sm:px-7 sm:pt-7 px-4 py-4 flex flex-col w-full border-b border-border sticky top-0">
                 <div className="flex w-full items-center">
                     <div className="font-medium flex items-center text-3xl text-gray-900 dark:text-white">
                         Users
@@ -137,7 +137,7 @@ function Users() {
     }
 
     return <>
-        <div className="sm:px-7 sm:pt-7 px-4 py-4 flex flex-col w-full border-b border-gray-200 bg-white dark:bg-gray-900 dark:text-white dark:border-gray-800 sticky top-0">
+        <div className="sm:px-7 sm:pt-7 px-4 py-4 flex flex-col w-full border-b border-border sticky top-0">
             <div className="flex w-full items-center">
                 <div className="font-medium flex items-center text-3xl text-gray-900 dark:text-white">
                     Users ({data?.pages?.[0]?.meta?.totalRowCount ?? 0})
@@ -161,7 +161,7 @@ function Users() {
                                                 key={header.id}
                                                 colSpan={header.colSpan}
                                                 style={{ width: header.getSize() }}
-                                                className='text-left first-of-type:pl-4 py-2 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 dark:text-white text-sm font-medium text-gray-500 uppercase tracking-wider'
+                                                className='text-left first-of-type:pl-4 py-2 border-b border-border bg-gray-50 dark:bg-gray-900 dark:text-white text-sm font-medium text-gray-500 uppercase tracking-wider'
                                             >
                                                 {header.isPlaceholder ? null : (
                                                     <div

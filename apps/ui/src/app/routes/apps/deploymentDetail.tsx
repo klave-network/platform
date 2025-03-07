@@ -312,7 +312,7 @@ export const AppDeploymentDetail: FC = () => {
                                 || (stage === 'install' && buildOutputs.build.length > 0);
                             let lineNumber = 0;
                             return <div key={stage} className='mt-5'>
-                                <h3 className='bg-slate-100 p-2 rounded-t border-gray-200 border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-5' />}</h3>
+                                <h3 className='bg-slate-100 p-2 rounded-t border border-border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-5' />}</h3>
                                 <pre className='overflow-auto w-full max-w-full bg-gray-800'>{outputs.length > 0 ? outputs.map((output, i) => {
                                     if (isSettled) {
                                         if (!output.full)
@@ -383,7 +383,7 @@ export const AppDeploymentDetail: FC = () => {
                                     || (stage === 'install' && buildOutputs.build.length > 0);
                                 let lineNumber = 0;
                                 return <div key={stage} className='mt-5'>
-                                    <h3 className='bg-slate-100 p-2 rounded-t border-gray-200 border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-5' />}</h3>
+                                    <h3 className='bg-slate-100 p-2 rounded-t border border-border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-5' />}</h3>
                                     <pre className='overflow-auto w-full max-w-full bg-gray-800'>{outputs.length > 0 ? outputs.map((output, i) => {
                                         if (isSettled) {
                                             if (!output.full)
@@ -430,7 +430,7 @@ export const AppDeploymentDetail: FC = () => {
                                     || (stage === 'install' && buildOutputs.build.length > 0);
                                 let lineNumber = 0;
                                 return <div key={stage} className='mt-5'>
-                                    <h3 className='bg-slate-100 p-2 rounded-t border-gray-200 border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-5' />}</h3>
+                                    <h3 className='bg-slate-100 p-2 rounded-t border border-border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-5' />}</h3>
                                     <pre className='overflow-auto w-full max-w-full bg-gray-800'>{outputs.length > 0 ? outputs.map((output, i) => {
                                         if (isSettled) {
                                             if (!output.full)
