@@ -28,7 +28,7 @@ const CSSTransition: FC<Partial<TransitionProps<HTMLElement>>> = ({
     children,
     ...rest
 }) => {
-    const enterClasses = enter.split(' ').filter((s: string) => s.length);
+    const enterClasses = typeof enter === 'string' ? enter.split(' ').filter((s: string) => s.length) : [];
     const enterStartClasses = enterStart.split(' ').filter((s: string) => s.length);
     const enterEndClasses = enterEnd.split(' ').filter((s: string) => s.length);
     const leaveClasses = leave.split(' ').filter((s: string) => s.length);
