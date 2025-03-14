@@ -103,7 +103,7 @@ export const RepoAppSelect: FC = () => {
                     We are fetching data about your repository.<br />
                     It will only take a moment...<br />
                     <br />
-                    <UilSpinner className='inline-block animate-spin' />
+                    <UilSpinner className='inline-block animate-spin h-5' />
                 </> : <>
                     We looked hard but could not find this repo.<br />
                     Head over to the deployment section to find one.<br />
@@ -139,12 +139,12 @@ export const RepoAppSelect: FC = () => {
                     </div>
                     We are waiting to hear from GitHub.<br />
                     This shouldn&apos;t be very long...<br />
-                    <UilSpinner className='inline-block animate-spin' />
+                    <UilSpinner className='inline-block animate-spin h-5' />
                 </> : <>
                     We are waiting to hear from GitHub.<br />
                     This shouldn&apos;t be very long...<br />
                     <br />
-                    <UilSpinner className='inline-block animate-spin' />
+                    <UilSpinner className='inline-block animate-spin h-5' />
                 </>}
             </div>
         </>;
@@ -212,7 +212,7 @@ export const RepoAppSelect: FC = () => {
             {/* There is one more thing.<br /> */}
             Let us know which organisation you want to create this application in.<br />
             {areOrganisationsLoading
-                ? <UilSpinner className='inline-block animate-spin' />
+                ? <UilSpinner className='inline-block animate-spin h-5' />
                 : <>
                     <Select.Root value={selectedOrgId} defaultValue={selectedOrgId} onValueChange={setSelectedOrgId}>
                         <Select.Trigger className={'select select-bordered inline-flex justify-between flex-grow w-full items-center text-klave-light-blue bg-white data-[placeholder]:text-klave-light-blue mt-3 mb-5'}>

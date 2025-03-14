@@ -6,7 +6,7 @@ import { httpApi } from '../utils/api';
 type LoaderResult = {
     data: Awaited<ReturnType<typeof httpApi.v0.repos.registerGitHubCredentials.query>> | null;
     state: string;
-} | null
+} | null;
 
 export const loader: LoaderFunction = async ({ request }): Promise<LoaderResult> => {
     const { host, search, pathname } = new URL(request.url);
@@ -38,6 +38,7 @@ export const loader: LoaderFunction = async ({ request }): Promise<LoaderResult>
         }
         return { data, state };
     } catch (e) {
+        console.error(e?.toString());
         return null;
     }
 };

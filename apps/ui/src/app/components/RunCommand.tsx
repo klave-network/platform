@@ -9,14 +9,14 @@ type RunCommandProps = {
     address: string;
     cluster?: string;
     functions?: string[];
-}
+};
 
 type KeyPointer = {
     name: string;
     key: ClearKeyPair & {
         name?: string;
     };
-}
+};
 
 export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = [] }) => {
 
@@ -75,6 +75,7 @@ export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = 
                             key: JSON.parse(e.target?.result as string)
                         });
                     } catch (e) {
+                        console.error(e?.toString());
                         resolve(undefined);
                     }
                 };
@@ -98,10 +99,11 @@ export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = 
                     read.key = await (await Key.importEncryptedKeyPair(key, password)).exportKey();
                 }
             } catch (e) {
+                console.error(e?.toString());
                 return undefined;
             }
             if (read.key)
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
                 (read.key as KeyPointer['key']).name = read.name;
             return read as KeyPointer;
         });
@@ -143,6 +145,7 @@ export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = 
     try {
         JSON.parse(args);
     } catch (e) {
+        console.error(e?.toString());
         passedArgs = JSON.stringify(args);
     }
 

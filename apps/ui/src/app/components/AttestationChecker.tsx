@@ -8,9 +8,10 @@ import { BackendVersion } from '@klave/constants';
 type AttestationCheckerProps = {
     deploymentId: string;
     address: string;
-}
+    cluster?: string;
+};
 
-export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, address }) => {
+export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, address, cluster }) => {
 
     const { data: deployment, isLoading: isLoadingDeployments } = api.v0.deployments.getById.useQuery({ deploymentId: deploymentId || '' });
     const [challenge, setChallenge] = useState(Array.from(Utils.getRandomBytes(64)));
@@ -39,6 +40,7 @@ export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, 
         },
         quote_binary: Array<number>,
     }>({
+        cluster,
         app: address,
         route: 'klave.get_quote',
         args: quoteArgs,
@@ -49,12 +51,14 @@ export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, 
         quote_verification_result_description: string;
         sa_list: string;
     }>({
+        cluster,
         app: address,
         route: 'klave.verify_quote',
         args: verifyArgs,
         live: false
     }, [verifyArgs]);
     const { data: versions, refetch: refetchVersion } = useSecretariumQuery<BackendVersion['version']>({
+        cluster,
         app: address,
         route: 'klave.version',
         live: false

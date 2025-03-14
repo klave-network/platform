@@ -6,9 +6,10 @@ import isPropValid from '@emotion/is-prop-valid';
 import { hookApi, apiClientOptions } from './utils/api';
 
 export const Providers: FC<PropsWithChildren> = ({ children }) => {
+
     const [queryClient] = useState(() => new QueryClient());
-    const [trpcClient] = useState(() => hookApi.createClient(apiClientOptions)
-    );
+    const [trpcClient] = useState(() => hookApi.createClient(apiClientOptions));
+
     return <StyleSheetManager shouldForwardProp={shouldForwardProp}>
         <ThemeProvider>
             <BaseStyles>

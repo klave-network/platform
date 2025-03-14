@@ -36,7 +36,7 @@ const CheckoutForm = () => {
     const clientSecret = useMemo(() => data?.clientSecret, [data?.clientSecret]);
 
     if (!sessionId || !clientSecret)
-        return <UilSpinner className='inline-block animate-spin' />;
+        return <UilSpinner className='inline-block animate-spin h-5' />;
 
     return <EmbeddedCheckoutProvider
         stripe={initialiseStripe()}
@@ -64,7 +64,7 @@ const OrganisationAddCredit = () => {
         <AlertDialog.Trigger asChild onClick={() => {
             setSearchParams();
         }}>
-            <button title='Delete' className="btn btn-sm mt-3 h-8 inline-flex items-center justify-center text-slate-500 text-md font-normalmt-auto">
+            <button title='Add credits' className="btn btn-sm mt-3 h-8 inline-flex items-center justify-center text-slate-500 text-md font-normalmt-auto">
                 <Uil0Plus className='inline-block h-4 w-4' /> Add credits
             </button>
         </AlertDialog.Trigger>
@@ -139,7 +139,7 @@ const CreditCellEdit: FC<{
                 <span className='text-xs text-red-700'>{error?.message?.toString() ?? ''} &nbsp;</span>
             </div>
             <button disabled={isPending} onClick={allocateCredit} className='btn btn-sm flex rounded-sm border border-slate-300 bg-slate-100 p-0 h-7 w-7 items-center justify-center hover:bg-slate-200 hover:cursor-pointer'>
-                {isPending ? <UilSpinner className='inline-block h-4 w-4 animate-spin' /> : <UilCheck className='h-4 w-4' />}
+                {isPending ? <UilSpinner className='inline-block h-4 w-4 animate-spin h-5' /> : <UilCheck className='h-4 w-4' />}
             </button>
         </div>;
 
@@ -151,7 +151,7 @@ const CreditCellEdit: FC<{
     </div>;
 };
 
-export const OrganisationSettings: FC = () => {
+export const OrganisationCredits: FC = () => {
 
     const { orgSlug } = useParams();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -180,7 +180,7 @@ export const OrganisationSettings: FC = () => {
             We are fetching data about your organisation.<br />
             It will only take a moment...<br />
             <br />
-            <UilSpinner className='inline-block animate-spin' />
+            <UilSpinner className='inline-block animate-spin h-5' />
         </>;
 
     return <div className="flex flex-col gap-10 w-full justify-start mb-7">
@@ -191,7 +191,7 @@ export const OrganisationSettings: FC = () => {
                 {isReturningFromCheckout
                     ? <>
                         <span className='text-green-700'>Thank you for your purchase! We are updating your balance...</span>
-                        <UilSpinner className='inline-block animate-spin h-full' /><br />
+                        <UilSpinner className='inline-block animate-spin h-5' /><br />
                     </>
                     : null}
                 <OrganisationAddCredit />
@@ -200,7 +200,7 @@ export const OrganisationSettings: FC = () => {
         <div>
             <h1 className='font-bold text-xl mb-5'>Application allocations</h1>
             {isLoadingApps
-                ? <><UilSpinner className='inline-block animate-spin' /></>
+                ? <><UilSpinner className='inline-block animate-spin h-5' /></>
                 : <table className='w-full' cellPadding={10}>
                     <thead className='bg-slate-100 border-slate-100 border rounded-sm p-2'>
                         <tr>
@@ -230,4 +230,4 @@ export const OrganisationSettings: FC = () => {
     </div>;
 };
 
-export default OrganisationSettings;
+export default OrganisationCredits;

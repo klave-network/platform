@@ -8,7 +8,7 @@ import { formatTimeAgo } from '../../utils/formatTimeAgo';
 
 type DeploymentContextProps = {
     deployment: Omit<Deployment, 'buildOutputDTS' | 'buildOutputWASM' | 'buildOutputWAT' | 'buildOutputs' | 'configSnapshot'>
-}
+};
 
 export const DeploymentPromotion: FC<DeploymentContextProps> = ({ deployment: { id } }) => {
 
@@ -31,7 +31,7 @@ export const DeploymentPromotion: FC<DeploymentContextProps> = ({ deployment: { 
 
     return <AlertDialog.Root>
         <AlertDialog.Trigger asChild onClick={e => e.stopPropagation()}>
-            <button className="btn btn-sm h-8 inline-flex items-center justify-center font-normal ml-auto">
+            <button title='Release' className="btn btn-sm h-8 inline-flex items-center justify-center font-normal ml-auto">
                 Release
             </button>
         </AlertDialog.Trigger>
@@ -141,7 +141,7 @@ export const Deployments: FC = () => {
             We are fetching data about your deployments.<br />
             It will only take a moment...<br />
             <br />
-            <UilSpinner className='inline-block animate-spin' />
+            <UilSpinner className='inline-block animate-spin h-5' />
         </>;
 
     return <>
