@@ -13,6 +13,7 @@ RUN addgroup --system hubber && \
 
 COPY --chown=hubber:hubber dist/apps/hubber/package.json hubber/
 COPY --chown=hubber:hubber dist/apps/hubber/yarn.lock hubber/
+COPY --chown=hubber:hubber tools/fixtures/.yarnclean hubber/
 COPY --chown=hubber:hubber libs/db/src/prisma hubber/prisma
 
 RUN cd hubber && yarn install --production --no-cache && yarn cache clean

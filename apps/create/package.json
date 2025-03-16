@@ -18,7 +18,7 @@
         "@clack/prompts": "^0.10.0",
         "@expo/spawn-async": "1.7.2",
         "@klave/sdk": "0.14.5",
-        "chalk": "^5.4.1",
+        "chalk": "^4.1.2",
         "commander": "^13.1.0",
         "cross-spawn": "7.0.6",
         "fs-extra": "^11.3.0",

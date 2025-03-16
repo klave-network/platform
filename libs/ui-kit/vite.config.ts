@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
+import git from 'git-rev-sync';
 import * as path from 'path';
+import { version } from './package.json';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 
@@ -44,13 +46,21 @@ export default defineConfig({
             external: ['react', 'react-dom', 'react/jsx-runtime']
         }
     },
+    define: {
+        'import.meta.vitest': undefined,
+        'import.meta.env.VITE_REPO_COMMIT': JSON.stringify(git.long(__dirname)),
+        'import.meta.env.VITE_REPO_BRANCH': JSON.stringify(git.branch(__dirname)),
+        'import.meta.env.VITE_REPO_DIRTY': git.isDirty(),
+        'import.meta.env.VITE_REPO_VERSION': JSON.stringify(version)
+    },
     test: {
         reporters: ['default'],
         globals: true,
         passWithNoTests: true,
         environment: 'jsdom',
         watch: false,
-        include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-        includeSource: ['src/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}']
+        exclude: ['*'],
+        include: ['src[\\/]**[\\/]*.{test,spec}.?(c|m)[jt]s?(x)'],
+        includeSource: ['src[\\/]**[\\/]*.?(c|m)[jt]s?(x)']
     }
 });

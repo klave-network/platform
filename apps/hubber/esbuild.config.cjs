@@ -1,6 +1,5 @@
 const git = require('git-rev-sync');
 const { sentryEsbuildPlugin } = require('@sentry/esbuild-plugin');
-const { nodeExternalsPlugin } = require('esbuild-node-externals');
 const { version } = require('./package.json');
 
 const klaveSentryURL = process.env.KLAVE_SENTRY_DSN ? new URL(process.env.KLAVE_SENTRY_DSN) : null;
@@ -8,8 +7,8 @@ const klaveSentryURL = process.env.KLAVE_SENTRY_DSN ? new URL(process.env.KLAVE_
 /** @type {import('esbuild').BuildOptions} */
 module.exports = {
     sourcemap: process.env.NODE_ENV === 'development' ? 'inline' : 'external',
+    treeShaking: true,
     plugins: [
-        nodeExternalsPlugin(),
         // Put the Sentry esbuild plugin after all other plugins
         klaveSentryURL ? sentryEsbuildPlugin({
             url: `${klaveSentryURL.protocol}//${klaveSentryURL.host}`,
@@ -19,11 +18,7 @@ module.exports = {
             release: `klave@${JSON.stringify(version)}`
         }) : undefined
     ].filter(Boolean),
-    // Add extra external dependencies
-    external: [
-        '@sentry/node',
-        'winston-transport'
-    ],
+    target: ['node'],
     platform: 'node',
     loader: {
         // ensures .node binaries are copied to ./dist

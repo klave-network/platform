@@ -8,13 +8,13 @@ import { deployToSubstrate } from '@klave/api';
 function isUserAccount(account: unknown): account is OctokitComponents['schemas']['simple-user'] {
     if (!account || typeof account !== 'object')
         return false;
-    return Object.hasOwn(account, 'email');
+    return Object.hasOwn(account, 'login');
 }
 
 function isEnterpriseAccount(account: unknown): account is OctokitComponents['schemas']['enterprise'] {
     if (!account || typeof account !== 'object')
         return false;
-    return !Object.hasOwn(account, 'email');
+    return Object.hasOwn(account, 'name');
 }
 
 const accountName = (account: unknown): string => {
