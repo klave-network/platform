@@ -1,0 +1,10 @@
+[workspace]
+members = ["apps/rust-template"]
+resolver = "2"
+
+[profile.release]
+lto = true
+# Tell `rustc` to optimize for small code size.
+opt-level = "z"
+strip = true
+codegen-units = 1
