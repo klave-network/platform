@@ -41,6 +41,28 @@ Read more ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', 'https://docs
     p.intro(KLAVE_CYAN_BG(chalk.bold.black(' Klave - The honest-by-design platform ')));
     p.note('Welcome to Klave. Let\'s create your honest application!');
 
+    // First, determine the template type early so we can conditionally show prompts
+    let projectTemplate: 'typescript' | 'rust';
+    
+    if (!template) {
+        const templateResponse = await p.select({
+            message: 'What language would you like to use?',
+            options: [
+                { value: 'typescript', label: 'TypeScript' },
+                { value: 'rust', label: 'Rust' }
+            ]
+        });
+        
+        if (p.isCancel(templateResponse)) {
+            p.cancel('Operation cancelled.');
+            process.exit(0);
+        }
+        
+        projectTemplate = templateResponse as 'typescript' | 'rust';
+    } else {
+        projectTemplate = template as 'typescript' | 'rust';
+    }
+
     const appInfo = await p.group(
         {
             // Ask for the directory to create the project in
@@ -72,16 +94,6 @@ Read more ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', 'https://docs
 
                         return;
                     }
-                })
-            }),
-            // Ask for the language of the app
-            ...(!template && {
-                template: async () => p.select({
-                    message: 'What language would you like to use?',
-                    options: [
-                        { value: 'ts', label: 'TypeScript' },
-                        { value: 'rs', label: 'Rust' }
-                    ]
                 })
             }),
             // Ask for the name of the app
@@ -154,10 +166,11 @@ Read more ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', 'https://docs
                     message: 'Initialize a git repository?'
                 })
             }),
-            // Ask if the user wants to install dependencies
-            ...(!noInstall && {
+            // Ask if the user wants to install dependencies - only for TypeScript
+            ...(!noInstall && projectTemplate === 'typescript' && {
                 installDeps: async () => p.confirm({
-                    message: 'Install dependencies?'
+                    message: 'Install dependencies?',
+                    initialValue: true
                 })
             })
         },
@@ -184,8 +197,7 @@ Read more ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', 'https://docs
     } = appInfo;
 
     const projectDir = (dir ?? directory) as string;
-    const projectName = name ?? appName;
-    // const projectTemplate = template ?? appInfo.template;
+    const projectName = name ?? appName as string;
 
     const targetDir = path.join(CWD, projectDir);
     const packageManager = resolvePackageManager();
@@ -196,14 +208,14 @@ Read more ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', 'https://docs
     // Create the project template
     await createTemplateAsync(targetDir, {
         project: {
-            slug: projectName as string,
+            slug: projectName,
             version: '0.0.1',
             description: description as string
         },
         author: `${authorName as string} <${authorEmail as string}> (${authorUrl as string})`,
         license: 'MIT',
         repo: repo as string
-    });
+    }, projectTemplate);
 
     // Initialize the git repository
     if (initGit) {
@@ -218,8 +230,8 @@ Read more ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', 'https://docs
         s.stop('Created an empty Git repository');
     }
 
-    // Install dependencies
-    if (installDeps) {
+    // Install dependencies - only for TypeScript projects
+    if (installDeps && projectTemplate === 'typescript') {
         const s = p.spinner();
         s.start(`Installing via ${packageManager}`);
 
@@ -239,10 +251,30 @@ Read more ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', 'https://docs
         s.stop(`Installed via ${packageManager}`);
     }
 
-    const buildCmd = packageManager === 'yarn' ? 'build' : 'run build';
-    const installLegacyDeps = packageManager === 'npm' ? '--legacy-peer-deps' : '';
-    const nextSteps = `
-Build your application:
+    // Show appropriate next steps based on the selected template
+    let nextSteps: string;
+    
+    if (projectTemplate === 'rust') {
+        nextSteps = `
+Build your Rust application:
+
+    - Enter your project directory using ${KLAVE_LIGHT_BLUE(chalk.bold(`cd ${projectDir}`))}
+    - Make sure you have Rust toolchain installed: ${KLAVE_LIGHT_BLUE(chalk.bold('rustup target add wasm32-unknown-unknown'))}
+    - Make sure you have cargo-component installed: ${KLAVE_LIGHT_BLUE(chalk.bold('cargo install cargo-component'))}
+    - To build your application, run ${KLAVE_LIGHT_BLUE(chalk.bold('cargo component build --target wasm32-unknown-unknown --release'))}
+    - Log in to ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('Klave', KLAVE_PLATFORM_URL)))} to deploy your application
+
+Documentation
+
+    - Learn more about Klave ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', DOCS_URL)))}
+    `;
+    } else {
+        // TypeScript instructions
+        const buildCmd = packageManager === 'yarn' ? 'build' : 'run build';
+        const installLegacyDeps = packageManager === 'npm' ? '--legacy-peer-deps' : '';
+        
+        nextSteps = `
+Build your TypeScript application:
 
     - Enter your project directory using ${KLAVE_LIGHT_BLUE(chalk.bold(`cd ${projectDir}`))}
     ${installDeps ? 'EMPTY_LINE' : `- To install dependencies, run ${KLAVE_LIGHT_BLUE(chalk.bold(`${packageManager} install ${installLegacyDeps}`))}`}
@@ -252,7 +284,8 @@ Build your application:
 Documentation
 
     - Learn more about Klave ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('here', DOCS_URL)))}
-    `.replace(/EMPTY_LINE\n?/g, ''); // Remove unnecessary blank lines;
+    `.replace(/EMPTY_LINE\n?/g, ''); // Remove unnecessary blank lines
+    }
 
     p.note(nextSteps, KLAVE_CYAN_BG(chalk.bold.black(' Next steps ')));
 
