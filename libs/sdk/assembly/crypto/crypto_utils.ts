@@ -15,7 +15,8 @@ export class KeyFormatWrapper
 export class CryptoUtil
 {
     static isValidAlgorithm(algorithm: string): boolean {
-        if (algorithm != 'sha2-256' && algorithm != 'SHA2-256' && algorithm != 'sha-256' && algorithm != 'SHA-256' && 
+        if (algorithm != 'sha1-160' && algorithm != 'SHA1-160' && algorithm != 'sha1' && algorithm != 'SHA1' &&
+            algorithm != 'sha2-256' && algorithm != 'SHA2-256' && algorithm != 'sha-256' && algorithm != 'SHA-256' && 
             algorithm != 'sha2-384' && algorithm != 'SHA2-384' && algorithm != 'sha-384' && algorithm != 'SHA-384' &&
             algorithm != 'sha2-512' && algorithm != 'SHA2-512' && algorithm != 'sha-512' && algorithm != 'SHA-512' &&
             algorithm != 'sha3-256' && algorithm != 'SHA3-256' &&
@@ -27,7 +28,12 @@ export class CryptoUtil
 
     static digestSize(algorithm: string): number {
         switch (algorithm)
-        {
+        {   
+            case 'sha1-160':
+            case 'SHA1-160':
+            case 'sha1':
+            case 'SHA1':
+                return 20;
             case 'sha3-256':
             case 'SHA3-256':
             case 'sha2-256':
@@ -57,7 +63,10 @@ export class CryptoUtil
 
     static getShaMetadata(algorithm: string): Result<idlV1.sha_metadata, Error>
     {
-        if(algorithm == 'sha2-256' || algorithm == 'SHA2-256' || algorithm == 'sha-256' || algorithm == 'SHA-256')
+        if (algorithm == 'sha1-160' || algorithm == 'SHA1-160' || algorithm == 'sha1' || algorithm == 'SHA1')
+        {
+            return {data: {algo_id: idlV1.sha_algorithm.sha1, length: idlV1.sha_digest_bitsize.SHA_160}, err: null};
+        }else if(algorithm == 'sha2-256' || algorithm == 'SHA2-256' || algorithm == 'sha-256' || algorithm == 'SHA-256')
         {
             return  {data: {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_256}, err: null};
         }else if(algorithm == 'sha2-384' || algorithm == 'SHA2-384' || algorithm == 'sha-384' || algorithm == 'SHA-384')
