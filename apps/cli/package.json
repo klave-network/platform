@@ -9,20 +9,20 @@
         "klave": "./bin/klave.js"
     },
     "dependencies": {
+        "@clack/prompts": "^0.9.1",
         "@expo/spawn-async": "1.7.2",
         "@klave/sdk": "0.14.5",
-        "commander": "^13.1.0",
-        "chalk": "^4.1.2",
-        "cross-spawn": "7.0.6",
-        "github-username": "8.0.0",
-        "prompts": "2.4.2",
-        "fs-extra": "^11.2.0",
-        "@clack/prompts": "^0.9.1",
-        "terminal-link": "^3.0.0",
         "arg": "^5.0.2",
-        "validate-npm-package-name": "6.0.0",
-        "sanitize-filename": "1.6.3",
+        "chalk": "^4.1.2",
+        "commander": "^13.1.0",
+        "cross-spawn": "7.0.6",
+        "fs-extra": "^11.2.0",
+        "github-username": "8.0.0",
+        "latest-version": "9.0.0",
+        "prompts": "2.4.2",
         "replace-in-file": "^8.3.0",
-        "latest-version": "9.0.0"
+        "sanitize-filename": "1.6.3",
+        "terminal-link": "^3.0.0",
+        "validate-npm-package-name": "6.0.0"
     }
 }
