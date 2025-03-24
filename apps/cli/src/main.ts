@@ -8,6 +8,7 @@ import { info } from './commands/info';
 import { apps } from './commands/apps';
 import { create } from './commands/create';
 import { add } from './commands/add';
+import { build } from './commands/build';
 
 export const runCli = async () => {
 
@@ -53,11 +54,13 @@ export const runCli = async () => {
     // Command: build
     program
         .command('build')
-        .description('Build a Klave application')
-        .action(() => {
+        .description('Build Klave applications')
+        .option('-a, --app <name>', 'build a specific application by name')
+        .action(async (options) => {
             isKlaveProject();
-            console.log('Building the Klave application...');
-            // Implementation for building will go here
+            await build({
+                app: options.app
+            });
         });
 
     // Command: login
