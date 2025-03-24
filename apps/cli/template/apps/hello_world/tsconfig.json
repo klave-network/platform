@@ -1,6 +1,0 @@
-{
-    "extends": "../../node_modules/@klave/sdk/sdk.json",
-    "include": [
-        "./**/*.ts"
-    ]
-}
