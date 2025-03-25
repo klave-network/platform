@@ -8,7 +8,6 @@ import validateNpmPackage from 'validate-npm-package-name';
 import sanitize from 'sanitize-filename';
 
 type NewType = {
-    template?: 'typescript' | 'rust';
     name?: string;
 };
 
@@ -16,7 +15,47 @@ type NewType = {
 const CWD = process.env.INIT_CWD || process.cwd();
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
-export const add = async ({ template, name }: NewType) => {
+/**
+ * Detect the project type based on project files
+ * @returns 'typescript' | 'rust'
+ */
+const detectProjectType = (): 'typescript' | 'rust' => {
+    // Check for Cargo.toml at project root
+    const hasCargoToml = fs.existsSync(path.join(CWD, 'Cargo.toml'));
+    
+    // Check for package.json at project root
+    const hasPackageJson = fs.existsSync(path.join(CWD, 'package.json'));
+    
+    // Check apps directory for existing app types
+    const appsDir = path.join(CWD, 'apps');
+    if (fs.existsSync(appsDir)) {
+        const appDirs = fs.readdirSync(appsDir).filter(dir => 
+            fs.statSync(path.join(appsDir, dir)).isDirectory()
+        );
+        
+        for (const appDir of appDirs) {
+            // Check for Rust app
+            if (fs.existsSync(path.join(appsDir, appDir, 'Cargo.toml'))) {
+                return 'rust';
+            }
+            
+            // Check for TypeScript app
+            if (fs.existsSync(path.join(appsDir, appDir, 'tsconfig.json'))) {
+                return 'typescript';
+            }
+        }
+    }
+  
+    // If no apps exist yet, use root project files to determine
+    if (hasCargoToml) return 'rust';
+    if (hasPackageJson) return 'typescript';
+    
+    // Default to TypeScript if we can't determine
+    console.warn(chalk.yellow('Warning: Could not determine project type. Defaulting to TypeScript.'));
+    return 'typescript';
+};
+
+export const add = async ({ name }: NewType) => {
 
     // Checks if file klave.json exists
     const klaveConfigPath = path.join(CWD, 'klave.json');
@@ -35,10 +74,13 @@ export const add = async ({ template, name }: NewType) => {
         console.error(chalk.red('Error: Invalid klave.json file structure.'));
         process.exit(1);
     }
+    
+    // Detect the current project type
+    const appTemplate = detectProjectType();
 
     console.log('\n');
     p.intro(KLAVE_CYAN_BG(chalk.bold.black(' Klave - The honest-by-design platform ')));
-    p.note('Let\'s add a new honest app to your project!');
+    p.note(`Let's add a new ${appTemplate} app to your project!`);
 
     const appInfo = await p.group(
         {
@@ -54,16 +96,6 @@ export const add = async ({ template, name }: NewType) => {
                             return 'The name can only contain ASCII letters, digits, and the characters ., -, and _';
                         return;
                     }
-                })
-            }),
-            // Ask for the language of the app
-            ...(!template && {
-                template: async () => p.select({
-                    message: 'What language would you like to use?',
-                    options: [
-                        { value: 'ts', label: 'TypeScript' },
-                        { value: 'rs', label: 'Rust' }
-                    ]
                 })
             }),
             // Ask for the description of the project
@@ -88,7 +120,6 @@ export const add = async ({ template, name }: NewType) => {
     );
 
     const appName = (name ?? appInfo.appName) as string;
-    const appTemplate = template ?? appInfo.template as 'typescript' | 'rust';
 
     // Define paths
     const appsDir = path.join(CWD, 'apps');
@@ -96,8 +127,6 @@ export const add = async ({ template, name }: NewType) => {
     // Template source paths vary based on selected template
     let templateDir: string;
     let newAppDir: string;
-    // const templateDir = path.join(dirname, '../..', 'template', './apps/hello_world');
-    // const newAppDir = path.join(appsDir, appName);
 
     if (appTemplate === 'rust') {
         // For rust template, we need to:

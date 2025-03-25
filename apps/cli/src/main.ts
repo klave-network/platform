@@ -29,7 +29,6 @@ export const runCli = async () => {
         .action(async (options) => {
             isKlaveProject();
             await add({
-                template: options.template,
                 name: options.name
             });
         });
