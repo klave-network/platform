@@ -1,4 +1,4 @@
-import { KLAVE_CYAN_BG, KLAVE_LIGHT_BLUE } from '../lib/constants';
+import { KLAVE_CYAN_BG, KLAVE_LIGHT_BLUE, DISCORD_URL } from '../lib/constants';
 import chalk from 'chalk';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -98,7 +98,7 @@ export const build = async ({ app }: { app?: string }) => {
             : path.join(CWD, application.rootDir);
 
         if (!fs.existsSync(appDir)) {
-            console.error(chalk.yellow(`Warning: Directory not found for app "${appSlug}" at ${appDir}`));
+            p.log.warn(chalk.yellow(`Warning: Directory not found for app "${appSlug}" at ${appDir}`));
             buildResults.push({
                 app: appSlug,
                 success: false,
@@ -118,7 +118,7 @@ export const build = async ({ app }: { app?: string }) => {
         }
 
         if (appType === 'unknown') {
-            console.error(chalk.yellow(`Warning: Could not determine app type for "${appSlug}"`));
+            p.log.warn(chalk.yellow(`Warning: Could not determine app type for "${appSlug}"`));
             buildResults.push({
                 app: appSlug,
                 success: false,
@@ -209,34 +209,37 @@ export const build = async ({ app }: { app?: string }) => {
             s.stop(`Failed to build ${appType} app "${appSlug}"`);
 
             const errorMessage = (error as Error).message;
-            console.error(chalk.red(`Error building "${appSlug}": ${errorMessage}`));
+            p.log.error(chalk.red(`Error building "${appSlug}": ${errorMessage}`));
 
             // Provide helpful installation instructions based on error
             if (appType === 'rust') {
                 if (!hasCargo) {
-                    console.log(chalk.yellow(`
+                    p.note(`
 To install Rust:
-  ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('https://rustup.rs/', 'https://rustup.rs/')))}
 
-  # Then add WebAssembly target
-  ${KLAVE_LIGHT_BLUE(chalk.bold('rustup target add wasm32-unknown-unknown'))}
-
-  # Install cargo-component
-  ${KLAVE_LIGHT_BLUE(chalk.bold('cargo install cargo-component'))}
-`));
+    - Visit the Rust ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('homepage', 'https://rustup.rs/')))} to download and install Rust
+    - Add WebAssembly target ${KLAVE_LIGHT_BLUE(chalk.bold('rustup target add wasm32-unknown-unknown'))}
+    - Install cargo-component ${KLAVE_LIGHT_BLUE(chalk.bold('cargo install cargo-component'))}
+`);
                 } else if (!hasCargoComponent) {
-                    console.log(chalk.yellow(`
+                    p.note(`
 To install cargo-component:
-  ${KLAVE_LIGHT_BLUE(chalk.bold('cargo install cargo-component'))}
 
-  # Make sure you also have the WebAssembly target
-  ${KLAVE_LIGHT_BLUE(chalk.bold('rustup target add wasm32-unknown-unknown'))}
-`));
+    - Run in your terminal ${KLAVE_LIGHT_BLUE(chalk.bold('cargo install cargo-component'))}
+    - Make sure you also have the WebAssembly target ${KLAVE_LIGHT_BLUE(chalk.bold('rustup target add wasm32-unknown-unknown'))}
+`);
+                } else if (!hasNpm || !hasNode) {
+                    p.note(`
+To install Node.js:
+
+    - Visit the Node.js ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('homepage', 'https://nodejs.org/en/download/')))} to download and install Node.js
+`);
                 } else if (errorMessage.includes('unknown target')) {
-                    console.log(chalk.yellow(`
+                    p.note(`
 To add the WebAssembly target:
-  ${KLAVE_LIGHT_BLUE(chalk.bold('rustup target add wasm32-unknown-unknown'))}
-`));
+
+    - Run in your terminal ${KLAVE_LIGHT_BLUE(chalk.bold('rustup target add wasm32-unknown-unknown'))}
+`);
                 }
             }
 
@@ -250,18 +253,19 @@ To add the WebAssembly target:
     }
 
     // Show summary
-    console.log('\n');
-    p.note('Build Summary', chalk.bold('Results'));
-
+    let summary: string;
     const total = buildResults.length;
     const successful = buildResults.filter(r => r.success).length;
 
-    console.log(`${chalk.bold('Total:')} ${total} apps`);
-    console.log(`${chalk.bold('Built successfully:')} ${successful} apps`);
-
-    if (successful < total) {
-        console.log(`${chalk.bold('Failed:')} ${total - successful} apps`);
-    }
+    summary = `
+${chalk.bold('Total builds:')} ${total} apps
+${chalk.bold('Successfull builds:')} ${successful} apps
+${successful < total ? `${chalk.bold('Failed builds:')} ${total - successful} apps` : ''}
+`;
+    
+    p.note(summary, chalk.bold('Build summary'));
+    
+    p.outro(`Stuck? Reach out to us on ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('Discord', DISCORD_URL)))}`);
 
     // Detailed results
     console.log('\n' + chalk.bold('Details:'));
