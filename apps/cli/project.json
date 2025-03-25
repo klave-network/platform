@@ -86,7 +86,7 @@
             "options": {
                 "cwd": "apps/cli",
                 "commands": [
-                    "bun build --compile src/index.ts --outfile klave"
+                    "bun build --compile --target={args.target} src/index.ts --outfile ../../dist/apps/cli/klave-{args.target}"
                 ]
             }
         }
