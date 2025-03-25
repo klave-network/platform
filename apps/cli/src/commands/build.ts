@@ -1,7 +1,6 @@
 import { KLAVE_CYAN_BG, KLAVE_LIGHT_BLUE, DISCORD_URL } from '../lib/constants';
 import chalk from 'chalk';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import fs from 'fs-extra';
 import * as p from '@clack/prompts';
 import spawnAsync from '@expo/spawn-async';
@@ -14,7 +13,7 @@ const execPromise = promisify(exec);
 
 // `yarn run` may change the current working dir, then we should use `INIT_CWD` env.
 const CWD = process.env.INIT_CWD || process.cwd();
-const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+//const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * Check if a command is available in the PATH
@@ -71,7 +70,7 @@ export const build = async ({ app }: { app?: string }) => {
 
     // Check project structure to determine what we're building
     const hasPackageJson = fs.existsSync(path.join(CWD, 'package.json'));
-    const hasCargoToml = fs.existsSync(path.join(CWD, 'Cargo.toml'));
+    //const hasCargoToml = fs.existsSync(path.join(CWD, 'Cargo.toml'));
 
     // Check if we have necessary tools installed
     const hasNode = await isCommandAvailable('node');
