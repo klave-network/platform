@@ -1,4 +1,11 @@
 # Changelog
+## [0.13.1](https://github.com/klave-network/platform/compare/api@0.13.0...api@0.13.1) (2025-03-27)
+
+
+### Bug Fixes
+
+* **api:** `bindings.rs` not generated leading to compilation errors ([cf56e70](https://github.com/klave-network/platform/commit/cf56e704374e8591c3a9510e4f7591942a1ac3b2))
+
 ## [0.13.0](https://github.com/klave-network/platform/compare/api@0.12.0...api@0.13.0) (2024-08-02)
 
 
