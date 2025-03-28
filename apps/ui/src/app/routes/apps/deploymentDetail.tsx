@@ -22,6 +22,7 @@ export const AppDeploymentDetail: FC = () => {
     const { deploymentId } = useParams();
     const scrollPointRef = useRef<HTMLDivElement>(null);
     const [effectiveClusterFQDN, setEffectiveClusterFQDN] = useState<string>();
+    const [shouldAutoScroll] = useState(false);
     const [WASMFingerprint, setWASMFingerprint] = useState<string>();
     const { data: deployment, isLoading: isLoadingDeployments } = api.v0.deployments.getById.useQuery({ deploymentId: deploymentId || '' }, {
         refetchInterval: (s) => ['errored', 'terminated', 'deployed'].includes(s.state.data?.status ?? '') ? (Date.now() - (s.state.data?.createdAt.getTime() ?? 0) < 60000 ? 5000 : 60000) : 500
@@ -44,9 +45,11 @@ export const AppDeploymentDetail: FC = () => {
         const isSettled = deployment.status === 'errored' || deployment.status === 'deployed' || deployment.status === 'terminated';
         if (isSettled)
             return;
+        if (!shouldAutoScroll)
+            return;
         if (scrollPointRef.current)
             scrollPointRef.current.scrollIntoView({ behavior: 'smooth' });
-    }, [deployment]);
+    }, [deployment, shouldAutoScroll]);
 
     const datacentreMarkers = [{
         type: 'Feature',
