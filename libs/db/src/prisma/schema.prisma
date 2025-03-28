@@ -238,6 +238,7 @@ model Deployment {
     expiresOn            DateTime
     createdAt            DateTime           @default(now())
     updatedAt            DateTime           @updatedAt
+    deletedAt            DateTime?
     application          Application        @relation(fields: [applicationId], references: [id], onDelete: Cascade)
     applicationId        String
     sourceType           String?
@@ -322,6 +323,7 @@ model Application {
     deployments         Deployment[]
     createdAt           DateTime          @default(now())
     updatedAt           DateTime          @updatedAt
+    deletedAt           DateTime?
     activityLog         ActivityLog[]
     permissionGrants    PermissionGrant[]
     organisation        Organisation      @relation(fields: [organisationId], references: [id])
