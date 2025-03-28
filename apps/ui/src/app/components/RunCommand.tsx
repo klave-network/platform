@@ -141,7 +141,8 @@ export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = 
     };
 
     try {
-        JSON.parse(args);
+        if (args.trim() !== '')
+            JSON.parse(args);
     } catch (e) {
         passedArgs = JSON.stringify(args);
     }
