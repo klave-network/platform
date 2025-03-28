@@ -11,7 +11,7 @@
     "devDependencies": {
         "@klave/sdk": "{{KLAVE_SDK_CURRENT_VERSION}}",
         "as-base64": "0.2.0",
-        "assemblyscript": "^0.27.29",
+        "assemblyscript": "0.27.29",
         "path-complete-extname": "1.0.0",
         "tslib": "^2.6.3",
         "visitor-as": "^0.11.4",
