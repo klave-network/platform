@@ -297,19 +297,29 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                         parent: 'dpl'
                                     });
                                     if (previousDeployment) {
-                                        await prisma.deployment.update({
+                                        const previousState = await prisma.deployment.findUnique({
                                             where: {
                                                 id: previousDeployment.id
                                             },
-                                            data: {
-                                                status: previousDeployment.status
+                                            select: {
+                                                id: true,
+                                                status: true
                                             }
-                                        }).catch((reason) => {
-                                            logger.debug(`Error while updating previous deployment ${previousDeployment.id} status`, {
-                                                parent: 'dpl',
-                                                reason
-                                            });
                                         });
+                                        if (!previousState)
+                                            await prisma.deployment.update({
+                                                where: {
+                                                    id: previousDeployment.id
+                                                },
+                                                data: {
+                                                    status: previousDeployment.status
+                                                }
+                                            }).catch((reason) => {
+                                                logger.debug(`Error while updating previous deployment ${previousDeployment.id} status`, {
+                                                    parent: 'dpl',
+                                                    reason
+                                                });
+                                            });
                                     }
                                     await prisma.deployment.update({
                                         where: {
