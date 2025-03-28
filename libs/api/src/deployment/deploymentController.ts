@@ -273,7 +273,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                             });
 
                             (new Promise((__unusedResolve, reject) => {
-                                setTimeout(reject, 60000);
+                                setTimeout(reject, 300000);
                                 prisma.deployment.update({
                                     where: {
                                         id: deployment.id
