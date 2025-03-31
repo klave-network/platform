@@ -17,10 +17,10 @@ function Users() {
 
     const tableContainerRef = useRef<HTMLDivElement>(null);
     const [sorting, setSorting] = useState<SortingState>([]);
-    const [filterIncomplete] = useState(true);
 
     //react-query has an useInfiniteQuery hook just for this situation!
     const { data, fetchNextPage, isFetching, isLoading } = api.v0.users.infiniteUsers.useInfiniteQuery({
+        filterUnitialized: true,
         limit: 50
     }, {
         getNextPageParam: (lastPage) => lastPage.nextCursor
@@ -58,8 +58,8 @@ function Users() {
 
     //we must flatten the array of arrays from the useInfiniteQuery hook
     const flatData = useMemo(
-        () => (data?.pages?.flatMap(page => page.data) ?? []).filter(page => filterIncomplete ? page.slug.includes('~$~') : false),
-        [data, filterIncomplete]
+        () => (data?.pages?.flatMap(page => page.data) ?? []),
+        [data?.pages]
     );
     const totalDBRowCount = data?.pages?.[0]?.meta?.totalRowCount ?? 0;
     const totalFetched = flatData.length;

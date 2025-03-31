@@ -21,6 +21,7 @@ function Organisations() {
 
     //react-query has an useInfiniteQuery hook just for this situation!
     const { data, fetchNextPage, isFetching, isLoading } = api.v0.organisations.infiniteOrganisations.useInfiniteQuery({
+        filterUnitialized: true,
         limit: 50
     }, {
         getNextPageParam: (lastPage) => lastPage.nextCursor
