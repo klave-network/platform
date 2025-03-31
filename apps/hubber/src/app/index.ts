@@ -93,7 +93,7 @@ export const start = async () => {
     );
 
     // Plug Probot for GitHub Apps
-    app.use('/hook', async (req, res, next) => {
+    app.use('/hook', (req, res, next) => {
         if (req.headers['x-github-event'])
             probotMiddleware(req, res, next);
         else if (req.headers['stripe-signature'])
@@ -126,18 +126,18 @@ export const start = async () => {
         sessionOptions.cookie = { secure: true }; // serve secure cookies
     }
 
-    app.use('/ping', async (__unusedReq, res) => {
+    app.use('/ping', (__unusedReq, res) => {
         res.setHeader('X-Klave-API-Status', 'ready');
-        await res.status(202).send({
+        res.status(202).send({
             ping: true,
             node: __hostname
         });
     });
 
-    app.use('/version', async (__unusedReq, res) => {
+    app.use('/version', (__unusedReq, res) => {
 
         res.setHeader('X-Klave-API-Status', 'ready');
-        await res.status(202).send({
+        res.status(202).send({
             version: {
                 name: process.env.NX_TASK_TARGET_PROJECT,
                 commit: process.env.GIT_REPO_COMMIT?.substring(0, 8),
