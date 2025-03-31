@@ -235,7 +235,7 @@ export const applicationRouter = createTRPCRouter({
                             .then(async (result) => {
                                 if (result.kredit === undefined)
                                     throw (new Error('No credits returned'));
-                                return prisma.application.update({
+                                return await prisma.application.update({
                                     where: {
                                         id: appId
                                     },
@@ -254,7 +254,7 @@ export const applicationRouter = createTRPCRouter({
                             .then(async (result) => {
                                 if (result.kredit === undefined)
                                     throw (new Error('No credits returned'));
-                                return prisma.application.update({
+                                return await prisma.application.update({
                                     where: {
                                         id: appId
                                     },
@@ -377,6 +377,8 @@ export const applicationRouter = createTRPCRouter({
                     op: 'scp.task',
                     description: 'Secretarium Task'
                 }, async () => {
+
+                    const newLimits = { ...(app.limits ?? {}) };
                     try {
                         // await scp.newTx<KlaveGetCreditResult>('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
                         //     app_id: app.id
@@ -400,16 +402,7 @@ export const applicationRouter = createTRPCRouter({
                             .then(async (result) => {
                                 if (result.kredit === undefined)
                                     throw (new Error('No credits returned'));
-                                return prisma.application.update({
-                                    where: {
-                                        id: app.id
-                                    },
-                                    data: {
-                                        limits: {
-                                            queryCallSpend: result.kredit ?? 0
-                                        }
-                                    }
-                                });
+                                newLimits.queryCallSpend = result.kredit ?? 0;
                             }).catch(() => {
                                 // Swallow this error
                             });
@@ -419,19 +412,18 @@ export const applicationRouter = createTRPCRouter({
                             .then(async (result) => {
                                 if (result.kredit === undefined)
                                     throw (new Error('No credits returned'));
-                                return prisma.application.update({
-                                    where: {
-                                        id: app.id
-                                    },
-                                    data: {
-                                        limits: {
-                                            transactionCallSpend: result.kredit ?? 0
-                                        }
-                                    }
-                                });
+                                newLimits.transactionCallSpend = result.kredit ?? 0;
                             }).catch(() => {
                                 // Swallow this error
                             });
+                        await prisma.application.update({
+                            where: {
+                                id: app.id
+                            },
+                            data: {
+                                limits: newLimits
+                            }
+                        });
                     } catch (e) {
                         console.error(e?.toString());
                         ///
@@ -917,8 +909,8 @@ export const applicationRouter = createTRPCRouter({
 
             await Sentry.startSpan({
                 name: 'SCP Subtask',
-                op: 'scp.task',
-                description: 'Secretarium Task'
+                op: 'scp.task.kredit.transaction.allow',
+                description: 'Secretarium Task Transaction Kredit Allocation'
             }, async () => {
                 return await new Promise((resolve, reject) => {
 
@@ -928,8 +920,28 @@ export const applicationRouter = createTRPCRouter({
                     scp.newTx('wasm-manager', 'set_allowed_kredit_per_transaction', `klave-app-set-transaction-limit-${app.id}`, {
                         app_id: app.id,
                         kredit: Number(combinedLimits.transactionCallSpend)
-                    }).onResult(result => {
+                    }).onExecuted(result => {
                         resolve(result);
+                    }).onError(error => {
+                        reject(error);
+                    }).send()
+                        .catch(reject);
+                });
+            });
+
+            await Sentry.startSpan({
+                name: 'SCP Subtask',
+                op: 'scp.task.kredit.query.allow',
+                description: 'Secretarium Task Query Kredit Allocation'
+            }, async () => {
+                return await new Promise((resolve, reject) => {
+
+                    if (!app)
+                        throw (new Error('No application found'));
+
+                    scp.newTx('wasm-manager', 'set_allowed_kredit_per_query', `klave-app-set-query-limit-${app.id}`, {
+                        app_id: app.id,
+                        kredit: Number(combinedLimits.queryCallSpend)
                     }).onExecuted(result => {
                         resolve(result);
                     }).onError(error => {
