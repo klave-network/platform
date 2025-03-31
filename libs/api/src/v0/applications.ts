@@ -875,6 +875,17 @@ export const applicationRouter = createTRPCRouter({
                         organisationId_slug: {
                             slug: applicationSlug,
                             organisationId: organisationId
+                        },
+                        permissionGrants: {
+                            some: {
+                                userId: user?.id,
+                                OR: [{
+                                    write: true
+                                },
+                                {
+                                    admin: true
+                                }]
+                            }
                         }
                     }
                 });
@@ -882,7 +893,18 @@ export const applicationRouter = createTRPCRouter({
                 const { applicationId } = input;
                 app = await prisma.application.findFirst({
                     where: {
-                        id: applicationId
+                        id: applicationId,
+                        permissionGrants: {
+                            some: {
+                                userId: user?.id,
+                                OR: [{
+                                    write: true
+                                },
+                                {
+                                    admin: true
+                                }]
+                            }
+                        }
                     }
                 });
             }
@@ -950,6 +972,123 @@ export const applicationRouter = createTRPCRouter({
                         .catch(reject);
                 });
             });
+        }),
+    infiniteUsage: publicProcedure
+        .input(
+            z.object({
+                appSlug: z.string(),
+                orgSlug: z.string(),
+                limit: z.number().min(1).max(100).nullish(),
+                cursor: z.string().nullish() // <-- "cursor" needs to exist, but can be any type
+            })
+        )
+        .query(async ({ ctx: { session: { user }, prisma }, input }) => {
+
+            if (!user)
+                throw (new Error('You must be logged in to delete an application'));
+
+            const org = await prisma.organisation.findUnique({
+                where: {
+                    slug: input.orgSlug,
+                    permissionGrants: {
+                        some: {
+                            userId: user?.id,
+                            OR: [{
+                                read: true
+                            },
+                            {
+                                write: true
+                            },
+                            {
+                                admin: true
+                            }]
+                        }
+                    }
+                }
+            });
+
+            if (!org)
+                throw (new Error('No usage found'));
+
+            const app = await prisma.application.findUnique({
+                where: {
+                    organisationId_slug: {
+                        organisationId: org.id,
+                        slug: input.appSlug
+                    },
+                    OR: [{
+                        organisation: {
+                            permissionGrants: {
+                                some: {
+                                    userId: user?.id
+                                    , OR: [{
+                                        read: true
+                                    },
+                                    {
+                                        write: true
+                                    },
+                                    {
+                                        admin: true
+                                    }]
+                                }
+                            }
+                        }
+                    }, {
+                        permissionGrants: {
+                            some: {
+                                userId: user?.id,
+                                OR: [{
+                                    read: true
+                                },
+                                {
+                                    write: true
+                                },
+                                {
+                                    admin: true
+                                }]
+                            }
+                        }
+                    }]
+                },
+                include: {
+                    deployments: {
+                        select: {
+                            deploymentAddress: true
+                        }
+                    }
+                }
+            });
+
+            if (!app)
+                throw (new Error('No usage found'));
+
+            const deploymentAddresses = app.deployments.flatMap((deployment) => deployment.deploymentAddress).filter(Boolean).map(address => address.fqdn);
+
+            const { cursor } = input;
+            const limit = input.limit ?? 50;
+            const usages = ((await prisma.usageRecord.findMany({
+                take: limit + 1, // get an extra item at the end which we'll use as next cursor
+                cursor: cursor ? {
+                    id: cursor
+                } : undefined,
+                orderBy: {
+                    id: 'asc'
+                }
+            }))).filter((usage) => deploymentAddresses.includes(usage.data.consumption.fqdn));
+
+            const usageCount = usages.length;
+            let nextCursor: typeof cursor | undefined = undefined;
+            if (usageCount > limit) {
+                const nextItem = usages.pop();
+                nextCursor = nextItem?.id;
+            }
+            return {
+                data: usages,
+                meta: {
+                    totalRowCount: usageCount
+                },
+                nextCursor
+            };
         })
 });
 

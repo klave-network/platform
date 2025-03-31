@@ -18,6 +18,7 @@ import RepoSheet from './routes/deploy/repo';
 import AppInfo from './routes/apps/index';
 import AppActivity from './routes/apps/activity';
 import AppDomains from './routes/apps/domains';
+import AppUsage from './routes/apps/usage';
 import AppDeployments from './routes/apps/deployments';
 import AppDeploymentDetail from './routes/apps/deploymentDetail';
 import AppSettings from './routes/apps/settings';
@@ -130,6 +131,7 @@ const router = sentryCreateBrowserRouter(
                                 <Route index element={<AppDeployments />} />
                             </Route>
                             <Route path="domains" element={<AppDomains />} />
+                            <Route path="usage" element={<AppUsage />} />
                             <Route path="settings" element={<AppSettings />} />
                             <Route path="*" element={<AppActivity />} />
                         </Route>
