@@ -876,17 +876,35 @@ export const applicationRouter = createTRPCRouter({
                             slug: applicationSlug,
                             organisationId: organisationId
                         },
-                        permissionGrants: {
-                            some: {
-                                userId: user?.id,
-                                OR: [{
-                                    write: true
-                                },
-                                {
-                                    admin: true
-                                }]
+                        OR: [{
+                            organisation: {
+                                permissionGrants: {
+                                    some: {
+                                        userId: user?.id,
+                                        OR: [
+                                            {
+                                                write: true
+                                            },
+                                            {
+                                                admin: true
+                                            }]
+                                    }
+                                }
                             }
-                        }
+                        }, {
+                            permissionGrants: {
+                                some: {
+                                    userId: user?.id,
+                                    OR: [
+                                        {
+                                            write: true
+                                        },
+                                        {
+                                            admin: true
+                                        }]
+                                }
+                            }
+                        }]
                     }
                 });
             } else {
@@ -894,17 +912,35 @@ export const applicationRouter = createTRPCRouter({
                 app = await prisma.application.findFirst({
                     where: {
                         id: applicationId,
-                        permissionGrants: {
-                            some: {
-                                userId: user?.id,
-                                OR: [{
-                                    write: true
-                                },
-                                {
-                                    admin: true
-                                }]
+                        OR: [{
+                            organisation: {
+                                permissionGrants: {
+                                    some: {
+                                        userId: user?.id,
+                                        OR: [
+                                            {
+                                                write: true
+                                            },
+                                            {
+                                                admin: true
+                                            }]
+                                    }
+                                }
                             }
-                        }
+                        }, {
+                            permissionGrants: {
+                                some: {
+                                    userId: user?.id,
+                                    OR: [
+                                        {
+                                            write: true
+                                        },
+                                        {
+                                            admin: true
+                                        }]
+                                }
+                            }
+                        }]
                     }
                 });
             }
@@ -936,9 +972,6 @@ export const applicationRouter = createTRPCRouter({
             }, async () => {
                 return await new Promise((resolve, reject) => {
 
-                    if (!app)
-                        throw (new Error('No application found'));
-
                     scp.newTx('wasm-manager', 'set_allowed_kredit_per_transaction', `klave-app-set-transaction-limit-${app.id}`, {
                         app_id: app.id,
                         kredit: Number(combinedLimits.transactionCallSpend)
@@ -957,9 +990,6 @@ export const applicationRouter = createTRPCRouter({
                 description: 'Secretarium Task Query Kredit Allocation'
             }, async () => {
                 return await new Promise((resolve, reject) => {
-
-                    if (!app)
-                        throw (new Error('No application found'));
 
                     scp.newTx('wasm-manager', 'set_allowed_kredit_per_query', `klave-app-set-query-limit-${app.id}`, {
                         app_id: app.id,
