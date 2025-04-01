@@ -27,6 +27,7 @@ type UsageRecord = {
 
 let client: MongoClient;
 export let collection: Collection<UsageRecord>;
+export let collectionDev: Collection<UsageRecord>;
 export const mongoOps = {
     initialize: async () => {
         try {
@@ -37,8 +38,39 @@ export const mongoOps = {
             client = new MongoClient(uri);
             await client.connect();
             collection = client.db(client.options.dbName).collection<UsageRecord>('UsageRecord');
-        } catch (e) {
-            console.error(`Could not initialize Sentry: ${e}`);
+
+            const uriDev = process.env['KLAVE_DISPATCH_DEV_MONGODB_URL'];
+            if (uriDev) {
+                // Bifurcate data storage for dev and prod
+                // TODO: This must be removed eventually
+                const clientDev = new MongoClient(uriDev);
+                await clientDev.connect();
+                collectionDev = clientDev.db(clientDev.options.dbName).collection<UsageRecord>('UsageRecord');
+                const originalCollection = collection;
+                collection = new Proxy(originalCollection, {
+                    get(target, prop, receiver) {
+                        const member = Reflect.get(target, prop, receiver);
+                        if (typeof member === 'function') {
+                            return function (...args: any[]) {
+                                const targetResult = member.apply(target, args);
+                                try {
+                                    const devMember = Reflect.get(collectionDev, prop, receiver);
+                                    if (typeof devMember === 'function') {
+                                        devMember.apply(collectionDev, args);
+                                    }
+                                } catch (__unusedError) {
+                                    // Swallow silently the error on the mirror collection
+                                }
+                                return targetResult;
+                            };
+                        }
+                        return member;
+                    }
+                });
+            }
+
+        } catch (error) {
+            console.error(`Could not initialize Sentry: ${error}`);
         }
     }
 };
