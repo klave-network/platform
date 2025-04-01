@@ -2,7 +2,7 @@ import { MongoClient, Collection } from 'mongodb';
 import { z } from 'zod';
 
 const KreditConsumptionSchema = z.object({
-    cluster_key_b64: z.string(),
+    cluster_key: z.string(),
     app_id: z.string(),
     fqdn: z.string(),
     is_transaction: z.boolean(),

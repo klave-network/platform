@@ -129,8 +129,9 @@ export async function app(fastify: FastifyInstance) {
             const content = new TextDecoder('utf-8').decode(rawContent);
             if (typeof content !== 'string')
                 return await res.status(400).send({ ok: false });
-            data = KreditConsumptionReportSchema.parse(content);
-        } catch (__unusedError) {
+            data = KreditConsumptionReportSchema.parse(JSON.parse(content));
+        } catch (error) {
+            fastify.log.error('Failed to parse the content', error);
             return await res.status(400).send({ ok: false });
         }
         if (!collection)
