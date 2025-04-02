@@ -43,7 +43,8 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- --no-modify-path --profile minimal
     cargo --version; \
     rustc --version; \
     rustup target add wasm32-unknown-unknown --toolchain $RUST_VERSION; \
-    cargo install cargo-component
+    cargo install cargo-quickinstall; \
+    cargo quickinstall cargo-component
 
 FROM base AS final
 
