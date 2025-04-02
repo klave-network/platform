@@ -552,6 +552,7 @@ export const sendToSecretarium = async ({
 
     const rollback = async () => {
         if (previousDeployment) {
+            logger.debug(`Rolling back deployment ${previousDeployment.id}`);
             await prisma.deployment.update({
                 where: {
                     id: previousDeployment.id
@@ -608,10 +609,15 @@ export const sendToSecretarium = async ({
                 wasm_bytes_b64: wasmB64
                 // own_enclave: true,
             })
+                .onResult((result) => {
+                    logger.debug(`Received unexpected message during ${!targetRef ? 'update' : 'registration'} of smart contract ${target}: ${JSON.stringify(result)}`);
+                })
                 .onExecuted(() => {
                     (async () => {
                         await handleSuccess();
-                    })().catch(() => { return; });
+                    })().catch((error) => {
+                        logger.debug(`Error while processing success callback ${!targetRef ? 'updating' : 'registering'} ${target}: ${JSON.stringify(error)}`);
+                    });
                 })
                 .onError((error) => {
                     (async () => {
@@ -626,9 +632,11 @@ export const sendToSecretarium = async ({
                             }
                         });
                         logger.debug(`Error while ${!targetRef ? 'updating' : 'registering'} smart contract ${target}: ${error}`);
-                    })().catch(() => { return; });
-                }).send().catch(() => {
-                    // Swallow this error
+                    })().catch(() => {
+                        logger.debug(`Error while processing error callback ${!targetRef ? 'updating' : 'registering'} ${target}: ${JSON.stringify(error)}`);
+                    });
+                }).send().catch((error) => {
+                    logger.debug(`Error while performing ${!targetRef ? 'update' : 'registration'} for ${target}: ${JSON.stringify(error)}`);
                 });
             // } else if (previousDeployment?.deploymentAddress?.fqdn && deployment?.deploymentAddress?.fqdn) {
             //     logger.debug(`Releasing smart contract: ${deployment.deploymentAddress.fqdn} as ${target}`);
@@ -665,6 +673,7 @@ export const sendToSecretarium = async ({
             //         });
         } else {
             logger.debug(`No wasm to deploy for ${target}`);
+            await rollback();
         }
     });
 
