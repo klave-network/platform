@@ -109,7 +109,7 @@ export class BuildHost {
                 const packageManagerCommands: Record<PackageManager, [string, string]> = {
                     yarn: ['yarn install', 'yarn build'],
                     npm: ['npm install', 'npm run build'],
-                    cargo: ['cargo check', 'cargo component build --target wasm32-unknown-unknown --release']
+                    cargo: ['cargo component bindings', 'cargo component build --target wasm32-unknown-unknown --release']
                 };
                 let packageManager: keyof typeof packageManagerCommands = 'yarn';
 
