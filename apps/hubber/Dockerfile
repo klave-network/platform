@@ -37,7 +37,6 @@ ENV RUST_VERSION=1.85.0 \
 
 RUN apk add --no-cache alpine-sdk musl-dev openssl-dev openssl-libs-static curl git clang; \
     rm -rf /var/cache/apk/* /tmp/* /usr/share/git-core/* /usr/share/apk/* /var/tmp /usr/share/doc/* /usr/share/doc/*/copyright /usr/share/man/* /usr/share/groff/* /usr/share/info/* /usr/share/lintian/* /usr/share/linda/* /usr/share/locale/* /usr/share/locale/en*
-RUN ls -lasR /usr/share
 RUN curl https://sh.rustup.rs -sSf | sh -s -- --no-modify-path --profile minimal --default-toolchain $RUST_VERSION -y --default-host `apk --print-arch`-unknown-linux-musl; \
     chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
     rustup --version; \
