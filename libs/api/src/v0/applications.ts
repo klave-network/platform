@@ -954,16 +954,14 @@ export const applicationRouter = createTRPCRouter({
                 ...limits
             };
 
-            await prisma.$transaction([
-                prisma.application.update({
-                    where: {
-                        id: app.id
-                    },
-                    data: {
-                        limits: combinedLimits
-                    }
-                })
-            ]);
+            await prisma.application.update({
+                where: {
+                    id: app.id
+                },
+                data: {
+                    limits: combinedLimits
+                }
+            });
 
             await Sentry.startSpan({
                 name: 'SCP Subtask',
