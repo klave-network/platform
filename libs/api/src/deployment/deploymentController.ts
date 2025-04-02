@@ -255,6 +255,10 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
 
                             contextualDeploymentId = deployment.id;
 
+                            logger.debug(`Starting compilation ${deployment.id} ...`, {
+                                parent: 'dpl'
+                            });
+
                             await prisma.activityLog.create({
                                 data: {
                                     class: 'deployment',
@@ -272,65 +276,92 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 }
                             });
 
-                            (new Promise((__unusedResolve, reject) => {
-                                setTimeout(reject, 300000);
-                                prisma.deployment.update({
-                                    where: {
-                                        id: deployment.id
-                                    },
-                                    data: {
-                                        status: 'deploying'
-                                    }
-                                }).catch(reject);
-                            })).catch(async () => {
-                                const currentState = await prisma.deployment.findUnique({
-                                    where: {
-                                        id: deployment.id
-                                    },
-                                    select: {
-                                        id: true,
-                                        status: true
-                                    }
-                                });
-                                if (currentState?.status !== 'deployed' && currentState?.status !== 'errored') {
-                                    logger.debug(`Deployment ${deployment.id} timed out`, {
+                            await prisma.deployment.update({
+                                where: {
+                                    id: deployment.id
+                                },
+                                data: {
+                                    status: 'deploying'
+                                }
+                            });
+
+                            const CompletionPollingInterval = setInterval(() => {
+
+                                (async () => {
+
+                                    logger.debug(`Checking on deployment ${deployment.id} for completion...`, {
                                         parent: 'dpl'
                                     });
-                                    if (previousDeployment) {
+                                    const currentState = await prisma.deployment.findUnique({
+                                        where: {
+                                            id: deployment.id
+                                        },
+                                        select: {
+                                            id: true,
+                                            status: true,
+                                            updatedAt: true
+                                        }
+                                    });
+
+                                    if (!currentState) {
+                                        clearInterval(CompletionPollingInterval);
+                                        return;
+                                    }
+
+                                    if (currentState.status === 'deployed' || currentState.status === 'errored') {
+                                        clearInterval(CompletionPollingInterval);
+                                        return;
+                                    }
+
+                                    const timeSinceLastUpdate = currentState.updatedAt ? Date.now() - currentState.updatedAt.getTime() : 0;
+
+                                    logger.debug(`Deployment ${deployment.id} updated ${timeSinceLastUpdate / 1000}s ago`, {
+                                        parent: 'dpl'
+                                    });
+
+                                    if (timeSinceLastUpdate > 1000 * 60) {
+                                        logger.debug(`Deployment ${deployment.id} timed out`, {
+                                            parent: 'dpl'
+                                        });
+                                        if (previousDeployment) {
+                                            await prisma.deployment.update({
+                                                where: {
+                                                    id: previousDeployment.id
+                                                },
+                                                data: {
+                                                    status: previousDeployment.status
+                                                }
+                                            }).catch((reason) => {
+                                                logger.debug(`Error while updating previous deployment ${previousDeployment.id} status`, {
+                                                    parent: 'dpl',
+                                                    reason
+                                                });
+                                            });
+                                        }
                                         await prisma.deployment.update({
                                             where: {
-                                                id: previousDeployment.id
+                                                id: deployment.id
                                             },
                                             data: {
-                                                status: previousDeployment.status
+                                                status: 'errored',
+                                                buildOutputStdErr: 'Deployment timed out'
                                             }
                                         }).catch((reason) => {
-                                            logger.debug(`Error while updating previous deployment ${previousDeployment.id} status`, {
+                                            logger.debug('Error while updating deployment status to error', {
                                                 parent: 'dpl',
                                                 reason
                                             });
                                         });
                                     }
-                                    await prisma.deployment.update({
-                                        where: {
-                                            id: deployment.id
-                                        },
-                                        data: {
-                                            status: 'errored',
-                                            buildOutputStdErr: 'Deployment timed out'
-                                        }
-                                    }).catch((reason) => {
-                                        logger.debug('Error while updating deployment status to error', {
-                                            parent: 'dpl',
-                                            reason
-                                        });
+                                })().catch((error) => {
+                                    logger.debug('Error while updating deployment status to error', {
+                                        parent: 'dpl',
+                                        error
                                     });
-                                }
-                            });
+                                    clearInterval(CompletionPollingInterval);
+                                });
 
-                            logger.debug(`Starting compilation ${deployment.id} ...`, {
-                                parent: 'dpl'
-                            });
+                            }, 1000 * 60);
 
                             const applicationObject = availableApplicationsConfig[application.slug];
 
