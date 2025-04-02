@@ -11,7 +11,7 @@ import { JSON } from '@klave/as-json/assembly';
 declare function get_quote(challenge: ArrayBuffer, challenge_size: i32, result: ArrayBuffer, result_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "verify_quote")
-declare function verify_quote(quote_binary: ArrayBuffer, quote_binary_size: i32, result: ArrayBuffer, result_size: i32): i32;
+declare function verify_quote(current_time: i64, quote_binary: ArrayBuffer, quote_binary_size: i32, result: ArrayBuffer, result_size: i32): i32;
 
 @json
 export class Quote {
@@ -125,17 +125,17 @@ export function getQuote(challenge: u8[]): Result<QuoteResponse, Error> {
     return { data: quote, err: null };
 }
 
-export function verifyQuote(binaryQuote: Array<u8>): Result<QuoteVerificationResponse, Error> {
+export function verifyQuote(current_time: i64, binaryQuote: Array<u8>): Result<QuoteVerificationResponse, Error> {
     let binaryQuoteBuf = new Uint8Array(binaryQuote.length);
     for (let i = 0; i < binaryQuote.length; ++i) {
         binaryQuoteBuf[i] = binaryQuote[i];
     }
     let result = new ArrayBuffer(2000);
-    let res = verify_quote(binaryQuoteBuf.buffer, binaryQuoteBuf.buffer.byteLength, result, result.byteLength);
+    let res = verify_quote(current_time, binaryQuoteBuf.buffer, binaryQuoteBuf.buffer.byteLength, result, result.byteLength);
     if (abs(res) > result.byteLength) {
         // buffer not big enough, retry with a properly sized one
         result = new ArrayBuffer(abs(res));
-        res = verify_quote(binaryQuoteBuf.buffer, binaryQuoteBuf.buffer.byteLength, result, result.byteLength);
+        res = verify_quote(current_time, binaryQuoteBuf.buffer, binaryQuoteBuf.buffer.byteLength, result, result.byteLength);
     }
     if (res < 0)
         return { data: null, err: new Error("Failed to verify quote : " + String.UTF8.decode(result.slice(0, -res))) };
