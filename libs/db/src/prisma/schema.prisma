@@ -152,6 +152,7 @@ enum CompilationStageType {
 
 enum DeploymentStatus {
     created
+    compiling
     compiled
     deploying
     deployed

@@ -276,15 +276,6 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 }
                             });
 
-                            await prisma.deployment.update({
-                                where: {
-                                    id: deployment.id
-                                },
-                                data: {
-                                    status: 'deploying'
-                                }
-                            });
-
                             const CompletionPollingInterval = setInterval(() => {
 
                                 (async () => {
@@ -371,6 +362,15 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 repo,
                                 application: applicationObject,
                                 deployment
+                            });
+
+                            await prisma.deployment.update({
+                                where: {
+                                    id: deployment.id
+                                },
+                                data: {
+                                    status: 'compiling'
+                                }
                             });
 
                             const buildResult = await buildVm.build();
