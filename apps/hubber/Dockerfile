@@ -57,9 +57,9 @@ RUN addgroup --system hubber && \
 
 WORKDIR /app
 
-COPY --chown=hubber:hubber dist/apps/hubber hubber
 COPY --chown=hubber:hubber --from=builder /app/hubber/node_modules hubber/node_modules
 COPY --chown=hubber:hubber --from=db /app/hubber/node_modules/.prisma hubber/node_modules/.prisma
+COPY --chown=hubber:hubber dist/apps/hubber hubber
 
 WORKDIR /app/hubber
 
