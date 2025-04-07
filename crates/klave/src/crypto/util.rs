@@ -19,8 +19,8 @@ struct KeyFormatWrapper {
 
 pub fn is_valid_hash_algorithm(algorithm: &str) -> bool {
     matches!(
-        algorithm,
-        "sha-256"
+        algorithm,        
+              "sha-256"
             | "sha-384"
             | "sha-512"
             | "sha2-256"
@@ -38,11 +38,16 @@ pub fn is_valid_hash_algorithm(algorithm: &str) -> bool {
             | "SHA3-256"
             | "SHA3-384"
             | "SHA3-512"
+            | "sha1"
+            | "SHA1"
+            | "sha1-160"
+            | "SHA1-160"
     )
 }
 
 pub fn digest_size(algorithm: &str) -> usize {
     match algorithm {
+        "sha1" | "SHA1" | "sha1-160" | "SHA1-160" => 20,
         "sha-256" | "SHA-256" | "sha2-256" | "SHA2-256" | "sha3-256" | "SHA3-256" => 32,
         "sha-384" | "SHA-384" | "sha2-384" | "SHA2-384" | "sha3-384" | "SHA3-384" => 48,
         "sha-512" | "SHA-512" | "sha2-512" | "SHA2-512" | "sha3-512" | "SHA3-512" => 64,
@@ -52,6 +57,10 @@ pub fn digest_size(algorithm: &str) -> usize {
 
 pub fn get_sha_metadata(algorithm: &str) -> Result<ShaMetadata, Box<dyn Error>> {
     match algorithm {
+        "sha1" | "SHA1" | "sha1-160" | "SHA1-160" => Ok(ShaMetadata {
+            algo_id: ShaAlgorithm::Sha2,
+            length: ShaDigestBitsize::Sha1,
+        }),
         "sha-256" | "SHA-256" | "sha2-256" | "SHA2-256" => Ok(ShaMetadata {
             algo_id: ShaAlgorithm::Sha2,
             length: ShaDigestBitsize::Sha256,
