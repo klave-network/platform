@@ -52,7 +52,10 @@ pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn st
             .ok_or("Missing host in URI")?
             .to_string(),
         port: i32::from(port),
-        path: request.uri().path().to_string(),
+        path: match request.uri().path_and_query() {
+            Some(path_and_query) => path_and_query.as_str().to_string(),
+            None => "/".to_string(),
+        },
         version: format!("{:?}", request.version()),
         headers: request
             .headers()
@@ -72,9 +75,19 @@ pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn st
 
     let http_request_str = serde_json::to_string(&http_request)?;
 
-    let response = sdk::https_query(&http_request_str)?;
+    let response = match sdk::https_query(&http_request_str) {
+        Ok(response) => response,
+        Err(e) => {            
+            return Err(format!("Failed to send https query:\n{}\n{}\n{:?}", e, http_request, http_request_str).into())
+        }
+    };
 
-    let http_response: HttpResponse<String> = serde_json::from_str(&response)?;
+    let http_response: HttpResponse<String> = match serde_json::from_str(&response) {
+        Ok(http_response) => http_response,
+        Err(e) => {            
+            return Err(format!("Failed to deserialize http response:\n{}\n{:?}\n{}\n{:?}", e, response, http_request, http_request_str).into())
+        }
+    };
 
     let mut parts = Response::new(String::new()).into_parts().0;
 
