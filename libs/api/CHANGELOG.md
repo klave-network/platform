@@ -1,6 +1,12 @@
 # Changelog
-## [0.13.1](https://github.com/klave-network/platform/compare/api@0.13.0...api@0.13.1) (2025-03-27)
 
+## [0.13.2](https://github.com/klave-network/platform/compare/api@0.13.1...api@0.13.2) (2025-04-07)
+
+### Bug Fixes
+
+* **api:** Change timeout determination model ([2695861f](https://github.com/klave-network/platform/commit/2695861f5f66ef7665ba1eb933c1c859fca6753a))
+
+## [0.13.1](https://github.com/klave-network/platform/compare/api@0.13.0...api@0.13.1) (2025-03-27)
 
 ### Bug Fixes
 
@@ -8,12 +14,10 @@
 
 ## [0.13.0](https://github.com/klave-network/platform/compare/api@0.12.0...api@0.13.0) (2024-08-02)
 
-
 ### Features
 
 * **api,ui:** Add the ability to add a custom cluster ([fcc3c5f](https://github.com/klave-network/platform/commit/fcc3c5f0f9b76f4e8a5a7826ef64327061b1d096))
 * **api,ui:** Allow editing of permission grants for organisations ([e2bd7d2](https://github.com/klave-network/platform/commit/e2bd7d2097b773e2a7151594ee837950298cfe2d)), closes [#KN-232](https://github.com/klave-network/platform/issues/KN-232)
-
 
 ### Bug Fixes
 
@@ -32,7 +36,6 @@
 ### Features
 
 * **api,ui:** Add cluster listing in Organisation view ([fbdedfb](https://github.com/klave-network/platform/commit/fbdedfb5162390b242c6a8365a12bf8242dfb702))
-
 
 ### Bug Fixes
 
@@ -59,6 +62,7 @@
 * `db` updated to version `0.10.0`
 * `constants` updated to version `0.10.0`
 * `providers` updated to version `0.10.0`
+
 ## [0.10.0](https://github.com/klave-network/platform/compare/api@0.9.0...api@0.10.0) (2024-05-31)
 
 ### Dependency Updates
@@ -75,7 +79,6 @@
 * **db,api,ui:** Provide application options to deploy every commit ([f2e5ac3](https://github.com/klave-network/platform/commit/f2e5ac33fe7fc302c8c25d590c83508b7b05e906))
 * **db,constants,api,ui:** Provide full build tracing in UI ([6e6cc10](https://github.com/klave-network/platform/commit/6e6cc10fa13c8c266d78b99697687d8ca1622b8a))
 
-
 ### Bug Fixes
 
 * **api,hubber:** Message streaming and Dockerfile Rust setup ([a66676f](https://github.com/klave-network/platform/commit/a66676fdc66a92002e5b8f6e02a15eba946e64b9))
@@ -91,7 +94,6 @@
 
 * **compiler,sdk,api:** Bring ASC and compiler versions forward ([520ae67](https://github.com/klave-network/platform/commit/520ae67a6ae630e9c2d9c75d05ea13a175bf7273))
 
-
 ### Bug Fixes
 
 * **api:** We should not require `package.json` for WASM only deployment ([abdfbaf](https://github.com/klave-network/platform/commit/abdfbaf1929d5e62f77a21afa215713ea5f13519))
@@ -101,11 +103,13 @@
 ### Dependency Updates
 
 * `compiler` updated to version `0.8.1`
+
 ## [0.8.1](https://github.com/klave-network/platform/compare/api@0.8.0...api@0.8.1) (2024-05-02)
 
 ### Dependency Updates
 
 * `compiler` updated to version `0.8.0`
+
 ## [0.8.0](https://github.com/klave-network/platform/compare/api@0.7.3...api@0.8.0) (2024-04-25)
 
 ### Dependency Updates
@@ -126,6 +130,7 @@
 * `compiler` updated to version `0.7.2`
 * `providers` updated to version `0.7.2`
 * `constants` updated to version `0.7.2`
+
 ## [0.7.2](https://github.com/klave-network/platform/compare/api@0.7.1...api@0.7.2) (2024-04-05)
 
 ### Dependency Updates
@@ -141,7 +146,6 @@
 * **api:** Issue with existing FQDN on registration ([0f59ea4](https://github.com/klave-network/platform/commit/0f59ea4013b02b0e7e598c18b0e6e3cafeeceada))
 
 ## [0.7.1](https://github.com/klave-network/platform/compare/api@0.7.0...api@0.7.1) (2024-03-19)
-
 
 ### Bug Fixes
 
@@ -161,7 +165,6 @@
 * **api,ui:** Add new application listing page for admin + Supplement existing dashboard ([8540fd5](https://github.com/klave-network/platform/commit/8540fd563644e39547b9a9732bed9dc9017d9072))
 * **api,ui:** Add view for current running configuration ([c971c65](https://github.com/klave-network/platform/commit/c971c654f858fe249d154e516fc1218fee9efea4))
 * **constants,db,api,ui:** Add system dashboard for users and organisations listing ([e3c118f](https://github.com/klave-network/platform/commit/e3c118f1b59b88f5293b4904e704c6e88cbd665a))
-
 
 ### Bug Fixes
 
@@ -194,7 +197,6 @@
 * **db,api,ui:** Trigger deployments based on commit signature filter ([7562f89](https://github.com/klave-network/platform/commit/7562f89b533eae5996be563e2637ff06893856e1))
 * **db,constants,api,ui:** Add tracking of commit signatures ([a39311d](https://github.com/klave-network/platform/commit/a39311d03d2f8fa50983958d4a829ec3ab09565f))
 
-
 ### Bug Fixes
 
 * **api,constants:** Ensure the API packages only exposes types to the UI ([d325251](https://github.com/klave-network/platform/commit/d325251033fd05fa895f5058ef97e15b5ff89d51))
@@ -220,7 +222,6 @@
 
 * **db,api,klave,deployer:** Add deployment FQDN leaping 221f9a2
 
-
 ### Bug Fixes
 
 * **db,api,klave,providers,hubber:** Target correct default branch and deploy on forced commit 1a6ede1
@@ -238,7 +239,6 @@
 
 * **db,api:** Add compilation dependencies manifest tracking 6e51f29
 
-
 ### Bug Fixes
 
 * **api,klave:** Forcefully expel bad cached credentials 90c1274
@@ -250,6 +250,7 @@
 ### Dependency Updates
 
 * `klave-compiler` updated to version `0.2.2`
+
 ## [0.3.0](///compare/klave-api@0.2.0...klave-api@0.3.0) (2023-06-12)
 
 ### Dependency Updates
@@ -260,7 +261,6 @@
 ### Features
 
 * **providers,api:** Enable Sentry breadcrumb on logging with parent tracing f535496
-
 
 ### Bug Fixes
 
@@ -275,7 +275,6 @@
 ### Features
 
 * **db,api,klave:** Add support for Webauthn enrollement 85aabab
-
 
 ### Bug Fixes
 
@@ -297,7 +296,6 @@
 * **api:** Allow resolution of relative files in github repos 8ca71f4
 * **db,api,klave:** Provide feedback Klave has no GitHub App access 2d9bfa2
 * **klave:** Add repository information in the Application settings page f1580b2
-
 
 ### Bug Fixes
 
