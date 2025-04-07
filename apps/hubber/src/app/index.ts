@@ -56,6 +56,8 @@ export const start = async (port: number) => {
     // app.use(i18nextMiddleware);
     app.use(multer().none());
     app.disable('X-Powered-By');
+    app.use(helmet.frameguard({ action: 'sameorigin' }));
+    app.use(helmet.hidePoweredBy());
     app.use(helmet({
         // crossOriginEmbedderPolicy: false,
         // crossOriginResourcePolicy: false,
@@ -71,7 +73,15 @@ export const start = async (port: number) => {
             policy: 'same-origin'
         },
         contentSecurityPolicy: {
-            useDefaults: true
+            useDefaults: true,
+            directives: {
+                // 'default-src': ['"self"', 'data:', 'blob:'],
+                // 'script-src': ['"self"', 'unsafe-inline', 'unsafe-eval', 'https://*.klave.dev', 'https://*.klave.network', 'https://*.ingest.sentry.io'],
+                // 'style-src': ['"self"', 'unsafe-inline', 'https://*.klave.dev', 'https://*.klave.network'],
+                'frame-src': ['"self"', '"https://*.klave.dev"', '"https://*.klave.network"', '"https://klave.network"']
+                // upgradeInsecureRequests: true,
+                // blockAllMixedContent: true
+            }
             // reportOnly: true
             // directives: {
             //     'img-src': ['"self"', 'data:', 'blob:', '"https://*.githubusercontent.com"'],
