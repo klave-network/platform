@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.13.2](https://github.com/klave-network/platform/compare/ui@0.13.2...ui@0.13.2) (2025-04-07)
+
+### Bug Fixes
+
+* **ui:** Prevent overactive autoscroll ([7febf66d](https://github.com/klave-network/platform/commit/7febf66d553908ea9cf1119dca287097a82bac31))
+
 ## [0.13.1](https://github.com/klave-network/platform/compare/ui@0.13.0...ui@0.13.1) (2025-04-07)
 
 ### Features
