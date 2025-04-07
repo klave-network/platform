@@ -1,4 +1,11 @@
 # Changelog
+
+## [0.13.1](https://github.com/klave-network/platform/compare/ui@0.13.0...ui@0.13.1) (2025-04-07)
+
+### Features
+
+* **api,hubber:** Enable Secretarium Connector chunking ([2e916d3f](https://github.com/klave-network/platform/commit/2e916d3f1b42c4d823eb1fef11b2ce353c16321c))
+
 ## [0.13.0](https://github.com/klave-network/platform/compare/ui@0.12.0...ui@0.13.0) (2024-08-02)
 
 ### Dependency Updates
@@ -10,12 +17,10 @@
 * **api,ui:** Add the ability to add a custom cluster ([fcc3c5f](https://github.com/klave-network/platform/commit/fcc3c5f0f9b76f4e8a5a7826ef64327061b1d096))
 * **api,ui:** Allow editing of permission grants for organisations ([e2bd7d2](https://github.com/klave-network/platform/commit/e2bd7d2097b773e2a7151594ee837950298cfe2d)), closes [#KN-232](https://github.com/klave-network/platform/issues/KN-232)
 
-
 ### Bug Fixes
 
 * **ui:** Fix wrong text on members page + Cleanup ([ff6aa83](https://github.com/klave-network/platform/commit/ff6aa83272699bc3fa550322ae323506f0d1f0a6))
 * **ui:** Run attestation check again the correct custom cluster ([aa5c2fe](https://github.com/klave-network/platform/commit/aa5c2fe1366cd8ca6a83b82af624eb3741e30eb4))
-
 
 ### Reverts
 
@@ -32,7 +37,6 @@
 ### Features
 
 * **api,ui:** Add cluster listing in Organisation view ([fbdedfb](https://github.com/klave-network/platform/commit/fbdedfb5162390b242c6a8365a12bf8242dfb702))
-
 
 ### Bug Fixes
 
@@ -60,6 +64,7 @@
 * `constants` updated to version `0.10.0`
 * `db` updated to version `0.10.0`
 * `api` updated to version `0.10.0`
+
 ## [0.10.0](https://github.com/klave-network/platform/compare/ui@0.9.2...ui@0.10.0) (2024-05-31)
 
 ### Dependency Updates
@@ -75,7 +80,6 @@
 * **db,constants,api,ui:** Provide full build tracing in UI ([6e6cc10](https://github.com/klave-network/platform/commit/6e6cc10fa13c8c266d78b99697687d8ca1622b8a))
 * **ui:** Add Rust non-determinism warning ([76d1417](https://github.com/klave-network/platform/commit/76d14174ebfa387821f8b35603a8a4c2eb3214dc))
 
-
 ### Bug Fixes
 
 * **api,ui:** Setting button for out-of-branch commit deployment has wrong target ([523dc27](https://github.com/klave-network/platform/commit/523dc276a543333537d3c49ec36d35b323a4529a))
@@ -89,6 +93,7 @@
 ### Dependency Updates
 
 * `api` updated to version `0.9.0`
+
 ## [0.9.0](https://github.com/klave-network/platform/compare/ui@0.8.0...ui@0.9.0) (2024-04-25)
 
 ### Dependency Updates
@@ -115,7 +120,6 @@
 * **ui:** Add ability to release from a terminated contract ([28276fe](https://github.com/klave-network/platform/commit/28276fed3c22cf5edadc16f756536a8498380fdc))
 * **ui:** Add link to deploy from template on landing page ([dd9ba31](https://github.com/klave-network/platform/commit/dd9ba31ffcf80fbc418f9e1505a750ec4bf685e4))
 
-
 ### Bug Fixes
 
 * **ui:** Typo in expiry timestamps ([389aea6](https://github.com/klave-network/platform/commit/389aea60c947ef0e6dd056927844116a84d3350c))
@@ -132,7 +136,6 @@
 
 * **ui:** Add location information ([898b83d](https://github.com/klave-network/platform/commit/898b83d33ebade8296b0d03f9bcc246fef0d08ba))
 * **ui:** Adding run-command key basic management ([a3d2414](https://github.com/klave-network/platform/commit/a3d24145b096f27f7dc9c9dc22d329b5aa79b9b4))
-
 
 ### Bug Fixes
 
@@ -152,7 +155,6 @@
 * **api,ui:** Add new application listing page for admin + Supplement existing dashboard ([8540fd5](https://github.com/klave-network/platform/commit/8540fd563644e39547b9a9732bed9dc9017d9072))
 * **api,ui:** Add view for current running configuration ([c971c65](https://github.com/klave-network/platform/commit/c971c654f858fe249d154e516fc1218fee9efea4))
 * **constants,db,api,ui:** Add system dashboard for users and organisations listing ([e3c118f](https://github.com/klave-network/platform/commit/e3c118f1b59b88f5293b4904e704c6e88cbd665a))
-
 
 ### Bug Fixes
 
@@ -187,7 +189,6 @@
 * **ui:** Add new IFrame-based Secretarium ID ([ba04f40](https://github.com/klave-network/platform/commit/ba04f40873095cc7340440a6827c3c7293dafaba))
 * **ui:** Add new useSecretariumQuery hook which support parallel queries ([18d14be](https://github.com/klave-network/platform/commit/18d14bec5687d78ee850be2a1d02789d06d3ce76))
 * **ui:** Display multiple errors in the run command window ([96ec17b](https://github.com/klave-network/platform/commit/96ec17bb7383602ee4a49e36944dd7487ecc78b2))
-
 
 ### Bug Fixes
 
