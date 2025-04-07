@@ -28,7 +28,8 @@ export enum hash_algorithm {
 export enum sha_algorithm {
     none,
     sha2,
-    sha3
+    sha3,
+    sha1
 }
 
 export enum tagged_sha_algorithm {
@@ -41,7 +42,8 @@ export enum tagged_sha_algorithm {
 export enum sha_digest_bitsize {
     SHA_256 = 256,
     SHA_384 = 384,
-    SHA_512 = 512
+    SHA_512 = 512,
+    SHA_160 = 160
 }
 
 @json
