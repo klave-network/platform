@@ -404,7 +404,7 @@ export class BuildMiniVM {
                             };
                         } else if (message.type === 'write') {
                             if ((message.filename).endsWith('.wasm'))
-                                compiledBinary = message.contents ? Uint8Array.from(Buffer.from(message.contents)) : new Uint8Array(0);
+                                compiledBinary = message.contents ? Uint8Array.from(typeof message.contents === 'string' ? Buffer.from(message.contents) : message.contents) : new Uint8Array(0);
                             if ((message.filename).endsWith('.wat')) {
                                 compiledWAT = message.contents?.toLocaleString() ?? undefined;
                             } if ((message.filename).endsWith('.d.ts'))

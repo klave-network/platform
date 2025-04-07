@@ -45,9 +45,9 @@ const format = winston.format.combine(
     winston.format.colorize({ all: true }),
     // Define the format of the message showing the timestamp, the level and the message
     winston.format.printf((info) => {
-        const deepLevel = info[Symbol.for('level')];
-        const meta = info[Symbol.for('splat')]?.[0] ?? {};
-        return `${info['timestamp']} ${process.env['NX_TASK_TARGET_PROJECT']} > ${meta.parent ? `${info.level.replace(deepLevel, `${deepLevel}(${meta.parent})`)}` : info.level}: ${info.message}`;
+        const deepLevel = info[Symbol.for('level')] as string;
+        const meta = (info[Symbol.for('splat')] as Array<Record<string, string>>)?.[0] ?? {};
+        return `${info['timestamp']} ${process.env['NX_TASK_TARGET_PROJECT']} > ${meta['parent'] ? `${info.level.replace(deepLevel, `${deepLevel}(${meta['parent']})`)}` : info.level}: ${info.message}`;
     })
 );
 
