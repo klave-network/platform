@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.6](https://github.com/klave-network/platform/compare/hubber@0.3.5...hubber@0.3.6) (2025-04-07)
+
+### Bug Fixes
+
+* **api:** Change timeout determination model ([2695861f](https://github.com/klave-network/platform/commit/2695861f5f66ef7665ba1eb933c1c859fca6753a))
+
 ## [0.3.5](https://github.com/klave-network/platform/compare/hubber@0.3.4...hubber@0.3.5) (2025-04-07)
 
 ### Features

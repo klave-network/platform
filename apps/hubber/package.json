@@ -1,6 +1,6 @@
 {
     "name": "@klave/hubber",
-    "version": "0.3.5",
+    "version": "0.3.6",
     "license": "MIT",
     "dependencies": {
         "typescript": "^5.5.4"
