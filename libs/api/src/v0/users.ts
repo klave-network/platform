@@ -5,6 +5,7 @@ export const userRouter = createTRPCRouter({
     infiniteUsers: publicProcedure
         .input(
             z.object({
+                filterUnitialized: z.boolean().nullish(),
                 limit: z.number().min(1).max(100).nullish(),
                 cursor: z.string().nullish() // <-- "cursor" needs to exist, but can be any type
             })
@@ -15,10 +16,9 @@ export const userRouter = createTRPCRouter({
                 throw new Error('Not authenticated');
             }
 
-            const userCount = await prisma.user.count();
             const { cursor } = input;
             const limit = input.limit ?? 50;
-            const users = await prisma.user.findMany({
+            const users = (await prisma.user.findMany({
                 take: limit + 1, // get an extra item at the end which we'll use as next cursor
                 cursor: cursor ? {
                     id: cursor
@@ -29,9 +29,10 @@ export const userRouter = createTRPCRouter({
                 include: {
                     createdOrganisations: true
                 }
-            });
+            })).filter((user) => input.filterUnitialized ? !user.slug.startsWith('~$~') : true);
+            const userCount = users.length;
             let nextCursor: typeof cursor | undefined = undefined;
-            if (users.length > limit) {
+            if (userCount > limit) {
                 const nextItem = users.pop();
                 nextCursor = nextItem?.id;
             }

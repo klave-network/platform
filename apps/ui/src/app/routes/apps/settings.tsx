@@ -270,7 +270,6 @@ export const AppSettings: FC = () => {
         <div>
             <h1 className='font-bold text-xl mb-5'>Limits</h1>
             <p>
-                {/* Query spending limit: <b>{application.limits.queryCallSpend.toString()}</b><br /> */}
                 Query spending limit: <LimitEditor type="query" kredits={application.limits.queryCallSpend} application={application} /><br />
                 Transaction spending limit: <LimitEditor type="transaction" kredits={application.limits.transactionCallSpend} application={application} /><br />
             </p>

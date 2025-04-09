@@ -152,6 +152,7 @@ enum CompilationStageType {
 
 enum DeploymentStatus {
     created
+    compiling
     compiled
     deploying
     deployed
@@ -396,6 +397,33 @@ model Web {
     deletedAt       DateTime?
     createdAt       DateTime         @default(now())
     updatedAt       DateTime         @updatedAt
+}
+
+enum UsageType {
+    usage
+}
+
+type UsageDataConsumption {
+    cluster_key              String
+    app_id                   String
+    fqdn                     String
+    is_transaction           Boolean
+    timestamp                Int
+    cpu_consumption          BigInt
+    native_calls_consumption BigInt
+}
+
+type UsageData {
+    version       Int
+    consumption   UsageDataConsumption
+    signature_b64 String
+}
+
+model UsageRecord {
+    id        String    @id @default(uuid()) @map("_id")
+    type      UsageType
+    timestamp String
+    data      UsageData
 }
 
 enum CouponType {

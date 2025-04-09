@@ -397,6 +397,7 @@ export const organisationRouter = createTRPCRouter({
     infiniteOrganisations: publicProcedure
         .input(
             z.object({
+                filterUnitialized: z.boolean().nullish(),
                 limit: z.number().min(1).max(100).nullish(),
                 cursor: z.string().nullish() // <-- "cursor" needs to exist, but can be any type
             })
@@ -407,11 +408,17 @@ export const organisationRouter = createTRPCRouter({
                 throw new Error('Not authenticated');
             }
 
-            const organisationCount = await prisma.organisation.count();
             const { cursor } = input;
             const limit = input.limit ?? 50;
-            const organisations = await prisma.organisation.findMany({
+            const organisations = (await prisma.organisation.findMany({
                 take: limit + 1, // get an extra item at the end which we'll use as next cursor
+                // where: {
+                //     slug: {
+                //         not: {
+                //             startsWith: '~$~*'
+                //         }
+                //     }
+                // },
                 cursor: cursor ? {
                     id: cursor
                 } : undefined,
@@ -422,9 +429,10 @@ export const organisationRouter = createTRPCRouter({
                     creator: true,
                     applications: true
                 }
-            });
+            })).filter(org => input.filterUnitialized ? !org.slug.startsWith('~$~') : true);
+            const organisationCount = organisations.length;
             let nextCursor: typeof cursor | undefined = undefined;
-            if (organisations.length > limit) {
+            if (organisationCount > limit) {
                 const nextItem = organisations.pop();
                 nextCursor = nextItem?.id;
             }

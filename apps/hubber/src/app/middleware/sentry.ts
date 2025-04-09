@@ -26,21 +26,21 @@ const initializeSentry = (app: Application) => {
     sentryErrorMiddlewareReference = fork<ErrorRequestHandler>(Sentry.Handlers.errorHandler);
 };
 
-export const sentryRequestMiddleware: RequestHandler = async (req, res, next) => {
+export const sentryRequestMiddleware: RequestHandler = (req, res, next) => {
 
     if (!sentryRequestMiddlewareReference)
         initializeSentry(req.app);
     sentryRequestMiddlewareReference(req, res, next);
 };
 
-export const sentryTracingMiddleware: RequestHandler = async (req, res, next) => {
+export const sentryTracingMiddleware: RequestHandler = (req, res, next) => {
 
     if (!sentryTracingMiddlewareReference)
         initializeSentry(req.app);
     sentryTracingMiddlewareReference(req, res, next);
 };
 
-export const sentryErrorMiddleware: ErrorRequestHandler = async (err, req, res, next) => {
+export const sentryErrorMiddleware: ErrorRequestHandler = (err, req, res, next) => {
 
     if (!sentryErrorMiddlewareReference)
         initializeSentry(req.app);

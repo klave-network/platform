@@ -181,8 +181,8 @@ export const Deployments: FC = () => {
                     const setBuild = deployments[0]?.build;
                     const setBranch = deployments[0]?.branch;
                     const setVersion = deployments[0]?.version;
-                    const hasDeploying = deployments.some(({ status }) => ['created', 'deploying', 'terminating'].includes(status));
-                    return <tr key={setId} className={hasDeploying ? 'stripe-progress' : ''}>
+                    const isDeploying = deployments.some(({ status }) => ['created', 'compiling', 'deploying', 'terminating'].includes(status));
+                    return <tr key={setId} className={isDeploying ? 'stripe-progress' : ''}>
                         <td className={'sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 grid'}>
                             {deployments.map(deployment => {
                                 const { id, deploymentAddress, expiresOn, life, status } = deployment;
@@ -265,7 +265,7 @@ export const Deployments: FC = () => {
                             const { id, deploymentAddress, createdAt, life, status, version, build, branch } = deployment;
                             if (!deploymentAddress?.fqdn)
                                 return null;
-                            return <tr key={id} className={['created', 'deploying', 'terminating'].includes(status) ? 'stripe-progress' : 'hover:bg-slate-50 hover:cursor-pointer'} onClick={() => navigate(`./${id}`)}>
+                            return <tr key={id} className={['created', 'compiling', 'deploying', 'terminating'].includes(status) ? 'stripe-progress' : 'hover:bg-slate-50 hover:cursor-pointer'} onClick={() => navigate(`./${id}`)}>
                                 {/*
                                 <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 md:table-cell hidden">
                                     <div className="flex items-center">
