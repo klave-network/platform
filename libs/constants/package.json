@@ -1,6 +1,6 @@
 {
     "name": "@klave/constants",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "type": "module",
     "dependencies": {
         "@swc/helpers": "0.5.15",
