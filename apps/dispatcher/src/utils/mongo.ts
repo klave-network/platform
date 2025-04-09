@@ -1,10 +1,13 @@
 import { MongoClient, Collection } from 'mongodb';
 import { z } from 'zod';
 
-const KreditConsumptionSchema = z.object({
+const KreditConsumptionSchemaV0 = z.object({
     cluster_key: z.string(),
+    node_key: z.string(),
     app_id: z.string(),
     fqdn: z.string(),
+    wasm_hash: z.string(),
+    request_id: z.string(),
     is_transaction: z.boolean(),
     timestamp: z.number(),
     cpu_consumption: z.number(),
@@ -13,7 +16,7 @@ const KreditConsumptionSchema = z.object({
 
 export const KreditConsumptionReportSchema = z.object({
     version: z.number(),
-    consumption: KreditConsumptionSchema,
+    consumption: KreditConsumptionSchemaV0,
     signature_b64: z.string()
 });
 
