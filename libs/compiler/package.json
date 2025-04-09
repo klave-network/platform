@@ -14,10 +14,10 @@
     },
     "type": "module",
     "dependencies": {
-        "@klave/as-json": "0.9.21",
+        "@klave/as-json": "0.9.23",
         "assemblyscript": "0.27.27",
         "serialize-error": "12.0.0",
-        "typescript": "^5.8.2",
+        "typescript": "^5.8.3",
         "uuid": "^11.1.0"
     }
 }

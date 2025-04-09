@@ -5,11 +5,11 @@
     "dependencies": {
         "@secretarium/connector": "0.17.0",
         "@secretarium/instrumentation": "0.5.0",
-        "@sentry/profiling-node": "7.120.3",
         "@sentry/core": "7.120.3",
         "@sentry/node": "7.120.3",
+        "@sentry/profiling-node": "7.120.3",
         "@swc/helpers": "0.5.15",
-        "probot": "14.0.0-full-esm.3",
+        "probot": "14.0.0-beta.11",
         "strip-ansi": "7.1.0",
         "winston": "3.17.0",
         "winston-transport": "4.9.0",
