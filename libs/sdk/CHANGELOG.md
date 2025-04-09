@@ -1,4 +1,15 @@
 # Changelog
+## [0.15.0](https://github.com/klave-network/platform/compare/sdk@0.14.5...sdk@0.15.0) (2025-04-09)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.14.5`
+* `constants` updated to version `0.14.5`
+
+### Features
+
+* **sdk:** Add attestation management ([0374250](https://github.com/klave-network/platform/commit/037425065f064ed96a5678174c6142634e946cb6))
+* **sdk:** Add current_time parameters to verify_quote ([6acbc93](https://github.com/klave-network/platform/commit/6acbc93ba69e978cbfe4ac23b3ad41c77ac83dcf))
 
 ## [0.14.4](https://github.com/klave-network/platform/compare/sdk@0.14.3...sdk@0.14.4) (2025-01-24)
 
