@@ -23,6 +23,7 @@ export const AppDeploymentDetail: FC = () => {
     const scrollPointRef = useRef<HTMLDivElement>(null);
     const [shouldAutoScroll] = useState(false);
     const [effectiveClusterFQDN, setEffectiveClusterFQDN] = useState<string>();
+    const [shouldAutoScroll] = useState(false);
     const [WASMFingerprint, setWASMFingerprint] = useState<string>();
     const { data: deployment, isLoading: isLoadingDeployments } = api.v0.deployments.getById.useQuery({ deploymentId: deploymentId || '' }, {
         refetchInterval: (s) => ['errored', 'terminated', 'deployed'].includes(s.state.data?.status ?? '') ? (Date.now() - (s.state.data?.createdAt.getTime() ?? 0) < 60000 ? 5000 : 60000) : 500
@@ -44,6 +45,8 @@ export const AppDeploymentDetail: FC = () => {
             return;
         const isSettled = deployment.status === 'errored' || deployment.status === 'deployed' || deployment.status === 'terminated';
         if (isSettled || !shouldAutoScroll)
+            return;
+        if (!shouldAutoScroll)
             return;
         if (scrollPointRef.current)
             scrollPointRef.current.scrollIntoView({ behavior: 'smooth' });

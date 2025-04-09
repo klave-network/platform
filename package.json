@@ -86,7 +86,7 @@
         "@trpc/server": "next",
         "ansi-to-react": "6.1.6",
         "as-base64": "0.2.0",
-        "assemblyscript": "^0.27.29",
+        "assemblyscript": "0.27.29",
         "autoprefixer": "10.4.19",
         "axios": "1.7.3",
         "base64url": "3.0.1",

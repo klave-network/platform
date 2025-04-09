@@ -15,7 +15,8 @@ export const applicationRouter = createTRPCRouter({
 
             const manifest = await prisma.application.findMany({
                 where: {
-                    webId
+                    webId,
+                    deletedAt: null
                 },
                 include: {
                     deployments: {
@@ -57,6 +58,7 @@ export const applicationRouter = createTRPCRouter({
 
             const apps = await prisma.application.findMany({
                 where: {
+                    deletedAt: null,
                     organisation: {
                         OR: [{
                             id: orgId
@@ -283,6 +285,7 @@ export const applicationRouter = createTRPCRouter({
                     kredits: true,
                     createdAt: true,
                     updatedAt: true,
+                    deletedAt: true,
                     permissionGrants: {
                         where: {
                             userId: user?.id
@@ -430,6 +433,7 @@ export const applicationRouter = createTRPCRouter({
                     kredits: true,
                     createdAt: true,
                     updatedAt: true,
+                    deletedAt: true,
                     permissionGrants: {
                         where: {
                             userId: user?.id
@@ -788,9 +792,12 @@ export const applicationRouter = createTRPCRouter({
                         }
                     }
                 }),
-                prisma.application.delete({
+                prisma.application.update({
                     where: {
                         id: app.id
+                    },
+                    data: {
+                        deletedAt: new Date()
                     }
                 })
             ]);
