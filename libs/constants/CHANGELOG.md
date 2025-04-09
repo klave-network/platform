@@ -1,4 +1,42 @@
 # Changelog
+## [1.0.6](https://github.com/klave-network/platform/compare/constants@1.0.5...constants@1.0.6) (2025-04-09)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.5`
+## [1.0.5](https://github.com/klave-network/platform/compare/constants@1.0.4...constants@1.0.5) (2025-02-20)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.4`
+## [1.0.4](https://github.com/klave-network/platform/compare/constants@1.0.3...constants@1.0.4) (2025-01-23)
+
+## [1.0.3](https://github.com/klave-network/platform/compare/constants@1.0.2...constants@1.0.3) (2025-01-22)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.2`
+## [1.0.2](https://github.com/klave-network/platform/compare/constants@1.0.1...constants@1.0.2) (2024-12-16)
+
+## [1.0.1](https://github.com/klave-network/platform/compare/constants@1.0.0...constants@1.0.1) (2024-12-13)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.0`
+## [1.0.0](https://github.com/klave-network/platform/compare/constants@0.4.1...constants@1.0.0) (2024-10-04)
+
+### Dependency Updates
+
+* `db` updated to version `0.4.1`
+
+### ⚠ BREAKING CHANGES
+
+* Moving to pure ESM repo
+
+### Miscellaneous Chores
+
+* Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
+
 ## [0.4.1](https://github.com/klave-network/platform/compare/constants@0.4.0...constants@0.4.1) (2024-07-25)
 
 ### Dependency Updates
