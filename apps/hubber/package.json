@@ -6,9 +6,9 @@
     "dependencies": {
         "@quixo3/prisma-session-store": "3.1.13",
         "@sentry/core": "7.120.3",
-        "@sentry/esbuild-plugin": "3.1.1",
+        "@sentry/esbuild-plugin": "3.1.2",
         "@sentry/node": "7.120.3",
-        "@trpc/server": "11.0.0-rc.730",
+        "@trpc/server": "11.0.4",
         "cors": "2.8.5",
         "esbuild-node-externals": "1.16.0",
         "expect-ct": "1.0.0",
@@ -16,17 +16,17 @@
         "express-session": "1.18.1",
         "git-rev-sync": "3.0.2",
         "helmet": "8.0.0",
-        "i18next": "24.2.2",
+        "i18next": "24.2.3",
         "i18next-fs-backend": "2.6.0",
-        "i18next-http-middleware": "3.7.1",
+        "i18next-http-middleware": "3.7.2",
         "morgan": "1.10.0",
-        "multer": "1.4.5-lts.1",
+        "multer": "1.4.5-lts.2",
         "passport": "0.7.0",
-        "probot": "14.0.0-full-esm.3",
+        "probot": "14.0.0-beta.11",
         "rate-limiter-flexible": "5.0.5",
         "stripe": "17.6.0",
         "unique-names-generator": "4.7.1",
         "uuid": "^11.0.5",
-        "ws": "8.18.0"
+        "ws": "8.18.1"
     }
 }

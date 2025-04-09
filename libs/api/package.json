@@ -4,17 +4,17 @@
     "type": "module",
     "dependencies": {
         "@ideafast/idgen": "0.2.1",
-        "@octokit/rest": "^21.1.0",
+        "@octokit/rest": "^21.1.1",
         "@sentry/node": "7.120.3",
         "@swc/helpers": "0.5.15",
-        "@trpc/server": "11.0.0-rc.730",
-        "probot": "14.0.0-full-esm.3",
+        "@trpc/server": "11.0.4",
+        "probot": "14.0.0-beta.11",
         "stripe": "17.6.0",
         "superjson": "2.2.2",
         "toml": "3.0.0",
         "ts-case-convert": "2.1.0",
         "uuid": "^11.0.5",
-        "wabt": "1.0.36",
-        "zod": "^3.24.1"
+        "wabt": "1.0.37",
+        "zod": "^3.24.2"
     }
 }
