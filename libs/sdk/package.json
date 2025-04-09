@@ -24,7 +24,7 @@
     },
     "dependencies": {
         "@klave/as-json": "0.9.23",
-        "@klave/compiler": "1.0.3",
+        "@klave/compiler": "1.0.4",
         "as-base64": "0.2.0",
         "chalk": "^4.1.2",
         "esbuild-node-externals": "1.18.0",

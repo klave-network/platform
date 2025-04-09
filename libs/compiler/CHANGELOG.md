@@ -1,4 +1,5 @@
 # Changelog
+## [1.0.4](https://github.com/klave-network/platform/compare/compiler@1.0.3...compiler@1.0.4) (2025-04-09)
 
 ## [1.0.3](https://github.com/klave-network/platform/compare/compiler@1.0.2...compiler@1.0.3) (2025-01-24)
 
