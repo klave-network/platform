@@ -1,6 +1,6 @@
 {
     "name": "@klave/compiler",
-    "version": "0.5.0",
+    "version": "1.0.4",
     "license": "MIT",
     "private": false,
     "type": "commonjs",

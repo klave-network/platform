@@ -1,4 +1,26 @@
 # Changelog
+## [1.0.4](https://github.com/klave-network/platform/compare/compiler@1.0.3...compiler@1.0.4) (2025-04-09)
+
+## [1.0.3](https://github.com/klave-network/platform/compare/compiler@1.0.2...compiler@1.0.3) (2025-01-24)
+
+### ⚠ BREAKING CHANGES
+
+* Realigning version with NPM latest published package
+
+## [1.0.2](https://github.com/klave-network/platform/compare/compiler@1.0.1...compiler@1.0.2) (2025-01-23)
+
+## [1.0.1](https://github.com/klave-network/platform/compare/compiler@1.0.0...compiler@1.0.1) (2025-01-23)
+
+## [1.0.0](https://github.com/klave-network/platform/compare/compiler@0.5.0...compiler@1.0.0) (2025-01-23)
+
+### ⚠ BREAKING CHANGES
+
+* Moving to pure ESM repo
+
+### Miscellaneous Chores
+
+* Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
+
 ## [0.5.0](https://github.com/klave-network/platform/compare/compiler@0.4.0...compiler@0.5.0) (2024-06-06)
 
 
