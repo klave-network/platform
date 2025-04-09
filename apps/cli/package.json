@@ -2,5 +2,8 @@
     "name": "@klave/cli",
     "version": "0.0.1",
     "type": "commonjs",
-    "license": "MIT"
+    "license": "MIT",
+    "dependencies": {
+        "@klave/sdk": "0.16.0"
+    }
 }

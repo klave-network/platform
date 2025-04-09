@@ -1,7 +1,7 @@
 {
     "name": "create-on-klave",
     "description": "The tool to bootstrap trustless apps on Klave",
-    "version": "0.3.20",
+    "version": "0.4.3",
     "license": "MIT",
     "private": false,
     "author": {
@@ -11,5 +11,8 @@
     "bin": {
         "create-on-klave": "./bin/create-on-klave.js",
         "create-trustless-app": "./bin/create-trustless-app.js"
+    },
+    "dependencies": {
+        "@klave/sdk": "0.16.0"
     }
 }
