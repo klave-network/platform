@@ -7,6 +7,8 @@ import { JSON } from "@klave/as-json/assembly";
 export { JSON }
 import * as Crypto from "./crypto"
 export { Crypto }
+import * as Attestation from "./attestation"
+export { Attestation }
 
 // @ts-ignore: decorator
 @external("env", "add_user_query")
