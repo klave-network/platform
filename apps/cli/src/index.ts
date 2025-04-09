@@ -1,21 +1,26 @@
-import { Command } from 'commander';
-import chalk from 'chalk';
-import { KLAVE_CYAN_BG } from '~/lib/constants';
-import packageJson from '../package.json';
-import { info } from '~/commands/info';
+{
+    const SILENCED_ERRORS = [
+        'DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.'
+    ];
 
-console.log(KLAVE_CYAN_BG(chalk.bold(` ${packageJson.name} `)), `v${packageJson.version}`, 'The honest-by-design platform.');
-console.log();
 
-const program = new Command();
+    const originalError = console.error;
 
-program
-    .name(packageJson.name)
-    .version(packageJson.version)
-    .description(packageJson.description)
-    .arguments('[path]');
+    console.error = (msg: unknown) => {
+        const isSilencedError = SILENCED_ERRORS.some(
+            error => typeof msg === 'string' && msg.includes(error)
+        );
+        if (isSilencedError) {
+            return;
+        }
+        originalError(msg);
+    };
+}
 
-program
-    .addCommand(info());
+import { runCli } from './main';
 
-program.parse(process.argv);
+const main = async () => {
+    await runCli();
+};
+
+main();

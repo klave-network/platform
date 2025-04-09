@@ -71,6 +71,24 @@
                     "cli:build"
                 ]
             }
+        },
+        "serve": {
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "apps/cli",
+                "commands": [
+                    "NODE_ENV=development node --import=tsx src/index.ts"
+                ]
+            }
+        },
+        "compile": {
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "apps/cli",
+                "commands": [
+                    "bun build --compile --target={args.target} src/index.ts --outfile ../../dist/apps/cli/klave-{args.target}"
+                ]
+            }
         }
     }
 }
