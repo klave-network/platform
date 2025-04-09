@@ -1,4 +1,14 @@
 # Changelog
+## [1.1.2](https://github.com/klave-network/platform/compare/dispatcher@1.1.1...dispatcher@1.1.2) (2025-04-09)
+
+### Dependency Updates
+
+* `constants` updated to version `1.1.1`
+
+### Bug Fixes
+
+* **dispatcher:** Parsing issue with usage ingest data ([0191b16](https://github.com/klave-network/platform/commit/0191b16f2654cd971bb57d5d087f915d1b6980f2))
+
 ## [1.1.1](https://github.com/klave-network/platform/compare/dispatcher@1.1.0...dispatcher@1.1.1) (2025-01-22)
 
 
