@@ -1,4 +1,24 @@
 # Changelog
+## [1.2.0](https://github.com/klave-network/platform/compare/ui@1.1.0...ui@1.2.0) (2025-04-10)
+
+### Dependency Updates
+
+* `constants` updated to version `1.1.0`
+* `db` updated to version `1.1.0`
+* `api` updated to version `1.1.0`
+
+### Features
+
+* **db,api,ui:** Add credit consumption screens ([5452408](https://github.com/klave-network/platform/commit/5452408ac3999d1bef4c20c3cdad82624d96d03a))
+* **db,api,ui:** Add new usage format support ([e0910c3](https://github.com/klave-network/platform/commit/e0910c34bf6a6519db1e3ed274845b80e0b9dc11))
+
+
+### Bug Fixes
+
+* **api:** Rewire kredit setting for queries ([25e4e7c](https://github.com/klave-network/platform/commit/25e4e7c01ce2852665668323a08b5f9ef73dfd3f))
+* **ui:** Change inputs font color in darkmode ([1810064](https://github.com/klave-network/platform/commit/1810064eb4114e4fa6707436230dd77fb030d29e))
+* **ui:** Prevent overactive autoscroll ([e34e1f9](https://github.com/klave-network/platform/commit/e34e1f9233107c852e6654cdeb98e4d1ca836437))
+
 ## [1.1.0](https://github.com/klave-network/platform/compare/ui@1.0.1...ui@1.1.0) (2025-01-23)
 
 ### Dependency Updates
