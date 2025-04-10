@@ -1,4 +1,29 @@
 # Changelog
+## [1.3.0](https://github.com/klave-network/platform/compare/ui@1.2.0...ui@1.3.0) (2025-04-10)
+
+### Dependency Updates
+
+* `constants` updated to version `1.2.0`
+* `db` updated to version `1.2.0`
+* `api` updated to version `1.2.0`
+
+### Bug Fixes
+
+* **ui:** Prevent overactive autoscroll ([7febf66](https://github.com/klave-network/platform/commit/7febf66d553908ea9cf1119dca287097a82bac31))
+
+## [0.13.1](https://github.com/klave-network/platform/compare/ui@1.1.0...ui@0.13.1) (2025-04-07)
+
+
+### Features
+
+* **db,api,ui:** Preserve deleted deployments and application, recycling bin style ([e32637a](https://github.com/klave-network/platform/commit/e32637a44f2f0c1e4897f05be08d571306d78df9))
+
+
+### Bug Fixes
+
+* **ui:** Avoid systematic `Unexpected end of JSON input` ([c784c74](https://github.com/klave-network/platform/commit/c784c74426aed5520a04f0815ea697b3bd05deb6))
+* **ui:** Prevent UI scroll of doom during compilation ([bd20197](https://github.com/klave-network/platform/commit/bd2019796000188fc9750392c591cfc189b0e5ef))
+
 ## [1.2.0](https://github.com/klave-network/platform/compare/ui@1.1.0...ui@1.2.0) (2025-04-10)
 
 ### Dependency Updates
