@@ -8,6 +8,8 @@ const baseURL = process.env['BASE_URL'] || 'http://localhost:4220';
  * https://github.com/motdotla/dotenv
  */
 // require('dotenv').config();
+// Need to add CI environment is nx run-many (we are obviously not running multiple feedback tests in parallel)
+process.env.CI = process.argv.includes('run-many') ? 'true' : (process.env.CI ?? 'false');
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -24,7 +26,9 @@ export default defineConfig({
         command: 'yarn nx serve ui',
         url: 'http://localhost:4220',
         reuseExistingServer: !process.env.CI,
-        cwd: workspaceRoot
+        cwd: workspaceRoot,
+        stdout: 'pipe',
+        stderr: 'pipe'
     }, projects: [
         { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
         { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
