@@ -1,4 +1,22 @@
 # Changelog
+## [1.1.0](https://github.com/klave-network/platform/compare/hubber@1.0.2...hubber@1.1.0) (2025-04-10)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.2`
+* `constants` updated to version `1.0.2`
+* `providers` updated to version `1.0.2`
+* `api` updated to version `1.0.2`
+* `pruner` updated to version `1.0.2`
+
+### Features
+
+* **providers,hubber:** Adding kredit pipeline data fetching ([89afcb4](https://github.com/klave-network/platform/commit/89afcb4f0154b4acc225a12ae86657d9752c0084))
+
+
+### Bug Fixes
+
+* **hubber:** Resolving bug in `owner` resolution in deployment ([7783a9b](https://github.com/klave-network/platform/commit/7783a9bf561bce9bbf156f123f39faaedca686c8))
 
 ## [1.1.0](https://github.com/klave-network/platform/compare/hubber@0.3.3...hubber@1.1.0) (2025-03-03)
 
