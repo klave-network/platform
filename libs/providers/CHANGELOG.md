@@ -1,4 +1,15 @@
 # Changelog
+## [1.2.0](https://github.com/klave-network/platform/compare/providers@1.1.2...providers@1.2.0) (2025-04-10)
+
+### Dependency Updates
+
+* `db` updated to version `1.1.2`
+* `constants` updated to version `1.1.2`
+
+### Features
+
+* **providers,hubber:** Adding kredit pipeline data fetching ([89afcb4](https://github.com/klave-network/platform/commit/89afcb4f0154b4acc225a12ae86657d9752c0084))
+
 ## [1.1.2](https://github.com/klave-network/platform/compare/providers@1.1.1...providers@1.1.2) (2025-02-20)
 
 ### Dependency Updates
