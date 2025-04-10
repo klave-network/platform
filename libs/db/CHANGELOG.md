@@ -1,4 +1,11 @@
 # Changelog
+## [1.2.0](https://github.com/klave-network/platform/compare/db@1.1.0...db@1.2.0) (2025-04-10)
+
+
+### Features
+
+* **db,api,ui:** Add new usage format support ([e0910c3](https://github.com/klave-network/platform/commit/e0910c34bf6a6519db1e3ed274845b80e0b9dc11))
+
 ## [1.1.0](https://github.com/klave-network/platform/compare/db@1.0.3...db@1.1.0) (2025-04-09)
 
 
