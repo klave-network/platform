@@ -1,4 +1,29 @@
 # Changelog
+## [1.2.0](https://github.com/klave-network/platform/compare/api@1.1.3...api@1.2.0) (2025-04-10)
+
+### Dependency Updates
+
+* `db` updated to version `1.1.3`
+* `constants` updated to version `1.1.3`
+* `providers` updated to version `1.1.3`
+* `ui-kit` updated to version `1.1.3`
+
+### Features
+
+* **api:** Send emails on actions ([4126b80](https://github.com/klave-network/platform/commit/4126b80a145bad53f81ed59ae727eaa1303b3f11))
+* **db,api,ui:** Add credit consumption screens ([5452408](https://github.com/klave-network/platform/commit/5452408ac3999d1bef4c20c3cdad82624d96d03a))
+* **db,api,ui:** Add new usage format support ([e0910c3](https://github.com/klave-network/platform/commit/e0910c34bf6a6519db1e3ed274845b80e0b9dc11))
+* **db,api:** Add new `compiling` deployment step ([34fad79](https://github.com/klave-network/platform/commit/34fad7992d07262547c0492f3f532cd22b457522))
+
+
+### Bug Fixes
+
+* **api:** Change timeout determination model ([a34be44](https://github.com/klave-network/platform/commit/a34be44d9cc4407cf9c197de4b5a332e6285e695))
+* **api:** Operation `cargo component bindings` before the build ([ac8f839](https://github.com/klave-network/platform/commit/ac8f83980a15a5fe8148b1ccdae9f09c4be6814c))
+* **api:** Permission check issues with application limit settings ([f6749ca](https://github.com/klave-network/platform/commit/f6749ca51d9bd7782fe16c98d8bfe87ebc2a4e53))
+* **api:** Remove superfluous transaction wrapper ([8a59df9](https://github.com/klave-network/platform/commit/8a59df9e188b788d25052f70d7a182175df05484))
+* **api:** Rewire kredit setting for queries ([25e4e7c](https://github.com/klave-network/platform/commit/25e4e7c01ce2852665668323a08b5f9ef73dfd3f))
+
 ## [1.1.3](https://github.com/klave-network/platform/compare/api@1.1.2...api@1.1.3) (2025-02-20)
 
 ## [1.1.2](https://github.com/klave-network/platform/compare/api@1.1.1...api@1.1.2) (2025-02-20)
