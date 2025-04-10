@@ -49,7 +49,7 @@ export const SysDashboard: FC = () => {
                         </div >
                     </Link>
                 </div>
-                <div className="flex-grow bg-white dark:bg-gray-900 overflow-x-auto">
+                <div className="app-content-panel flex-grow bg-white dark:bg-gray-900 overflow-x-auto">
                     {outlet}
                 </div>
             </div>

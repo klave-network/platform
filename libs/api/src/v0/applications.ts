@@ -1007,7 +1007,7 @@ export const applicationRouter = createTRPCRouter({
                 appSlug: z.string(),
                 orgSlug: z.string(),
                 limit: z.number().min(1).max(100).nullish(),
-                cursor: z.string().nullish() // <-- "cursor" needs to exist, but can be any type
+                cursor: z.number().nullish() // <-- "cursor" needs to exist, but can be any type
             })
         )
         .query(async ({ ctx: { session: { user }, prisma }, input }) => {
@@ -1094,24 +1094,22 @@ export const applicationRouter = createTRPCRouter({
 
             const { cursor } = input;
             const limit = input.limit ?? 50;
-            const usages = ((await prisma.usageRecord.findMany({
-                take: limit + 1, // get an extra item at the end which we'll use as next cursor
-                cursor: cursor ? {
-                    id: cursor
-                } : undefined,
+            const usages = (await prisma.usageRecord.findMany({
                 orderBy: {
                     id: 'asc'
                 }
-            }))).filter((usage) => deploymentAddresses.includes(usage.data.consumption.fqdn));
+            })).filter(usage => deploymentAddresses.includes(usage.data.consumption.fqdn));
+
+            const usagesSlice = usages
+                .sort((a, b) => b.data.consumption.timestamp - a.data.consumption.timestamp)
+                .slice(cursor ?? 0, (cursor ?? 0) + limit);
 
             const usageCount = usages.length;
             let nextCursor: typeof cursor | undefined = undefined;
-            if (usageCount > limit) {
-                const nextItem = usages.pop();
-                nextCursor = nextItem?.id;
-            }
+            if (usageCount > limit)
+                nextCursor = (cursor ?? 0) ? (cursor ?? 0) + limit : limit;
             return {
-                data: usages,
+                data: usagesSlice,
                 meta: {
                     totalRowCount: usageCount
                 },

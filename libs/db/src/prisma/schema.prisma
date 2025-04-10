@@ -405,8 +405,11 @@ enum UsageType {
 
 type UsageDataConsumption {
     cluster_key              String
+    node_key                 String
     app_id                   String
     fqdn                     String
+    wasm_hash                String
+    request_id               String
     is_transaction           Boolean
     timestamp                Int
     cpu_consumption          BigInt

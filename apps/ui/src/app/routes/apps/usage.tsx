@@ -1,89 +1,243 @@
-import { FC, useMemo } from 'react';
+
+import { useRef, useState, useMemo, useCallback, useEffect } from 'react';
+import {
+    ColumnDef,
+    flexRender,
+    getCoreRowModel,
+    getSortedRowModel,
+    Row,
+    SortingState,
+    useReactTable
+} from '@tanstack/react-table';
 import { useParams } from 'react-router-dom';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { UilSpinner } from '@iconscout/react-unicons';
 import api from '../../utils/api';
-import { UsageRecord } from '@klave/db';
+import CreditDisplay from '../../components/CreditDisplay';
 
-type UsageRecordProps = {
-    usage: UsageRecord
-};
+function ApplicationUsage() {
 
-const UsageRecord: FC<UsageRecordProps> = ({ usage }) => {
-
-    const { data: { consumption } } = usage;
-    const { is_transaction, cpu_consumption, native_calls_consumption, fqdn, timestamp } = consumption ?? {};
-    const dateTime = new Date(timestamp / 1_000_000);
-
-    const CPUConsumptionNumber = Number(cpu_consumption);
-    let CPUConsumption = CPUConsumptionNumber / 100_000_000;
-    if (CPUConsumptionNumber > 0 && CPUConsumptionNumber < 1_000_000)
-        CPUConsumption = 0.01;
-
-    const NativeConsumptionNumber = Number(native_calls_consumption);
-    let NativeConsumption = NativeConsumptionNumber / 100_000_000;
-    if (NativeConsumptionNumber > 0 && NativeConsumptionNumber < 1_000_000)
-        NativeConsumption = 0.01;
-
-    return <tr>
-        <td className="px-1 border-b border-gray-200 dark:border-gray-800 md:table-cell hidden">
-            <div className="flex items-center" >
-                {is_transaction ? <span className="w-8 border rounded border-violet-400 bg-violet-100 text-violet-500 text-xs px-2">Tx</span> : <span className="w-8 border rounded border-blue-400 bg-blue-100 text-blue-500 text-xs px-2">Qy</span>}
-            </div>
-        </td>
-        <td className="px-1 border-b border-gray-200 dark:border-gray-800 overflow-hidden max-w-32 truncate" title={fqdn}><span className='font-mono bg-gray-100 py-1 px-2 rounded truncate'>{fqdn}</span></td>
-        <td className={'px-1 border-b border-gray-200 dark:border-gray-800'}>£{CPUConsumption}<br /><span className='text-xs'>{cpu_consumption.toString()}</span></td>
-        <td className={'px-1 border-b border-gray-200 dark:border-gray-800'}>£{NativeConsumption}<br /><span className='text-xs'>{native_calls_consumption.toString()}</span></td>
-        <td className={'px-1 border-b border-gray-200 dark:border-gray-800'}>{dateTime.toUTCString()}</td>
-    </tr>;
-};
-
-export const UsageListing: FC = () => {
-
+    const tableContainerRef = useRef<HTMLDivElement>(null);
+    const [sorting, setSorting] = useState<SortingState>([]);
     const { appSlug, orgSlug } = useParams();
-    const { data, isLoading } = api.v0.applications.infiniteUsage.useInfiniteQuery({
+
+    //react-query has an useInfiniteQuery hook just for this situation!
+    const { data, fetchNextPage, isFetching, isLoading } = api.v0.applications.infiniteUsage.useInfiniteQuery({
         appSlug: appSlug || '',
         orgSlug: orgSlug || '',
-        limit: 100
+        limit: 50
     }, {
-        getNextPageParam: (lastPage) => lastPage?.nextCursor
+        getNextPageParam: (lastPage) => lastPage.nextCursor
     });
 
-    // const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug || '', orgSlug: orgSlug || '' });
-    // const { data: usagesList, isLoading } = api.v0.usages.getByApplication.useQuery({ appId: application?.id || '' });
-    // const [addingUsage, setAddingUsage] = useState(false);
+    type UsageResult = NonNullable<typeof data>['pages'][number]['data'][number];
+    const columns = useMemo<ColumnDef<UsageResult>[]>(
+        () => [
+            {
+                accessorKey: 'data.consumption.is_transaction',
+                header: 'Class',
+                size: 50,
+                cell: info => {
+                    const isTransaction = info.getValue<UsageResult['data']['consumption']['is_transaction']>();
+                    return isTransaction ? <span className="w-8 border rounded border-violet-400 bg-violet-100 text-violet-500 text-xs px-2">Tx</span> : <span className="w-8 border rounded border-blue-400 bg-blue-100 text-blue-500 text-xs px-2">Qy</span>;
+                }
+            },
+            {
+                accessorKey: 'data.consumption.fqdn',
+                header: 'FQDN',
+                cell: info => {
+                    const fqdn = info.getValue<UsageResult['data']['consumption']['fqdn']>();
+                    return <span title={fqdn} className='font-mono bg-gray-100 py-1 px-2 rounded truncate'>{fqdn}</span>;
+                }
+            },
+            {
+                accessorKey: 'data.consumption.cpu_consumption',
+                header: 'WASM',
+                cell: info => {
+                    const CPUConsumption = info.getValue<UsageResult['data']['consumption']['cpu_consumption']>();
+                    return <CreditDisplay compact kredits={CPUConsumption} />;
+                }
+            },
+            {
+                accessorKey: 'data.consumption.native_calls_consumption',
+                header: 'Native',
+                cell: info => {
+                    const NativeConsumption = info.getValue<UsageResult['data']['consumption']['native_calls_consumption']>();
+                    return <CreditDisplay compact kredits={NativeConsumption} />;
+                }
+            },
+            {
+                accessorKey: 'data.consumption.timestamp',
+                header: 'Date',
+                size: 120,
+                cell: info => {
+                    const timestamp = info.getValue<UsageResult['data']['consumption']['timestamp']>();
+                    const dateTime = new Date(timestamp / 1_000_000);
+                    return dateTime.toLocaleString();
+                }
+            }
+        ],
+        []
+    );
 
     //we must flatten the array of arrays from the useInfiniteQuery hook
     const flatData = useMemo(
-        () => (data?.pages?.flatMap(page => page?.data ?? []) ?? []),
-        [data?.pages]
+        () => data?.pages?.flatMap(page => page.data) ?? [],
+        [data]
     );
-    // const totalDBRowCount = data?.pages?.[0]?.meta?.totalRowCount ?? 0;
-    // const totalFetched = flatData.length;
+    const totalDBRowCount = data?.pages?.[0]?.meta?.totalRowCount ?? 0;
+    const totalFetched = flatData.length;
 
-    if (isLoading)
+    //called on scroll and possibly on mount to fetch more data as the user scrolls and reaches bottom of table
+    const fetchMoreOnBottomReached = useCallback(
+        (containerRefElement?: HTMLDivElement | null) => {
+            if (containerRefElement) {
+                const { scrollHeight, scrollTop, clientHeight } = containerRefElement;
+                //once the user has scrolled within 300px of the bottom of the table, fetch more data if there is any
+                if (
+                    scrollHeight - scrollTop - clientHeight < 300 &&
+                    !isFetching &&
+                    totalFetched < totalDBRowCount
+                ) {
+                    fetchNextPage()
+                        .catch(err => {
+                            console.error(err);
+                        });
+                }
+                const activePanel = containerRefElement.closest('.app-content-panel');
+                if (activePanel) {
+                    const { clientHeight: parentClientHeight } = activePanel;
+                    if (clientHeight < parentClientHeight &&
+                        !isFetching &&
+                        totalFetched < totalDBRowCount) {
+                        fetchNextPage()
+                            .catch(err => {
+                                console.error(err);
+                            });
+                    }
+                }
+            }
+        },
+        [fetchNextPage, isFetching, totalFetched, totalDBRowCount]
+    );
+
+    //a check on mount and after a fetch to see if the table is already scrolled to the bottom and immediately needs to fetch more data
+    useEffect(() => {
+        fetchMoreOnBottomReached(tableContainerRef.current);
+    }, [fetchMoreOnBottomReached]);
+
+    const table = useReactTable({
+        data: flatData,
+        columns,
+        state: {
+            sorting
+        },
+        onSortingChange: setSorting,
+        getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel()
+    });
+
+    const { rows } = table.getRowModel();
+
+    //Virtualizing is optional, but might be necessary if we are going to potentially have hundreds or thousands of rows
+    const rowVirtualizer = useVirtualizer({
+        count: rows.length,
+        getScrollElement: () => tableContainerRef.current,
+        estimateSize: () => 100,
+        overscan: 10
+    });
+
+    const totalSize = rowVirtualizer.getTotalSize();
+    const virtualRows = rowVirtualizer.getVirtualItems();
+    const paddingTop = virtualRows.length > 0 ? virtualRows?.[0]?.start || 0 : 0;
+    const paddingBottom =
+        virtualRows.length > 0
+            ? totalSize - (virtualRows?.[virtualRows.length - 1]?.end || 0)
+            : 0;
+
+    if (isLoading) {
         return <>
             We are fetching your usage data.<br />
             It will only take a moment...<br />
             <br />
             <UilSpinner className='inline-block animate-spin h-5' />
         </>;
+    }
 
-    return <>
-        <table className="w-full text-left">
+    return <div
+        id="usage-table-container"
+        className="h-full w-full max-w-full overflow-auto"
+        onScroll={e => fetchMoreOnBottomReached(e.target as HTMLDivElement)}
+        ref={tableContainerRef}
+    >
+        <table className='min-w-full'>
             <thead>
-                <tr className="text-gray-400">
-                    <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800">Class</th>
-                    <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800">FQDN</th>
-                    <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800">WASM</th>
-                    <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800">Native</th>
-                    <th className="font-normal px-3 pt-0 pb-3 border-b border-gray-200 dark:border-gray-800">Date</th>
-                </tr>
+                {table.getHeaderGroups().map(headerGroup => (
+                    <tr key={headerGroup.id}>
+                        {headerGroup.headers.map(header => {
+                            return (
+                                <th
+                                    key={header.id}
+                                    colSpan={header.colSpan}
+                                    style={{ width: header.getSize() }}
+                                    className='text-left first-of-type:pl-4 py-2 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 dark:text-white text-sm font-medium text-gray-500 uppercase tracking-wider'
+                                >
+                                    {header.isPlaceholder ? null : (
+                                        <div
+                                            {...{
+                                                className: header.column.getCanSort()
+                                                    ? 'cursor-pointer select-none'
+                                                    : '',
+                                                onClick: header.column.getToggleSortingHandler()
+                                            }}
+                                        >
+                                            {flexRender(
+                                                header.column.columnDef.header,
+                                                header.getContext()
+                                            )}
+                                            {{
+                                                asc: ' 🔼',
+                                                desc: ' 🔽'
+                                            }[header.column.getIsSorted() as string] ?? null}
+                                        </div>
+                                    )}
+                                </th>
+                            );
+                        })}
+                    </tr>
+                ))}
             </thead>
-            <tbody className="text-gray-600 dark:text-gray-100">
-                {flatData.map(usage => <UsageRecord key={usage.id} usage={usage} />)}
+            <tbody>
+                {paddingTop > 0 && (
+                    <tr>
+                        <td style={{ height: `${paddingTop}px` }} />
+                    </tr>
+                )}
+                {virtualRows.map(virtualRow => {
+                    const row = rows[virtualRow.index] as Row<UsageResult>;
+                    return (
+                        <tr key={row.id} className='hover:bg-slate-50'>
+                            {row.getVisibleCells().map(cell => {
+                                return (
+                                    <td key={cell.id} className={`first-of-type:pl-3 p-2 ${(cell.column.columnDef as unknown as Record<string, string>).accessorKey === 'data.consumption.fqdn' ? 'truncate max-w-32' : ''}`}>
+                                        {flexRender(
+                                            cell.column.columnDef.cell,
+                                            cell.getContext()
+                                        )}
+                                    </td>
+                                );
+                            })}
+                        </tr>
+                    );
+                })}
+                {paddingBottom > 0 && (
+                    <tr>
+                        <td style={{ height: `${paddingBottom}px` }} />
+                    </tr>
+                )}
             </tbody>
         </table>
-    </>;
-};
+    </div>;
+}
 
-export default UsageListing;
+export default ApplicationUsage;

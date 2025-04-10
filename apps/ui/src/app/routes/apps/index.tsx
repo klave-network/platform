@@ -60,7 +60,7 @@ export const AppTabs: FC = () => {
         <div className="sm:px-7 sm:pt-7 px-4 pt-4 flex flex-col w-full border-b border-gray-200 bg-white dark:bg-gray-900 dark:text-white dark:border-gray-800 sticky top-0">
             <div className="flex w-full items-center">
                 <div className="font-medium flex items-center text-3xl text-gray-900 dark:text-white">
-                    {orgSlug} / {application.slug} <img className='h-5 mt-2 ml-3' src={sourceType?.includes('rust') ? RustLogo : sourceType === 'assemblyscript' ? ASLogo : sourceType === 'wasm' ? WASMLogo : 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\'/%3E'} />
+                    {orgSlug} / {application.slug} <img alt='Language logo' className='h-5 mt-2 ml-3' src={sourceType?.includes('rust') ? RustLogo : sourceType === 'assemblyscript' ? ASLogo : sourceType === 'wasm' ? WASMLogo : 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\'/%3E'} />
                 </div>
                 <div className="ml-auto sm:flex hidden items-center justify-end">
                     <div className="text-right">

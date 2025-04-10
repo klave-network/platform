@@ -14,7 +14,7 @@ import { UilSpinner } from '@iconscout/react-unicons';
 import api from '../../utils/api';
 import CreditDisplay from '../../components/CreditDisplay';
 
-function Organisations() {
+function Applications() {
 
     const tableContainerRef = useRef<HTMLDivElement>(null);
     const [sorting, setSorting] = useState<SortingState>([]);
@@ -237,4 +237,4 @@ function Organisations() {
     </>;
 }
 
-export default Organisations;
+export default Applications;
