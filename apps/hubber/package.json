@@ -24,7 +24,7 @@
         "passport": "0.7.0",
         "probot": "14.0.0-beta.11",
         "rate-limiter-flexible": "5.0.5",
-        "stripe": "17.6.0",
+        "stripe": "17.7.0",
         "unique-names-generator": "4.7.1",
         "uuid": "^11.0.5",
         "ws": "8.18.1"
