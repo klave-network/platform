@@ -1,4 +1,30 @@
 # Changelog
+## [1.3.0](https://github.com/klave-network/platform/compare/api@1.2.0...api@1.3.0) (2025-04-10)
+
+### Dependency Updates
+
+* `db` updated to version `1.2.0`
+* `constants` updated to version `1.2.0`
+* `providers` updated to version `1.2.0`
+
+### Features
+
+* **db,api,ui:** Preserve deleted deployments and application, recycling bin style ([e32637a](https://github.com/klave-network/platform/commit/e32637a44f2f0c1e4897f05be08d571306d78df9))
+
+
+### Bug Fixes
+
+* **api:** Change timeout determination model ([2695861](https://github.com/klave-network/platform/commit/2695861f5f66ef7665ba1eb933c1c859fca6753a))
+* **api:** Validating previous deployments haven't been deleted prior to timeouts ([b0f5d1e](https://github.com/klave-network/platform/commit/b0f5d1ecb4ad62077b647f6cc7a5be9295daafbe))
+* **providers,api,hubber:** Align types mismatches ([e9bbf67](https://github.com/klave-network/platform/commit/e9bbf67afe7b7a05161929b53d87fd6e870e61bf))
+
+## [0.13.1](https://github.com/klave-network/platform/compare/api@1.1.3...api@0.13.1) (2025-03-27)
+
+
+### Bug Fixes
+
+* **api:** `bindings.rs` not generated leading to compilation errors ([cf56e70](https://github.com/klave-network/platform/commit/cf56e704374e8591c3a9510e4f7591942a1ac3b2))
+
 ## [1.2.0](https://github.com/klave-network/platform/compare/api@1.1.3...api@1.2.0) (2025-04-10)
 
 ### Dependency Updates
