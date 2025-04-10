@@ -1,4 +1,11 @@
 # Changelog
+## [1.3.0](https://github.com/klave-network/platform/compare/db@1.2.0...db@1.3.0) (2025-04-10)
+
+
+### Features
+
+* **db,api,ui:** Preserve deleted deployments and application, recycling bin style ([e32637a](https://github.com/klave-network/platform/commit/e32637a44f2f0c1e4897f05be08d571306d78df9))
+
 ## [1.2.0](https://github.com/klave-network/platform/compare/db@1.1.0...db@1.2.0) (2025-04-10)
 
 
