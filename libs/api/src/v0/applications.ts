@@ -15,7 +15,8 @@ export const applicationRouter = createTRPCRouter({
 
             const manifest = await prisma.application.findMany({
                 where: {
-                    webId
+                    webId,
+                    deletedAt: null
                 },
                 include: {
                     deployments: {
@@ -57,6 +58,7 @@ export const applicationRouter = createTRPCRouter({
 
             const apps = await prisma.application.findMany({
                 where: {
+                    deletedAt: null,
                     organisation: {
                         OR: [{
                             id: orgId
@@ -327,6 +329,7 @@ export const applicationRouter = createTRPCRouter({
                     kredits: true,
                     createdAt: true,
                     updatedAt: true,
+                    deletedAt: true,
                     permissionGrants: {
                         where: {
                             userId: user?.id
@@ -358,12 +361,11 @@ export const applicationRouter = createTRPCRouter({
             if (!org)
                 return null;
 
-            const app = await prisma.application.findUnique({
+            const app = await prisma.application.findFirst({
                 where: {
-                    organisationId_slug: {
-                        organisationId: org.id,
-                        slug: appSlug
-                    }
+                    deletedAt: null,
+                    slug: appSlug,
+                    organisationId: org.id
                 }
             });
 
@@ -485,6 +487,7 @@ export const applicationRouter = createTRPCRouter({
                     kredits: true,
                     createdAt: true,
                     updatedAt: true,
+                    deletedAt: true,
                     permissionGrants: {
                         where: {
                             userId: user?.id
@@ -741,15 +744,24 @@ export const applicationRouter = createTRPCRouter({
                         slug: orgSlug
                     }
                 });
+
                 if (!org)
+                    return null;
+
+                const app = await prisma.application.findFirst({
+                    where: {
+                        deletedAt: null,
+                        slug: appSlug,
+                        organisationId: org.id
+                    }
+                });
+
+                if (!app)
                     return null;
 
                 await prisma.application.update({
                     where: {
-                        organisationId_slug: {
-                            slug: appSlug,
-                            organisationId: org.id
-                        }
+                        id: app.id
                     },
                     data
                 });
@@ -759,10 +771,7 @@ export const applicationRouter = createTRPCRouter({
                         class: 'environment',
                         application: {
                             connect: {
-                                organisationId_slug: {
-                                    slug: appSlug,
-                                    organisationId: org.id
-                                }
+                                id: app.id
                             }
                         },
                         context: {
@@ -820,12 +829,11 @@ export const applicationRouter = createTRPCRouter({
                     }
                 });
             else if (applicationSlug && organisationId)
-                app = await prisma.application.findUnique({
+                app = await prisma.application.findFirst({
                     where: {
-                        organisationId_slug: {
-                            slug: applicationSlug,
-                            organisationId: organisationId
-                        }
+                        deletedAt: null,
+                        slug: applicationSlug,
+                        organisationId: organisationId
                     }
                 });
 
@@ -843,9 +851,12 @@ export const applicationRouter = createTRPCRouter({
                         }
                     }
                 }),
-                prisma.application.delete({
+                prisma.application.update({
                     where: {
                         id: app.id
+                    },
+                    data: {
+                        deletedAt: new Date()
                     }
                 })
             ]);
@@ -870,12 +881,11 @@ export const applicationRouter = createTRPCRouter({
 
             if (input.withSlug) {
                 const { applicationSlug, organisationId } = input;
-                app = await prisma.application.findUnique({
+                app = await prisma.application.findFirst({
                     where: {
-                        organisationId_slug: {
-                            slug: applicationSlug,
-                            organisationId: organisationId
-                        },
+                        deletedAt: null,
+                        slug: applicationSlug,
+                        organisationId: organisationId,
                         OR: [{
                             organisation: {
                                 permissionGrants: {
@@ -1038,12 +1048,11 @@ export const applicationRouter = createTRPCRouter({
             if (!org)
                 throw (new Error('No usage found'));
 
-            const app = await prisma.application.findUnique({
+            const app = await prisma.application.findFirst({
                 where: {
-                    organisationId_slug: {
-                        organisationId: org.id,
-                        slug: input.appSlug
-                    },
+                    deletedAt: null,
+                    organisationId: org.id,
+                    slug: input.appSlug,
                     OR: [{
                         organisation: {
                             permissionGrants: {

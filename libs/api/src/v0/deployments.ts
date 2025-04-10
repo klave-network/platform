@@ -19,6 +19,7 @@ export const deploymentRouter = createTRPCRouter({
 
             return await prisma.deployment.findMany({
                 where: {
+                    deletedAt: null,
                     application: {
                         id: appId,
                         OR: [{
@@ -154,6 +155,7 @@ export const deploymentRouter = createTRPCRouter({
                     tags: true,
                     createdAt: true,
                     updatedAt: true,
+                    deletedAt: true,
                     expiresOn: true,
                     sourceType: true,
                     applicationId: true,
@@ -185,6 +187,7 @@ export const deploymentRouter = createTRPCRouter({
 
             const deploymentList = await prisma.deployment.findMany({
                 where: {
+                    deletedAt: null,
                     application: {
                         OR: [{
                             organisation: {
@@ -323,7 +326,7 @@ export const deploymentRouter = createTRPCRouter({
             if (!user && !override)
                 return;
             logger.debug(`Deleting deployment ${deploymentId}`);
-            await prisma.deployment.delete({
+            await prisma.deployment.update({
                 where: {
                     id: deploymentId,
                     application: override !== '__system_post_deploy' && override !== '__system_pruner_cleaner' ? {
@@ -349,6 +352,9 @@ export const deploymentRouter = createTRPCRouter({
                             }
                         }]
                     } : undefined
+                },
+                data: {
+                    deletedAt: new Date()
                 }
             });
             return;

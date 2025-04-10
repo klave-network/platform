@@ -62,6 +62,18 @@
 
 * Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
 
+## [0.13.2](https://github.com/klave-network/platform/compare/ui@0.13.2...ui@0.13.2) (2025-04-07)
+
+### Bug Fixes
+
+* **ui:** Prevent overactive autoscroll ([7febf66d](https://github.com/klave-network/platform/commit/7febf66d553908ea9cf1119dca287097a82bac31))
+
+## [0.13.1](https://github.com/klave-network/platform/compare/ui@0.13.0...ui@0.13.1) (2025-04-07)
+
+### Features
+
+* **api,hubber:** Enable Secretarium Connector chunking ([2e916d3f](https://github.com/klave-network/platform/commit/2e916d3f1b42c4d823eb1fef11b2ce353c16321c))
+
 ## [0.13.0](https://github.com/klave-network/platform/compare/ui@0.12.0...ui@0.13.0) (2024-08-02)
 
 ### Dependency Updates

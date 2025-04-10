@@ -68,12 +68,25 @@
 
 * Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
 
+## [0.3.6](https://github.com/klave-network/platform/compare/hubber@0.3.5...hubber@0.3.6) (2025-04-07)
+
+### Bug Fixes
+
+* **api:** Change timeout determination model ([2695861f](https://github.com/klave-network/platform/commit/2695861f5f66ef7665ba1eb933c1c859fca6753a))
+
+## [0.3.5](https://github.com/klave-network/platform/compare/hubber@0.3.4...hubber@0.3.5) (2025-04-07)
+
+### Features
+
+* **api,hubber:** Enable Secretarium Connector chunking ([2e916d3f](https://github.com/klave-network/platform/commit/2e916d3f1b42c4d823eb1fef11b2ce353c16321c))
+
 ## [0.3.4](https://github.com/klave-network/platform/compare/hubber@0.3.3...hubber@0.3.4) (2024-08-02)
 
 ### Dependency Updates
 
 * `api` updated to version `0.3.3`
 * `pruner` updated to version `0.3.3`
+
 ## [0.3.3](https://github.com/klave-network/platform/compare/hubber@0.3.2...hubber@0.3.3) (2024-07-25)
 
 ### Dependency Updates

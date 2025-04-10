@@ -106,10 +106,10 @@ export class BuildHost {
 
                 const { token, workingDirectory, repo, context: { commit: { after } } } = this.options;
                 type PackageManager = 'yarn' | 'npm' | 'cargo';
-                const packageManagerCommands: Record<PackageManager, [string, string]> = {
-                    yarn: ['yarn install', 'yarn build'],
-                    npm: ['npm install', 'npm run build'],
-                    cargo: ['cargo component bindings', 'cargo component build --target wasm32-unknown-unknown --release']
+                const packageManagerCommands: Record<PackageManager, [string[], string[]]> = {
+                    yarn: [['yarn install'], ['yarn build']],
+                    npm: [['npm install'], ['npm run build']],
+                    cargo: [['cargo component bindings'], ['cargo component build --target wasm32-unknown-unknown --release']]
                 };
                 let packageManager: keyof typeof packageManagerCommands = 'yarn';
 
@@ -162,7 +162,8 @@ export class BuildHost {
                     this.listeners['message']?.forEach(listener => listener({ type: 'progress', sourceType: packageManager === 'cargo' ? 'rust-component' : 'assemblyscript', stage: 'install', output: { type: 'stdout', full: false, time: new Date().toISOString(), data: `Using ${packageManager} as package manager\r` } }));
 
                     return new Promise<void>((resolve, reject) => {
-                        const command = packageManagerCommands[packageManager][0];
+                        const commands = packageManagerCommands[packageManager][0];
+                        const command = commands.join(' && ');
                         this.consolePrint('install', { type: 'stdout', full: true, data: `$> ${command}` });
                         this.consolePrint('install', { type: 'stdout', full: false, data: `$> ${command}` });
                         const hook = exec(command, {
@@ -181,7 +182,8 @@ export class BuildHost {
                         });
                     });
                 }).then(async () => new Promise<void>((resolve, reject) => {
-                    const command = packageManagerCommands[packageManager][1];
+                    const commands = packageManagerCommands[packageManager][1];
+                    const command = commands.join(' && ');
                     this.consolePrint('build', { type: 'stdout', full: true, data: `$> ${command}` });
                     this.consolePrint('build', { type: 'stdout', full: false, data: `$> ${command}` });
                     const hook = exec(command, {
@@ -230,7 +232,7 @@ export class BuildHost {
                             if (file.split('-').shift() === `${appIndex}`)
                                 this.listeners['message']?.forEach(listener => listener({
                                     type: 'write',
-                                    contents: fs.readFileSync(path.join(appCompiledPath, file), null),
+                                    contents: Uint8Array.from(fs.readFileSync(path.join(appCompiledPath, file), null)),
                                     filename: path.basename(file)
                                 }));
                         });
@@ -252,7 +254,7 @@ export class BuildHost {
                             if (filename === tomlConf.package?.name || filename === tomlConf.package?.name?.replaceAll('-', '_'))
                                 this.listeners['message']?.forEach(listener => listener({
                                     type: 'write',
-                                    contents: fs.readFileSync(path.join(appCompiledPath, file), null),
+                                    contents: Uint8Array.from(fs.readFileSync(path.join(appCompiledPath, file), null)),
                                     filename: file
                                 }));
                         });
@@ -271,7 +273,7 @@ export class BuildHost {
                 });
             }
 
-            catch (e) {
+            catch (e: unknown) {
                 if (typeof e === 'string')
                     console.error(e);
                 else if (e instanceof Error)

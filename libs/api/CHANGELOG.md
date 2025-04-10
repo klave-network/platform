@@ -67,6 +67,18 @@
 
 * Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
 
+## [0.13.2](https://github.com/klave-network/platform/compare/api@0.13.1...api@0.13.2) (2025-04-07)
+
+### Bug Fixes
+
+* **api:** Change timeout determination model ([2695861f](https://github.com/klave-network/platform/commit/2695861f5f66ef7665ba1eb933c1c859fca6753a))
+
+## [0.13.1](https://github.com/klave-network/platform/compare/api@0.13.0...api@0.13.1) (2025-03-27)
+
+### Bug Fixes
+
+* **api:** `bindings.rs` not generated leading to compilation errors ([cf56e70](https://github.com/klave-network/platform/commit/cf56e704374e8591c3a9510e4f7591942a1ac3b2))
+
 ## [0.13.0](https://github.com/klave-network/platform/compare/api@0.12.0...api@0.13.0) (2024-08-02)
 
 
