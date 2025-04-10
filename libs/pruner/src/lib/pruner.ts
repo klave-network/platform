@@ -147,8 +147,8 @@ async function cancelUpdatingDeployments() {
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function reconcileApplicationKredits() {
+
+async function __unusedReconcileApplicationKredits() {
 
     const applicationsWithDeployments = await prisma.application.findMany({
         where: {
@@ -217,7 +217,7 @@ export async function prune() {
 
 type PrunerOptions = {
     interval?: number;
-}
+};
 
 export function startPruner(options?: PrunerOptions) {
     const { interval = 6000 } = options ?? {};

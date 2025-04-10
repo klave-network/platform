@@ -1,8 +1,22 @@
 {
     "name": "@klave/cli",
     "version": "0.0.1",
-    "type": "commonjs",
+    "private": false,
+    "description": "The Klave Command Line Interface lets you interact with your Klave apps from the command line",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/klave-network/platform.git",
+        "directory": "libs/sdk"
+    },
     "license": "MIT",
+    "author": {
+        "name": "Florian Guitton",
+        "email": "florian@secretarium.com"
+    },
+    "type": "commonjs",
+    "bin": {
+        "klave": "./bin/klave.js"
+    },
     "dependencies": {
         "@klave/sdk": "0.16.0"
     }

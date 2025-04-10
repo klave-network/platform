@@ -1,14 +1,21 @@
 {
     "name": "create-on-klave",
-    "description": "The tool to bootstrap trustless apps on Klave",
     "version": "0.4.3",
-    "license": "MIT",
     "private": false,
-    "author": {
-        "email": "florian@secretarium.com",
-        "name": "Florian Guitton"
+    "description": "Klave Honest Apps templater",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/klave-network/platform.git",
+        "directory": "apps/create"
     },
+    "license": "MIT",
+    "author": {
+        "name": "Florian Guitton",
+        "email": "florian@secretarium.com"
+    },
+    "type": "commonjs",
     "bin": {
+        "create-honest-app": "./bin/create-trustless-app.js",
         "create-on-klave": "./bin/create-on-klave.js",
         "create-trustless-app": "./bin/create-trustless-app.js"
     },

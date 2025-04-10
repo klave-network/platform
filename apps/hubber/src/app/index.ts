@@ -126,6 +126,7 @@ export const start = async () => {
         sessionOptions.cookie = { secure: true }; // serve secure cookies
     }
 
+    // TODO - Remove in a few versions
     app.use('/ping', (__unusedReq, res) => {
         res.setHeader('X-Klave-API-Status', 'ready');
         res.status(202).send({

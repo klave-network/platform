@@ -1,4 +1,87 @@
 # Changelog
+## [1.1.0](https://github.com/klave-network/platform/compare/ui@1.0.1...ui@1.1.0) (2025-01-23)
+
+### Dependency Updates
+
+* `constants` updated to version `1.0.1`
+* `db` updated to version `1.0.1`
+* `api` updated to version `1.0.1`
+
+### Features
+
+* **api,ui:** Adding support for setting query spending limits ([928392c](https://github.com/klave-network/platform/commit/928392c28f9d9db92482360befac7db9c6231745))
+* **ui,hubber,providers:** Filter node name through ([620d41b](https://github.com/klave-network/platform/commit/620d41b14324e777bf40fe275decbf890458954f))
+
+
+### Bug Fixes
+
+* **ui:** Correct impossible nesting ([ae2909f](https://github.com/klave-network/platform/commit/ae2909f0699a09e4f687e49255fd86f812486de3))
+* **ui:** Explicitly set spinner heights ([27a65bf](https://github.com/klave-network/platform/commit/27a65bfc8e2a966f064c0a5ffa961f31fab6fe97))
+* **ui:** Header new logo dimension ([06b8737](https://github.com/klave-network/platform/commit/06b8737b64e6883dc3da08cbe44fe40231ee6d75))
+
+## [1.0.1](https://github.com/klave-network/platform/compare/ui@1.0.0...ui@1.0.1) (2024-10-04)
+
+## [1.0.0](https://github.com/klave-network/platform/compare/ui@0.13.0...ui@1.0.0) (2024-10-04)
+
+### Dependency Updates
+
+* `api` updated to version `0.13.0`
+* `constants` updated to version `0.13.0`
+* `db` updated to version `0.13.0`
+
+### ⚠ BREAKING CHANGES
+
+* Moving to pure ESM repo
+
+### Bug Fixes
+
+* Package `git-rev-sync` relies on non-ESM features so we provide explicit location ([cee72ae](https://github.com/klave-network/platform/commit/cee72ae5cd5a2fe998c987864b060f039ddb939b))
+
+
+### Miscellaneous Chores
+
+* Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
+
+## [0.13.0](https://github.com/klave-network/platform/compare/ui@0.12.0...ui@0.13.0) (2024-08-02)
+
+### Dependency Updates
+
+* `api` updated to version `0.12.0`
+
+### Features
+
+* **api,ui:** Add the ability to add a custom cluster ([fcc3c5f](https://github.com/klave-network/platform/commit/fcc3c5f0f9b76f4e8a5a7826ef64327061b1d096))
+* **api,ui:** Allow editing of permission grants for organisations ([e2bd7d2](https://github.com/klave-network/platform/commit/e2bd7d2097b773e2a7151594ee837950298cfe2d)), closes [#KN-232](https://github.com/klave-network/platform/issues/KN-232)
+
+
+### Bug Fixes
+
+* **ui:** Fix wrong text on members page + Cleanup ([ff6aa83](https://github.com/klave-network/platform/commit/ff6aa83272699bc3fa550322ae323506f0d1f0a6))
+* **ui:** Run attestation check again the correct custom cluster ([aa5c2fe](https://github.com/klave-network/platform/commit/aa5c2fe1366cd8ca6a83b82af624eb3741e30eb4))
+
+
+### Reverts
+
+* Revert "chore(ui): Hide organisation creation button" ([bd3bc9d](https://github.com/klave-network/platform/commit/bd3bc9dc888b4cb98617ca4d3835ccc914c3c596))
+
+## [0.12.0](https://github.com/klave-network/platform/compare/ui@0.11.0...ui@0.12.0) (2024-07-25)
+
+### Dependency Updates
+
+* `constants` updated to version `0.11.0`
+* `db` updated to version `0.11.0`
+* `api` updated to version `0.11.0`
+
+### Features
+
+* **api,ui:** Add cluster listing in Organisation view ([fbdedfb](https://github.com/klave-network/platform/commit/fbdedfb5162390b242c6a8365a12bf8242dfb702))
+
+
+### Bug Fixes
+
+* **db,api,ui:** Correct typo in cluster structure declaration ([5fe9160](https://github.com/klave-network/platform/commit/5fe91607dec8aee57d9cb367715d10231169b83a))
+* **ui:** Ensure the RunCommand component targets the `wss` protocol ([05a1bec](https://github.com/klave-network/platform/commit/05a1bece3839933ab6bab69319c571038648de57))
+
 ## [0.11.0](https://github.com/klave-network/platform/compare/ui@0.10.2...ui@0.11.0) (2024-07-24)
 
 ### Dependency Updates

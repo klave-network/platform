@@ -13,5 +13,11 @@ module.exports = {
         'process.env.GIT_REPO_BRANCH': JSON.stringify(git.branch()),
         'process.env.GIT_REPO_DIRTY': JSON.stringify(git.isDirty()),
         'process.env.GIT_REPO_VERSION': JSON.stringify(version)
+    },
+    target: ['node'],
+    platform: 'node',
+    loader: {
+        // ensures .node binaries are copied to ./dist
+        '.node': 'copy'
     }
 };

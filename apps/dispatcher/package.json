@@ -1,6 +1,17 @@
 {
     "name": "@klave/dispatcher",
     "version": "1.1.2",
-    "type": "commonjs",
-    "license": "MIT"
+    "private": false,
+    "description": "Klave Platform message sink and dispatcher",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/klave-network/platform.git",
+        "directory": "apps/dispatcher"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Florian Guitton",
+        "email": "florian@secretarium.com"
+    },
+    "type": "module"
 }

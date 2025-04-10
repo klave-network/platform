@@ -5,11 +5,33 @@
         "crate"
     ],
     "targets": {
+        "deps": {
+            "command": "(is-ci && cargo install cargo-component --force) || cargo install cargo-component",
+            "cache": true,
+            "inputs": [
+                "{workspaceRoot}/Cargo.toml",
+                "{workspaceRoot}/Cargo.lock",
+                "{projectRoot}/Cargo.toml"
+            ]
+        },
         "build": {
-            "command": "cargo build -p klave --target-dir crates/klave/target --release",
+            "dependsOn": [
+                "deps"
+            ],
+            "command": "rimraf target && cargo component build --target wasm32-unknown-unknown -p klave --target-dir crates/klave/target --release",
             "cache": true,
             "outputs": [
                 "{projectRoot}/target"
+            ]
+        },
+        "publish": {
+            "dependsOn": [
+                "build"
+            ],
+            "command": "cargo publish --no-verify -p klave",
+            "cache": true,
+            "outputs": [
+                "{workspaceRoot}/target"
             ]
         }
     }

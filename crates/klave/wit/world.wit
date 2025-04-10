@@ -1,0 +1,6 @@
+package component:klave-sdk;
+
+/// An example world for the component to target.
+world klave-sdk {
+    import klave:sdk/sdk;
+}

@@ -10,7 +10,7 @@ export const probotMiddleware: RequestHandler = (req, res, next) => {
         middlewareReference = createNodeMiddleware(probotApp, {
             probot,
             webhooksPath: '/'
-        });
+        }) as RequestHandler;
 
     if (middlewareReference)
         middlewareReference(req, res, next);

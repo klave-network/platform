@@ -3,3 +3,9 @@ resolver = "2"
 members = [
     "crates/klave"
 ]
+
+# Sub-crates profiles are ignored by the workspace profile
+[profile.release]
+lto = true
+opt-level = "s"
+strip = true

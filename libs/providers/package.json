@@ -1,4 +1,17 @@
 {
     "name": "@klave/providers",
-    "version": "1.1.2"
+    "version": "1.1.2",
+    "private": true,
+    "description": "Klave backend external systems providers",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/klave-network/platform.git",
+        "directory": "libs/providers"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Florian Guitton",
+        "email": "florian@secretarium.com"
+    },
+    "type": "commonjs"
 }

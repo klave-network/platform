@@ -1,6 +1,6 @@
 export default {
     displayName: 'dispatcher',
-    preset: '../../jest.preset.js',
+    preset: '../../jest.preset.cjs',
     globals: {},
     testEnvironment: 'node',
     transform: {

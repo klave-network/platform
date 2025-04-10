@@ -1,5 +1,17 @@
 {
     "name": "@klave/db",
     "version": "1.1.0",
+    "private": true,
+    "description": "Klave database schema definitions",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/klave-network/platform.git",
+        "directory": "libs/db"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Florian Guitton",
+        "email": "florian@secretarium.com"
+    },
     "type": "commonjs"
 }
