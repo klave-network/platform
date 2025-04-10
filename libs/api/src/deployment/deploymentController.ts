@@ -455,7 +455,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                     }
                                 });
                             }
-                            
+
                             await prisma.deployment.update({
                                 where: {
                                     id: deployment.id
