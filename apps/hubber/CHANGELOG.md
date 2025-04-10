@@ -1,4 +1,25 @@
 # Changelog
+## [1.1.1](https://github.com/klave-network/platform/compare/hubber@1.1.0...hubber@1.1.1) (2025-04-10)
+
+### Dependency Updates
+
+* `db` updated to version `1.1.0`
+* `constants` updated to version `1.1.0`
+* `providers` updated to version `1.1.0`
+* `api` updated to version `1.1.0`
+* `pruner` updated to version `1.1.0`
+
+### Bug Fixes
+
+* **hubber:** Dockerfile node version causes issues with `@sentry/profiling` ([59bd5af](https://github.com/klave-network/platform/commit/59bd5af6f899d19a5e75f68bb9eadf3276db4519))
+
+## [0.3.5](https://github.com/klave-network/platform/compare/hubber@1.0.2...hubber@0.3.5) (2025-04-07)
+
+
+### Bug Fixes
+
+* **providers,api,hubber:** Align types mismatches ([e9bbf67](https://github.com/klave-network/platform/commit/e9bbf67afe7b7a05161929b53d87fd6e870e61bf))
+
 ## [1.1.0](https://github.com/klave-network/platform/compare/hubber@1.0.2...hubber@1.1.0) (2025-04-10)
 
 ### Dependency Updates
