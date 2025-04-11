@@ -57,7 +57,8 @@ export const getFinalParseUsage = (usageRecord: string | object | null): ReturnT
         newData.consumption.egress_in_bytes = 0;
         newData.consumption.ledger_write_in_bytes = 0;
         newData.consumption.ledger_read_in_bytes = 0;
-        return newData as unknown as ReturnType<typeof KreditConsumptionReportSchemaV1.safeParse>;
+        originalParse.data = newData;
+        originalParse.success = true;
     }
     return originalParse as unknown as ReturnType<typeof KreditConsumptionReportSchemaV1.safeParse>;
 };
