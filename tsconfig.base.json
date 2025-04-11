@@ -24,6 +24,7 @@
         "skipLibCheck": true,
         "skipDefaultLibCheck": true,
         "forceConsistentCasingInFileNames": true,
+        "assumeChangesOnlyAffectDirectDependencies": true,
         "resolveJsonModule": true,
         "strict": true,
         "strictNullChecks": true,
