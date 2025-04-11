@@ -414,8 +414,8 @@ type UsageDataConsumption {
     request_id               String
     is_transaction           Boolean
     timestamp                Int
-    cpu_consumption          BigInt
-    native_calls_consumption BigInt
+    cpu_consumption          Int
+    native_calls_consumption Int
 }
 
 type UsageData {
