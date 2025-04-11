@@ -1,4 +1,9 @@
 # Changelog
+## [1.1.5](https://github.com/klave-network/platform/compare/dispatcher@1.1.4...dispatcher@1.1.5) (2025-04-11)
+
+### Dependency Updates
+
+* `constants` updated to version `1.1.4`
 ## [1.1.4](https://github.com/klave-network/platform/compare/dispatcher@1.1.3...dispatcher@1.1.4) (2025-04-11)
 
 
