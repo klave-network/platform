@@ -413,10 +413,15 @@ type UsageDataConsumption {
     fqdn                     String
     wasm_hash                String
     request_id               String
+    call_type                String
     is_transaction           Boolean
     timestamp                Int
     cpu_consumption          Int
     native_calls_consumption Int
+    ingress_in_bytes         Int
+    egress_in_bytes          Int
+    ledger_write_in_bytes    Int
+    ledger_read_in_bytes     Int
 }
 
 type UsageData {

@@ -1,31 +1,10 @@
 import { MongoClient, Collection } from 'mongodb';
-import { z } from 'zod';
-
-const KreditConsumptionSchemaV0 = z.object({
-    cluster_key: z.string(),
-    node_key: z.string(),
-    app_id: z.string(),
-    fqdn: z.string(),
-    wasm_hash: z.string(),
-    request_id: z.string(),
-    is_transaction: z.boolean(),
-    timestamp: z.number(),
-    cpu_consumption: z.number(),
-    native_calls_consumption: z.number()
-});
-
-export const KreditConsumptionReportSchema = z.object({
-    version: z.number(),
-    consumption: KreditConsumptionSchemaV0,
-    signature_b64: z.string()
-});
-
-export type ConsumptionReport = z.infer<typeof KreditConsumptionReportSchema>;
+import { getFinalParseUsage } from '@klave/constants';
 
 type UsageRecord = {
     type: string;
     timestamp: string;
-    data?: ConsumptionReport
+    data?: NonNullable<ReturnType<typeof getFinalParseUsage>['data']>
 };
 
 let client: MongoClient;

@@ -1,7 +1,8 @@
 import { FastifyInstance, RouteHandler } from 'fastify';
 import type { WebSocket } from 'ws';
 import { v4 as uuid } from 'uuid';
-import { collection, ConsumptionReport, KreditConsumptionReportSchema } from '../utils/mongo';
+import { collection } from '../utils/mongo';
+import { getFinalParseUsage } from '@klave/constants';
 
 const definitions = process.env.KLAVE_DISPATCH_ENDPOINTS?.split(',') ?? [];
 const endpoints = definitions.map(def => def.split('#') as [string, string]).filter(def => def.length === 2);
@@ -125,12 +126,17 @@ export async function app(fastify: FastifyInstance) {
         // We assume that it is not a multipart request either
         const rawContent = Uint8Array.from(req.raw.read() ?? []);
 
-        let data: ConsumptionReport;
+        let data: NonNullable<ReturnType<typeof getFinalParseUsage>['data']>;
         try {
             const content = new TextDecoder('utf-8').decode(rawContent);
             if (typeof content !== 'string')
                 return await res.status(400).send({ ok: false });
-            data = KreditConsumptionReportSchema.parse(JSON.parse(content));
+            const parseResult = getFinalParseUsage(content);
+            if (parseResult.error)
+                return await res.status(400).send({ ok: false });
+            if (parseResult.data === undefined)
+                return await res.status(400).send({ ok: false });
+            data = parseResult.data;
         } catch (error) {
             fastify.log.error('Failed to parse the content', error);
             return await res.status(400).send({ ok: false });
