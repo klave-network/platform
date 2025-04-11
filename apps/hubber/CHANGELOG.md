@@ -1,4 +1,19 @@
 # Changelog
+## [1.1.2](https://github.com/klave-network/platform/compare/hubber@1.1.1...hubber@1.1.2) (2025-04-11)
+
+### Dependency Updates
+
+* `db` updated to version `1.1.1`
+* `constants` updated to version `1.1.1`
+* `providers` updated to version `1.1.1`
+* `api` updated to version `1.1.1`
+* `pruner` updated to version `1.1.1`
+
+### Bug Fixes
+
+* **dispatcher,hubber:** Packaging issue with CJS ([9bcf47a](https://github.com/klave-network/platform/commit/9bcf47a5c3e3124e32e3b3b6a79d8435a9aa1685))
+* **hubber:** Sentry profiling incompatibility in node `22-alpine` ([fdbf6b3](https://github.com/klave-network/platform/commit/fdbf6b3795bbfe9fc953d2d7a189dfe2cc654c34))
+
 ## [1.1.1](https://github.com/klave-network/platform/compare/hubber@1.1.0...hubber@1.1.1) (2025-04-10)
 
 ### Dependency Updates
