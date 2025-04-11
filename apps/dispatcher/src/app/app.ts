@@ -17,7 +17,7 @@ export async function app(fastify: FastifyInstance) {
 
     const __hostname = process.env['HOSTNAME'] ?? 'unknown';
 
-    fastify.log.info(endpoints, 'Preparing for enpoints');
+    fastify.log.info(endpoints, 'Preparing for enpoints ');
     const secrets = process.env.KLAVE_DISPATCH_SECRETS?.split(',') ?? [];
 
     fastify.get('/dev', { websocket: true }, (connection) => {
@@ -110,7 +110,8 @@ export async function app(fastify: FastifyInstance) {
 
         const statusValues = Object.values(statuses);
 
-        await res.headers({ 'X-Klave-API-Node': __hostname })
+        await res
+            .headers({ 'X-Klave-API-Node': __hostname })
             .status(!statusValues.length ? 200 : statusValues.find(status => status === 200) ? 207 : 500)
             .send({ ok: true, statuses });
     };
@@ -119,8 +120,7 @@ export async function app(fastify: FastifyInstance) {
     fastify.all('/vcs/hook', hookMiddleware);
 
     fastify.all('/ingest/usage', async (req, res) => {
-
-        await res.headers({ 'X-Klave-API-Node': __hostname });
+        const preRes = res.headers({ 'X-Klave-API-Node': __hostname });
 
         // We assume that the request is not too long
         // We assume that it is not a multipart request either
@@ -130,38 +130,45 @@ export async function app(fastify: FastifyInstance) {
         try {
             const content = new TextDecoder('utf-8').decode(rawContent);
             if (typeof content !== 'string')
-                return await res.status(400).send({ ok: false });
+                return await preRes.status(400).send({ ok: false });
             const parseResult = getFinalParseUsage(content);
             if (parseResult.error)
-                return await res.status(400).send({ ok: false });
+                return await preRes.status(400).send({ ok: false });
             if (parseResult.data === undefined)
-                return await res.status(400).send({ ok: false });
+                return await preRes.status(400).send({ ok: false });
             data = parseResult.data;
         } catch (error) {
             fastify.log.error('Failed to parse the content', error);
-            return await res.status(400).send({ ok: false });
+            return await preRes.status(400).send({ ok: false });
         }
         if (!collection)
-            return await res.status(202).send({ ok: true });
+            return await preRes.status(202).send({ ok: true });
         await collection?.insertOne({
             type: 'usage',
             timestamp: new Date().toISOString(),
             data
         });
-        return await res.status(201).send({ ok: true });
+        return await preRes.status(201).send({ ok: true });
     });
 
     fastify.all('/version', async (__unusedReq, res) => {
+        await res
+            .headers({ 'X-Klave-API-Node': __hostname })
+            .status(202).send({
+                version: {
+                    name: process.env.NX_TASK_TARGET_PROJECT,
+                    commit: process.env.GIT_REPO_COMMIT?.substring(0, 8),
+                    branch: process.env.GIT_REPO_BRANCH,
+                    version: process.env.GIT_REPO_VERSION
+                },
+                node: __hostname
+            });
+    });
 
-        await res.headers({ 'X-Klave-API-Node': __hostname });
-        await res.status(202).send({
-            version: {
-                name: process.env.NX_TASK_TARGET_PROJECT,
-                commit: process.env.GIT_REPO_COMMIT?.substring(0, 8),
-                branch: process.env.GIT_REPO_BRANCH,
-                version: process.env.GIT_REPO_VERSION
-            },
-            node: __hostname
-        });
+    fastify.all('*', async (__unusedReq, res) => {
+        await res
+            .headers({ 'X-Klave-API-Node': __hostname })
+            .status(400)
+            .send({ ok: false });
     });
 }
