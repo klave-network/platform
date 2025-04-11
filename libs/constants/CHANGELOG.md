@@ -1,4 +1,11 @@
 # Changelog
+## [1.0.10](https://github.com/klave-network/platform/compare/constants@1.0.9...constants@1.0.10) (2025-04-11)
+
+
+### Bug Fixes
+
+* **dispatcher:** Data structure mismatched insertion ([25fc08e](https://github.com/klave-network/platform/commit/25fc08eb0ff815a6b424b5aac3d447388d02fdc0))
+
 ## [1.0.9](https://github.com/klave-network/platform/compare/constants@1.0.8...constants@1.0.9) (2025-04-11)
 
 ### Dependency Updates
