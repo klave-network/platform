@@ -83,10 +83,11 @@ model WebauthCredential {
     user                 User     @relation(fields: [userId], references: [id])
     userId               String
     credentialID         String
-    credentialPublicKey  String
+    credentialPublicKey  Int[]
     credentialType       String
     credentialDeviceType String
     credentialBackedUp   Boolean
+    credentialTransport  String?
     userVerified         Boolean
     aaguid               String
     counter              Int
