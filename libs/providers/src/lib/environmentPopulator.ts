@@ -14,10 +14,11 @@ export const envOps = {
         });
         if (process.env['KLAVE_LOAD_ENV'] === 'true')
             await Promise.all(Object.entries(process.env).map(async ([key, value]) => {
+                if (!value)
+                    return;
                 if (key.startsWith('KLAVE_') ||
                     key.startsWith('KLAVE_SECRETARIUM_') ||
                     key.startsWith('KLAVE_GITHUB_') ||
-                    key.startsWith('KLAVE_') ||
                     key.startsWith('SECRETARIUM_') ||
                     key.startsWith('GITHUB_'))
                     if ((await prisma.environment.findMany({
