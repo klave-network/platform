@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { SCP, Key, Constants } from '@secretarium/connector';
+import { SCP, Key, Constants, Utils } from '@secretarium/connector';
 import { httpApi } from './api';
 
 export const client = new SCP({
@@ -56,7 +56,7 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
     const [count, setCount] = useState(0);
     const [opts, setOpts] = useState<SecretariumQueryOptions>();
     const { app, route, args, key, cluster } = opts ?? {};
-    const argDigest = useMemo(() => {
+    const argPrint = useMemo(() => {
         if (typeof args === 'undefined' || args === null)
             return '';
         if (typeof args === 'string')
@@ -65,6 +65,7 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
             return Object.entries(args).sort((a, b) => a[0].localeCompare(b[0])).map(([, v]) => v).join('|');
         return Math.random().toString().replaceAll('.', '');
     }, [args]);
+    const argDigest = Utils.hash(Uint8Array.from(argPrint));
     const cacheKey = useMemo(() => `${app}|${route}|${argDigest}|${count}`, [count]);
     const dataCache = useRef<Cache<ResultType>>({});
     const errorsCache = useRef<Cache<Error | ErrorType>>({});
@@ -223,7 +224,7 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
 
                 dataCache.current[cacheKey] = [];
                 errorsCache.current[cacheKey] = [];
-                await client.newTx<ResultType, ErrorType>(app, route, `klave-deployment-${Math.random().toString().replaceAll('.', '')}`, args ?? {})
+                await client.newTx<ResultType, ErrorType>(app, route, `klave-ui-runcommand-${argDigest}-${Math.random().toString().replaceAll('.', '').substring(0, 10)}`, args ?? {})
                     .onResult((result) => {
 
                         if (!dataCache.current[cacheKey])
