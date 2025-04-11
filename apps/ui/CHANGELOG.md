@@ -1,4 +1,17 @@
 # Changelog
+## [1.3.1](https://github.com/klave-network/platform/compare/ui@1.3.0...ui@1.3.1) (2025-04-11)
+
+### Dependency Updates
+
+* `constants` updated to version `1.3.0`
+* `db` updated to version `1.3.0`
+* `api` updated to version `1.3.0`
+
+### Bug Fixes
+
+* **db,api,ui:** Upgrade `[@simplewebauthn](https://github.com/simplewebauthn)` and remove padding addition on `credentialID` ([70eb2e1](https://github.com/klave-network/platform/commit/70eb2e1493781e3774c5b7428343e4da510e92d3))
+* **ui:** Add required `title` attributes in `RunCommand` ([02b3b59](https://github.com/klave-network/platform/commit/02b3b59e7c20244b2f30e0a8874c98feaef62365))
+
 ## [1.3.0](https://github.com/klave-network/platform/compare/ui@1.2.0...ui@1.3.0) (2025-04-10)
 
 ### Dependency Updates
