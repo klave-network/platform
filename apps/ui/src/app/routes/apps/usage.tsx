@@ -14,6 +14,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { UilSpinner } from '@iconscout/react-unicons';
 import api from '../../utils/api';
 import CreditDisplay from '../../components/CreditDisplay';
+import prettyBytes from 'pretty-bytes';
 
 function ApplicationUsage() {
 
@@ -43,11 +44,52 @@ function ApplicationUsage() {
                 }
             },
             {
+                accessorKey: 'data.consumption.call_type',
+                header: 'Type',
+                size: 50,
+                cell: info => {
+                    const callType = info.getValue<UsageResult['data']['consumption']['call_type']>();
+                    return <span className="w-8 border rounded border-gray-400 bg-gray-100 text-gray-500 text-xs px-2">{callType}</span>;
+                }
+            },
+            {
                 accessorKey: 'data.consumption.fqdn',
                 header: 'FQDN',
                 cell: info => {
                     const fqdn = info.getValue<UsageResult['data']['consumption']['fqdn']>();
                     return <span title={fqdn} className='font-mono bg-gray-100 py-1 px-2 rounded truncate'>{fqdn}</span>;
+                }
+            },
+            {
+                accessorKey: 'data.consumption.ingress_in_bytes',
+                header: 'Ingress',
+                cell: info => {
+                    const bytes = info.getValue<UsageResult['data']['consumption']['ingress_in_bytes']>();
+                    return prettyBytes(bytes, { maximumFractionDigits: 2 });
+                }
+            },
+            {
+                accessorKey: 'data.consumption.egress_in_bytes',
+                header: 'Egress',
+                cell: info => {
+                    const bytes = info.getValue<UsageResult['data']['consumption']['egress_in_bytes']>();
+                    return prettyBytes(bytes, { maximumFractionDigits: 2 });
+                }
+            },
+            {
+                accessorKey: 'data.consumption.ledger_write_in_bytes',
+                header: 'Write',
+                cell: info => {
+                    const bytes = info.getValue<UsageResult['data']['consumption']['ledger_write_in_bytes']>();
+                    return prettyBytes(bytes, { maximumFractionDigits: 2 });
+                }
+            },
+            {
+                accessorKey: 'data.consumption.ledger_read_in_bytes',
+                header: 'Read',
+                cell: info => {
+                    const bytes = info.getValue<UsageResult['data']['consumption']['ledger_read_in_bytes']>();
+                    return prettyBytes(bytes, { maximumFractionDigits: 2 });
                 }
             },
             {
