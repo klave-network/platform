@@ -1,4 +1,11 @@
 # Changelog
+## [1.1.4](https://github.com/klave-network/platform/compare/dispatcher@1.1.3...dispatcher@1.1.4) (2025-04-11)
+
+
+### Bug Fixes
+
+* **dispatcher:** New Fastify API requires the response builder to be only awaited once ([7951e83](https://github.com/klave-network/platform/commit/7951e83a5a9e417b3f1abbaaf6958d014375b7fd))
+
 ## [1.1.3](https://github.com/klave-network/platform/compare/dispatcher@1.1.2...dispatcher@1.1.3) (2025-04-11)
 
 ### Dependency Updates
