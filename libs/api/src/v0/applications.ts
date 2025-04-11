@@ -16,7 +16,9 @@ export const applicationRouter = createTRPCRouter({
             const manifest = await prisma.application.findMany({
                 where: {
                     webId,
-                    deletedAt: null
+                    deletedAt: {
+                        isSet: false
+                    }
                 },
                 include: {
                     deployments: {
@@ -58,7 +60,9 @@ export const applicationRouter = createTRPCRouter({
 
             const apps = await prisma.application.findMany({
                 where: {
-                    deletedAt: null,
+                    deletedAt: {
+                        isSet: false
+                    },
                     organisation: {
                         OR: [{
                             id: orgId
@@ -363,7 +367,9 @@ export const applicationRouter = createTRPCRouter({
 
             const app = await prisma.application.findFirst({
                 where: {
-                    deletedAt: null,
+                    deletedAt: {
+                        isSet: false
+                    },
                     slug: appSlug,
                     organisationId: org.id
                 }
@@ -750,7 +756,9 @@ export const applicationRouter = createTRPCRouter({
 
                 const app = await prisma.application.findFirst({
                     where: {
-                        deletedAt: null,
+                        deletedAt: {
+                            isSet: false
+                        },
                         slug: appSlug,
                         organisationId: org.id
                     }
@@ -831,7 +839,9 @@ export const applicationRouter = createTRPCRouter({
             else if (applicationSlug && organisationId)
                 app = await prisma.application.findFirst({
                     where: {
-                        deletedAt: null,
+                        deletedAt: {
+                            isSet: false
+                        },
                         slug: applicationSlug,
                         organisationId: organisationId
                     }
@@ -883,7 +893,9 @@ export const applicationRouter = createTRPCRouter({
                 const { applicationSlug, organisationId } = input;
                 app = await prisma.application.findFirst({
                     where: {
-                        deletedAt: null,
+                        deletedAt: {
+                            isSet: false
+                        },
                         slug: applicationSlug,
                         organisationId: organisationId,
                         OR: [{
@@ -1050,7 +1062,9 @@ export const applicationRouter = createTRPCRouter({
 
             const app = await prisma.application.findFirst({
                 where: {
-                    deletedAt: null,
+                    deletedAt: {
+                        isSet: false
+                    },
                     organisationId: org.id,
                     slug: input.appSlug,
                     OR: [{
