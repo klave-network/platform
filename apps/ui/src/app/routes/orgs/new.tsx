@@ -44,7 +44,7 @@ export const OrgNew: FC = () => {
             </div>
             <div className="flex items-center space-x-3 sm:mt-7 mt-4" />
         </div>
-        <div className="sm:p-7 p-4">
+        <div className="sm:p-7 p-4 flex-grow">
             <form
                 onSubmit={(e) => {
                     e.preventDefault();

@@ -21,7 +21,7 @@ export const OrgListing: FC = () => {
                 </div>
                 <div className="flex items-center space-x-3 sm:mt-7 mt-4" />
             </div>
-            <div className="sm:p-7 p-4">
+            <div className="sm:p-7 p-4 flex-grow">
                 Select an organisation to browse the info
             </div>
         </>;
@@ -36,7 +36,7 @@ export const OrgListing: FC = () => {
                 </div>
                 <div className="flex items-center space-x-3 sm:mt-7 mt-4" />
             </div>
-            <div className="sm:p-7 p-4">
+            <div className="sm:p-7 p-4 flex-grow">
                 We are fetching data about your organisations.<br />
                 It will only take a moment...<br />
             </div>
@@ -52,7 +52,7 @@ export const OrgListing: FC = () => {
                 </div>
                 <div className="flex items-center space-x-3 sm:mt-7 mt-4" />
             </div>
-            <div className="sm:p-7 p-4">
+            <div className="sm:p-7 p-4 flex-grow">
                 We could not find an information about your organisations.<br />
                 Please try again in a little while.<br />
             </div>
@@ -98,7 +98,7 @@ export const OrgListing: FC = () => {
                 </NavLink>
             </div>
         </div>
-        <div className="sm:p-7 p-4">
+        <div className="sm:p-7 p-4 flex-grow">
             {outlet}
         </div>
     </>;
