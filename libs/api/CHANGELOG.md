@@ -1,4 +1,17 @@
 # Changelog
+## [1.3.1](https://github.com/klave-network/platform/compare/api@1.3.0...api@1.3.1) (2025-04-11)
+
+### Dependency Updates
+
+* `db` updated to version `1.3.0`
+* `constants` updated to version `1.3.0`
+* `providers` updated to version `1.3.0`
+
+### Bug Fixes
+
+* **api:** Ensuring queries can function when `deletedAt` is unset ([26af14e](https://github.com/klave-network/platform/commit/26af14e1545e42a26225100c70b43a3a6dc54f8c))
+* **db,api,ui:** Upgrade `[@simplewebauthn](https://github.com/simplewebauthn)` and remove padding addition on `credentialID` ([70eb2e1](https://github.com/klave-network/platform/commit/70eb2e1493781e3774c5b7428343e4da510e92d3))
+
 ## [1.3.0](https://github.com/klave-network/platform/compare/api@1.2.0...api@1.3.0) (2025-04-10)
 
 ### Dependency Updates
