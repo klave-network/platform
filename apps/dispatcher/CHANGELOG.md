@@ -1,4 +1,15 @@
 # Changelog
+## [1.1.3](https://github.com/klave-network/platform/compare/dispatcher@1.1.2...dispatcher@1.1.3) (2025-04-11)
+
+### Dependency Updates
+
+* `constants` updated to version `1.1.2`
+
+### Bug Fixes
+
+* **dispatcher,hubber:** Packaging issue with CJS ([9bcf47a](https://github.com/klave-network/platform/commit/9bcf47a5c3e3124e32e3b3b6a79d8435a9aa1685))
+* **dispatcher:** Reverting to `commonjs` compilation ([751a684](https://github.com/klave-network/platform/commit/751a6843732d5d0b43c12c8aec226076fc70feb9))
+
 ## [1.1.2](https://github.com/klave-network/platform/compare/dispatcher@1.1.1...dispatcher@1.1.2) (2025-04-09)
 
 ### Dependency Updates
