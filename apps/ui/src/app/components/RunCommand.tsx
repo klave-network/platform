@@ -206,10 +206,10 @@ export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = 
         <h3 className='mb-3'>Execution input</h3>
         <div className='flex'>
             {functions.length
-                ? <select name='klave-route-name' onChange={({ target }) => setRoute(target.value)} className="h-9 font-mono mb-2 bg-gray-900 text-gray-100 border border-gray-300 dark:border-gray-700 dark:text-white w-full text-sm" >
+                ? <select title='Route name' name='klave-route-name' onChange={({ target }) => setRoute(target.value)} className="h-9 font-mono mb-2 bg-gray-900 text-gray-100 border border-gray-300 dark:border-gray-700 dark:text-white w-full text-sm" >
                     {functions.map((f, i) => <option key={`function.${i}`} value={f}>{f}</option>)}
                 </select>
-                : <input type='text' value={route} onChange={({ target }) => setRoute(target.value)} className="h-9 font-mono mb-2 bg-gray-900 text-gray-100 border border-gray-300 dark:border-gray-700 dark:text-white w-full text-sm" />
+                : <input title='Route name' type='text' value={route} onChange={({ target }) => setRoute(target.value)} className="h-9 font-mono mb-2 bg-gray-900 text-gray-100 border border-gray-300 dark:border-gray-700 dark:text-white w-full text-sm" />
             }
             <button onClick={() => refetch()} className='btn btn-sm h-9 ml-1 mb-2 bg-gray-800 hover:bg-gray-600 text-gray-100 border border-gray-300 dark:border-gray-700 dark:text-white rounded-none text-sm font-normal'>Go</button>
         </div>
