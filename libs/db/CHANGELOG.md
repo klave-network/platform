@@ -1,4 +1,12 @@
 # Changelog
+## [1.3.1](https://github.com/klave-network/platform/compare/db@1.3.0...db@1.3.1) (2025-04-11)
+
+
+### Bug Fixes
+
+* **db,api,ui:** Upgrade `[@simplewebauthn](https://github.com/simplewebauthn)` and remove padding addition on `credentialID` ([70eb2e1](https://github.com/klave-network/platform/commit/70eb2e1493781e3774c5b7428343e4da510e92d3))
+* **db:** Usage data currently stored at UInt64 ([21c7da0](https://github.com/klave-network/platform/commit/21c7da057e63cfc1a5dfb7cb7462781651d2cc0e))
+
 ## [1.3.0](https://github.com/klave-network/platform/compare/db@1.2.0...db@1.3.0) (2025-04-10)
 
 
