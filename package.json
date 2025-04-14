@@ -253,7 +253,7 @@
         "jest-environment-jsdom": "29.7.0",
         "jest-environment-node": "^29.7.0",
         "jest-websocket-mock": "2.5.0",
-        "jsdom": "~26.0.0",
+        "jsdom": "~26.1.0",
         "lint-staged": "15.5.0",
         "mongodb-memory-server": "10.1.4",
         "nx": "19.8.14",
