@@ -9,6 +9,9 @@ let intervalTimer: NodeJS.Timeout;
 async function errorLongDeployingDeployments() {
     return prisma.deployment.updateMany({
         where: {
+            deletedAt: {
+                isSet: false
+            },
             status: {
                 // TODO Figure out what to with failing termination
                 in: ['created', 'compiling', 'compiled', 'deploying', 'terminating']
@@ -45,6 +48,9 @@ async function cleanDisconnectedDeployments() {
         (async () => {
             const deploymentsList = await prisma.deployment.findMany({
                 where: {
+                    deletedAt: {
+                        isSet: false
+                    },
                     status: {
                         in: ['deployed']
                     },
@@ -83,6 +89,9 @@ async function cleanDisconnectedDeployments() {
 async function terminateExpiredDeployments() {
     const expiredDeploymentList = await prisma.deployment.findMany({
         where: {
+            deletedAt: {
+                isSet: false
+            },
             status: {
                 in: ['deployed', 'errored']
             },
@@ -120,6 +129,9 @@ async function cancelUpdatingDeployments() {
 
     const expiredDeploymentList = await prisma.deployment.findMany({
         where: {
+            deletedAt: {
+                isSet: false
+            },
             status: {
                 in: ['updating']
             },
@@ -152,6 +164,9 @@ async function __unusedReconcileApplicationKredits() {
 
     const applicationsWithDeployments = await prisma.application.findMany({
         where: {
+            deletedAt: {
+                isSet: false
+            },
             deployments: {
                 some: {
                     status: {
