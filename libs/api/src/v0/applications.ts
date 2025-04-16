@@ -22,6 +22,11 @@ export const applicationRouter = createTRPCRouter({
                 },
                 include: {
                     deployments: {
+                        where: {
+                            deletedAt: {
+                                isSet: false
+                            }
+                        },
                         select: {
                             id: true,
                             set: true,
@@ -107,6 +112,11 @@ export const applicationRouter = createTRPCRouter({
                 },
                 include: {
                     deployments: {
+                        where: {
+                            deletedAt: {
+                                isSet: false
+                            }
+                        },
                         select: {
                             id: true,
                             set: true,
