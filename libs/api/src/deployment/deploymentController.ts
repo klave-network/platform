@@ -533,46 +533,6 @@ export const sendToSecretarium = async ({
         }
     }) : null;
 
-    const handleSuccess = async () => {
-        logger.debug(`Successfully ${targetRef ? 'updated' : 'registered'} smart contract: ${target}`);
-        await prisma.deployment.update({
-            where: {
-                id: deployment.id
-            },
-            data: {
-                status: 'deployed'
-            }
-        });
-        if (previousDeployment) {
-            logger.debug(`Deleting previous deployment ${previousDeployment.id} for ${target}`);
-            const createCaller = createCallerFactory(router);
-            const caller = createCaller({
-                prisma,
-                session: {},
-                override: '__system_post_deploy'
-            } as unknown as Context);
-            caller.v0.deployments.delete({
-                deploymentId: previousDeployment.id
-            }).catch((error) => {
-                logger.debug(`Failure while deleting previous deployment ${previousDeployment.id} for ${target}:, ${error}`);
-            });
-        }
-    };
-
-    const rollback = async () => {
-        if (previousDeployment) {
-            logger.debug(`Rolling back deployment ${previousDeployment.id}`);
-            await prisma.deployment.update({
-                where: {
-                    id: previousDeployment.id
-                },
-                data: {
-                    status: previousDeployment.status
-                }
-            });
-        }
-    };
-
     let currentSCP = scp;
     if (targetCluster) {
         logger.debug(`Using out-of-band deployment cluster ${targetCluster} for ${target}`);
@@ -604,6 +564,86 @@ export const sendToSecretarium = async ({
             currentSCP = sideSCP;
         }
     }
+
+    const handleSuccess = async () => {
+        logger.debug(`Successfully ${targetRef ? 'updated' : 'registered'} smart contract: ${target}`);
+        await prisma.deployment.update({
+            where: {
+                id: deployment.id
+            },
+            data: {
+                status: 'deployed'
+            }
+        });
+
+        logger.debug(`Setting default kredit limits for application ${deployment.applicationId}`);
+        await Sentry.startSpan({
+            name: 'SCP Subtask',
+            op: 'scp.task.kredit.transaction.allow',
+            description: 'Secretarium Task Transaction Kredit Allocation'
+        }, async () => {
+            return await new Promise((resolve, reject) => {
+
+                currentSCP.newTx('wasm-manager', 'set_allowed_kredit_per_transaction', `klave-app-set-transaction-limit-${deployment.applicationId}`, {
+                    app_id: deployment.applicationId,
+                    kredit: 100_000_000
+                }).onExecuted(result => {
+                    resolve(result);
+                }).onError(error => {
+                    reject(error);
+                }).send()
+                    .catch(reject);
+            });
+        });
+
+        await Sentry.startSpan({
+            name: 'SCP Subtask',
+            op: 'scp.task.kredit.query.allow',
+            description: 'Secretarium Task Query Kredit Allocation'
+        }, async () => {
+            return await new Promise((resolve, reject) => {
+
+                currentSCP.newTx('wasm-manager', 'set_allowed_kredit_per_query', `klave-app-set-query-limit-${deployment.applicationId}`, {
+                    app_id: deployment.applicationId,
+                    kredit: 1_000_000_000
+                }).onExecuted(result => {
+                    resolve(result);
+                }).onError(error => {
+                    reject(error);
+                }).send()
+                    .catch(reject);
+            });
+        });
+
+        if (previousDeployment) {
+            logger.debug(`Deleting previous deployment ${previousDeployment.id} for ${target}`);
+            const createCaller = createCallerFactory(router);
+            const caller = createCaller({
+                prisma,
+                session: {},
+                override: '__system_post_deploy'
+            } as unknown as Context);
+            caller.v0.deployments.delete({
+                deploymentId: previousDeployment.id
+            }).catch((error) => {
+                logger.debug(`Failure while deleting previous deployment ${previousDeployment.id} for ${target}:, ${error}`);
+            });
+        }
+    };
+
+    const rollback = async () => {
+        if (previousDeployment) {
+            logger.debug(`Rolling back deployment ${previousDeployment.id}`);
+            await prisma.deployment.update({
+                where: {
+                    id: previousDeployment.id
+                },
+                data: {
+                    status: previousDeployment.status
+                }
+            });
+        }
+    };
 
     await Sentry.startSpan({
         name: 'SCP Subtask',
