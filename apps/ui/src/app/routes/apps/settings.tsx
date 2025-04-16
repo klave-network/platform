@@ -130,7 +130,7 @@ const LimitEditor: FC<LimitEditorProps> = ({ type, kredits, application: { id } 
             <div className='leading-snug pt-1'>
                 <input type='text' value={currentValue.toString()} onChange={handleChange} className='input input-bordered inline border p-2 h-6 text-sm' /><br />
                 {isPending
-                    ? <span className='text-xs text-green-700'>Setting the new limit ... <UilSpinner className='inline-block animate-spin h-full' /></span>
+                    ? <span className='text-xs text-green-700'>Setting the new limit ... <UilSpinner className='inline-block animate-spin h-5' /></span>
                     : <span className='text-xs text-red-700'>{error?.message?.toString() ?? ''} &nbsp;</span>
                 }
             </div>

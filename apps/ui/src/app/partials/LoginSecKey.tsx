@@ -310,7 +310,7 @@ export const LoginSecKey: FC = () => {
                         : emailHint?.message
                             ? <span className="block mt-1 text-xs text-green-700 leading-tight">{emailHint?.message}</span>
                             : isCheckingEmailHint
-                                ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-full' /><br />&nbsp;</span>
+                                ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-5' /><br />&nbsp;</span>
                                 : <span className="block mt-1 text-xs leading-tight">&nbsp;<br />&nbsp;</span>}
                 </div>
                 <button disabled={isLoading || emailHint?.sucess === false} onClick={handleLoginSubmit} onSubmit={handleLoginSubmit} type='submit' className='btn btn-sm bg-blue-600 text-white hover:bg-blue-500 disabled:bg-slate-300 rounded-md'>{isLoading ? <UilSpinner className='inline-block animate-spin h-5' /> : isWebauthAvailable ? 'Log in with a passkey' : 'Log in with email code'}</button><br />
