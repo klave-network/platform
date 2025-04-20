@@ -13,7 +13,7 @@
         "@sentry/profiling-node": "7.120.3",
         "@sentry/types": "7.120.3",
         "esbuild-node-externals": "1.16.0",
-        "fastify": "~5.2.2",
+        "fastify": "~5.3.2",
         "git-rev-sync": "3.0.2",
         "mongodb": "6.13.1",
         "uuid": "^11.0.5",
