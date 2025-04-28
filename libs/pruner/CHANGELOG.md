@@ -1,4 +1,16 @@
 # Changelog
+## [1.0.6](https://github.com/klave-network/platform/compare/pruner@1.0.5...pruner@1.0.6) (2025-04-28)
+
+### Dependency Updates
+
+* `api` updated to version `1.0.5`
+* `providers` updated to version `1.0.5`
+* `constants` updated to version `1.0.5`
+
+### Bug Fixes
+
+* **pruner:** Correct loop deletion of deployments do to switch to `deletedAt` update ([d933f2a](https://github.com/klave-network/platform/commit/d933f2a9740204313f052f9c7191f207f3404416))
+
 ## [1.0.5](https://github.com/klave-network/platform/compare/pruner@1.0.4...pruner@1.0.5) (2025-04-11)
 
 ### Dependency Updates
