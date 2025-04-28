@@ -1,4 +1,17 @@
 # Changelog
+## [1.3.2](https://github.com/klave-network/platform/compare/ui@1.3.1...ui@1.3.2) (2025-04-28)
+
+### Dependency Updates
+
+* `constants` updated to version `1.3.1`
+* `api` updated to version `1.3.1`
+
+### Bug Fixes
+
+* **ui:** Correct a few icons height anchorage ([8321397](https://github.com/klave-network/platform/commit/8321397740c2dc264231048bb39e9bd7f904f526))
+* **ui:** Pulsing flask icon not correctly coloured ([a7a084f](https://github.com/klave-network/platform/commit/a7a084fe8a765811b57b3e9716abd3fef354c71b))
+* **ui:** Usage table would not display correct cost ([ac0d471](https://github.com/klave-network/platform/commit/ac0d471c622840be9679ec22cc3c0f67102f2b6a))
+
 ## [1.3.1](https://github.com/klave-network/platform/compare/ui@1.3.0...ui@1.3.1) (2025-04-11)
 
 ### Dependency Updates
