@@ -35,6 +35,7 @@ function ApplicationUsage() {
     const columns = useMemo<ColumnDef<UsageResult>[]>(
         () => [
             {
+                id: 'is_transaction',
                 accessorKey: 'data.consumption.is_transaction',
                 header: 'Class',
                 size: 50,
@@ -97,7 +98,8 @@ function ApplicationUsage() {
                 header: 'WASM',
                 cell: info => {
                     const CPUConsumption = info.getValue<UsageResult['data']['consumption']['cpu_consumption']>();
-                    return <CreditDisplay compact consumption={CPUConsumption} />;
+                    const isTransaction = info.row.getValue<UsageResult['data']['consumption']['is_transaction']>('is_transaction');
+                    return <CostDisplay type='wasm' scope={isTransaction ? 'transaction' : 'query'} compact consumption={CPUConsumption} />;
                 }
             },
             {
@@ -105,7 +107,8 @@ function ApplicationUsage() {
                 header: 'Native',
                 cell: info => {
                     const NativeConsumption = info.getValue<UsageResult['data']['consumption']['native_calls_consumption']>();
-                    return <CreditDisplay compact consumption={NativeConsumption} />;
+                    const isTransaction = info.row.getValue<UsageResult['data']['consumption']['is_transaction']>('is_transaction');
+                    return <CostDisplay type='native' scope={isTransaction ? 'transaction' : 'query'} compact consumption={NativeConsumption} />;
                 }
             },
             {
