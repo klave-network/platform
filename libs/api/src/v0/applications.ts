@@ -1,6 +1,6 @@
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import * as Sentry from '@sentry/node';
-import { probot, scp, scpOps } from '@klave/providers';
+import { logger, probot, scp, scpOps } from '@klave/providers';
 import type { Application, Limits } from '@klave/db';
 import { z } from 'zod';
 import { deployToSubstrate } from '../deployment/deploymentController';
@@ -452,6 +452,9 @@ export const applicationRouter = createTRPCRouter({
 
             return await prisma.application.findUnique({
                 where: {
+                    deletedAt: {
+                        isSet: false
+                    },
                     id: app.id,
                     OR: [{
                         organisation: {
@@ -573,6 +576,9 @@ export const applicationRouter = createTRPCRouter({
                 return [appName, await (async () => {
                     const existingApp = await prisma.application.findFirst({
                         where: {
+                            deletedAt: {
+                                isSet: false
+                            },
                             organisationId,
                             slug: appSlug
                         }
@@ -618,6 +624,9 @@ export const applicationRouter = createTRPCRouter({
                     const appSlug = appName.replaceAll(/\W/g, '-').toLocaleLowerCase();
                     const existingApp = await prisma.application.findFirst({
                         where: {
+                            deletedAt: {
+                                isSet: false
+                            },
                             organisationId,
                             slug: appSlug
                         }
@@ -682,6 +691,8 @@ export const applicationRouter = createTRPCRouter({
                             // owner: webId ?? emphemeralKlaveTag ?? sessionID lklk
                         }
                     });
+
+                    logger.debug(`Registering application ${appSlug} (${newApp.id})`);
 
                     const installationOctokit = await probot.auth(parseInt(deployableRepo.installationRemoteId));
 
