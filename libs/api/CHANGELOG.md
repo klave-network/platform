@@ -1,4 +1,17 @@
 # Changelog
+## [1.3.2](https://github.com/klave-network/platform/compare/api@1.3.1...api@1.3.2) (2025-04-28)
+
+### Dependency Updates
+
+* `constants` updated to version `1.3.1`
+* `providers` updated to version `1.3.1`
+
+### Bug Fixes
+
+* **api:** Application deleted wrongly selected ([afb9997](https://github.com/klave-network/platform/commit/afb9997ac247975085ddc2c6948289c54c0374f1))
+* **api:** Compilation would not correctly extract route names ([1f4fd6c](https://github.com/klave-network/platform/commit/1f4fd6cf1d88d71c93c01ad96afa3fbdc70d22dd))
+* **api:** Filter out deleted deployment in application listing ([d891322](https://github.com/klave-network/platform/commit/d8913229acae716f7f0d87a6469499944384955e))
+
 ## [1.3.1](https://github.com/klave-network/platform/compare/api@1.3.0...api@1.3.1) (2025-04-11)
 
 ### Dependency Updates
