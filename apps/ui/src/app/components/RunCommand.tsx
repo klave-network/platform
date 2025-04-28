@@ -196,7 +196,7 @@ export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = 
         <h2 className='font-bold mb-3'>Command runner</h2>
         <h3 className='mb-3'>Session identity</h3>
         <div onDrop={handleFileDrop} onDragOverCapture={handleDragOver} onDragLeaveCapture={handleDragLeave} className={`flex box-content ${isHoveringKeys ? ' bg-gray-100' : ''}`}>
-            <select name='klave-route-name' value={selectedPointer} onChange={({ target }) => setSelectedPointer(target.value)} className={`${isHoveringKeys ? 'bg-cyan-700' : 'bg-gray-900'} justify-center align-middle items-center h-9 font-mono mb-2 text-gray-100 border border-gray-300 dark:border-gray-700 dark:text-white w-1/3 text-sm`} >
+            <select title='Route name' name='klave-route-name' value={selectedPointer} onChange={({ target }) => setSelectedPointer(target.value)} className={`${isHoveringKeys ? 'bg-cyan-700' : 'bg-gray-900'} justify-center align-middle items-center h-9 font-mono mb-2 text-gray-100 border border-gray-300 dark:border-gray-700 dark:text-white w-1/3 text-sm`} >
                 <option key='none' value="none" className='h-5'>Ephemeral</option>
                 {connectionKeys?.map((k) => <option key={`key.${k.name}`} value={k.name}>{k.name}</option>)}
             </select>

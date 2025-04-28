@@ -135,7 +135,7 @@ const CreditCellEdit: FC<{
         return <div className='flex gap-4 items-center align-middle justify-end grow'>
             <BalanceDisplay kredits={currentValue} size='small' justify='end' className='w-30' />
             <div className='leading-snug pt-1'>
-                <input type="range" min={0} max={Number(kredits + max)} onChange={handleChange} value={currentValue} className={`range range-xs w-40 ${error ? 'range-error' : 'range-info'}`} /><br />
+                <input title="Kredit" type="range" min={0} max={Number(kredits + max)} onChange={handleChange} value={currentValue} className={`range range-xs w-40 ${error ? 'range-error' : 'range-info'}`} /><br />
                 <span className='text-xs text-red-700'>{error?.message?.toString() ?? ''} &nbsp;</span>
             </div>
             <button disabled={isPending} onClick={allocateCredit} className='btn btn-sm flex rounded-sm border border-slate-300 bg-slate-100 p-0 h-7 w-7 items-center justify-center hover:bg-slate-200 hover:cursor-pointer'>
@@ -145,7 +145,7 @@ const CreditCellEdit: FC<{
 
     return <div className='flex gap-4 items-center align-middle justify-end grow'>
         <BalanceDisplay kredits={kreditValue} size='small' justify='end' className='w-30' />
-        <button disabled={isPending} onClick={toggleEditing} className='btn btn-sm flex rounded-sm border border-slate-300 bg-slate-100 p-0 h-7 w-7 items-center justify-center hover:bg-slate-200 hover:cursor-pointer'>
+        <button title="Edit" disabled={isPending} onClick={toggleEditing} className='btn btn-sm flex rounded-sm border border-slate-300 bg-slate-100 p-0 h-7 w-7 items-center justify-center hover:bg-slate-200 hover:cursor-pointer'>
             <UilEdit className='h-4 w-4' />
         </button>
     </div>;
