@@ -13,7 +13,7 @@ import { useParams } from 'react-router-dom';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { UilSpinner } from '@iconscout/react-unicons';
 import api from '../../utils/api';
-import CreditDisplay from '../../components/CreditDisplay';
+import CostDisplay from '../../components/CostDisplay';
 import prettyBytes from 'pretty-bytes';
 
 function ApplicationUsage() {
@@ -97,7 +97,7 @@ function ApplicationUsage() {
                 header: 'WASM',
                 cell: info => {
                     const CPUConsumption = info.getValue<UsageResult['data']['consumption']['cpu_consumption']>();
-                    return <CreditDisplay compact kredits={CPUConsumption} />;
+                    return <CreditDisplay compact consumption={CPUConsumption} />;
                 }
             },
             {
@@ -105,7 +105,7 @@ function ApplicationUsage() {
                 header: 'Native',
                 cell: info => {
                     const NativeConsumption = info.getValue<UsageResult['data']['consumption']['native_calls_consumption']>();
-                    return <CreditDisplay compact kredits={NativeConsumption} />;
+                    return <CreditDisplay compact consumption={NativeConsumption} />;
                 }
             },
             {

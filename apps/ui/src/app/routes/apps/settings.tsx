@@ -6,7 +6,7 @@ import api from '../../utils/api';
 import { useZodForm } from '../../utils/useZodForm';
 import { z } from 'zod';
 import { useEffect } from 'react';
-import CreditDisplay from '../../components/CreditDisplay';
+import BalanceDisplay from '../../components/BalanceDisplay';
 import { Application } from '@klave/db';
 import { useToggle } from 'usehooks-ts';
 
@@ -140,7 +140,7 @@ const LimitEditor: FC<LimitEditorProps> = ({ type, kredits, application: { id } 
     if (kreditValue === 0)
         return <b><span className='text-klave-light-blue'>Unlimited</span> <UilEdit onClick={() => toggleEditing()} className='inline-block h-3 hover:cursor-pointer' /></b>;
 
-    return <b><CreditDisplay compact={true} kredits={kredits} /> <UilEdit onClick={() => toggleEditing()} className='inline-block h-3 hover:cursor-pointer' /></b>;
+    return <b><BalanceDisplay compact={true} kredits={kredits} /> <UilEdit onClick={() => toggleEditing()} className='inline-block h-3 hover:cursor-pointer' /></b>;
 };
 
 export const AppSettings: FC = () => {
@@ -277,7 +277,7 @@ export const AppSettings: FC = () => {
         <div>
             <h1 className='font-bold text-xl mb-5'>Credit allocation</h1>
             <p>
-                Balance: <b><CreditDisplay kredits={application.kredits} /></b><br />
+                Balance: <b><BalanceDisplay kredits={application.kredits} /></b><br />
                 <Link to={`/organisation/${orgSlug}/credits`} className='text-klave-light-blue hover:underline'>Manage credit allocations</Link>
             </p>
         </div>

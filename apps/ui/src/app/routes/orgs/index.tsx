@@ -88,7 +88,7 @@ export const OrgListing: FC = () => {
                     Clusters
                 </NavLink>
                 <NavLink to={`/organisation/${orgSlug}/credits`} className={({ isActive }) => `px-3 pb-1.5 border-b-2 ${isActive ? 'border-klave-light-blue text-klave-light-blue dark:text-white dark:border-white font-bold' : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-klave-light-blue'}`}>
-                    Credits
+                    Balance
                 </NavLink>
                 <NavLink to={`/organisation/${orgSlug}/members`} className={({ isActive }) => `px-3 pb-1.5 border-b-2 ${isActive ? 'border-klave-light-blue text-klave-light-blue dark:text-white dark:border-white font-bold' : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-klave-light-blue'}`}>
                     Members

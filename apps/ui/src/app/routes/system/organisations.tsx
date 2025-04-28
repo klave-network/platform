@@ -12,7 +12,7 @@ import {
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { UilSpinner } from '@iconscout/react-unicons';
 import api from '../../utils/api';
-import CreditDisplay from '../../components/CreditDisplay';
+import BalanceDisplay from '../../components/BalanceDisplay';
 
 function Organisations() {
 
@@ -55,7 +55,7 @@ function Organisations() {
             {
                 accessorKey: 'kredits',
                 header: 'Kredits',
-                cell: info => <CreditDisplay compact kredits={info.getValue<number>()} />
+                cell: info => <BalanceDisplay compact kredits={info.getValue<number>()} />
             },
             {
                 accessorKey: 'id',

@@ -7,7 +7,7 @@ import { Application } from '@klave/db';
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
 import api, { httpApi } from '../../utils/api';
 import { useToggle } from 'usehooks-ts';
-import CreditDisplay from '../../components/CreditDisplay';
+import BalanceDisplay from '../../components/BalanceDisplay';
 
 // Make sure to call loadStripe outside of a component’s render to avoid
 // recreating the Stripe object on every render.
@@ -64,14 +64,14 @@ const OrganisationAddCredit = () => {
         <AlertDialog.Trigger asChild onClick={() => {
             setSearchParams();
         }}>
-            <button title='Add credits' className="btn btn-sm mt-3 h-8 inline-flex items-center justify-center text-slate-500 text-md font-normalmt-auto">
-                <Uil0Plus className='inline-block h-4 w-4' /> Add credits
+            <button title='Add blance credits' className="btn btn-sm mt-3 h-8 inline-flex items-center justify-center text-slate-500 text-md font-normalmt-auto">
+                <Uil0Plus className='inline-block h-4 w-4' /> Add blance credits
             </button>
         </AlertDialog.Trigger>
         <AlertDialog.Portal>
             <AlertDialog.Overlay className="AlertDialogOverlay" />
             <AlertDialog.Content className="AlertDialogContent overflow-auto w-[calc(412px)]">
-                <AlertDialog.Title className="AlertDialogTitle mb-4">Add credit to your organisation</AlertDialog.Title>
+                <AlertDialog.Title className="AlertDialogTitle mb-4">Add blance credit to your organisation</AlertDialog.Title>
                 <AlertDialog.Description className="AlertDialogDescription" asChild>
                     <CheckoutForm />
                 </AlertDialog.Description>
@@ -133,7 +133,7 @@ const CreditCellEdit: FC<{
 
     if (isEditing)
         return <div className='flex gap-4 items-center align-middle justify-end grow'>
-            <CreditDisplay kredits={currentValue} size='small' justify='end' className='w-30' />
+            <BalanceDisplay kredits={currentValue} size='small' justify='end' className='w-30' />
             <div className='leading-snug pt-1'>
                 <input type="range" min={0} max={Number(kredits + max)} onChange={handleChange} value={currentValue} className={`range range-xs w-40 ${error ? 'range-error' : 'range-info'}`} /><br />
                 <span className='text-xs text-red-700'>{error?.message?.toString() ?? ''} &nbsp;</span>
@@ -144,7 +144,7 @@ const CreditCellEdit: FC<{
         </div>;
 
     return <div className='flex gap-4 items-center align-middle justify-end grow'>
-        <CreditDisplay kredits={kreditValue} size='small' justify='end' className='w-30' />
+        <BalanceDisplay kredits={kreditValue} size='small' justify='end' className='w-30' />
         <button disabled={isPending} onClick={toggleEditing} className='btn btn-sm flex rounded-sm border border-slate-300 bg-slate-100 p-0 h-7 w-7 items-center justify-center hover:bg-slate-200 hover:cursor-pointer'>
             <UilEdit className='h-4 w-4' />
         </button>
@@ -187,7 +187,7 @@ export const OrganisationCredits: FC = () => {
         <div>
             <h1 className='font-bold text-xl mb-5'>Total Balance</h1>
             <p>
-                Balance: <b><CreditDisplay kredits={organisation.kredits} /></b><br />
+                Balance: <b><BalanceDisplay kredits={organisation.kredits} /></b><br />
                 {isReturningFromCheckout
                     ? <>
                         <span className='text-green-700'>Thank you for your purchase! We are updating your balance...</span>
