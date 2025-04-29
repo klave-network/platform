@@ -5,8 +5,9 @@ import { publicProcedure, createTRPCRouter } from '../trpc';
 import { webcrypto } from 'node:crypto';
 import { createTransport } from 'nodemailer';
 import FakeMailGuard from 'fakemail-guard';
-import { AuthenticatorTransportFuture, GenerateRegistrationOptionsOpts, generateAuthenticationOptions, generateRegistrationOptions, verifyAuthenticationResponse, verifyRegistrationResponse } from '@simplewebauthn/server';
+import { GenerateRegistrationOptionsOpts, generateAuthenticationOptions, generateRegistrationOptions, verifyAuthenticationResponse, verifyRegistrationResponse } from '@simplewebauthn/server';
 import { type startRegistration, type startAuthentication } from '@simplewebauthn/browser';
+import { Utils } from '@secretarium/connector';
 // import * as passport from 'passport';
 import { z } from 'zod';
 import { render } from '@react-email/components';
@@ -412,7 +413,7 @@ export const authRouter = createTRPCRouter({
         .mutation(async ({ ctx: { prisma, session, sessionStore }, input: { email, data } }) => {
 
             const credId = data.id;
-            // const credId = data.id.padEnd(data.id.length + 4 - data.id.length % 4, '=');
+            const credIdPadded = data.id.padEnd(data.id.length + 4 - data.id.length % 4, '=');
             logger.debug(`wan: Seeking credID ${credId} for email ${email}`);
             const user = await prisma.user.findFirst({
                 where: {
@@ -421,7 +422,9 @@ export const authRouter = createTRPCRouter({
                     },
                     webauthCredentials: {
                         some: {
-                            credentialID: credId
+                            credentialID: {
+                                in: [credId, credIdPadded]
+                            }
                         }
                     }
                 },
@@ -452,9 +455,9 @@ export const authRouter = createTRPCRouter({
                 };
             }
 
-            const credential = user?.webauthCredentials.find(cred => cred.credentialID === credId);
+            const authenticator = user?.webauthCredentials.find(cred => cred.credentialID === credId);
 
-            if (!credential) {
+            if (!authenticator) {
                 logger.debug('wan: Authenticator could not be found');
                 return {
                     ok: false,
@@ -470,11 +473,10 @@ export const authRouter = createTRPCRouter({
                 expectedChallenge: `${user.webauthChallenge}`,
                 expectedOrigin: origin,
                 expectedRPID: rpID,
-                credential: {
-                    id: credential.credentialID,
-                    publicKey: new Uint8Array(credential.credentialPublicKey),
-                    counter: credential.counter,
-                    transports: credential.credentialTransport?.split(',') as AuthenticatorTransportFuture[]
+                authenticator: {
+                    credentialPublicKey: Utils.fromBase64(authenticator.credentialPublicKey),
+                    credentialID: authenticator.credentialID,
+                    counter: authenticator.counter
                 }
             };
 
@@ -493,7 +495,7 @@ export const authRouter = createTRPCRouter({
 
             await prisma.webauthCredential.update({
                 where: {
-                    id: credential.id
+                    id: authenticator.id
                 },
                 data: {
                     counter: newCounter
@@ -555,8 +557,7 @@ export const authRouter = createTRPCRouter({
                     }
                 },
                 select: {
-                    id: true,
-                    webauthCredentials: true
+                    id: true
                 }
             });
 
@@ -586,13 +587,8 @@ export const authRouter = createTRPCRouter({
                 //     type: 'public-key',
                 //     transports: dev.transports
                 // })),
-                // excludeCredentials: user?.webauthCredentials.map(cred => ({
-                //     id: cred.credentialID
-                // })) ?? [],
                 authenticatorSelection: {
-                    residentKey: 'preferred',
-                    userVerification: 'preferred',
-                    authenticatorAttachment: 'platform'
+                    residentKey: 'discouraged'
                 },
                 // Support the two most common algorithms: ES256, and RS256
                 supportedAlgorithmIDs: [-7, -257]
@@ -664,16 +660,13 @@ export const authRouter = createTRPCRouter({
                 };
 
             const {
-                credential: {
-                    id: credentialID,
-                    publicKey: credentialPublicKey,
-                    counter,
-                    transports: credentialTransport
-                },
+                credentialPublicKey,
+                credentialID,
                 credentialType,
                 credentialDeviceType,
                 credentialBackedUp,
                 userVerified,
+                counter,
                 aaguid
             } = registrationInfo;
 
@@ -685,9 +678,8 @@ export const authRouter = createTRPCRouter({
                                 id: user.id
                             }
                         },
-                        credentialPublicKey: [...credentialPublicKey],
+                        credentialPublicKey: Utils.toBase64(credentialPublicKey, true),
                         credentialID,
-                        credentialTransport: credentialTransport?.join(','),
                         credentialType,
                         credentialDeviceType,
                         credentialBackedUp,

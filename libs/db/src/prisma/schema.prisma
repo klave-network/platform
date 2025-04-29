@@ -83,11 +83,10 @@ model WebauthCredential {
     user                 User     @relation(fields: [userId], references: [id])
     userId               String
     credentialID         String
-    credentialPublicKey  Int[]
+    credentialPublicKey  String
     credentialType       String
     credentialDeviceType String
     credentialBackedUp   Boolean
-    credentialTransport  String?
     userVerified         Boolean
     aaguid               String
     counter              Int
@@ -413,15 +412,10 @@ type UsageDataConsumption {
     fqdn                     String
     wasm_hash                String
     request_id               String
-    call_type                String
     is_transaction           Boolean
     timestamp                Int
     cpu_consumption          Int
     native_calls_consumption Int
-    ingress_in_bytes         Int
-    egress_in_bytes          Int
-    ledger_write_in_bytes    Int
-    ledger_read_in_bytes     Int
 }
 
 type UsageData {
