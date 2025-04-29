@@ -88,6 +88,11 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
     const repo = await prisma.repo.findUnique({
         include: {
             applications: {
+                where: {
+                    deletedAt: {
+                        isSet: false
+                    }
+                },
                 include: {
                     organisation: true
                 }
@@ -208,6 +213,9 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                         try {
                             const previousDeployment = await prisma.deployment.findFirst({
                                 where: {
+                                    deletedAt: {
+                                        isSet: false
+                                    },
                                     deploymentAddress: {
                                         fqdn: target
                                     },
@@ -255,7 +263,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
 
                             contextualDeploymentId = deployment.id;
 
-                            logger.debug(`Starting compilation ${deployment.id} ...`, {
+                            logger.debug(`Starting compilation ${deployment.id} for target ${target}...`, {
                                 parent: 'dpl'
                             });
 
@@ -295,11 +303,17 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                     });
 
                                     if (!currentState) {
+                                        logger.debug(`Deployment ${deployment.id} is no longer available`, {
+                                            parent: 'dpl'
+                                        });
                                         clearInterval(CompletionPollingInterval);
                                         return;
                                     }
 
                                     if (currentState.status === 'deployed' || currentState.status === 'errored') {
+                                        logger.debug(`Deployment ${deployment.id} already completed`, {
+                                            parent: 'dpl'
+                                        });
                                         clearInterval(CompletionPollingInterval);
                                         return;
                                     }

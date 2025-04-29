@@ -543,6 +543,11 @@ export const applicationRouter = createTRPCRouter({
                 orderBy: {
                     id: 'asc'
                 },
+                where: {
+                    deletedAt: {
+                        isSet: false
+                    }
+                },
                 include: {
                     organisation: true,
                     deployments: true
