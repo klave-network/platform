@@ -1,4 +1,11 @@
 # Changelog
+## [1.3.3](https://github.com/klave-network/platform/compare/ui@1.3.2...ui@1.3.3) (2025-04-29)
+
+
+### Bug Fixes
+
+* **ui:** Primer CSS import is included higher ([ed6e520](https://github.com/klave-network/platform/commit/ed6e5201a63ef96836dc6dbbca4919926fa9af79))
+
 ## [1.3.2](https://github.com/klave-network/platform/compare/ui@1.3.1...ui@1.3.2) (2025-04-28)
 
 ### Dependency Updates
