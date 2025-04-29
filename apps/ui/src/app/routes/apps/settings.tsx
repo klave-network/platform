@@ -259,7 +259,14 @@ export const AppSettings: FC = () => {
             </button>
         </form>
         <div>
-            <h1 className='font-bold text-xl mb-5'>Repository information</h1>
+            <h1 className='font-bold text-xl mb-5'>Information</h1>
+            <p>
+                Name: <b>{application.slug.replace('~$~', '')}</b><br />
+                ID: <b className='font-mono'>{application.id}</b><br />
+            </p>
+        </div>
+        <div>
+            <h1 className='font-bold text-xl mb-5'>Repository</h1>
             <p>
                 Source: <b>{application.repo.source}</b><br />
                 Owner: <b>{application.repo.owner}</b><br />

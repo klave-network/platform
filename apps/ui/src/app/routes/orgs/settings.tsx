@@ -141,9 +141,10 @@ export const OrganisationSettings: FC = () => {
             </button>
         </form>
         <div>
-            <h1 className='font-bold text-xl mb-5'>Organisation information</h1>
+            <h1 className='font-bold text-xl mb-5'>Information</h1>
             <p>
                 Name: <b>{organisation.slug.replace('~$~', '')}</b><br />
+                ID: <b className='font-mono'>{organisation.id}</b><br />
             </p>
         </div>
         <div>
