@@ -659,7 +659,10 @@ export const sendToSecretarium = async ({
                 // own_enclave: true,
             })
                 .onResult((result) => {
-                    logger.debug(`Received unexpected message during ${!targetRef ? 'update' : 'registration'} of smart contract ${target}: ${JSON.stringify(result)}`);
+                    const errorString = JSON.stringify(result);
+                    if (errorString.includes('deployed'))
+                        return;
+                    logger.debug(`Received unexpected message during ${!targetRef ? 'update' : 'registration'} of smart contract ${target}: ${errorString}`);
                 })
                 .onExecuted(() => {
                     (async () => {
