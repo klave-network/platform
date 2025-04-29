@@ -127,7 +127,16 @@ function ApplicationUsage() {
 
     //we must flatten the array of arrays from the useInfiniteQuery hook
     const flatData = useMemo(
-        () => data?.pages?.flatMap(page => page.data) ?? [],
+        () => {
+            // Remove duplicate entries here
+            // TODO: This is a temporary fix, we need to handle this in the backend
+            const workingArray = data?.pages?.flatMap(page => page.data) ?? [];
+            const workingMap = new Map<string, UsageResult>();
+            workingArray.forEach(item => {
+                workingMap.set(item.id, item);
+            });
+            return Array.from(workingMap.values());
+        },
         [data]
     );
     const totalDBRowCount = data?.pages?.[0]?.meta?.totalRowCount ?? 0;
