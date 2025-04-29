@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import prettyBytes from 'pretty-bytes';
 
 type CostDisplayProps = {
     consumption: bigint | number;
@@ -41,7 +42,7 @@ const CostDisplay: FC<CostDisplayProps> = ({ consumption, type, scope, compact, 
 
     return <span className={`flex flex-col flex-shrink justify-start items-${justify ?? 'start'} ${className ?? ''}`} >
         <span className={`text-klave-light-blue font-bold ${size === 'small' ? 'text-xl' : size === 'medium' ? 'text-2xl' : 'text-3xl'}`}>{isNonNilTinyAmount ? '~' : ''}£{currencyValue.toFixed(2)}</span>
-        <span className="text-slate-300 text-xs">{consumptionNumber.toString()} {(type === 'wasm' || type === 'native') ? 'Kredits' : 'Bytes'}</span>
+        <span className="text-slate-300 text-xs">{(type === 'wasm' || type === 'native') ? `${consumptionNumber.toString()} Kredits` : prettyBytes(consumptionNumber, { maximumFractionDigits: 2 })}</span>
     </span>;
 };
 

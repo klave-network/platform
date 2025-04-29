@@ -14,7 +14,6 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { UilSpinner } from '@iconscout/react-unicons';
 import api from '../../utils/api';
 import CostDisplay from '../../components/CostDisplay';
-import prettyBytes from 'pretty-bytes';
 
 function ApplicationUsage() {
 
@@ -66,7 +65,8 @@ function ApplicationUsage() {
                 header: 'Ingress',
                 cell: info => {
                     const bytes = info.getValue<UsageResult['data']['consumption']['ingress_in_bytes']>();
-                    return prettyBytes(bytes, { maximumFractionDigits: 2 });
+                    const isTransaction = info.row.getValue<UsageResult['data']['consumption']['is_transaction']>('is_transaction');
+                    return <CostDisplay type='ingress' scope={isTransaction ? 'transaction' : 'query'} compact consumption={bytes} />;
                 }
             },
             {
@@ -74,7 +74,8 @@ function ApplicationUsage() {
                 header: 'Egress',
                 cell: info => {
                     const bytes = info.getValue<UsageResult['data']['consumption']['egress_in_bytes']>();
-                    return prettyBytes(bytes, { maximumFractionDigits: 2 });
+                    const isTransaction = info.row.getValue<UsageResult['data']['consumption']['is_transaction']>('is_transaction');
+                    return <CostDisplay type='egress' scope={isTransaction ? 'transaction' : 'query'} compact consumption={bytes} />;
                 }
             },
             {
@@ -82,7 +83,8 @@ function ApplicationUsage() {
                 header: 'Write',
                 cell: info => {
                     const bytes = info.getValue<UsageResult['data']['consumption']['ledger_write_in_bytes']>();
-                    return prettyBytes(bytes, { maximumFractionDigits: 2 });
+                    const isTransaction = info.row.getValue<UsageResult['data']['consumption']['is_transaction']>('is_transaction');
+                    return <CostDisplay type='write' scope={isTransaction ? 'transaction' : 'query'} compact consumption={bytes} />;
                 }
             },
             {
@@ -90,7 +92,8 @@ function ApplicationUsage() {
                 header: 'Read',
                 cell: info => {
                     const bytes = info.getValue<UsageResult['data']['consumption']['ledger_read_in_bytes']>();
-                    return prettyBytes(bytes, { maximumFractionDigits: 2 });
+                    const isTransaction = info.row.getValue<UsageResult['data']['consumption']['is_transaction']>('is_transaction');
+                    return <CostDisplay type='read' scope={isTransaction ? 'transaction' : 'query'} compact consumption={bytes} />;
                 }
             },
             {
