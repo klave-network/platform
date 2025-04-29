@@ -1,4 +1,11 @@
 # Changelog
+## [1.3.3](https://github.com/klave-network/platform/compare/api@1.3.2...api@1.3.3) (2025-04-29)
+
+
+### Bug Fixes
+
+* **api:** Avoid displaying `unexpected message` when deployment succeeded ([29a0f79](https://github.com/klave-network/platform/commit/29a0f790bc48828b0a099aab824341bf02e52ab4))
+
 ## [1.3.2](https://github.com/klave-network/platform/compare/api@1.3.1...api@1.3.2) (2025-04-28)
 
 ### Dependency Updates
