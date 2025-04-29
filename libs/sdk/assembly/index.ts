@@ -23,6 +23,12 @@ declare function runtime_notify(s: ArrayBuffer): void;
 @external("env", "read_ledger")
 declare function runtime_read_ledger_raw(table: ArrayBuffer, key: ArrayBuffer, key_size: i32, value: ArrayBuffer, value_size: i32): i32;
 // @ts-ignore: decorator
+@external("env", "list_keys_from_ledger")
+declare function runtime_list_keys_from_ledger(table: ArrayBuffer, result: ArrayBuffer, result_size: i32): i32;
+// @ts-ignore: decorator
+@external("env", "key_exists_in_ledger")
+declare function runtime_key_exists_in_ledger(table: ArrayBuffer, key: ArrayBuffer, key_size: i32, value: ArrayBuffer, value_size: i32): i32;
+// @ts-ignore: decorator
 @external("env", "write_ledger")
 declare function runtime_write_ledger_raw(table: ArrayBuffer, key: ArrayBuffer, key_size: i32, value: ArrayBuffer, value_size: i32, error: ArrayBuffer, error_size: i32): i32;
 // @ts-ignore: decorator
@@ -67,6 +73,11 @@ export class Router {
     }
 }
 
+@json
+export class LedgerTableKeys {
+    keys: Array<u8>[] = [];
+}
+
 class Table {
 
     table: ArrayBuffer;
@@ -103,6 +114,42 @@ class Table {
         let k = String.UTF8.encode(key, true);
         let buf = new ArrayBuffer(64);
         return runtime_remove_from_ledger_raw(this.table, k, k.byteLength, buf, buf.byteLength);
+    }
+
+    listKeys(): Array<string> 
+    {
+        let value = new ArrayBuffer(64);
+        let result = runtime_list_keys_from_ledger(this.table, value, value.byteLength);
+        if (abs(result) > value.byteLength) {
+            // buffer not big enough, retry with a properly sized one
+            value = new ArrayBuffer(abs(result));
+            result = runtime_list_keys_from_ledger(this.table, value, value.byteLength);
+        }
+        if (result < 0)
+            return []; //TODO: Report error
+        let keys = String.UTF8.decode(value.slice(0, result), true);
+        let ledgerTableKeyObject = JSON.parse<LedgerTableKeys>(keys);
+        // intialize the keys array
+        let keysArray = new Array<string>(ledgerTableKeyObject.keys.length);
+        //Convert ArrayBuffer to string and retun an array of strings
+        for (let i = 0; i < ledgerTableKeyObject.keys.length; i++) {
+            let buffer = new ArrayBuffer(ledgerTableKeyObject.keys[i].length);
+            let bufferView = Uint8Array.wrap(buffer);
+            for (let j = 0; j < ledgerTableKeyObject.keys[i].length; j++) {
+                bufferView[j] = ledgerTableKeyObject.keys[i][j];
+            }
+            keysArray[i] = String.UTF8.decode(buffer, true);
+        }
+        return keysArray;
+    }
+
+    keyExists(key: string): boolean {
+        let k = String.UTF8.encode(key, true);
+        let buf = new ArrayBuffer(64);
+        const result = runtime_key_exists_in_ledger(this.table, k, k.byteLength, buf, buf.byteLength);
+        if (result < 0)
+            return false;
+        return String.UTF8.decode(buf.slice(0, result)) == 'true';
     }
 }
 
