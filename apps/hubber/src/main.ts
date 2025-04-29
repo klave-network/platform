@@ -1,4 +1,4 @@
-import { startPruner } from '@klave/pruner';
+// import { startPruner } from '@klave/pruner';
 import { start } from './app';
 import './i18n';
 import { dbOps } from './utils/db';
@@ -36,7 +36,7 @@ const serverHandle = dbOps.initialize()
                 .catch(() => { return; });
         });
 
-        startPruner();
+        // startPruner();
 
         return server;
 
