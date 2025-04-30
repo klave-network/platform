@@ -9621,10 +9621,10 @@ csrf-csrf@3.2.2:
   dependencies:
     http-errors "^2.0.0"
 
-csrf-sync@4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/csrf-sync/-/csrf-sync-4.1.0.tgz#2561a417d4558aa3b0c0495be80066037cae1f23"
-  integrity sha512-bEA+AwaBbXkf6k4UHg0JGuGpuVs+HiOX4KjoZmbvxIhtKl+8ND7OOElgbaR59qSPtvfvXIyCnmAPYzsND+EZhA==
+csrf-sync@4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/csrf-sync/-/csrf-sync-4.2.0.tgz#3b182a09dc42c9d1900c2a3d0c97a9d5088e5e53"
+  integrity sha512-WdxMehlhL1dB7qnkyXM90GEU4M1ovwvxrZk6mtP7PD32Uw0j01AP6hgTPl6iBqKaMX/Os0NnLWHi8shYw8Idzw==
   dependencies:
     http-errors "^2.0.0"
 

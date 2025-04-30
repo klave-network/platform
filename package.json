@@ -109,7 +109,7 @@
         "cors": "2.8.5",
         "cross-spawn": "7.0.6",
         "csrf-csrf": "3.2.2",
-        "csrf-sync": "4.1.0",
+        "csrf-sync": "4.2.0",
         "daisyui": "4.12.24",
         "expect-ct": "1.0.0",
         "express": "4.21.2",
