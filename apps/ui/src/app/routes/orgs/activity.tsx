@@ -28,7 +28,7 @@ export const ApplicationRecord: FC<ApplicationRecordProps> = ({ application }) =
 export const OrganisationRecordListing: FC = () => {
 
     const { orgSlug } = useParams();
-    const { data: applicationsList, isLoading: isLoadingActivities } = api.v0.applications.getByOrganisation.useQuery({ orgSlug: orgSlug || '' });
+    const { data: applicationsList, isLoading: isLoadingActivities } = api.v0.applications.getByOrganisation.useQuery({ orgSlug: orgSlug ?? '' });
     const sortedApplications = useMemo(() => (applicationsList ?? []).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()), [applicationsList]);
 
     if (isLoadingActivities || !applicationsList)

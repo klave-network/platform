@@ -23,8 +23,8 @@ function ApplicationUsage() {
 
     //react-query has an useInfiniteQuery hook just for this situation!
     const { data, fetchNextPage, isFetching, isLoading } = api.v0.applications.infiniteUsage.useInfiniteQuery({
-        appSlug: appSlug || '',
-        orgSlug: orgSlug || '',
+        appSlug: appSlug ?? '',
+        orgSlug: orgSlug ?? '',
         limit: 50
     }, {
         getNextPageParam: (lastPage) => lastPage.nextCursor

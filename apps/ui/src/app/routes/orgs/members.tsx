@@ -14,7 +14,7 @@ const AddMember = () => {
     const [canSubmit, setCanSubmit] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [error, setError] = useState<string>();
-    const { data: organisation } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug || '' });
+    const { data: organisation } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug ?? '' });
     const utils = api.useUtils().v0.organisations;
     const addMutation = api.v0.organisations.addMember.useMutation({
         onError(error) {
@@ -135,7 +135,7 @@ export const OrganisationMembers: FC = () => {
 
     const { orgSlug } = useParams();
     const [, setError] = useState<string>();
-    const { data: organisation, isLoading } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug || '' }, {
+    const { data: organisation, isLoading } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug ?? '' }, {
 
     });
     const utils = api.useUtils().v0.organisations;

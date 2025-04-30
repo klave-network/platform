@@ -106,8 +106,8 @@ export const Deployments: FC = () => {
 
     const navigate = useNavigate();
     const { appSlug, orgSlug } = useParams();
-    const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug || '', orgSlug: orgSlug || '' });
-    const { data: deploymentList, isLoading: isLoadingDeployments } = api.v0.deployments.getByApplication.useQuery({ appId: application?.id || '' }, {
+    const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug ?? '', orgSlug: orgSlug ?? '' });
+    const { data: deploymentList, isLoading: isLoadingDeployments } = api.v0.deployments.getByApplication.useQuery({ appId: application?.id ?? '' }, {
         refetchInterval: (s) => s.state.data?.find(d => !['errored', 'terminated', 'deployed'].includes(d.status ?? '')) === undefined ? 5000 : 500
     });
 

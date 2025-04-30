@@ -24,7 +24,7 @@ export const AppDeploymentDetail: FC = () => {
     const [shouldAutoScroll] = useState(false);
     const [effectiveClusterFQDN, setEffectiveClusterFQDN] = useState<string>();
     const [WASMFingerprint, setWASMFingerprint] = useState<string>();
-    const { data: deployment, isLoading: isLoadingDeployments } = api.v0.deployments.getById.useQuery({ deploymentId: deploymentId || '' }, {
+    const { data: deployment, isLoading: isLoadingDeployments } = api.v0.deployments.getById.useQuery({ deploymentId: deploymentId ?? '' }, {
         refetchInterval: (s) => ['errored', 'terminated', 'deployed'].includes(s.state.data?.status ?? '') ? (Date.now() - (s.state.data?.createdAt.getTime() ?? 0) < 60000 ? 5000 : 60000) : 500
     });
 

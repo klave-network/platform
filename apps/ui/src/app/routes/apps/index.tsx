@@ -12,7 +12,7 @@ export const AppTabs: FC = () => {
     const outlet = useOutlet();
     const { appSlug, orgSlug } = useParams();
     const [sourceType, setSourceType] = useState('unknown');
-    const { data: application, isLoading } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug || '', orgSlug: orgSlug || '' });
+    const { data: application, isLoading } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug ?? '', orgSlug: orgSlug ?? '' });
     const { data: deploymentList } = api.v0.deployments.getByApplication.useQuery({ appId: application?.id ?? '' });
 
     useEffect(() => {
