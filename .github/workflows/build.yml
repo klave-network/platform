@@ -65,7 +65,7 @@ jobs:
 
       - name: Attest
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v2
         with:
           subject-path: |
             - '${{ github.workspace }}/dist/libs/sdk/**/*'
