@@ -1,4 +1,6 @@
 # Changelog
+## [1.1.6](https://github.com/klave-network/platform/compare/hubber@1.1.5...hubber@1.1.6) (2025-04-30)
+
 ## [1.1.5](https://github.com/klave-network/platform/compare/hubber@1.1.4...hubber@1.1.5) (2025-04-30)
 
 ### Dependency Updates
