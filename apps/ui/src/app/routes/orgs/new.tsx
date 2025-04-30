@@ -49,7 +49,7 @@ export const OrgNew: FC = () => {
                 onSubmit={(e) => {
                     e.preventDefault();
                     methods.handleSubmit(async (data) => {
-                        await mutation.mutateAsync({ slug: orgSlug || '', data });
+                        await mutation.mutateAsync({ slug: orgSlug ?? '', data });
                         methods.reset();
                     })()
                         .catch(() => { return; });

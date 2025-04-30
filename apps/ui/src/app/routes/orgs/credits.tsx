@@ -161,8 +161,8 @@ export const OrganisationCredits: FC = () => {
         refetchInterval: 1000,
         enabled: isReturningFromCheckout
     });
-    const { data: organisation, isLoading, refetch: refetchOrganisation } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug || '' });
-    const { data: applicationsList, isLoading: isLoadingApps } = api.v0.applications.getByOrganisation.useQuery({ orgSlug: orgSlug || '' });
+    const { data: organisation, isLoading, refetch: refetchOrganisation } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug ?? '' });
+    const { data: applicationsList, isLoading: isLoadingApps } = api.v0.applications.getByOrganisation.useQuery({ orgSlug: orgSlug ?? '' });
     const sortedApplications = useMemo(() => (applicationsList ?? []).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()), [applicationsList]);
 
     useEffect(() => {

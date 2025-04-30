@@ -13,7 +13,7 @@ const OrganisationDeletion = () => {
     const { orgSlug } = useParams();
     const [nameCopy, setNameCopy] = useState('');
     const [canSubmit, setCanSubmit] = useState(false);
-    const { data: organisation } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug || '' });
+    const { data: organisation } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug ?? '' });
     const utils = api.useUtils().v0.organisations;
     const mutation = api.v0.organisations.delete.useMutation({
         onSuccess: async () => {
@@ -79,7 +79,7 @@ const OrganisationDeletion = () => {
 export const OrganisationSettings: FC = () => {
 
     const { orgSlug } = useParams();
-    const { data: organisation, isLoading } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug || '' }, {
+    const { data: organisation, isLoading } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug ?? '' }, {
 
     });
     const utils = api.useUtils().v0.organisations;
@@ -94,7 +94,7 @@ export const OrganisationSettings: FC = () => {
             slug: z.string()
         }),
         values: {
-            slug: organisation?.slug || ''
+            slug: organisation?.slug ?? ''
         }
     });
 
@@ -111,7 +111,7 @@ export const OrganisationSettings: FC = () => {
             onSubmit={(e) => {
                 e.preventDefault();
                 methods.handleSubmit(async (data) => {
-                    await mutation.mutateAsync({ orgSlug: orgSlug || '', data });
+                    await mutation.mutateAsync({ orgSlug: orgSlug ?? '', data });
                     methods.reset();
                 })()
                     .catch(() => { return; });

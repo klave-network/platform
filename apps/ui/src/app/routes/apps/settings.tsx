@@ -16,7 +16,7 @@ const ApplicationDeletion = () => {
     const { appSlug, orgSlug } = useParams();
     const [nameCopy, setNameCopy] = useState('');
     const [canSubmit, setCanSubmit] = useState(false);
-    const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug || '', orgSlug: orgSlug || '' });
+    const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug ?? '', orgSlug: orgSlug ?? '' });
     const utils = api.useUtils().v0.applications;
     const mutation = api.v0.applications.delete.useMutation({
         onSuccess: async () => {
@@ -146,7 +146,7 @@ const LimitEditor: FC<LimitEditorProps> = ({ type, kredits, application: { id } 
 export const AppSettings: FC = () => {
 
     const { appSlug, orgSlug } = useParams();
-    const { data: application, isLoading } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug || '', orgSlug: orgSlug || '' });
+    const { data: application, isLoading } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug ?? '', orgSlug: orgSlug ?? '' });
     const utils = api.useUtils().v0.applications;
     const mutation = api.v0.applications.update.useMutation({
         onSuccess: async () => {
@@ -162,10 +162,10 @@ export const AppSettings: FC = () => {
             webhook: z.string()
         }),
         values: {
-            homepage: application?.homepage || '',
-            description: application?.description || '',
-            license: application?.license || '',
-            webhook: application?.webhook || ''
+            homepage: application?.homepage ?? '',
+            description: application?.description ?? '',
+            license: application?.license ?? '',
+            webhook: application?.webhook ?? ''
         }
     });
 
@@ -183,7 +183,7 @@ export const AppSettings: FC = () => {
     const handleGitSignRequired: ChangeEventHandler<HTMLInputElement> = (e) => {
         mutation.mutateAsync({
             withSlug: false,
-            appId: application.id || '', data: {
+            appId: application.id ?? '', data: {
                 gitSignRequired: e.currentTarget.checked
             }
         })
@@ -194,7 +194,7 @@ export const AppSettings: FC = () => {
     const handleDeployCommitLedgers: ChangeEventHandler<HTMLInputElement> = (e) => {
         mutation.mutateAsync({
             withSlug: false,
-            appId: application.id || '', data: {
+            appId: application.id ?? '', data: {
                 deployCommitLedgers: e.currentTarget.checked
             }
         })
@@ -208,7 +208,7 @@ export const AppSettings: FC = () => {
                 methods.handleSubmit(async (data) => {
                     await mutation.mutateAsync({
                         withSlug: false,
-                        appId: application.id || '',
+                        appId: application.id ?? '',
                         data
                     });
                     methods.reset();
