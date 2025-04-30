@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { SCP, Key, Constants } from '@secretarium/connector';
 import { httpApi } from './api';
+import IMurmur from 'imurmurhash';
 
 export const client = new SCP({
     logger: process.env.NODE_ENV === 'development' ? console : undefined
@@ -65,8 +66,8 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
             return Object.entries(args).sort((a, b) => a[0].localeCompare(b[0])).map(([, v]) => v).join('|');
         return Math.random().toString().replaceAll('.', '');
     }, [args]);
-    // const argDigest = Utils.hash(Uint8Array.from(argPrint));
-    const argDigest = argPrint.replaceAll(/[^a-zA-Z0-9]/g, '');
+
+    const argDigest = useMemo(() => new IMurmur(argPrint).result().toString(16).padEnd(8, '0'), [argPrint]);
     const cacheKey = useMemo(() => `${app}|${route}|${argDigest}|${count}`, [count]);
     const dataCache = useRef<Cache<ResultType>>({});
     const errorsCache = useRef<Cache<Error | ErrorType>>({});
