@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { SCP, Key, Constants } from '@secretarium/connector';
 import { httpApi } from './api';
+import IMurmur from 'imurmurhash';
 
 export const client = new SCP({
     logger: process.env.NODE_ENV === 'development' ? console : undefined
@@ -33,14 +34,14 @@ interface State<ResultType, ErrorType> {
     refetch: () => void;
 }
 
-type Cache<T> = { [url: string]: Array<T> }
+type Cache<T> = { [url: string]: Array<T> };
 
 // discriminated union type
 type Action<ResultType, ErrorType> =
     | { type: 'reset' }
     | { type: 'loading' }
     | { type: 'fetched'; payload: Array<ResultType> }
-    | { type: 'error'; payload: Array<Error | ErrorType> }
+    | { type: 'error'; payload: Array<Error | ErrorType> };
 
 type SecretariumQueryOptions = {
     app: string;
@@ -49,14 +50,14 @@ type SecretariumQueryOptions = {
     key?: Key;
     args?: string | Record<string, unknown>;
     live?: boolean;
-}
+};
 
 export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(options: SecretariumQueryOptions, deps: Array<unknown> = []): State<ResultType, ErrorType> {
 
     const [count, setCount] = useState(0);
     const [opts, setOpts] = useState<SecretariumQueryOptions>();
     const { app, route, args, key, cluster } = opts ?? {};
-    const argDigest = useMemo(() => {
+    const argPrint = useMemo(() => {
         if (typeof args === 'undefined' || args === null)
             return '';
         if (typeof args === 'string')
@@ -65,6 +66,8 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
             return Object.entries(args).sort((a, b) => a[0].localeCompare(b[0])).map(([, v]) => v).join('|');
         return Math.random().toString().replaceAll('.', '');
     }, [args]);
+
+    const argDigest = useMemo(() => new IMurmur(argPrint).result().toString(16).padEnd(8, '0'), [argPrint]);
     const cacheKey = useMemo(() => `${app}|${route}|${argDigest}|${count}`, [count]);
     const dataCache = useRef<Cache<ResultType>>({});
     const errorsCache = useRef<Cache<Error | ErrorType>>({});
@@ -223,7 +226,7 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
 
                 dataCache.current[cacheKey] = [];
                 errorsCache.current[cacheKey] = [];
-                await client.newTx<ResultType, ErrorType>(app, route, `klave-deployment-${Math.random().toString().replaceAll('.', '')}`, args ?? {})
+                await client.newTx<ResultType, ErrorType>(app, route, `klave-ui-runcommand-${argDigest}-${Math.random().toString().replaceAll('.', '').substring(0, 10)}`, args ?? {})
                     .onResult((result) => {
 
                         if (!dataCache.current[cacheKey])

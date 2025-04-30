@@ -1,4 +1,4 @@
-import { startPruner } from '@klave/pruner';
+// import { startPruner } from '@klave/pruner';
 import { start } from './app';
 import './i18n';
 import { dbOps } from './utils/db';
@@ -24,7 +24,7 @@ const serverHandle = dbOps.initialize()
 
         const port = Number(process.env.PORT) || 3333;
         const host = process.env.HOST || '127.0.0.1';
-        const server = (await start(port)).listen(port, host, () => {
+        const server = (await start()).listen(port, host, () => {
             logger.info(`Listening at http://${host}:${port}`);
         }).on('error', function (err) {
             console.error(err);
@@ -36,7 +36,7 @@ const serverHandle = dbOps.initialize()
                 .catch(() => { return; });
         });
 
-        startPruner();
+        // startPruner();
 
         return server;
 

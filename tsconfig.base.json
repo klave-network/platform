@@ -15,15 +15,16 @@
         "noUnusedParameters": true,
         "noUncheckedIndexedAccess": true,
         "importHelpers": true,
-        "target": "es2021",
+        "target": "es2022",
         "module": "esnext",
         "lib": [
-            "es2021",
+            "es2022",
             "dom"
         ],
         "skipLibCheck": true,
         "skipDefaultLibCheck": true,
         "forceConsistentCasingInFileNames": true,
+        "assumeChangesOnlyAffectDirectDependencies": true,
         "resolveJsonModule": true,
         "strict": true,
         "strictNullChecks": true,
@@ -49,6 +50,9 @@
             ],
             "@klave/sdk": [
                 "libs/sdk/src/index.ts"
+            ],
+            "@klave/ui-kit": [
+                "libs/ui-kit/src/index.ts"
             ]
         }
     },

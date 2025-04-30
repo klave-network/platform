@@ -19,7 +19,9 @@ export const deploymentRouter = createTRPCRouter({
 
             return await prisma.deployment.findMany({
                 where: {
-                    deletedAt: null,
+                    deletedAt: {
+                        isSet: false
+                    },
                     application: {
                         id: appId,
                         OR: [{
@@ -187,7 +189,9 @@ export const deploymentRouter = createTRPCRouter({
 
             const deploymentList = await prisma.deployment.findMany({
                 where: {
-                    deletedAt: null,
+                    deletedAt: {
+                        isSet: false
+                    },
                     application: {
                         OR: [{
                             organisation: {

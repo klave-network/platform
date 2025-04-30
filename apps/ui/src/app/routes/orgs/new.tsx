@@ -44,12 +44,12 @@ export const OrgNew: FC = () => {
             </div>
             <div className="flex items-center space-x-3 sm:mt-7 mt-4" />
         </div>
-        <div className="sm:p-7 p-4">
+        <div className="sm:p-7 p-4 flex-grow">
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
                     methods.handleSubmit(async (data) => {
-                        await mutation.mutateAsync({ slug: orgSlug || '', data });
+                        await mutation.mutateAsync({ slug: orgSlug ?? '', data });
                         methods.reset();
                     })()
                         .catch(() => { return; });
@@ -62,7 +62,7 @@ export const OrgNew: FC = () => {
                         <br />
                         <input {...methods.register('slug')} onChange={e => setOrgSlug(e.target.value.trim())} className="input input-bordered border w-2/3" /><br />
                         {isOrgLoading
-                            ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-full' /><br />&nbsp;</span>
+                            ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-5' /><br />&nbsp;</span>
                             : alreadyExists
                                 ? <span className="block mt-1 text-xs text-red-700 leading-tight">The organisation <b>{orgSlug}</b> already exists.<br />&nbsp;</span>
                                 : orgSlug.length

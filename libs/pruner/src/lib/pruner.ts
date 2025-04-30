@@ -9,9 +9,12 @@ let intervalTimer: NodeJS.Timeout;
 async function errorLongDeployingDeployments() {
     return prisma.deployment.updateMany({
         where: {
+            deletedAt: {
+                isSet: false
+            },
             status: {
                 // TODO Figure out what to with failing termination
-                in: ['created', 'compiled', 'deploying', 'terminating']
+                in: ['created', 'compiling', 'compiled', 'deploying', 'terminating']
             },
             updatedAt: {
                 lt: new Date(Date.now() - 1000 * 60 * 5)
@@ -45,6 +48,9 @@ async function cleanDisconnectedDeployments() {
         (async () => {
             const deploymentsList = await prisma.deployment.findMany({
                 where: {
+                    deletedAt: {
+                        isSet: false
+                    },
                     status: {
                         in: ['deployed']
                     },
@@ -83,6 +89,9 @@ async function cleanDisconnectedDeployments() {
 async function terminateExpiredDeployments() {
     const expiredDeploymentList = await prisma.deployment.findMany({
         where: {
+            deletedAt: {
+                isSet: false
+            },
             status: {
                 in: ['deployed', 'errored']
             },
@@ -120,6 +129,9 @@ async function cancelUpdatingDeployments() {
 
     const expiredDeploymentList = await prisma.deployment.findMany({
         where: {
+            deletedAt: {
+                isSet: false
+            },
             status: {
                 in: ['updating']
             },
@@ -147,11 +159,14 @@ async function cancelUpdatingDeployments() {
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function reconcileApplicationKredits() {
+
+async function __unusedReconcileApplicationKredits() {
 
     const applicationsWithDeployments = await prisma.application.findMany({
         where: {
+            deletedAt: {
+                isSet: false
+            },
             deployments: {
                 some: {
                     status: {
@@ -217,7 +232,7 @@ export async function prune() {
 
 type PrunerOptions = {
     interval?: number;
-}
+};
 
 export function startPruner(options?: PrunerOptions) {
     const { interval = 6000 } = options ?? {};

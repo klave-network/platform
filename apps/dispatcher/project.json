@@ -22,7 +22,7 @@
                 ],
                 "generatePackageJson": true,
                 "thirdParty": true,
-                "esbuildConfig": "apps/dispatcher/esbuild.config.js"
+                "esbuildConfig": "apps/dispatcher/esbuild.config.cjs"
             }
         },
         "serve": {

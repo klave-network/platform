@@ -4,20 +4,20 @@ import { FC, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import api from '../../utils/api';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
-import { Octicon, Timeline } from '@primer/react';
+import { CircleOcticon, Timeline } from '@primer/react';
 import { CubeIcon } from '@radix-ui/react-icons';
 // import { UilSpinner } from '@iconscout/react-unicons';
 // import api from '../../utils/api';
 
 type ApplicationRecordProps = {
     application: Application
-}
+};
 
 export const ApplicationRecord: FC<ApplicationRecordProps> = ({ application }) => {
     const { orgSlug } = useParams();
     return <Timeline.Item condensed >
         <Timeline.Badge>
-            <Octicon icon={CubeIcon} />
+            <CircleOcticon icon={CubeIcon} />
         </Timeline.Badge>
         <Timeline.Body>
             Created application <Link to={`/${orgSlug}/${application.slug}`} className='font-semibold'>{application.slug}</Link> <i>({formatTimeAgo(application.createdAt)})</i>
@@ -28,7 +28,7 @@ export const ApplicationRecord: FC<ApplicationRecordProps> = ({ application }) =
 export const OrganisationRecordListing: FC = () => {
 
     const { orgSlug } = useParams();
-    const { data: applicationsList, isLoading: isLoadingActivities } = api.v0.applications.getByOrganisation.useQuery({ orgSlug: orgSlug || '' });
+    const { data: applicationsList, isLoading: isLoadingActivities } = api.v0.applications.getByOrganisation.useQuery({ orgSlug: orgSlug ?? '' });
     const sortedApplications = useMemo(() => (applicationsList ?? []).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()), [applicationsList]);
 
     if (isLoadingActivities || !applicationsList)
@@ -36,7 +36,7 @@ export const OrganisationRecordListing: FC = () => {
             We are fetching data about your organisation's activities.<br />
             It will only take a moment...<br />
             <br />
-            <UilSpinner className='inline-block animate-spin' />
+            <UilSpinner className='inline-block animate-spin h-5' />
         </>;
 
     return <div className="w-full mb-7">

@@ -18,7 +18,7 @@ export type ParentMessage = {
     contents: string | null;
 } | {
     type: 'compile';
-}
+};
 
 type BuildHostMessage = {
     type: 'read';
@@ -57,15 +57,15 @@ type BuildHostMessage = {
     version: string;
 } | {
     type: 'compile';
-}
+};
 
 export type BuildHostCreatorOptions = BuildMiniVMOptions & {
     token: string;
-}
+};
 
 export type BuildHostOptions = BuildHostCreatorOptions & {
     workingDirectory: string;
-}
+};
 
 export class BuildHost {
 
@@ -109,7 +109,7 @@ export class BuildHost {
                 const packageManagerCommands: Record<PackageManager, [string[], string[]]> = {
                     yarn: [['yarn install'], ['yarn build']],
                     npm: [['npm install'], ['npm run build']],
-                    cargo: [['cargo component bindings', 'cargo check'], ['cargo component build --target wasm32-unknown-unknown --release']]
+                    cargo: [['cargo component bindings'], ['cargo component build --target wasm32-unknown-unknown --release']]
                 };
                 let packageManager: keyof typeof packageManagerCommands = 'yarn';
 
@@ -267,7 +267,8 @@ export class BuildHost {
                 }).catch(async (error) => {
                     // Leave a bit of time for the last buffered process message to be committed
                     setTimeout(() => {
-                        this.listeners['message']?.forEach(listener => listener({ type: 'errored', error, sourceType: packageManager === 'cargo' ? 'rust-component' : 'assemblyscript', output: this.outputProgress }));
+                        const finalError = error instanceof Error ? error : new Error(error?.toString() ?? 'Unknown error');
+                        this.listeners['message']?.forEach(listener => listener({ type: 'errored', error: finalError, sourceType: packageManager === 'cargo' ? 'rust-component' : 'assemblyscript', output: this.outputProgress }));
                     }, 5000);
                 });
             }

@@ -8,7 +8,7 @@ import { formatTimeAgo } from '../../utils/formatTimeAgo';
 
 type DeploymentContextProps = {
     deployment: Omit<Deployment, 'buildOutputDTS' | 'buildOutputWASM' | 'buildOutputWAT' | 'buildOutputs' | 'configSnapshot' | 'deletedAt'>
-}
+};
 
 export const DeploymentPromotion: FC<DeploymentContextProps> = ({ deployment: { id } }) => {
 
@@ -106,8 +106,8 @@ export const Deployments: FC = () => {
 
     const navigate = useNavigate();
     const { appSlug, orgSlug } = useParams();
-    const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug || '', orgSlug: orgSlug || '' });
-    const { data: deploymentList, isLoading: isLoadingDeployments } = api.v0.deployments.getByApplication.useQuery({ appId: application?.id || '' }, {
+    const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug ?? '', orgSlug: orgSlug ?? '' });
+    const { data: deploymentList, isLoading: isLoadingDeployments } = api.v0.deployments.getByApplication.useQuery({ appId: application?.id ?? '' }, {
         refetchInterval: (s) => s.state.data?.find(d => !['errored', 'terminated', 'deployed'].includes(d.status ?? '')) === undefined ? 5000 : 500
     });
 
@@ -141,7 +141,7 @@ export const Deployments: FC = () => {
             We are fetching data about your deployments.<br />
             It will only take a moment...<br />
             <br />
-            <UilSpinner className='inline-block animate-spin' />
+            <UilSpinner className='inline-block animate-spin h-5' />
         </>;
 
     return <>
@@ -181,8 +181,8 @@ export const Deployments: FC = () => {
                     const setBuild = deployments[0]?.build;
                     const setBranch = deployments[0]?.branch;
                     const setVersion = deployments[0]?.version;
-                    const hasDeploying = deployments.some(({ status }) => ['created', 'deploying', 'terminating'].includes(status));
-                    return <tr key={setId} className={hasDeploying ? 'stripe-progress' : ''}>
+                    const isDeploying = deployments.some(({ status }) => ['created', 'compiling', 'deploying', 'terminating'].includes(status));
+                    return <tr key={setId} className={isDeploying ? 'stripe-progress' : ''}>
                         <td className={'sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 grid'}>
                             {deployments.map(deployment => {
                                 const { id, deploymentAddress, expiresOn, life, status } = deployment;
@@ -265,7 +265,7 @@ export const Deployments: FC = () => {
                             const { id, deploymentAddress, createdAt, life, status, version, build, branch } = deployment;
                             if (!deploymentAddress?.fqdn)
                                 return null;
-                            return <tr key={id} className={['created', 'deploying', 'terminating'].includes(status) ? 'stripe-progress' : 'hover:bg-slate-50 hover:cursor-pointer'} onClick={() => navigate(`./${id}`)}>
+                            return <tr key={id} className={['created', 'compiling', 'deploying', 'terminating'].includes(status) ? 'stripe-progress' : 'hover:bg-slate-50 hover:cursor-pointer'} onClick={() => navigate(`./${id}`)}>
                                 {/*
                                 <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 md:table-cell hidden">
                                     <div className="flex items-center">

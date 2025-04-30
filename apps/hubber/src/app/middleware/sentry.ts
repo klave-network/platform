@@ -30,19 +30,19 @@ export const sentryRequestMiddleware: RequestHandler = (req, res, next) => {
 
     if (!sentryRequestMiddlewareReference)
         initializeSentry(req.app);
-    return sentryRequestMiddlewareReference(req, res, next);
+    sentryRequestMiddlewareReference(req, res, next);
 };
 
 export const sentryTracingMiddleware: RequestHandler = (req, res, next) => {
 
     if (!sentryTracingMiddlewareReference)
         initializeSentry(req.app);
-    return sentryTracingMiddlewareReference(req, res, next);
+    sentryTracingMiddlewareReference(req, res, next);
 };
 
 export const sentryErrorMiddleware: ErrorRequestHandler = (err, req, res, next) => {
 
     if (!sentryErrorMiddlewareReference)
         initializeSentry(req.app);
-    return sentryErrorMiddlewareReference(err, req, res, next);
+    sentryErrorMiddlewareReference(err, req, res, next);
 };

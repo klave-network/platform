@@ -20,7 +20,7 @@ function Welcome() {
                 Get started with Klave by creating a new application in a GitHub repository and connecting it to Klave.<br />
                 If you would like, you can start with a template from our marketplace: <br />
                 <h2 className='mt-5'>Start from template</h2>
-                <a className='btn my-8 w-auto h-auto py-6' href='https://klave.com/marketplace' target='_blank'>
+                <a rel="noopener" className='btn my-8 w-auto h-auto py-6' href='https://klave.com/marketplace' target='_blank'>
                     <div className='grid grid-flow-row grid-cols-2 gap-2'>
                         <img alt='E1' title='E1' className='bg-slate-950 m-0 p-0 rounded-md w-32 h-24' src={Expl_1} />
                         <img alt='E2' title='E2' className='bg-slate-950 m-0 p-0 rounded-md w-32 h-24' src={Expl_2} />
@@ -35,7 +35,7 @@ function Welcome() {
             <span className='inline-block h-8 w-8 -ml-1 mt-3 mb-3 border rounded-full font-bold text-center'>1</span>
             <h2 className='mt-0'>Check you have Node installed</h2>
             You will need Node version 20 or greater for the best experience.<br />
-            Get info on how to install Node at <a href='https://nodejs.org' target='_blank'>https://nodejs.org</a><br />
+            Get info on how to install Node at <a rel="noopener" href='https://nodejs.org' target='_blank'>https://nodejs.org</a><br />
             <pre className='text-left'>
                 &gt; node -v<br />
                 v20.9.0
@@ -64,7 +64,7 @@ function Welcome() {
             <span className='inline-block h-8 w-8 -ml-1 mt-10 mb-3 border rounded-full font-bold text-center'>3</span>
             <h2 className='mt-0'>Move to the application directory and get your code ready</h2>
             Check out Klave documentation to know more about the available APIs.<br />
-            <a href='https://klave.com/docs' target='_blank'>https://klave.com/docs</a>
+            <a rel="noopener" href='https://klave.com/docs' target='_blank'>https://klave.com/docs</a>
             <br />
             <span className='inline-block h-8 w-8 -ml-1 mt-10 mb-3 border rounded-full font-bold text-center'>4</span>
             <h2 className='mt-0'>Push your application repository on Github</h2>

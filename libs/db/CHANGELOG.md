@@ -1,4 +1,51 @@
 # Changelog
+## [1.3.1](https://github.com/klave-network/platform/compare/db@1.3.0...db@1.3.1) (2025-04-11)
+
+
+### Bug Fixes
+
+* **db,api,ui:** Upgrade `[@simplewebauthn](https://github.com/simplewebauthn)` and remove padding addition on `credentialID` ([70eb2e1](https://github.com/klave-network/platform/commit/70eb2e1493781e3774c5b7428343e4da510e92d3))
+* **db:** Usage data currently stored at UInt64 ([21c7da0](https://github.com/klave-network/platform/commit/21c7da057e63cfc1a5dfb7cb7462781651d2cc0e))
+
+## [1.3.0](https://github.com/klave-network/platform/compare/db@1.2.0...db@1.3.0) (2025-04-10)
+
+
+### Features
+
+* **db,api,ui:** Preserve deleted deployments and application, recycling bin style ([e32637a](https://github.com/klave-network/platform/commit/e32637a44f2f0c1e4897f05be08d571306d78df9))
+
+## [1.2.0](https://github.com/klave-network/platform/compare/db@1.1.0...db@1.2.0) (2025-04-10)
+
+
+### Features
+
+* **db,api,ui:** Add new usage format support ([e0910c3](https://github.com/klave-network/platform/commit/e0910c34bf6a6519db1e3ed274845b80e0b9dc11))
+
+## [1.1.0](https://github.com/klave-network/platform/compare/db@1.0.3...db@1.1.0) (2025-04-09)
+
+
+### Features
+
+* **db,api,ui:** Add credit consumption screens ([5452408](https://github.com/klave-network/platform/commit/5452408ac3999d1bef4c20c3cdad82624d96d03a))
+* **db,api:** Add new `compiling` deployment step ([34fad79](https://github.com/klave-network/platform/commit/34fad7992d07262547c0492f3f532cd22b457522))
+
+## [1.0.3](https://github.com/klave-network/platform/compare/db@1.0.2...db@1.0.3) (2025-02-20)
+
+## [1.0.2](https://github.com/klave-network/platform/compare/db@1.0.1...db@1.0.2) (2025-01-22)
+
+## [1.0.1](https://github.com/klave-network/platform/compare/db@1.0.0...db@1.0.1) (2024-12-13)
+
+## [1.0.0](https://github.com/klave-network/platform/compare/db@0.8.1...db@1.0.0) (2024-10-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* Moving to pure ESM repo
+
+### Miscellaneous Chores
+
+* Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
+
 ## [0.8.1](https://github.com/klave-network/platform/compare/db@0.8.0...db@0.8.1) (2024-07-25)
 
 

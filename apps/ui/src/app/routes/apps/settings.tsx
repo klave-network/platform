@@ -6,7 +6,7 @@ import api from '../../utils/api';
 import { useZodForm } from '../../utils/useZodForm';
 import { z } from 'zod';
 import { useEffect } from 'react';
-import CreditDisplay from '../../components/CreditDisplay';
+import BalanceDisplay from '../../components/BalanceDisplay';
 import { Application } from '@klave/db';
 import { useToggle } from 'usehooks-ts';
 
@@ -16,7 +16,7 @@ const ApplicationDeletion = () => {
     const { appSlug, orgSlug } = useParams();
     const [nameCopy, setNameCopy] = useState('');
     const [canSubmit, setCanSubmit] = useState(false);
-    const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug || '', orgSlug: orgSlug || '' });
+    const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug ?? '', orgSlug: orgSlug ?? '' });
     const utils = api.useUtils().v0.applications;
     const mutation = api.v0.applications.delete.useMutation({
         onSuccess: async () => {
@@ -80,11 +80,12 @@ const ApplicationDeletion = () => {
 };
 
 type LimitEditorProps = {
+    type: 'query' | 'transaction',
     kredits: bigint | number
     application: Partial<Application>
-}
+};
 
-const LimitEditor: FC<LimitEditorProps> = ({ kredits, application: { id } }) => {
+const LimitEditor: FC<LimitEditorProps> = ({ type, kredits, application: { id } }) => {
 
     const kreditValue = useMemo(() => Number(kredits), [kredits]);
     const [isEditing, toggleEditing] = useToggle(false);
@@ -111,7 +112,8 @@ const LimitEditor: FC<LimitEditorProps> = ({ kredits, application: { id } }) => 
                 withSlug: false,
                 applicationId: id,
                 limits: {
-                    transactionCallSpend: BigInt(currentValue)
+                    queryCallSpend: type === 'query' ? BigInt(currentValue) : undefined,
+                    transactionCallSpend: type === 'transaction' ? BigInt(currentValue) : undefined
                 }
             });
             await appAPIUtils.getAll.invalidate();
@@ -126,9 +128,9 @@ const LimitEditor: FC<LimitEditorProps> = ({ kredits, application: { id } }) => 
     if (isEditing)
         return <form className='flex flex-row gap-2' onSubmit={e => e.preventDefault()}>
             <div className='leading-snug pt-1'>
-                <input type='text' value={currentValue.toString()} onChange={handleChange} className='input input-bordered inline border p-2 h-6 text-sm' /><br />
+                <input title="Kredit" type='text' value={currentValue.toString()} onChange={handleChange} className='input input-bordered inline border p-2 h-6 text-sm' /><br />
                 {isPending
-                    ? <span className='text-xs text-green-700'>Setting the new limit ... <UilSpinner className='inline-block animate-spin h-full' /></span>
+                    ? <span className='text-xs text-green-700'>Setting the new limit ... <UilSpinner className='inline-block animate-spin h-5' /></span>
                     : <span className='text-xs text-red-700'>{error?.message?.toString() ?? ''} &nbsp;</span>
                 }
             </div>
@@ -138,13 +140,13 @@ const LimitEditor: FC<LimitEditorProps> = ({ kredits, application: { id } }) => 
     if (kreditValue === 0)
         return <b><span className='text-klave-light-blue'>Unlimited</span> <UilEdit onClick={() => toggleEditing()} className='inline-block h-3 hover:cursor-pointer' /></b>;
 
-    return <b><CreditDisplay compact={true} kredits={kredits} /> <UilEdit onClick={() => toggleEditing()} className='inline-block h-3 hover:cursor-pointer' /></b>;
+    return <b><BalanceDisplay compact={true} kredits={kredits} /> <UilEdit onClick={() => toggleEditing()} className='inline-block h-3 hover:cursor-pointer' /></b>;
 };
 
 export const AppSettings: FC = () => {
 
     const { appSlug, orgSlug } = useParams();
-    const { data: application, isLoading } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug || '', orgSlug: orgSlug || '' });
+    const { data: application, isLoading } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug ?? '', orgSlug: orgSlug ?? '' });
     const utils = api.useUtils().v0.applications;
     const mutation = api.v0.applications.update.useMutation({
         onSuccess: async () => {
@@ -160,10 +162,10 @@ export const AppSettings: FC = () => {
             webhook: z.string()
         }),
         values: {
-            homepage: application?.homepage || '',
-            description: application?.description || '',
-            license: application?.license || '',
-            webhook: application?.webhook || ''
+            homepage: application?.homepage ?? '',
+            description: application?.description ?? '',
+            license: application?.license ?? '',
+            webhook: application?.webhook ?? ''
         }
     });
 
@@ -175,13 +177,13 @@ export const AppSettings: FC = () => {
             We are fetching data about your application.<br />
             It will only take a moment...<br />
             <br />
-            <UilSpinner className='inline-block animate-spin' />
+            <UilSpinner className='inline-block animate-spin h-5' />
         </>;
 
     const handleGitSignRequired: ChangeEventHandler<HTMLInputElement> = (e) => {
         mutation.mutateAsync({
             withSlug: false,
-            appId: application.id || '', data: {
+            appId: application.id ?? '', data: {
                 gitSignRequired: e.currentTarget.checked
             }
         })
@@ -192,7 +194,7 @@ export const AppSettings: FC = () => {
     const handleDeployCommitLedgers: ChangeEventHandler<HTMLInputElement> = (e) => {
         mutation.mutateAsync({
             withSlug: false,
-            appId: application.id || '', data: {
+            appId: application.id ?? '', data: {
                 deployCommitLedgers: e.currentTarget.checked
             }
         })
@@ -206,7 +208,7 @@ export const AppSettings: FC = () => {
                 methods.handleSubmit(async (data) => {
                     await mutation.mutateAsync({
                         withSlug: false,
-                        appId: application.id || '',
+                        appId: application.id ?? '',
                         data
                     });
                     methods.reset();
@@ -257,7 +259,14 @@ export const AppSettings: FC = () => {
             </button>
         </form>
         <div>
-            <h1 className='font-bold text-xl mb-5'>Repository information</h1>
+            <h1 className='font-bold text-xl mb-5'>Information</h1>
+            <p>
+                Name: <b>{application.slug.replace('~$~', '')}</b><br />
+                ID: <b className='font-mono'>{application.id}</b><br />
+            </p>
+        </div>
+        <div>
+            <h1 className='font-bold text-xl mb-5'>Repository</h1>
             <p>
                 Source: <b>{application.repo.source}</b><br />
                 Owner: <b>{application.repo.owner}</b><br />
@@ -268,27 +277,27 @@ export const AppSettings: FC = () => {
         <div>
             <h1 className='font-bold text-xl mb-5'>Limits</h1>
             <p>
-                {/* Query spending limit: <b>{application.limits.queryCallSpend.toString()}</b><br /> */}
-                Transaction spending limit: <LimitEditor kredits={application.limits.transactionCallSpend} application={application} /><br />
+                Query spending limit: <LimitEditor type="query" kredits={application.limits.queryCallSpend} application={application} /><br />
+                Transaction spending limit: <LimitEditor type="transaction" kredits={application.limits.transactionCallSpend} application={application} /><br />
             </p>
         </div>
         <div>
             <h1 className='font-bold text-xl mb-5'>Credit allocation</h1>
             <p>
-                Balance: <b><CreditDisplay kredits={application.kredits} /></b><br />
+                Balance: <b><BalanceDisplay kredits={application.kredits} /></b><br />
                 <Link to={`/organisation/${orgSlug}/credits`} className='text-klave-light-blue hover:underline'>Manage credit allocations</Link>
             </p>
         </div>
         <div>
             <h1 className='font-bold text-xl mb-5'>Deployment</h1>
             <p>
-                <label className='flex items-center'><input type="checkbox" className="toggle toggle-sm mr-2" checked={deployCommitLedgers} onChange={handleDeployCommitLedgers} /><span className='pb-1'>Create an out-of-branch deployment for every commit push</span> {mutation.isPending ? <UilSpinner className='inline-block animate-spin' /> : null}</label>
+                <label className='flex items-center'><input type="checkbox" className="toggle toggle-sm mr-2" checked={deployCommitLedgers} onChange={handleDeployCommitLedgers} /><span className='pb-1'>Create an out-of-branch deployment for every commit push</span> {mutation.isPending ? <UilSpinner className='inline-block animate-spin h-5' /> : null}</label>
             </p>
         </div>
         <div>
             <h1 className='font-bold text-xl mb-5'>Security</h1>
             <p>
-                <label className='flex items-center'><input type="checkbox" className="toggle toggle-sm mr-2" checked={gitSignRequired} onChange={handleGitSignRequired} /><span className='pb-1'>Require valid Git signature prior to deployment</span> {mutation.isPending ? <UilSpinner className='inline-block animate-spin' /> : null}</label>
+                <label className='flex items-center'><input type="checkbox" className="toggle toggle-sm mr-2" checked={gitSignRequired} onChange={handleGitSignRequired} /><span className='pb-1'>Require valid Git signature prior to deployment</span> {mutation.isPending ? <UilSpinner className='inline-block animate-spin h-5' /> : null}</label>
             </p>
         </div>
         <div>

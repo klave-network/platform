@@ -8,13 +8,19 @@ FROM docker.io/node:20-alpine
 
 ENV HOST=0.0.0.0
 ENV PORT=3000
+ENV HUSKY=0
 
 WORKDIR /app
 
 RUN addgroup --system dispatcher && \
     adduser --system -G dispatcher dispatcher
 
-COPY dist/apps/dispatcher dispatcher
-RUN chown -R dispatcher:dispatcher .
+COPY --chown=dispatcher:dispatcher --chmod=444 dist/apps/dispatcher dispatcher
+RUN cd dispatcher && yarn install --no-cache && yarn cache clean && rm -rf /var/cache/yarn 
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3000/ || exit 1
 
 CMD [ "node", "dispatcher" ]

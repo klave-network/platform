@@ -1,4 +1,64 @@
 # Changelog
+## [1.0.10](https://github.com/klave-network/platform/compare/constants@1.0.9...constants@1.0.10) (2025-04-11)
+
+
+### Bug Fixes
+
+* **dispatcher:** Data structure mismatched insertion ([25fc08e](https://github.com/klave-network/platform/commit/25fc08eb0ff815a6b424b5aac3d447388d02fdc0))
+
+## [1.0.9](https://github.com/klave-network/platform/compare/constants@1.0.8...constants@1.0.9) (2025-04-11)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.8`
+## [1.0.8](https://github.com/klave-network/platform/compare/constants@1.0.7...constants@1.0.8) (2025-04-10)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.7`
+## [1.0.7](https://github.com/klave-network/platform/compare/constants@1.0.6...constants@1.0.7) (2025-04-10)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.6`
+## [1.0.6](https://github.com/klave-network/platform/compare/constants@1.0.5...constants@1.0.6) (2025-04-09)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.5`
+## [1.0.5](https://github.com/klave-network/platform/compare/constants@1.0.4...constants@1.0.5) (2025-02-20)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.4`
+## [1.0.4](https://github.com/klave-network/platform/compare/constants@1.0.3...constants@1.0.4) (2025-01-23)
+
+## [1.0.3](https://github.com/klave-network/platform/compare/constants@1.0.2...constants@1.0.3) (2025-01-22)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.2`
+## [1.0.2](https://github.com/klave-network/platform/compare/constants@1.0.1...constants@1.0.2) (2024-12-16)
+
+## [1.0.1](https://github.com/klave-network/platform/compare/constants@1.0.0...constants@1.0.1) (2024-12-13)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.0`
+## [1.0.0](https://github.com/klave-network/platform/compare/constants@0.4.1...constants@1.0.0) (2024-10-04)
+
+### Dependency Updates
+
+* `db` updated to version `0.4.1`
+
+### ⚠ BREAKING CHANGES
+
+* Moving to pure ESM repo
+
+### Miscellaneous Chores
+
+* Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
+
 ## [0.4.1](https://github.com/klave-network/platform/compare/constants@0.4.0...constants@0.4.1) (2024-07-25)
 
 ### Dependency Updates

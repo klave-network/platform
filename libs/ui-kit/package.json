@@ -1,0 +1,32 @@
+{
+    "name": "@klave/ui-kit",
+    "version": "0.0.1",
+    "private": false,
+    "description": "Klave UI components kit",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/klave-network/platform.git",
+        "directory": "libs/ui-kit"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Florian Guitton",
+        "email": "florian@secretarium.com"
+    },
+    "type": "commonjs",
+    "exports": {
+        ".": {
+            "import": "./index.mjs",
+            "require": "./index.js"
+        }
+    },
+    "main": "./index.js",
+    "types": "./index.d.ts",
+    "dependencies": {
+        "@react-email/components": "^0.0.36",
+        "@react-email/render": "^1.0.6",
+        "@react-email/tailwind": "^1.0.4",
+        "react": "19.1.0",
+        "react-email": "3.0.7"
+    }
+}

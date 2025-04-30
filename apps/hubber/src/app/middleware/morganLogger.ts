@@ -12,8 +12,17 @@ const skip = () => {
     return env !== 'development';
 };
 
+let totalPingCount = 0;
+
 export const morganLoggerMiddleware: RequestHandler = morgan(
     (tokens, req, res) => {
+        if ((tokens.url?.(req, res)?.startsWith('/ping') || tokens.url?.(req, res)?.startsWith('/version')) && req.headers['x-kube-probe'] !== undefined) {
+            totalPingCount++;
+            if (totalPingCount % 1000 === 0)
+                return `The runtime probe has pinged ${totalPingCount} times...`;
+            else
+                return null;
+        }
         return [
             tokens['remote-addr']?.(req, res) ?? '-',
             tokens.method?.(req, res) ?? '-',

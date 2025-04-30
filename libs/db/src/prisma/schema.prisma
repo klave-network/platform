@@ -1,6 +1,6 @@
 generator client {
     provider        = "prisma-client-js"
-    previewFeatures = ["tracing"]
+    previewFeatures = ["metrics"]
 }
 
 datasource db {
@@ -152,6 +152,7 @@ enum CompilationStageType {
 
 enum DeploymentStatus {
     created
+    compiling
     compiled
     deploying
     deployed
@@ -329,7 +330,7 @@ model Application {
     organisation        Organisation      @relation(fields: [organisationId], references: [id])
     organisationId      String
 
-    @@unique([organisationId, slug])
+    @@unique([organisationId, slug, deletedAt])
 }
 
 model PermissionGrant {
@@ -398,6 +399,36 @@ model Web {
     deletedAt       DateTime?
     createdAt       DateTime         @default(now())
     updatedAt       DateTime         @updatedAt
+}
+
+enum UsageType {
+    usage
+}
+
+type UsageDataConsumption {
+    cluster_key              String
+    node_key                 String
+    app_id                   String
+    fqdn                     String
+    wasm_hash                String
+    request_id               String
+    is_transaction           Boolean
+    timestamp                Int
+    cpu_consumption          Int
+    native_calls_consumption Int
+}
+
+type UsageData {
+    version       Int
+    consumption   UsageDataConsumption
+    signature_b64 String
+}
+
+model UsageRecord {
+    id        String    @id @default(uuid()) @map("_id")
+    type      UsageType
+    timestamp String
+    data      UsageData
 }
 
 enum CouponType {

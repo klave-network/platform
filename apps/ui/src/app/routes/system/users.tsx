@@ -20,6 +20,7 @@ function Users() {
 
     //react-query has an useInfiniteQuery hook just for this situation!
     const { data, fetchNextPage, isFetching, isLoading } = api.v0.users.infiniteUsers.useInfiniteQuery({
+        filterUnitialized: true,
         limit: 50
     }, {
         getNextPageParam: (lastPage) => lastPage.nextCursor
@@ -57,8 +58,8 @@ function Users() {
 
     //we must flatten the array of arrays from the useInfiniteQuery hook
     const flatData = useMemo(
-        () => data?.pages?.flatMap(page => page.data) ?? [],
-        [data]
+        () => (data?.pages?.flatMap(page => page.data) ?? []),
+        [data?.pages]
     );
     const totalDBRowCount = data?.pages?.[0]?.meta?.totalRowCount ?? 0;
     const totalFetched = flatData.length;
@@ -129,7 +130,7 @@ function Users() {
             </div>
             <div className="sm:px-7 sm:pt-7 px-4 py-4 flex flex-col w-full bg-white dark:bg-gray-900 dark:text-white dark:border-gray-800 sticky top-0">
                 <div className="flex w-full items-center">
-                    Loading... <UilSpinner className='inline-block animate-spin' />
+                    Loading... <UilSpinner className='inline-block animate-spin h-8' />
                 </div>
             </div>
         </>;

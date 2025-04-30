@@ -1,10 +1,8 @@
-import ip from 'ip';
 import url from 'url';
 import path from 'node:path';
 import expectCt from 'expect-ct';
 import express from 'express';
 import session from 'express-session';
-import ews from 'express-ws';
 import helmet from 'helmet';
 import multer from 'multer';
 import cors from 'cors';
@@ -25,23 +23,16 @@ import { trcpMiddlware } from './middleware/trpc';
 // import { i18nextMiddleware } from './middleware/i18n';
 // import { getDriverSubstrate } from '../utils/db';
 import { usersRouter } from './routes';
-import { logger } from '@klave/providers';
 import { webLinkerMiddlware } from './middleware/webLinker';
 import { permissiblePeers } from '@klave/constants';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-const eapp = express();
-const { app, getWss } = ews(eapp, undefined, {
-    // leaveRouterUntouched: true,
-    wsOptions: {
-        path: '/bridge',
-        // noServer: true,
-        clientTracking: true
-    }
-});
+const app = express();
 
-export const start = async (port: number) => {
+export const start = async () => {
+
+    const __hostname = process.env['HOSTNAME'] ?? 'unknown';
 
     app.use(sentryRequestMiddleware);
     app.use(sentryTracingMiddleware);
@@ -56,6 +47,10 @@ export const start = async (port: number) => {
     // app.use(i18nextMiddleware);
     app.use(multer().none());
     app.disable('X-Powered-By');
+    app.use((__unusedReq, res, next) => {
+        res.setHeader('X-Klave-API-Node', __hostname);
+        next();
+    });
     app.use(helmet.frameguard({ action: 'sameorigin' }));
     app.use(helmet.hidePoweredBy());
     app.use(helmet({
@@ -110,21 +105,12 @@ export const start = async (port: number) => {
     // Plug Probot for GitHub Apps
     app.use('/hook', (req, res, next) => {
         if (req.headers['x-github-event'])
-            return probotMiddleware(req, res, next);
-        if (req.headers['stripe-signature'])
-            return stripeMiddlware(req, res, next);
-        next();
+            probotMiddleware(req, res, next);
+        else if (req.headers['stripe-signature'])
+            stripeMiddlware(req, res, next);
+        else
+            next();
     });
-
-    // const {
-    //     generateToken,
-    //     csrfSynchronisedProtection
-    // } = csrfSync();
-
-    // const mongoOptions = {
-    //     client: getDriverSubstrate(),
-    //     collectionName: 'sessions'
-    // };
 
     const sessionOptions: session.SessionOptions = {
         secret: process.env.KLAVE_EXPRESS_SESSION_SECRETS?.split(',') ?? [],
@@ -150,8 +136,27 @@ export const start = async (port: number) => {
         sessionOptions.cookie = { secure: true }; // serve secure cookies
     }
 
-    app.get('/ping', (__unusedReq, res) => {
-        res.json({ pong: true });
+    // TODO - Remove in a few versions
+    app.use('/ping', (__unusedReq, res) => {
+        res.setHeader('X-Klave-API-Status', 'ready');
+        res.status(202).send({
+            ping: true,
+            node: __hostname
+        });
+    });
+
+    app.use('/version', (__unusedReq, res) => {
+
+        res.setHeader('X-Klave-API-Status', 'ready');
+        res.status(202).send({
+            version: {
+                name: process.env.NX_TASK_TARGET_PROJECT,
+                commit: process.env.GIT_REPO_COMMIT?.substring(0, 8),
+                branch: process.env.GIT_REPO_BRANCH,
+                version: process.env.GIT_REPO_VERSION
+            },
+            node: __hostname
+        });
     });
 
     app.use(session(sessionOptions));
@@ -161,99 +166,13 @@ export const start = async (port: number) => {
     app.use(passport.initialize());
     app.use(passport.session());
 
-
-    // passport.serializeUser((user, done) => {
-    //     logger.debug(`serializeUser ${typeof user} >> ${JSON.stringify(user)}`);
-    //     process.nextTick(function () {
-    //         done(null, user.id);
-    //     });
-    // });
-
-    // passport.deserializeUser((id: string, done) => {
-    //     logger.debug(`deserializeUser ${typeof id} >> ${id}`);
-    //     prisma.user.findUnique({ where: { id } })
-    //         .then((user) => {
-    //             process.nextTick(function () {
-    //                 done(null, user);
-    //             });
-    //         })
-    //         .catch((err) => {
-    //             process.nextTick(function () {
-    //                 done(err, null);
-    //             });
-    //         });
-    // });
-
-    // passport.use(new LocalStrategy({
-    //     passReqToCallback: true
-    // }, (req, username, password, done) => {
-    //     const { web, session, user } = req;
-    //     prisma.user.findUnique({ where: { id: user?.id } })
-    //         .then((user) => {
-    //             if (!user) return done(null, false);
-    //             if (password !== (user as any).password) {
-    //                 return done(null, false);
-    //             } else {
-    //                 return done(null, user);
-    //             }
-    //         })
-    //         .catch((err) => { return done(err); });
-    // }));
-
     // Contextualise user session, devices, tags, tokens
     app.use(webLinkerMiddlware);
-
-    app.ws('/bridge', (ws, { session, sessionID, sessionStore }) => {
-        type WsWithSession = typeof ws & { sessionID: string };
-        type SessionWithLocator = typeof session & { locator?: string, localId?: string };
-        (ws as WsWithSession).sessionID = sessionID;
-        ws.on('connection', (ws) => {
-            ws.isAlive = true;
-            logger.info('PLR: Client is alive !');
-        });
-        ws.on('upgrade', () => {
-            logger.info('PLR: Client is upgrading ...');
-        });
-        ws.on('message', (msg) => {
-            const [verb, ...data] = msg.toString().split('#');
-            if (verb === 'request') {
-                logger.info('New Pocket login bridge client request ...');
-                const [locator] = data;
-                (session as SessionWithLocator).locator = locator;
-                session.save(() => {
-                    ws.send(`sid#${sessionID}#ws://${ip.address('public')}:${port}/bridge`);
-                });
-                return;
-            } else if (verb === 'confirm') {
-                logger.info('PLR: New remote device confirmation ...');
-                const [sid, locator, localId] = data;
-                if (sid !== sessionID)
-                    return;
-                sessionStore.get(sid, (err, rsession) => {
-                    if (err) {
-                        logger.error(`Pocket API bridge experienced an issue: ${err}`);
-                        return;
-
-                    } if (!rsession)
-                        return;
-                    if ((rsession as SessionWithLocator).locator !== locator)
-                        return;
-                    (rsession as SessionWithLocator).localId = localId;
-                    sessionStore.set(sid, rsession, () => {
-                        const browserTarget = Array.from(getWss().clients.values()).find(w => (w as WsWithSession).sessionID === sid);
-                        browserTarget?.send('confirmed');
-                    });
-                });
-            }
-            ws.send(msg);
-        });
-    });
 
     app.use(passportLoginCheckMiddleware);
     app.use('/trpc', trcpMiddlware);
     app.use(usersRouter);
     app.use(sentryErrorMiddleware);
-
     app.all('*', (req, res) => {
         res.json({
             path: req.path,

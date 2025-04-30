@@ -1,8 +1,20 @@
 {
     "name": "@klave/hubber",
-    "version": "0.3.6",
+    "version": "1.1.4",
+    "private": false,
+    "description": "Klave Platform server hub",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/klave-network/platform.git",
+        "directory": "apps/hubber"
+    },
     "license": "MIT",
+    "author": {
+        "name": "Florian Guitton",
+        "email": "florian@secretarium.com"
+    },
+    "type": "module",
     "dependencies": {
-        "typescript": "^5.5.4"
+        "typescript": "^5.8.3"
     }
 }

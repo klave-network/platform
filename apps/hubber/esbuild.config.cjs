@@ -6,7 +6,10 @@ const klaveSentryURL = process.env.KLAVE_SENTRY_DSN ? new URL(process.env.KLAVE_
 
 /** @type {import('esbuild').BuildOptions} */
 module.exports = {
-    sourcemap: process.env.NODE_ENV === 'development' ? 'inline' : 'external',
+    // sourcemap: 'both',
+    // minify: false,
+    treeShaking: true,
+    // keepNames: true,
     plugins: [
         // Put the Sentry esbuild plugin after all other plugins
         klaveSentryURL ? sentryEsbuildPlugin({
@@ -17,6 +20,7 @@ module.exports = {
             release: `klave@${JSON.stringify(version)}`
         }) : undefined
     ].filter(Boolean),
+    target: ['node'],
     platform: 'node',
     loader: {
         // ensures .node binaries are copied to ./dist

@@ -13,7 +13,7 @@ const OrganisationDeletion = () => {
     const { orgSlug } = useParams();
     const [nameCopy, setNameCopy] = useState('');
     const [canSubmit, setCanSubmit] = useState(false);
-    const { data: organisation } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug || '' });
+    const { data: organisation } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug ?? '' });
     const utils = api.useUtils().v0.organisations;
     const mutation = api.v0.organisations.delete.useMutation({
         onSuccess: async () => {
@@ -79,7 +79,7 @@ const OrganisationDeletion = () => {
 export const OrganisationSettings: FC = () => {
 
     const { orgSlug } = useParams();
-    const { data: organisation, isLoading } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug || '' }, {
+    const { data: organisation, isLoading } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug ?? '' }, {
 
     });
     const utils = api.useUtils().v0.organisations;
@@ -94,7 +94,7 @@ export const OrganisationSettings: FC = () => {
             slug: z.string()
         }),
         values: {
-            slug: organisation?.slug || ''
+            slug: organisation?.slug ?? ''
         }
     });
 
@@ -103,7 +103,7 @@ export const OrganisationSettings: FC = () => {
             We are fetching data about your organisation.<br />
             It will only take a moment...<br />
             <br />
-            <UilSpinner className='inline-block animate-spin' />
+            <UilSpinner className='inline-block animate-spin h-5' />
         </>;
 
     return <div className="flex flex-col gap-10 w-full justify-start mb-7">
@@ -111,7 +111,7 @@ export const OrganisationSettings: FC = () => {
             onSubmit={(e) => {
                 e.preventDefault();
                 methods.handleSubmit(async (data) => {
-                    await mutation.mutateAsync({ orgSlug: orgSlug || '', data });
+                    await mutation.mutateAsync({ orgSlug: orgSlug ?? '', data });
                     methods.reset();
                 })()
                     .catch(() => { return; });
@@ -141,9 +141,10 @@ export const OrganisationSettings: FC = () => {
             </button>
         </form>
         <div>
-            <h1 className='font-bold text-xl mb-5'>Organisation information</h1>
+            <h1 className='font-bold text-xl mb-5'>Information</h1>
             <p>
                 Name: <b>{organisation.slug.replace('~$~', '')}</b><br />
+                ID: <b className='font-mono'>{organisation.id}</b><br />
             </p>
         </div>
         <div>

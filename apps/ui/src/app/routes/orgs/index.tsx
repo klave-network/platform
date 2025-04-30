@@ -21,7 +21,7 @@ export const OrgListing: FC = () => {
                 </div>
                 <div className="flex items-center space-x-3 sm:mt-7 mt-4" />
             </div>
-            <div className="sm:p-7 p-4">
+            <div className="sm:p-7 p-4 flex-grow">
                 Select an organisation to browse the info
             </div>
         </>;
@@ -31,12 +31,12 @@ export const OrgListing: FC = () => {
             <div className="sm:px-7 sm:pt-7 px-4 pt-4 flex flex-col w-full border-b border-gray-200 bg-white dark:bg-gray-900 dark:text-white dark:border-gray-800 sticky top-0">
                 <div className="flex w-full items-center">
                     <div className="flex items-center text-3xl text-gray-900 dark:text-white">
-                        Looking for your organisation <UilSpinner className='inline-block animate-spin' />
+                        Looking for your organisation <UilSpinner className='inline-block animate-spin h-8' />
                     </div>
                 </div>
                 <div className="flex items-center space-x-3 sm:mt-7 mt-4" />
             </div>
-            <div className="sm:p-7 p-4">
+            <div className="sm:p-7 p-4 flex-grow">
                 We are fetching data about your organisations.<br />
                 It will only take a moment...<br />
             </div>
@@ -52,7 +52,7 @@ export const OrgListing: FC = () => {
                 </div>
                 <div className="flex items-center space-x-3 sm:mt-7 mt-4" />
             </div>
-            <div className="sm:p-7 p-4">
+            <div className="sm:p-7 p-4 flex-grow">
                 We could not find an information about your organisations.<br />
                 Please try again in a little while.<br />
             </div>
@@ -88,7 +88,7 @@ export const OrgListing: FC = () => {
                     Clusters
                 </NavLink>
                 <NavLink to={`/organisation/${orgSlug}/credits`} className={({ isActive }) => `px-3 pb-1.5 border-b-2 ${isActive ? 'border-klave-light-blue text-klave-light-blue dark:text-white dark:border-white font-bold' : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-klave-light-blue'}`}>
-                    Credits
+                    Balance
                 </NavLink>
                 <NavLink to={`/organisation/${orgSlug}/members`} className={({ isActive }) => `px-3 pb-1.5 border-b-2 ${isActive ? 'border-klave-light-blue text-klave-light-blue dark:text-white dark:border-white font-bold' : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-klave-light-blue'}`}>
                     Members
@@ -98,7 +98,7 @@ export const OrgListing: FC = () => {
                 </NavLink>
             </div>
         </div>
-        <div className="sm:p-7 p-4">
+        <div className="sm:p-7 p-4 flex-grow">
             {outlet}
         </div>
     </>;

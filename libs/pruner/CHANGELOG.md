@@ -1,4 +1,70 @@
 # Changelog
+## [1.0.6](https://github.com/klave-network/platform/compare/pruner@1.0.5...pruner@1.0.6) (2025-04-28)
+
+### Dependency Updates
+
+* `api` updated to version `1.0.5`
+* `providers` updated to version `1.0.5`
+* `constants` updated to version `1.0.5`
+
+### Bug Fixes
+
+* **pruner:** Correct loop deletion of deployments do to switch to `deletedAt` update ([d933f2a](https://github.com/klave-network/platform/commit/d933f2a9740204313f052f9c7191f207f3404416))
+
+## [1.0.5](https://github.com/klave-network/platform/compare/pruner@1.0.4...pruner@1.0.5) (2025-04-11)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.4`
+* `api` updated to version `1.0.4`
+* `providers` updated to version `1.0.4`
+* `constants` updated to version `1.0.4`
+## [1.0.4](https://github.com/klave-network/platform/compare/pruner@1.0.3...pruner@1.0.4) (2025-04-10)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.3`
+* `api` updated to version `1.0.3`
+* `providers` updated to version `1.0.3`
+* `constants` updated to version `1.0.3`
+## [1.0.3](https://github.com/klave-network/platform/compare/pruner@1.0.2...pruner@1.0.3) (2025-04-10)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.2`
+* `api` updated to version `1.0.2`
+* `providers` updated to version `1.0.2`
+* `constants` updated to version `1.0.2`
+## [1.0.2](https://github.com/klave-network/platform/compare/pruner@1.0.1...pruner@1.0.2) (2025-02-20)
+
+### Dependency Updates
+
+* `api` updated to version `1.0.1`
+## [1.0.1](https://github.com/klave-network/platform/compare/pruner@1.0.0...pruner@1.0.1) (2025-02-20)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.0`
+* `api` updated to version `1.0.0`
+* `providers` updated to version `1.0.0`
+* `constants` updated to version `1.0.0`
+## [1.0.0](https://github.com/klave-network/platform/compare/pruner@0.1.10...pruner@1.0.0) (2025-01-23)
+
+### Dependency Updates
+
+* `db` updated to version `0.1.10`
+* `api` updated to version `0.1.10`
+* `providers` updated to version `0.1.10`
+* `constants` updated to version `0.1.10`
+
+### ⚠ BREAKING CHANGES
+
+* Moving to pure ESM repo
+
+### Miscellaneous Chores
+
+* Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
+
 ## [0.1.10](https://github.com/klave-network/platform/compare/pruner@0.1.9...pruner@0.1.10) (2024-08-02)
 
 ### Dependency Updates

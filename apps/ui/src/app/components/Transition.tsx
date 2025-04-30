@@ -28,7 +28,7 @@ const CSSTransition: FC<Partial<TransitionProps<HTMLElement>>> = ({
     children,
     ...rest
 }) => {
-    const enterClasses = enter.split(' ').filter((s: string) => s.length);
+    const enterClasses = typeof enter === 'string' ? enter.split(' ').filter((s: string) => s.length) : [];
     const enterStartClasses = enterStart.split(' ').filter((s: string) => s.length);
     const enterEndClasses = enterEnd.split(' ').filter((s: string) => s.length);
     const leaveClasses = leave.split(' ').filter((s: string) => s.length);
@@ -37,11 +37,13 @@ const CSSTransition: FC<Partial<TransitionProps<HTMLElement>>> = ({
     const removeFromDom = unmountOnExit;
 
     function addClasses(node: HTMLElement | null, classes: string[]) {
-        classes.length && node && node.classList.add(...classes);
+        if (classes.length && node)
+            node.classList.add(...classes);
     }
 
     function removeClasses(node: HTMLElement | null, classes: string[]) {
-        classes.length && node && node.classList.remove(...classes);
+        if (classes.length && node)
+            node.classList.remove(...classes);
     }
 
     const nodeRef = React.useRef<HTMLElement>(null);

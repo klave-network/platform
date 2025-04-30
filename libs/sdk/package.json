@@ -1,6 +1,6 @@
 {
     "name": "@klave/sdk",
-    "version": "0.12.0",
+    "version": "0.16.0",
     "private": false,
     "description": "Klave Honest Apps helpers and definitions",
     "repository": {
@@ -15,37 +15,22 @@
     },
     "type": "commonjs",
     "exports": {
-        ".": {
-            "default": "./src/index.js",
-            "require": "./src/index.js"
-        },
-        "./stac": {
-            "default": "./src/compile.js",
-            "require": "./src/compile.js"
-        },
-        "./assembly": {
-            "default": "./assembly/index.ts",
-            "require": "./assembly/index.ts"
-        }
+        ".": "./index.js",
+        "./assembly": "./assembly/index.ts",
+        "./package.json": "./package.json",
+        "./stac": "./compile.js"
     },
-    "main": "assembly/index.ts",
-    "types": "assembly/index.ts",
     "bin": {
-        "stac": "./bin/stac"
+        "stac": "./bin/stac.js"
     },
     "dependencies": {
-        "@klave/as-json": "^0.8.2",
+        "@klave/as-json": "0.9.23",
         "@klave/compiler": "0.5.0",
-        "@swc/helpers": "0.5.12",
-        "@total-typescript/ts-reset": "^0.5.1",
         "as-base64": "0.2.0",
-        "assemblyscript": "0.27.29",
         "chalk": "^4.1.2",
-        "fs-extra": "^11.2.0",
+        "fs-extra": "^11.3.0",
         "path-complete-extname": "1.0.0",
-        "serialize-error": "8.1.0",
-        "uuid": "^10.0.0",
-        "zod": "^3.23.8"
+        "zod": "^3.24.3"
     },
     "devDependencies": {
         "@types/fs-extra": "^11.0.4"

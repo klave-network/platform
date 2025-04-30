@@ -4,6 +4,9 @@ import helmet from '@fastify/helmet';
 import sensible from '@fastify/sensible';
 import websocket from '@fastify/websocket';
 import { app } from './app/app';
+import { sentryOps } from './utils/sentry';
+import { mongoOps } from './utils/mongo';
+import { logger } from './utils/logger';
 
 process.on('unhandledRejection', (reason, p) => {
     console.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
@@ -12,13 +15,23 @@ process.on('unhandledRejection', (reason, p) => {
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
-(async () => {
+const serverHandle = (async () => {
+
+    await sentryOps.initialize();
+    await mongoOps.initialize();
+
     // Instantiate Fastify with some config
     const server = Fastify({
+        disableRequestLogging: true,
         logger: true,
         bodyLimit: 10485760
     });
 
+    // TODO: Enable when migrating to Sentry 8
+    // Sentry.setupFastifyErrorHandler(server);
+
+    // This is to disable content type parsing
+    // It requires handling the raw payload from the request object going forward
     server.removeAllContentTypeParsers();
     server.addContentTypeParser('*', function (__unusedReq, __unusedPayload, done) {
         done(null);
@@ -29,6 +42,8 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3000;
         max: 100,
         timeWindow: '1 minute'
     });
+
+    await server.register(logger);
     await server.register(helmet);
     await server.register(sensible);
     await server.register(websocket);
@@ -60,3 +75,5 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3000;
         console.error(err);
         process.exit(1);
     });
+
+export default async () => await serverHandle;

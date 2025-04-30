@@ -9,14 +9,14 @@ type RunCommandProps = {
     address: string;
     cluster?: string;
     functions?: string[];
-}
+};
 
 type KeyPointer = {
     name: string;
     key: ClearKeyPair & {
         name?: string;
     };
-}
+};
 
 export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = [] }) => {
 
@@ -75,6 +75,7 @@ export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = 
                             key: JSON.parse(e.target?.result as string)
                         });
                     } catch (e) {
+                        console.error(e?.toString());
                         resolve(undefined);
                     }
                 };
@@ -98,10 +99,11 @@ export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = 
                     read.key = await (await Key.importEncryptedKeyPair(key, password)).exportKey();
                 }
             } catch (e) {
+                console.error(e?.toString());
                 return undefined;
             }
             if (read.key)
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
                 (read.key as KeyPointer['key']).name = read.name;
             return read as KeyPointer;
         });
@@ -144,6 +146,7 @@ export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = 
         if (args.trim() !== '')
             JSON.parse(args);
     } catch (e) {
+        console.error(e?.toString());
         passedArgs = JSON.stringify(args);
     }
 
@@ -193,7 +196,7 @@ export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = 
         <h2 className='font-bold mb-3'>Command runner</h2>
         <h3 className='mb-3'>Session identity</h3>
         <div onDrop={handleFileDrop} onDragOverCapture={handleDragOver} onDragLeaveCapture={handleDragLeave} className={`flex box-content ${isHoveringKeys ? ' bg-gray-100' : ''}`}>
-            <select name='klave-route-name' value={selectedPointer} onChange={({ target }) => setSelectedPointer(target.value)} className={`${isHoveringKeys ? 'bg-cyan-700' : 'bg-gray-900'} justify-center align-middle items-center h-9 font-mono mb-2 text-gray-100 border border-gray-300 dark:border-gray-700 dark:text-white w-1/3 text-sm`} >
+            <select title='Route name' name='klave-route-name' value={selectedPointer} onChange={({ target }) => setSelectedPointer(target.value)} className={`${isHoveringKeys ? 'bg-cyan-700' : 'bg-gray-900'} justify-center align-middle items-center h-9 font-mono mb-2 text-gray-100 border border-gray-300 dark:border-gray-700 dark:text-white w-1/3 text-sm`} >
                 <option key='none' value="none" className='h-5'>Ephemeral</option>
                 {connectionKeys?.map((k) => <option key={`key.${k.name}`} value={k.name}>{k.name}</option>)}
             </select>
@@ -203,10 +206,10 @@ export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = 
         <h3 className='mb-3'>Execution input</h3>
         <div className='flex'>
             {functions.length
-                ? <select name='klave-route-name' onChange={({ target }) => setRoute(target.value)} className="h-9 font-mono mb-2 bg-gray-900 text-gray-100 border border-gray-300 dark:border-gray-700 dark:text-white w-full text-sm" >
+                ? <select title='Route name' name='klave-route-name' onChange={({ target }) => setRoute(target.value)} className="h-9 font-mono mb-2 bg-gray-900 text-gray-100 border border-gray-300 dark:border-gray-700 dark:text-white w-full text-sm" >
                     {functions.map((f, i) => <option key={`function.${i}`} value={f}>{f}</option>)}
                 </select>
-                : <input type='text' value={route} onChange={({ target }) => setRoute(target.value)} className="h-9 font-mono mb-2 bg-gray-900 text-gray-100 border border-gray-300 dark:border-gray-700 dark:text-white w-full text-sm" />
+                : <input title='Route name' type='text' value={route} onChange={({ target }) => setRoute(target.value)} className="h-9 font-mono mb-2 bg-gray-900 text-gray-100 border border-gray-300 dark:border-gray-700 dark:text-white w-full text-sm" />
             }
             <button onClick={() => refetch()} className='btn btn-sm h-9 ml-1 mb-2 bg-gray-800 hover:bg-gray-600 text-gray-100 border border-gray-300 dark:border-gray-700 dark:text-white rounded-none text-sm font-normal'>Go</button>
         </div>

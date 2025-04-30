@@ -10,7 +10,7 @@ import { formatTimeAgo } from '../../utils/formatTimeAgo';
 
 type DomainContextProps = {
     domain: Domain
-}
+};
 
 const DomainDeletion: FC<DomainContextProps> = ({ domain: { id } }) => {
 
@@ -56,7 +56,7 @@ const DomainDeletion: FC<DomainContextProps> = ({ domain: { id } }) => {
 
 type DomainRecordProps = {
     domain: Domain
-}
+};
 
 const DomainRecord: FC<DomainRecordProps> = ({ domain }) => {
 
@@ -104,12 +104,12 @@ const DomainRecord: FC<DomainRecordProps> = ({ domain }) => {
 
 type DomainAddBoxProps = {
     onClose(): void
-}
+};
 
 const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
 
     const { appSlug, orgSlug } = useParams();
-    const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug || '', orgSlug: orgSlug || '' });
+    const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug ?? '', orgSlug: orgSlug ?? '' });
     const utils = api.useUtils().v0.domains;
     const createMutation = api.v0.domains.add.useMutation({
         onSuccess: async () => {
@@ -214,8 +214,8 @@ const DomainAddBox: FC<DomainAddBoxProps> = ({ onClose }) => {
 export const DomainListing: FC = () => {
 
     const { appSlug, orgSlug } = useParams();
-    const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug || '', orgSlug: orgSlug || '' });
-    const { data: domainsList, isLoading } = api.v0.domains.getByApplication.useQuery({ appId: application?.id || '' });
+    const { data: application } = api.v0.applications.getBySlug.useQuery({ appSlug: appSlug ?? '', orgSlug: orgSlug ?? '' });
+    const { data: domainsList, isLoading } = api.v0.domains.getByApplication.useQuery({ appId: application?.id ?? '' });
     const [addingDomain, setAddingDomain] = useState(false);
 
     if (isLoading || !domainsList)
@@ -223,7 +223,7 @@ export const DomainListing: FC = () => {
             We are fetching data about your domains.<br />
             It will only take a moment...<br />
             <br />
-            <UilSpinner className='inline-block animate-spin' />
+            <UilSpinner className='inline-block animate-spin h-5' />
         </>;
 
     return <>

@@ -4,7 +4,7 @@
 # Tip: Modify "docker-build" options in project.json to change docker build args.
 #
 # Run the container with `docker run -p 3000:3000 -t ui`.
-FROM docker.io/node:20-alpine
+FROM docker.io/node:22-alpine
 
 ENV HOST=0.0.0.0
 ENV PORT=3000
@@ -15,10 +15,14 @@ WORKDIR /app
 RUN addgroup --system ui && \
     adduser --system -G ui ui
 
-COPY apps/ui/tools/kube_inject.sh .
-COPY dist/apps/ui ui
-RUN chown -R ui:ui .
+COPY --chown=ui:ui --chmod=444 apps/ui/tools/kube_inject.sh .
+COPY --chown=ui:ui --chmod=444 dist/apps/ui ui
 
-RUN yarn add serve
+RUN yarn add serve && yarn cache clean && rm -rf /var/cache/yarn
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3000/ || exit 1
 
 CMD [ "sh", "./kube_inject.sh" ]

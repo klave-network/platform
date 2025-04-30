@@ -90,7 +90,7 @@ export const Login: FC = () => {
                                     <label>
                                         <input {...methods.register('slug')} onChange={e => setSlug(e.target.value.trim())} className="input input-bordered border w-2/3" /><br />
                                         <div className='h-8'>{isCheckingIfExists
-                                            ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-full' /><br />&nbsp;</span>
+                                            ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-5' /><br />&nbsp;</span>
                                             : alreadyExists
                                                 ? <span className="block mt-1 text-xs text-red-700 leading-tight">The name <b>{slug}</b> already exists.<br />&nbsp;</span>
                                                 : slug.length
@@ -159,11 +159,6 @@ export const Login: FC = () => {
             <div className="p-5 min-w-[300px] bg-slate-100 dark:bg-gray-800 rounded-md">
                 <LoginSecKey />
             </div>
-            {/*
-            <div className="p-5 min-w-[300px] bg-slate-100 dark:bg-gray-800 rounded-md">
-                <LoginQR />
-            </div>
-             */}
         </div>
 
     </div>;

@@ -81,7 +81,7 @@ export const RedeemCreditCoupon: FC = () => {
                         <br />
                         <div className="space-y-2">
                             <div className='flex flex-row justify-center items-center gap-1'>
-                                + {Array.from((data.coupon.kredits).toString() || '').map((char, idx) =>
+                                + {Array.from((data.coupon.kredits).toString() ?? '').map((char, idx) =>
                                     <span key={idx} className='text-2xl font-bold'>{char}</span>
                                 )} credits
                             </div>
@@ -118,7 +118,7 @@ export const RedeemCreditCoupon: FC = () => {
                     <br />
                     <div className="space-y-2">
                         <div className='flex flex-row justify-center gap-3'>
-                            {Array.from(code || '').map((char, idx) =>
+                            {Array.from(code ?? '').map((char, idx) =>
                                 <span key={idx} className='text-2xl font-bold'>{char}</span>
                             )}
                         </div>

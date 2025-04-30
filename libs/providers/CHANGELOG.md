@@ -1,4 +1,69 @@
 # Changelog
+## [1.2.3](https://github.com/klave-network/platform/compare/providers@1.2.2...providers@1.2.3) (2025-04-28)
+
+### Dependency Updates
+
+* `constants` updated to version `1.2.2`
+## [1.2.2](https://github.com/klave-network/platform/compare/providers@1.2.1...providers@1.2.2) (2025-04-11)
+
+### Dependency Updates
+
+* `db` updated to version `1.2.1`
+* `constants` updated to version `1.2.1`
+## [1.2.1](https://github.com/klave-network/platform/compare/providers@1.2.0...providers@1.2.1) (2025-04-10)
+
+### Dependency Updates
+
+* `db` updated to version `1.2.0`
+* `constants` updated to version `1.2.0`
+## [1.2.0](https://github.com/klave-network/platform/compare/providers@1.1.2...providers@1.2.0) (2025-04-10)
+
+### Dependency Updates
+
+* `db` updated to version `1.1.2`
+* `constants` updated to version `1.1.2`
+
+### Features
+
+* **providers,hubber:** Adding kredit pipeline data fetching ([89afcb4](https://github.com/klave-network/platform/commit/89afcb4f0154b4acc225a12ae86657d9752c0084))
+
+## [1.1.2](https://github.com/klave-network/platform/compare/providers@1.1.1...providers@1.1.2) (2025-02-20)
+
+### Dependency Updates
+
+* `db` updated to version `1.1.1`
+* `constants` updated to version `1.1.1`
+## [1.1.1](https://github.com/klave-network/platform/compare/providers@1.1.0...providers@1.1.1) (2025-01-23)
+
+### Dependency Updates
+
+* `constants` updated to version `1.1.0`
+## [1.1.0](https://github.com/klave-network/platform/compare/providers@1.0.0...providers@1.1.0) (2025-01-23)
+
+### Dependency Updates
+
+* `constants` updated to version `1.0.0`
+* `db` updated to version `1.0.0`
+
+### Features
+
+* **ui,hubber,providers:** Filter node name through ([620d41b](https://github.com/klave-network/platform/commit/620d41b14324e777bf40fe275decbf890458954f))
+
+## [1.0.0](https://github.com/klave-network/platform/compare/providers@0.2.1...providers@1.0.0) (2024-10-04)
+
+### Dependency Updates
+
+* `constants` updated to version `0.2.1`
+* `db` updated to version `0.2.1`
+
+### ⚠ BREAKING CHANGES
+
+* Moving to pure ESM repo
+
+### Miscellaneous Chores
+
+* Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
+
 ## [0.2.1](https://github.com/klave-network/platform/compare/providers@0.2.0...providers@0.2.1) (2024-07-25)
 
 ### Dependency Updates

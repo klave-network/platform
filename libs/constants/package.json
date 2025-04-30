@@ -1,5 +1,17 @@
 {
     "name": "@klave/constants",
-    "version": "0.4.1",
+    "version": "1.0.10",
+    "private": true,
+    "description": "Klave constants",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/klave-network/platform.git",
+        "directory": "libs/constants"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Florian Guitton",
+        "email": "florian@secretarium.com"
+    },
     "type": "commonjs"
 }

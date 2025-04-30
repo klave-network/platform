@@ -15,7 +15,7 @@ if (swcJestConfig.swcrc === undefined) {
 
 export default {
     displayName: 'api',
-    preset: '../../jest.preset.js',
+    preset: '../../jest.preset.cjs',
     transform: {
         '^.+\\.[tj]s$': ['@swc/jest', swcJestConfig]
     },

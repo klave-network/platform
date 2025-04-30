@@ -1,4 +1,121 @@
 # Changelog
+## [1.1.4](https://github.com/klave-network/platform/compare/hubber@1.1.3...hubber@1.1.4) (2025-04-29)
+
+### Dependency Updates
+
+* `api` updated to version `1.1.3`
+## [1.1.3](https://github.com/klave-network/platform/compare/hubber@1.1.2...hubber@1.1.3) (2025-04-28)
+
+### Dependency Updates
+
+* `constants` updated to version `1.1.2`
+* `providers` updated to version `1.1.2`
+* `api` updated to version `1.1.2`
+* `pruner` updated to version `1.1.2`
+## [1.1.2](https://github.com/klave-network/platform/compare/hubber@1.1.1...hubber@1.1.2) (2025-04-11)
+
+### Dependency Updates
+
+* `db` updated to version `1.1.1`
+* `constants` updated to version `1.1.1`
+* `providers` updated to version `1.1.1`
+* `api` updated to version `1.1.1`
+* `pruner` updated to version `1.1.1`
+
+### Bug Fixes
+
+* **dispatcher,hubber:** Packaging issue with CJS ([9bcf47a](https://github.com/klave-network/platform/commit/9bcf47a5c3e3124e32e3b3b6a79d8435a9aa1685))
+* **hubber:** Sentry profiling incompatibility in node `22-alpine` ([fdbf6b3](https://github.com/klave-network/platform/commit/fdbf6b3795bbfe9fc953d2d7a189dfe2cc654c34))
+
+## [1.1.1](https://github.com/klave-network/platform/compare/hubber@1.1.0...hubber@1.1.1) (2025-04-10)
+
+### Dependency Updates
+
+* `db` updated to version `1.1.0`
+* `constants` updated to version `1.1.0`
+* `providers` updated to version `1.1.0`
+* `api` updated to version `1.1.0`
+* `pruner` updated to version `1.1.0`
+
+### Bug Fixes
+
+* **hubber:** Dockerfile node version causes issues with `@sentry/profiling` ([59bd5af](https://github.com/klave-network/platform/commit/59bd5af6f899d19a5e75f68bb9eadf3276db4519))
+
+## [0.3.5](https://github.com/klave-network/platform/compare/hubber@1.0.2...hubber@0.3.5) (2025-04-07)
+
+
+### Bug Fixes
+
+* **providers,api,hubber:** Align types mismatches ([e9bbf67](https://github.com/klave-network/platform/commit/e9bbf67afe7b7a05161929b53d87fd6e870e61bf))
+
+## [1.1.0](https://github.com/klave-network/platform/compare/hubber@1.0.2...hubber@1.1.0) (2025-04-10)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.2`
+* `constants` updated to version `1.0.2`
+* `providers` updated to version `1.0.2`
+* `api` updated to version `1.0.2`
+* `pruner` updated to version `1.0.2`
+
+### Features
+
+* **providers,hubber:** Adding kredit pipeline data fetching ([89afcb4](https://github.com/klave-network/platform/commit/89afcb4f0154b4acc225a12ae86657d9752c0084))
+
+
+### Bug Fixes
+
+* **hubber:** Resolving bug in `owner` resolution in deployment ([7783a9b](https://github.com/klave-network/platform/commit/7783a9bf561bce9bbf156f123f39faaedca686c8))
+
+## [1.1.0](https://github.com/klave-network/platform/compare/hubber@0.3.3...hubber@1.1.0) (2025-03-03)
+
+### ⚠ BREAKING CHANGES
+
+* Short-circuiting the `develop` track to provide release for non-compilable ESM format
+
+## [1.0.2](https://github.com/klave-network/platform/compare/hubber@1.0.1...hubber@1.0.2) (2025-02-20)
+
+### Dependency Updates
+
+* `api` updated to version `1.0.1`
+* `pruner` updated to version `1.0.1`
+## [1.0.1](https://github.com/klave-network/platform/compare/hubber@1.0.0...hubber@1.0.1) (2025-02-20)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.0`
+* `constants` updated to version `1.0.0`
+* `providers` updated to version `1.0.0`
+* `api` updated to version `1.0.0`
+* `pruner` updated to version `1.0.0`
+## [1.0.0](https://github.com/klave-network/platform/compare/hubber@0.3.4...hubber@1.0.0) (2025-01-23)
+
+### Dependency Updates
+
+* `db` updated to version `0.3.4`
+* `providers` updated to version `0.3.4`
+* `constants` updated to version `0.3.4`
+* `api` updated to version `0.3.4`
+* `pruner` updated to version `0.3.4`
+
+### ⚠ BREAKING CHANGES
+
+* Moving to pure ESM repo
+
+### Features
+
+* **ui,hubber,providers:** Filter node name through ([620d41b](https://github.com/klave-network/platform/commit/620d41b14324e777bf40fe275decbf890458954f))
+
+
+### Bug Fixes
+
+* **hubber:** Add explicit externals for ESBuild ([09d6847](https://github.com/klave-network/platform/commit/09d6847b35558dd12b75e4a4f74cfbe9bf08789b))
+* Package `git-rev-sync` relies on non-ESM features so we provide explicit location ([cee72ae](https://github.com/klave-network/platform/commit/cee72ae5cd5a2fe998c987864b060f039ddb939b))
+
+
+### Miscellaneous Chores
+
+* Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
 
 ## [0.3.6](https://github.com/klave-network/platform/compare/hubber@0.3.5...hubber@0.3.6) (2025-04-07)
 

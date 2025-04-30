@@ -1,3 +1,4 @@
+import os from 'node:os';
 import { prisma } from '@klave/db';
 import { logger } from './logger';
 
@@ -13,10 +14,11 @@ export const envOps = {
         });
         if (process.env['KLAVE_LOAD_ENV'] === 'true')
             await Promise.all(Object.entries(process.env).map(async ([key, value]) => {
+                if (!value)
+                    return;
                 if (key.startsWith('KLAVE_') ||
                     key.startsWith('KLAVE_SECRETARIUM_') ||
                     key.startsWith('KLAVE_GITHUB_') ||
-                    key.startsWith('KLAVE_') ||
                     key.startsWith('SECRETARIUM_') ||
                     key.startsWith('GITHUB_'))
                     if ((await prisma.environment.findMany({
@@ -32,5 +34,7 @@ export const envOps = {
                         });
                     }
             }));
+        if (!process.env['HOSTNAME'] || process.env['HOSTNAME'] === 'unknown')
+            process.env['HOSTNAME'] = os.hostname() ?? 'unknown';
     }
 };

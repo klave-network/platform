@@ -29,7 +29,7 @@
                     "typescript",
                     "visitor-as"
                 ],
-                "esbuildConfig": "apps/hubber/esbuild.config.js"
+                "esbuildConfig": "apps/hubber/esbuild.config.cjs"
             },
             "configurations": {
                 "development": {

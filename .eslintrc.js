@@ -33,7 +33,12 @@ const javascriptRules = {
     'no-extra-semi': 'error',
     'no-unused-vars': [
         'error',
-        { args: 'after-used', varsIgnorePattern: '^__unused' }
+        {
+            args: 'after-used',
+            varsIgnorePattern: '^__unused',
+            caughtErrorsIgnorePattern: '^__unused',
+            destructuredArrayIgnorePattern: '^_u'
+        }
     ],
     'semi': ['error', 'always']
 };
@@ -43,10 +48,7 @@ const typescriptRules = {
     'no-unused-vars': 'off',
     '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/no-non-null-assertion': 'error',
-    '@typescript-eslint/no-unused-vars': [
-        'error',
-        { args: 'after-used', varsIgnorePattern: '^__unused' }
-    ],
+    '@typescript-eslint/no-unused-vars': javascriptRules['no-unused-vars'],
     '@typescript-eslint/no-floating-promises': 'error',
     '@typescript-eslint/promise-function-async': 'error',
     '@typescript-eslint/no-misused-promises': 'error'

@@ -3,7 +3,8 @@
         "../../.eslintrc.js"
     ],
     "ignorePatterns": [
-        "!**/*"
+        "!**/*",
+        "template"
     ],
     "overrides": [
         {

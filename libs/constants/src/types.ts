@@ -13,15 +13,15 @@ export type BackendVersion = {
             build_number: number;
         };
     };
-}
+};
 
 export type KlaveGetCreditResult = {
     kredit: bigint
-}
+};
 
 export type StagedOutputGroups = Record<'clone' | 'fetch' | 'install' | 'build', Array<{
     type: 'stdout' | 'stderr';
     full: boolean;
     time: string;
     data: string;
-}>>
+}>>;

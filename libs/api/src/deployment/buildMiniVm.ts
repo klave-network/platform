@@ -5,7 +5,7 @@ import fetch from 'node-fetch';
 import { webcrypto } from 'node:crypto';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { ErrorObject, serializeError } from 'serialize-error';
-import type { Stats } from 'assemblyscript/dist/asc';
+import type { Stats } from 'assemblyscript/dist/asc.js';
 import { Utils } from '@secretarium/connector';
 import type { Context } from 'probot';
 import type { InstallationAccessTokenAuthentication } from '@octokit/auth-app';
@@ -42,7 +42,7 @@ type BuildOutput = {
 } | {
     success: false;
     error?: Error | ErrorObject;
-})
+});
 
 export type DeploymentContext<Type> = {
     octokit: Context['octokit']
@@ -56,7 +56,7 @@ export type BuildMiniVMOptions = {
     application: NonNullable<RepoConfigSchemaLatest['applications']>[number] | undefined;
     deployment: Deployment;
     // dependencies: Record<string, string>;
-}
+};
 
 export class BuildMiniVM {
 
@@ -403,12 +403,15 @@ export class BuildMiniVM {
                                 digests: {}
                             };
                         } else if (message.type === 'write') {
-                            if ((message.filename).endsWith('.wasm'))
-                                compiledBinary = message.contents ? Uint8Array.from(typeof message.contents === 'string' ? Buffer.from(message.contents) : message.contents) : new Uint8Array(0);
-                            if ((message.filename).endsWith('.wat')) {
-                                compiledWAT = message.contents?.toLocaleString() ?? undefined;
-                            } if ((message.filename).endsWith('.d.ts'))
-                                compiledDTS = message.contents?.toLocaleString() ?? undefined;
+                            if (message.contents) {
+                                if ((message.filename).endsWith('.wasm'))
+                                    compiledBinary = message.contents ? Uint8Array.from(typeof message.contents === 'string' ? Buffer.from(message.contents) : message.contents) : new Uint8Array(0);
+                                if ((message.filename).endsWith('.wat')) {
+                                    compiledWAT = typeof message.contents === 'string' ? message.contents : Buffer.from(message.contents).toString() ?? undefined;
+                                } if ((message.filename).endsWith('.d.ts')) {
+                                    compiledDTS = typeof message.contents === 'string' ? message.contents : Buffer.from(message.contents).toString() ?? undefined;
+                                }
+                            }
                         } else if (message.type === 'progress') {
                             outputProgress[message.stage] = outputProgress[message.stage] ?? [];
                             outputProgress[message.stage].push({

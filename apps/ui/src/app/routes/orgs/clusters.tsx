@@ -17,7 +17,7 @@ const AddCluster = () => {
     const [canSubmit, setCanSubmit] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [error, setError] = useState<string>();
-    const { data: organisation } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug || '' });
+    const { data: organisation } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug ?? '' });
     const utils = api.useUtils().v0.clusters;
     const addMutation = api.v0.clusters.addCluster.useMutation({
         onError(error) {
@@ -99,7 +99,7 @@ const AddCluster = () => {
 
 type ClusterContextProps = {
     cluster: Cluster
-}
+};
 
 const ClusterDeletion: FC<ClusterContextProps> = ({ cluster: { id } }) => {
 
@@ -144,7 +144,7 @@ const ClusterDeletion: FC<ClusterContextProps> = ({ cluster: { id } }) => {
 
 type ClusterRecordProps = {
     cluster: Cluster
-}
+};
 
 const ClusterRecord: FC<ClusterRecordProps> = ({ cluster }) => {
 
@@ -179,15 +179,15 @@ const ClusterRecord: FC<ClusterRecordProps> = ({ cluster }) => {
 export const ClusterListing: FC = () => {
 
     const { orgSlug } = useParams();
-    const { data: organisation } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug || '' });
-    const { data: clustersAllocationList, isLoading } = api.v0.clusters.getAllocationByOrganisationId.useQuery({ organisationId: organisation?.id || '' });
+    const { data: organisation } = api.v0.organisations.getBySlug.useQuery({ orgSlug: orgSlug ?? '' });
+    const { data: clustersAllocationList, isLoading } = api.v0.clusters.getAllocationByOrganisationId.useQuery({ organisationId: organisation?.id ?? '' });
 
     if (isLoading || !clustersAllocationList)
         return <>
             We are fetching data about your clusters.<br />
             It will only take a moment...<br />
             <br />
-            <UilSpinner className='inline-block animate-spin' />
+            <UilSpinner className='inline-block animate-spin h-5' />
         </>;
 
     return <div className="flex flex-col w-full justify-start mb-7">

@@ -7,6 +7,7 @@ import { logger } from './logger';
 export const githubOps = {
     initialize: async () => {
 
+        console.log('Initializing GitHub Sync');
         return trace({
             name: 'BOOT GitHub Sync',
             op: 'boot.github',
@@ -59,18 +60,12 @@ export const githubOps = {
                         });
 
                         const installationOctokit = await probot.auth(installation.id);
-                        const reposData = await installationOctokit.paginate(
+                        const repos = await installationOctokit.paginate(
                             installationOctokit.apps.listReposAccessibleToInstallation,
                             {
                                 per_page: 100
                             }
                         );
-
-                        // TODO - this is a hack to get around the fact that the type definition for the above call is wrong
-                        // See bug report at https://github.com/octokit/plugin-paginate-rest.js/issues/350
-                        const repos = Array.isArray(reposData) ? reposData as typeof reposData['repositories'] : [];
-                        if (reposData.repositories)
-                            repos.push(...reposData.repositories);
 
                         logger.info(`Syncing ${repos.length} repositories for installation ${installation.id}`);
                         for (const repo of repos) {

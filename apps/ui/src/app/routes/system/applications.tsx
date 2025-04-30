@@ -12,9 +12,9 @@ import {
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { UilSpinner } from '@iconscout/react-unicons';
 import api from '../../utils/api';
-import CreditDisplay from '../../components/CreditDisplay';
+import BalanceDisplay from '../../components/BalanceDisplay';
 
-function Organisations() {
+function Applications() {
 
     const tableContainerRef = useRef<HTMLDivElement>(null);
     const [sorting, setSorting] = useState<SortingState>([]);
@@ -52,7 +52,7 @@ function Organisations() {
             {
                 accessorKey: 'kredits',
                 header: 'Kredits',
-                cell: info => <CreditDisplay compact kredits={info.getValue<number>()} />
+                cell: info => <BalanceDisplay compact kredits={info.getValue<number>()} />
             },
             {
                 accessorKey: 'id',
@@ -142,7 +142,7 @@ function Organisations() {
             </div>
             <div className="sm:px-7 sm:pt-7 px-4 py-4 flex flex-col w-full bg-white dark:bg-gray-900 dark:text-white dark:border-gray-800 sticky top-0">
                 <div className="flex w-full items-center">
-                    Loading... <UilSpinner className='inline-block animate-spin' />
+                    Loading... <UilSpinner className='inline-block animate-spin h-8' />
                 </div>
             </div>
         </>;
@@ -237,4 +237,4 @@ function Organisations() {
     </>;
 }
 
-export default Organisations;
+export default Applications;

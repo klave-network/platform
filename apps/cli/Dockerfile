@@ -4,18 +4,16 @@
 # Tip: Modify "docker-build" options in project.json to change docker build args.
 #
 # Run the container with `docker run -p 3000:3000 -t cli`.
-FROM docker.io/node:20-alpine
+FROM docker.io/node:22-alpine
 
-ENV HOST=0.0.0.0
-ENV PORT=3000
+ENV HUSKY=0
 
 WORKDIR /app
 
 RUN addgroup --system cli && \
     adduser --system -G cli cli
 
-COPY dist/apps/cli cli
-RUN chown -R cli:cli .
+COPY --chown=cli:cli --chmod=444 dist/apps/cli cli
 
 # You can remove this install step if you build with `--bundle` option.
 # The bundled output will include external dependencies.

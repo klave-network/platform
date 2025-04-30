@@ -2,7 +2,7 @@
 # Tip: Modify "docker-build" options in project.json to change docker build args.
 #
 # Run the container with `docker run -p 3000:3000 -t hubber`.
-FROM docker.io/node:20-alpine AS builder
+FROM docker.io/node:22.9-alpine AS builder
 
 ENV HUSKY=0
 
@@ -11,9 +11,10 @@ WORKDIR /app
 RUN addgroup --system hubber && \
     adduser --system -G hubber hubber
 
-COPY --chown=hubber:hubber dist/apps/hubber/package.json hubber/
-COPY --chown=hubber:hubber dist/apps/hubber/yarn.lock hubber/
-COPY --chown=hubber:hubber libs/db/src/prisma hubber/prisma
+COPY --chown=hubber:hubber --chmod=444 dist/apps/hubber/package.json hubber/
+COPY --chown=hubber:hubber --chmod=444 dist/apps/hubber/yarn.lock hubber/
+COPY --chown=hubber:hubber --chmod=444 tools/fixtures/.yarnclean hubber/
+COPY --chown=hubber:hubber --chmod=444 libs/db/src/prisma hubber/prisma
 
 RUN cd hubber && yarn install --production --no-cache && yarn cache clean
 
@@ -21,13 +22,13 @@ FROM builder AS db
 
 WORKDIR /app
 
-RUN cd hubber && yarn add prisma && yarn cache clean
+RUN cd hubber && yarn add prisma && yarn autoclean --production && yarn cache clean
 RUN cd hubber && yarn run prisma generate
 
 FROM docker.io/node:22-alpine AS base
 
 ENV HUSKY=0
-ENV RUST_VERSION=1.85.1 \
+ENV RUST_VERSION=1.85.0 \
     RUSTUP_INIT_SKIP_PATH_CHECK=yes \
     RUSTUP_INIT_NO_MODIFY_PATH=no \
     RUSTUP_HOME=/usr/local/rustup \
@@ -42,7 +43,8 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- --no-modify-path --profile minimal
     cargo --version; \
     rustc --version; \
     rustup target add wasm32-unknown-unknown --toolchain $RUST_VERSION; \
-    cargo install cargo-component
+    cargo install cargo-quickinstall; \
+    cargo quickinstall cargo-component
 
 FROM base AS final
 
@@ -55,9 +57,9 @@ RUN addgroup --system hubber && \
 
 WORKDIR /app
 
-COPY --chown=hubber:hubber dist/apps/hubber hubber
-COPY --chown=hubber:hubber --from=builder /app/hubber/node_modules hubber/node_modules
-COPY --chown=hubber:hubber --from=db /app/hubber/node_modules/.prisma hubber/node_modules/.prisma
+COPY --chown=hubber:hubber --chmod=444 --from=builder /app/hubber/node_modules hubber/node_modules
+COPY --chown=hubber:hubber --chmod=444 --from=db /app/hubber/node_modules/.prisma hubber/node_modules/.prisma
+COPY --chown=hubber:hubber --chmod=444 dist/apps/hubber hubber
 
 WORKDIR /app/hubber
 

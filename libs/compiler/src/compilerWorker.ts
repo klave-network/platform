@@ -20,7 +20,7 @@ type ParentMessage = {
     contents: string | null;
 } | {
     type: 'compile';
-}
+};
 
 type CompilerMessage = {
     type: 'read';
@@ -48,7 +48,7 @@ type CompilerMessage = {
     version: string;
 } | {
     type: 'compile';
-}
+};
 
 export class CompilerHost {
 

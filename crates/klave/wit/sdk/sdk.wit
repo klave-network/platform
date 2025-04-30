@@ -1,0 +1,73 @@
+package klave:sdk;
+
+interface sdk {
+    // for now no types : keep same interface as pure host-provided native calls
+
+    // should only be called by register-routes
+    add-user-query: func(query-name: string);
+    add-user-transaction: func(transaction-name: string);
+
+    // normal sdk calls accessible to the user
+
+    // Notifications
+    notify: func(msg: string);
+    notify-error: func(msg: string);
+    on-success-notify: func(msg: string);
+
+    // Context
+    query-context: func(param: string) -> result<string, string>;
+
+    // Ledger
+    read-ledger: func(table: string, key: list<u8>) -> result<list<u8>, string>;
+    write-ledger: func(table: string, key: list<u8>, value: list<u8>) -> result<_, string>;
+    remove-from-ledger: func(table: string, key: list<u8>) -> result<_, string>;
+
+    // LLM - Inference
+    load-lightgbm-model: func(name: string, model: string) -> result<_, string>;
+    unload-lightgbm-model: func(name: string) -> result<_, string>;
+    infer-from-lightgbm-model: func(name: string, data: list<f64>, nb-outputs: s32) -> result<list<f64>, string>;
+
+    //Subtle Crypto
+    key-exists: func(key-name: string) -> result<bool, string>;
+    generate-key: func(key-name: string, algorithm: s32, algo-metadata: string, extractable: s32, usages: list<u8>) -> result<string, string>;
+    import-key: func(key-name: string, key-format: s32, key-data: list<u8>, algorithm: s32, algo-metadata: string, extractable: s32, usages: list<u8>) -> result<string, string>;
+    export-key: func(key-name: string, key-format: s32) -> result<list<u8>, string>;
+    get-public-key: func(key-name: string) -> result<list<u8>, string>;
+    get-public-key-as-cryptokey: func(key-name: string) -> result<string, string>;
+    derive-key: func(base-key-name: string, derivation-algorithm: s32, derivation-metadata: string, derived-key-algorithm: s32, derived-key-metadata: string, extractable: s32, usages: list<u8>) -> result<string, string>;
+    encrypt: func(key-name: string, encrypt-algo-id: s32, encrypt-metadata: string, plain-txt: list<u8>) -> result<list<u8>, string>;
+    decrypt: func(key-name: string, decrypt-algo-id: s32, decrypt-metadata: string, cipher-txt: list<u8>) -> result<list<u8>, string>;
+    sign: func(key-name: string, sign-algo-id: s32, sign-metadata: string, txt: list<u8>) -> result<list<u8>, string>;
+    verify: func(key-name: string, sign-algo-id: s32, sign-metadata: string, txt: list<u8>, signature: list<u8>) -> result<bool, string>;
+    digest: func(algo-id: s32, hash-metadata: string, txt: list<u8>) -> result<list<u8>, string>;
+    unwrap-key: func(decrypt-key-name: string, decrypt-algo-id: s32, decrypt-metadata: string, key-name-to-import: string, key-format: s32, wrapped-key-data: list<u8>, algorithm: s32, algo-metadata: string, extractable: s32, usages: list<u8>) -> result<string, string>;
+    wrap-key: func(key-name-to-export: string, key-format: s32, encrypt-key-name: string, encrypt-algo-id: s32, encrypt-metadata: string) -> result<list<u8>, string>;
+
+    //CryptoKey Management
+    save-key: func(key-name: string) -> result<_, string>;
+    persist-key: func(key-persist-params: string) -> result<_, string>;
+    load-key: func(key-name: string) -> result<string, string>;
+    delete-key: func(key-name: string) -> result<_, string>;
+
+    //Simple Crypto
+    generate-simple-encryption-key: func(key-name: string) -> result<_, string>;
+    generate-simple-signing-key: func(key-name: string) -> result<_, string>;
+    simple-encrypt: func(key-name: string, plain-txt: list<u8>) -> result<list<u8>, string>;
+    simple-decrypt: func(key-name: string, cipher-txt: list<u8>) -> result<list<u8>, string>;
+    simple-sign: func(key-name: string, txt: list<u8>) -> result<list<u8>, string>;
+    simple-verify: func(key-name: string, txt: list<u8>, signature: list<u8>) -> result<bool, string>;
+    simple-digest: func(txt: list<u8>) -> result<list<u8>, string>;
+
+    //Random
+    get-random-bytes: func(len: s32) -> result<list<u8>, string>;
+
+    //HTTP
+    https-query: func(request: string) -> result<string, string>;
+
+    //Subscription
+    start-recording: func();
+    stop-recording: func();
+
+    //Transaction
+    cancel-transaction: func();
+}

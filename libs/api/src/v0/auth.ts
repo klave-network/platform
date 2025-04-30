@@ -10,6 +10,8 @@ import { type startRegistration, type startAuthentication } from '@simplewebauth
 import { Utils } from '@secretarium/connector';
 // import * as passport from 'passport';
 import { z } from 'zod';
+import { render } from '@react-email/components';
+import { VerificationCodeEmail, RegistrationFollowUpEmail } from '@klave/ui-kit';
 
 const mailGuard = new FakeMailGuard({
     allowDisposable: false,
@@ -80,6 +82,29 @@ export const authRouter = createTRPCRouter({
                     slug: newSlug
                 }
             });
+
+            const transporter = createTransport(process.env['KLAVE_SMTP_HOST']);
+            const [keySelector, domainName] = (process.env['KLAVE_DKIM_DOMAIN'] ?? '@').split('@');
+            const followUpEmail = await render(RegistrationFollowUpEmail({ slug: newSlug }));
+
+            if (!keySelector || !domainName)
+                throw new Error('DKIM domain not set');
+
+            await Sentry.startSpan({
+                name: 'Email Transport',
+                op: 'mailer.send',
+                description: 'Email Transport'
+            }, async () => transporter.sendMail({
+                from: process.env['KLAVE_NOREPLY_ADDRESS'],
+                to: user.emails[0], // unsure if we should send email to all addresses
+                subject: 'Welcome to Klave',
+                html: followUpEmail,
+                dkim: {
+                    domainName,
+                    keySelector,
+                    privateKey: process.env['KLAVE_DKIM_PRIVATE_KEY'] ?? ''
+                }
+            }));
 
             await new Promise<void>((resolve, reject) => {
                 session.save(() => {
@@ -209,6 +234,11 @@ export const authRouter = createTRPCRouter({
                 const [keySelector, domainName] = (process.env['KLAVE_DKIM_DOMAIN'] ?? '@').split('@');
                 if (!keySelector || !domainName)
                     throw new Error('DKIM domain not set');
+
+                const verificationCodeEmail = await render(VerificationCodeEmail({
+                    code: temporaryCode.substring(0, 3) + '-' + temporaryCode.substring(3, 6) + '-' + temporaryCode.substring(6, 9),
+                    title: 'Your login code for Klave'
+                }));
                 await Sentry.startSpan({
                     name: 'Email Transport',
                     op: 'mailer.send',
@@ -216,8 +246,8 @@ export const authRouter = createTRPCRouter({
                 }, async () => transporter.sendMail({
                     from: process.env['KLAVE_NOREPLY_ADDRESS'],
                     to: email,
-                    subject: 'Login code',
-                    text: `Your Klave login code is: ${temporaryCode.substring(0, 3)}-${temporaryCode.substring(3, 6)}-${temporaryCode.substring(6, 9)}`,
+                    subject: 'Klave login code',
+                    html: verificationCodeEmail,
                     dkim: {
                         domainName,
                         keySelector,
@@ -382,7 +412,8 @@ export const authRouter = createTRPCRouter({
         }))
         .mutation(async ({ ctx: { prisma, session, sessionStore }, input: { email, data } }) => {
 
-            const credId = data.id.padEnd(data.id.length + 4 - data.id.length % 4, '=');
+            const credId = data.id;
+            const credIdPadded = data.id.padEnd(data.id.length + 4 - data.id.length % 4, '=');
             logger.debug(`wan: Seeking credID ${credId} for email ${email}`);
             const user = await prisma.user.findFirst({
                 where: {
@@ -391,7 +422,9 @@ export const authRouter = createTRPCRouter({
                     },
                     webauthCredentials: {
                         some: {
-                            credentialID: credId
+                            credentialID: {
+                                in: [credId, credIdPadded]
+                            }
                         }
                     }
                 },
@@ -442,7 +475,7 @@ export const authRouter = createTRPCRouter({
                 expectedRPID: rpID,
                 authenticator: {
                     credentialPublicKey: Utils.fromBase64(authenticator.credentialPublicKey),
-                    credentialID: Utils.fromBase64(authenticator.credentialID),
+                    credentialID: authenticator.credentialID,
                     counter: authenticator.counter
                 }
             };
@@ -536,7 +569,7 @@ export const authRouter = createTRPCRouter({
                 rpID,
                 // We pretend we found a user with this email address
                 // TODO - Ensure we compute a fake UUID not based on email to avoid revealing registration status
-                userID: user?.id ?? String(await webcrypto.subtle.digest('SHA-256', Buffer.from(email))),
+                userID: new TextEncoder().encode(user?.id ?? String(await webcrypto.subtle.digest('SHA-256', Buffer.from(email)))),
                 userName: email,
                 userDisplayName: `${email} | ${process.env['KLAVE_WEBAUTHN_ORIGIN_NAME']}`,
                 timeout: 60000,
@@ -646,7 +679,7 @@ export const authRouter = createTRPCRouter({
                             }
                         },
                         credentialPublicKey: Utils.toBase64(credentialPublicKey, true),
-                        credentialID: Utils.toBase64(credentialID, true),
+                        credentialID,
                         credentialType,
                         credentialDeviceType,
                         credentialBackedUp,

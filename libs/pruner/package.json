@@ -1,6 +1,17 @@
 {
     "name": "@klave/pruner",
-    "version": "0.1.10",
-    "type": "commonjs",
-    "license": "MIT"
+    "version": "1.0.6",
+    "private": true,
+    "description": "Klave autocleaning routines",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/klave-network/platform.git",
+        "directory": "libs/pruner"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Florian Guitton",
+        "email": "florian@secretarium.com"
+    },
+    "type": "commonjs"
 }

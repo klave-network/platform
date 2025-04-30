@@ -9,11 +9,11 @@ type AttestationCheckerProps = {
     deploymentId: string;
     address: string;
     cluster?: string;
-}
+};
 
 export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, address, cluster }) => {
 
-    const { data: deployment, isLoading: isLoadingDeployments } = api.v0.deployments.getById.useQuery({ deploymentId: deploymentId || '' });
+    const { data: deployment, isLoading: isLoadingDeployments } = api.v0.deployments.getById.useQuery({ deploymentId: deploymentId ?? '' });
     const [challenge, setChallenge] = useState(Array.from(Utils.getRandomBytes(64)));
     const [hasLaunched, setHasLaunched] = useState(false);
     const [isValidating, setIsValidating] = useState(true);

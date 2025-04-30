@@ -88,6 +88,11 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
     const repo = await prisma.repo.findUnique({
         include: {
             applications: {
+                where: {
+                    deletedAt: {
+                        isSet: false
+                    }
+                },
                 include: {
                     organisation: true
                 }
@@ -208,6 +213,9 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                         try {
                             const previousDeployment = await prisma.deployment.findFirst({
                                 where: {
+                                    deletedAt: {
+                                        isSet: false
+                                    },
                                     deploymentAddress: {
                                         fqdn: target
                                     },
@@ -255,7 +263,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
 
                             contextualDeploymentId = deployment.id;
 
-                            logger.debug(`Starting compilation ${deployment.id} ...`, {
+                            logger.debug(`Starting compilation ${deployment.id} for target ${target}...`, {
                                 parent: 'dpl'
                             });
 
@@ -273,15 +281,6 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                             deploymentId: deployment.id
                                         }
                                     }
-                                }
-                            });
-
-                            await prisma.deployment.update({
-                                where: {
-                                    id: deployment.id
-                                },
-                                data: {
-                                    status: 'deploying'
                                 }
                             });
 
@@ -304,11 +303,17 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                     });
 
                                     if (!currentState) {
+                                        logger.debug(`Deployment ${deployment.id} is no longer available`, {
+                                            parent: 'dpl'
+                                        });
                                         clearInterval(CompletionPollingInterval);
                                         return;
                                     }
 
                                     if (currentState.status === 'deployed' || currentState.status === 'errored') {
+                                        logger.debug(`Deployment ${deployment.id} already completed`, {
+                                            parent: 'dpl'
+                                        });
                                         clearInterval(CompletionPollingInterval);
                                         return;
                                     }
@@ -319,7 +324,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                         parent: 'dpl'
                                     });
 
-                                    if (timeSinceLastUpdate > 1000 * 60 * 5) {
+                                    if (timeSinceLastUpdate > 1000 * 60) {
                                         logger.debug(`Deployment ${deployment.id} timed out`, {
                                             parent: 'dpl'
                                         });
@@ -371,6 +376,15 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 repo,
                                 application: applicationObject,
                                 deployment
+                            });
+
+                            await prisma.deployment.update({
+                                where: {
+                                    id: deployment.id
+                                },
+                                data: {
+                                    status: 'compiling'
+                                }
                             });
 
                             const buildResult = await buildVm.build();
@@ -456,6 +470,15 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 });
                             }
 
+                            await prisma.deployment.update({
+                                where: {
+                                    id: deployment.id
+                                },
+                                data: {
+                                    status: 'deploying'
+                                }
+                            });
+
                             await sendToSecretarium({
                                 deployment,
                                 wasmB64,
@@ -524,45 +547,6 @@ export const sendToSecretarium = async ({
         }
     }) : null;
 
-    const handleSuccess = async () => {
-        logger.debug(`Successfully ${targetRef ? 'updated' : 'registered'} smart contract: ${target}`);
-        await prisma.deployment.update({
-            where: {
-                id: deployment.id
-            },
-            data: {
-                status: 'deployed'
-            }
-        });
-        if (previousDeployment) {
-            logger.debug(`Deleting previous deployment ${previousDeployment.id} for ${target}`);
-            const createCaller = createCallerFactory(router);
-            const caller = createCaller({
-                prisma,
-                session: {},
-                override: '__system_post_deploy'
-            } as unknown as Context);
-            caller.v0.deployments.delete({
-                deploymentId: previousDeployment.id
-            }).catch((error) => {
-                logger.debug(`Failure while deleting previous deployment ${previousDeployment.id} for ${target}:, ${error}`);
-            });
-        }
-    };
-
-    const rollback = async () => {
-        if (previousDeployment) {
-            await prisma.deployment.update({
-                where: {
-                    id: previousDeployment.id
-                },
-                data: {
-                    status: previousDeployment.status
-                }
-            });
-        }
-    };
-
     let currentSCP = scp;
     if (targetCluster) {
         logger.debug(`Using out-of-band deployment cluster ${targetCluster} for ${target}`);
@@ -595,6 +579,86 @@ export const sendToSecretarium = async ({
         }
     }
 
+    const handleSuccess = async () => {
+        logger.debug(`Successfully ${targetRef ? 'updated' : 'registered'} smart contract: ${target}`);
+        await prisma.deployment.update({
+            where: {
+                id: deployment.id
+            },
+            data: {
+                status: 'deployed'
+            }
+        });
+
+        logger.debug(`Setting default kredit limits for application ${deployment.applicationId}`);
+        await Sentry.startSpan({
+            name: 'SCP Subtask',
+            op: 'scp.task.kredit.transaction.allow',
+            description: 'Secretarium Task Transaction Kredit Allocation'
+        }, async () => {
+            return await new Promise((resolve, reject) => {
+
+                currentSCP.newTx('wasm-manager', 'set_allowed_kredit_per_transaction', `klave-app-set-transaction-limit-${deployment.applicationId}`, {
+                    app_id: deployment.applicationId,
+                    kredit: 100_000_000
+                }).onExecuted(result => {
+                    resolve(result);
+                }).onError(error => {
+                    reject(error);
+                }).send()
+                    .catch(reject);
+            });
+        });
+
+        await Sentry.startSpan({
+            name: 'SCP Subtask',
+            op: 'scp.task.kredit.query.allow',
+            description: 'Secretarium Task Query Kredit Allocation'
+        }, async () => {
+            return await new Promise((resolve, reject) => {
+
+                currentSCP.newTx('wasm-manager', 'set_allowed_kredit_per_query', `klave-app-set-query-limit-${deployment.applicationId}`, {
+                    app_id: deployment.applicationId,
+                    kredit: 1_000_000_000
+                }).onExecuted(result => {
+                    resolve(result);
+                }).onError(error => {
+                    reject(error);
+                }).send()
+                    .catch(reject);
+            });
+        });
+
+        if (previousDeployment) {
+            logger.debug(`Deleting previous deployment ${previousDeployment.id} for ${target}`);
+            const createCaller = createCallerFactory(router);
+            const caller = createCaller({
+                prisma,
+                session: {},
+                override: '__system_post_deploy'
+            } as unknown as Context);
+            caller.v0.deployments.delete({
+                deploymentId: previousDeployment.id
+            }).catch((error) => {
+                logger.debug(`Failure while deleting previous deployment ${previousDeployment.id} for ${target}:, ${error}`);
+            });
+        }
+    };
+
+    const rollback = async () => {
+        if (previousDeployment) {
+            logger.debug(`Rolling back deployment ${previousDeployment.id}`);
+            await prisma.deployment.update({
+                where: {
+                    id: previousDeployment.id
+                },
+                data: {
+                    status: previousDeployment.status
+                }
+            });
+        }
+    };
+
     await Sentry.startSpan({
         name: 'SCP Subtask',
         op: 'scp.task',
@@ -608,10 +672,18 @@ export const sendToSecretarium = async ({
                 wasm_bytes_b64: wasmB64
                 // own_enclave: true,
             })
+                .onResult((result) => {
+                    const errorString = JSON.stringify(result);
+                    if (errorString.includes('deployed'))
+                        return;
+                    logger.debug(`Received unexpected message during ${!targetRef ? 'update' : 'registration'} of smart contract ${target}: ${errorString}`);
+                })
                 .onExecuted(() => {
                     (async () => {
                         await handleSuccess();
-                    })().catch(() => { return; });
+                    })().catch((error) => {
+                        logger.debug(`Error while processing success callback ${!targetRef ? 'updating' : 'registering'} ${target}: ${JSON.stringify(error)}`);
+                    });
                 })
                 .onError((error) => {
                     (async () => {
@@ -626,9 +698,11 @@ export const sendToSecretarium = async ({
                             }
                         });
                         logger.debug(`Error while ${!targetRef ? 'updating' : 'registering'} smart contract ${target}: ${error}`);
-                    })().catch(() => { return; });
-                }).send().catch(() => {
-                    // Swallow this error
+                    })().catch(() => {
+                        logger.debug(`Error while processing error callback ${!targetRef ? 'updating' : 'registering'} ${target}: ${JSON.stringify(error)}`);
+                    });
+                }).send().catch((error) => {
+                    logger.debug(`Error while performing ${!targetRef ? 'update' : 'registration'} for ${target}: ${JSON.stringify(error)}`);
                 });
             // } else if (previousDeployment?.deploymentAddress?.fqdn && deployment?.deploymentAddress?.fqdn) {
             //     logger.debug(`Releasing smart contract: ${deployment.deploymentAddress.fqdn} as ${target}`);
@@ -665,6 +739,7 @@ export const sendToSecretarium = async ({
             //         });
         } else {
             logger.debug(`No wasm to deploy for ${target}`);
+            await rollback();
         }
     });
 

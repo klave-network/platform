@@ -1,4 +1,124 @@
 # Changelog
+## [1.3.3](https://github.com/klave-network/platform/compare/ui@1.3.2...ui@1.3.3) (2025-04-29)
+
+
+### Bug Fixes
+
+* **ui:** Primer CSS import is included higher ([ed6e520](https://github.com/klave-network/platform/commit/ed6e5201a63ef96836dc6dbbca4919926fa9af79))
+
+## [1.3.2](https://github.com/klave-network/platform/compare/ui@1.3.1...ui@1.3.2) (2025-04-28)
+
+### Dependency Updates
+
+* `constants` updated to version `1.3.1`
+* `api` updated to version `1.3.1`
+
+### Bug Fixes
+
+* **ui:** Correct a few icons height anchorage ([8321397](https://github.com/klave-network/platform/commit/8321397740c2dc264231048bb39e9bd7f904f526))
+* **ui:** Pulsing flask icon not correctly coloured ([a7a084f](https://github.com/klave-network/platform/commit/a7a084fe8a765811b57b3e9716abd3fef354c71b))
+* **ui:** Usage table would not display correct cost ([ac0d471](https://github.com/klave-network/platform/commit/ac0d471c622840be9679ec22cc3c0f67102f2b6a))
+
+## [1.3.1](https://github.com/klave-network/platform/compare/ui@1.3.0...ui@1.3.1) (2025-04-11)
+
+### Dependency Updates
+
+* `constants` updated to version `1.3.0`
+* `db` updated to version `1.3.0`
+* `api` updated to version `1.3.0`
+
+### Bug Fixes
+
+* **db,api,ui:** Upgrade `[@simplewebauthn](https://github.com/simplewebauthn)` and remove padding addition on `credentialID` ([70eb2e1](https://github.com/klave-network/platform/commit/70eb2e1493781e3774c5b7428343e4da510e92d3))
+* **ui:** Add required `title` attributes in `RunCommand` ([02b3b59](https://github.com/klave-network/platform/commit/02b3b59e7c20244b2f30e0a8874c98feaef62365))
+
+## [1.3.0](https://github.com/klave-network/platform/compare/ui@1.2.0...ui@1.3.0) (2025-04-10)
+
+### Dependency Updates
+
+* `constants` updated to version `1.2.0`
+* `db` updated to version `1.2.0`
+* `api` updated to version `1.2.0`
+
+### Bug Fixes
+
+* **ui:** Prevent overactive autoscroll ([7febf66](https://github.com/klave-network/platform/commit/7febf66d553908ea9cf1119dca287097a82bac31))
+
+## [0.13.1](https://github.com/klave-network/platform/compare/ui@1.1.0...ui@0.13.1) (2025-04-07)
+
+
+### Features
+
+* **db,api,ui:** Preserve deleted deployments and application, recycling bin style ([e32637a](https://github.com/klave-network/platform/commit/e32637a44f2f0c1e4897f05be08d571306d78df9))
+
+
+### Bug Fixes
+
+* **ui:** Avoid systematic `Unexpected end of JSON input` ([c784c74](https://github.com/klave-network/platform/commit/c784c74426aed5520a04f0815ea697b3bd05deb6))
+* **ui:** Prevent UI scroll of doom during compilation ([bd20197](https://github.com/klave-network/platform/commit/bd2019796000188fc9750392c591cfc189b0e5ef))
+
+## [1.2.0](https://github.com/klave-network/platform/compare/ui@1.1.0...ui@1.2.0) (2025-04-10)
+
+### Dependency Updates
+
+* `constants` updated to version `1.1.0`
+* `db` updated to version `1.1.0`
+* `api` updated to version `1.1.0`
+
+### Features
+
+* **db,api,ui:** Add credit consumption screens ([5452408](https://github.com/klave-network/platform/commit/5452408ac3999d1bef4c20c3cdad82624d96d03a))
+* **db,api,ui:** Add new usage format support ([e0910c3](https://github.com/klave-network/platform/commit/e0910c34bf6a6519db1e3ed274845b80e0b9dc11))
+
+
+### Bug Fixes
+
+* **api:** Rewire kredit setting for queries ([25e4e7c](https://github.com/klave-network/platform/commit/25e4e7c01ce2852665668323a08b5f9ef73dfd3f))
+* **ui:** Change inputs font color in darkmode ([1810064](https://github.com/klave-network/platform/commit/1810064eb4114e4fa6707436230dd77fb030d29e))
+* **ui:** Prevent overactive autoscroll ([e34e1f9](https://github.com/klave-network/platform/commit/e34e1f9233107c852e6654cdeb98e4d1ca836437))
+
+## [1.1.0](https://github.com/klave-network/platform/compare/ui@1.0.1...ui@1.1.0) (2025-01-23)
+
+### Dependency Updates
+
+* `constants` updated to version `1.0.1`
+* `db` updated to version `1.0.1`
+* `api` updated to version `1.0.1`
+
+### Features
+
+* **api,ui:** Adding support for setting query spending limits ([928392c](https://github.com/klave-network/platform/commit/928392c28f9d9db92482360befac7db9c6231745))
+* **ui,hubber,providers:** Filter node name through ([620d41b](https://github.com/klave-network/platform/commit/620d41b14324e777bf40fe275decbf890458954f))
+
+
+### Bug Fixes
+
+* **ui:** Correct impossible nesting ([ae2909f](https://github.com/klave-network/platform/commit/ae2909f0699a09e4f687e49255fd86f812486de3))
+* **ui:** Explicitly set spinner heights ([27a65bf](https://github.com/klave-network/platform/commit/27a65bfc8e2a966f064c0a5ffa961f31fab6fe97))
+* **ui:** Header new logo dimension ([06b8737](https://github.com/klave-network/platform/commit/06b8737b64e6883dc3da08cbe44fe40231ee6d75))
+
+## [1.0.1](https://github.com/klave-network/platform/compare/ui@1.0.0...ui@1.0.1) (2024-10-04)
+
+## [1.0.0](https://github.com/klave-network/platform/compare/ui@0.13.0...ui@1.0.0) (2024-10-04)
+
+### Dependency Updates
+
+* `api` updated to version `0.13.0`
+* `constants` updated to version `0.13.0`
+* `db` updated to version `0.13.0`
+
+### ⚠ BREAKING CHANGES
+
+* Moving to pure ESM repo
+
+### Bug Fixes
+
+* Package `git-rev-sync` relies on non-ESM features so we provide explicit location ([cee72ae](https://github.com/klave-network/platform/commit/cee72ae5cd5a2fe998c987864b060f039ddb939b))
+
+
+### Miscellaneous Chores
+
+* Moving to pure ESM repo ([377c0e7](https://github.com/klave-network/platform/commit/377c0e7413441ad3fbca90ec5967d668d871a98b))
 
 ## [0.13.2](https://github.com/klave-network/platform/compare/ui@0.13.2...ui@0.13.2) (2025-04-07)
 
@@ -23,10 +143,12 @@
 * **api,ui:** Add the ability to add a custom cluster ([fcc3c5f](https://github.com/klave-network/platform/commit/fcc3c5f0f9b76f4e8a5a7826ef64327061b1d096))
 * **api,ui:** Allow editing of permission grants for organisations ([e2bd7d2](https://github.com/klave-network/platform/commit/e2bd7d2097b773e2a7151594ee837950298cfe2d)), closes [#KN-232](https://github.com/klave-network/platform/issues/KN-232)
 
+
 ### Bug Fixes
 
 * **ui:** Fix wrong text on members page + Cleanup ([ff6aa83](https://github.com/klave-network/platform/commit/ff6aa83272699bc3fa550322ae323506f0d1f0a6))
 * **ui:** Run attestation check again the correct custom cluster ([aa5c2fe](https://github.com/klave-network/platform/commit/aa5c2fe1366cd8ca6a83b82af624eb3741e30eb4))
+
 
 ### Reverts
 
@@ -43,6 +165,7 @@
 ### Features
 
 * **api,ui:** Add cluster listing in Organisation view ([fbdedfb](https://github.com/klave-network/platform/commit/fbdedfb5162390b242c6a8365a12bf8242dfb702))
+
 
 ### Bug Fixes
 
@@ -70,7 +193,6 @@
 * `constants` updated to version `0.10.0`
 * `db` updated to version `0.10.0`
 * `api` updated to version `0.10.0`
-
 ## [0.10.0](https://github.com/klave-network/platform/compare/ui@0.9.2...ui@0.10.0) (2024-05-31)
 
 ### Dependency Updates
@@ -86,6 +208,7 @@
 * **db,constants,api,ui:** Provide full build tracing in UI ([6e6cc10](https://github.com/klave-network/platform/commit/6e6cc10fa13c8c266d78b99697687d8ca1622b8a))
 * **ui:** Add Rust non-determinism warning ([76d1417](https://github.com/klave-network/platform/commit/76d14174ebfa387821f8b35603a8a4c2eb3214dc))
 
+
 ### Bug Fixes
 
 * **api,ui:** Setting button for out-of-branch commit deployment has wrong target ([523dc27](https://github.com/klave-network/platform/commit/523dc276a543333537d3c49ec36d35b323a4529a))
@@ -99,7 +222,6 @@
 ### Dependency Updates
 
 * `api` updated to version `0.9.0`
-
 ## [0.9.0](https://github.com/klave-network/platform/compare/ui@0.8.0...ui@0.9.0) (2024-04-25)
 
 ### Dependency Updates
@@ -126,6 +248,7 @@
 * **ui:** Add ability to release from a terminated contract ([28276fe](https://github.com/klave-network/platform/commit/28276fed3c22cf5edadc16f756536a8498380fdc))
 * **ui:** Add link to deploy from template on landing page ([dd9ba31](https://github.com/klave-network/platform/commit/dd9ba31ffcf80fbc418f9e1505a750ec4bf685e4))
 
+
 ### Bug Fixes
 
 * **ui:** Typo in expiry timestamps ([389aea6](https://github.com/klave-network/platform/commit/389aea60c947ef0e6dd056927844116a84d3350c))
@@ -142,6 +265,7 @@
 
 * **ui:** Add location information ([898b83d](https://github.com/klave-network/platform/commit/898b83d33ebade8296b0d03f9bcc246fef0d08ba))
 * **ui:** Adding run-command key basic management ([a3d2414](https://github.com/klave-network/platform/commit/a3d24145b096f27f7dc9c9dc22d329b5aa79b9b4))
+
 
 ### Bug Fixes
 
@@ -161,6 +285,7 @@
 * **api,ui:** Add new application listing page for admin + Supplement existing dashboard ([8540fd5](https://github.com/klave-network/platform/commit/8540fd563644e39547b9a9732bed9dc9017d9072))
 * **api,ui:** Add view for current running configuration ([c971c65](https://github.com/klave-network/platform/commit/c971c654f858fe249d154e516fc1218fee9efea4))
 * **constants,db,api,ui:** Add system dashboard for users and organisations listing ([e3c118f](https://github.com/klave-network/platform/commit/e3c118f1b59b88f5293b4904e704c6e88cbd665a))
+
 
 ### Bug Fixes
 
@@ -195,6 +320,7 @@
 * **ui:** Add new IFrame-based Secretarium ID ([ba04f40](https://github.com/klave-network/platform/commit/ba04f40873095cc7340440a6827c3c7293dafaba))
 * **ui:** Add new useSecretariumQuery hook which support parallel queries ([18d14be](https://github.com/klave-network/platform/commit/18d14bec5687d78ee850be2a1d02789d06d3ce76))
 * **ui:** Display multiple errors in the run command window ([96ec17b](https://github.com/klave-network/platform/commit/96ec17bb7383602ee4a49e36944dd7487ecc78b2))
+
 
 ### Bug Fixes
 

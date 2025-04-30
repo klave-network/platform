@@ -112,8 +112,8 @@ export const Index: FC = () => {
                                 <p>To deploy a new Project, we will create a new repository for you</p>
                             </div>
                             <div className='relative h-[300px]'>
-                                <a href={githubAuth.toString()} className='btn btn-sm mb-3 rounded-full bg-black hover:bg-gray-900 text-white'><UilGithub color='white' />&nbsp;Connect to GitHub</a><br />
-                                <a href={gitlabAuth.toString()} className='btn btn-sm rounded-full bg-[#db7130] hover:bg-[#bb472d] text-white hidden'><UilGitlab color='white' />&nbsp;Connect to GitLab</a>
+                                <a href={githubAuth.toString()} className='btn btn-sm mb-3 rounded-full bg-black hover:bg-gray-900 text-white'><UilGithub color='white' className='inline-block h-5' />&nbsp;Connect to GitHub</a><br />
+                                <a href={gitlabAuth.toString()} className='btn btn-sm rounded-full bg-[#db7130] hover:bg-[#bb472d] text-white hidden'><UilGitlab color='white' className='inline-block h-5' />&nbsp;Connect to GitLab</a>
                             </div>
                         </div>
                     </div>
@@ -135,7 +135,7 @@ export const Index: FC = () => {
                             It will only take a moment...
                             <br />
                             <br />
-                            <UilSpinner className='inline-block animate-spin' />
+                            <UilSpinner className='inline-block animate-spin h-5' />
                         </div>
                     </div>
                 </div>

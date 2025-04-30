@@ -1,6 +1,6 @@
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import * as Sentry from '@sentry/node';
-import { probot, scp, scpOps } from '@klave/providers';
+import { logger, probot, scp, scpOps } from '@klave/providers';
 import type { Application, Limits } from '@klave/db';
 import { z } from 'zod';
 import { deployToSubstrate } from '../deployment/deploymentController';
@@ -16,10 +16,17 @@ export const applicationRouter = createTRPCRouter({
             const manifest = await prisma.application.findMany({
                 where: {
                     webId,
-                    deletedAt: null
+                    deletedAt: {
+                        isSet: false
+                    }
                 },
                 include: {
                     deployments: {
+                        where: {
+                            deletedAt: {
+                                isSet: false
+                            }
+                        },
                         select: {
                             id: true,
                             set: true,
@@ -58,7 +65,9 @@ export const applicationRouter = createTRPCRouter({
 
             const apps = await prisma.application.findMany({
                 where: {
-                    deletedAt: null,
+                    deletedAt: {
+                        isSet: false
+                    },
                     organisation: {
                         OR: [{
                             id: orgId
@@ -103,6 +112,11 @@ export const applicationRouter = createTRPCRouter({
                 },
                 include: {
                     deployments: {
+                        where: {
+                            deletedAt: {
+                                isSet: false
+                            }
+                        },
                         select: {
                             id: true,
                             set: true,
@@ -144,6 +158,31 @@ export const applicationRouter = createTRPCRouter({
             //             }).catch(() => {
             //                 // Swallow this error
             //             });
+            //             await scp.newTx('wasm-manager', 'get_allowed_kredit_per_query', `klave-app-get-query-limit-${appId}`, {
+            //                 app_id: appId
+            //             }).send()
+            //                 .then(async (result) => {
+            //                     if (result.kredit === undefined)
+            //                         throw (new Error('No credits returned'));
+            //                     return prisma.application.update({
+            //                         where: {
+            //                             id: appId
+            //                         },
+            //                         data: {
+            //                             limits: {
+            //                                 queryCallSpend: result.kredit ?? 0
+            //                             }
+            //                         }
+            //                     });
+            //                 }).catch(() => {
+            //                     // Swallow this error
+            //                 });
+            //                     } catch (e) {
+            //                         console.error(e);
+            //                         ///
+            //                     }
+            //                 });
+            //             }
             //             await scp.newTx('wasm-manager', 'get_allowed_kredit_per_transaction', `klave-app-get-transaction-limit-${appId}`, {
             //                 app_id: appId
             //             }).send()
@@ -189,18 +228,37 @@ export const applicationRouter = createTRPCRouter({
                     description: 'Secretarium Task'
                 }, async () => {
                     try {
-                        await scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${appId}`, {
+                        // await scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${appId}`, {
+                        //     app_id: appId
+                        // }).send()
+                        //     .then(async (result) => {
+                        //         if (result.kredit === undefined)
+                        //             throw (new Error('No credits returned'));
+                        //         return prisma.application.update({
+                        //             where: {
+                        //                 id: appId
+                        //             },
+                        //             data: {
+                        //                 kredits: result.kredit
+                        //             }
+                        //         });
+                        //     }).catch(() => {
+                        //         // Swallow this error
+                        //     });
+                        await scp.newTx('wasm-manager', 'get_allowed_kredit_per_query', `klave-app-get-query-limit-${appId}`, {
                             app_id: appId
                         }).send()
                             .then(async (result) => {
                                 if (result.kredit === undefined)
                                     throw (new Error('No credits returned'));
-                                return prisma.application.update({
+                                return await prisma.application.update({
                                     where: {
                                         id: appId
                                     },
                                     data: {
-                                        kredits: result.kredit
+                                        limits: {
+                                            queryCallSpend: result.kredit ?? 0
+                                        }
                                     }
                                 });
                             }).catch(() => {
@@ -212,7 +270,7 @@ export const applicationRouter = createTRPCRouter({
                             .then(async (result) => {
                                 if (result.kredit === undefined)
                                     throw (new Error('No credits returned'));
-                                return prisma.application.update({
+                                return await prisma.application.update({
                                     where: {
                                         id: appId
                                     },
@@ -226,7 +284,7 @@ export const applicationRouter = createTRPCRouter({
                                 // Swallow this error
                             });
                     } catch (e) {
-                        console.error(e);
+                        console.error(e?.toString());
                         ///
                     }
                 });
@@ -317,12 +375,13 @@ export const applicationRouter = createTRPCRouter({
             if (!org)
                 return null;
 
-            const app = await prisma.application.findUnique({
+            const app = await prisma.application.findFirst({
                 where: {
-                    organisationId_slug: {
-                        organisationId: org.id,
-                        slug: appSlug
-                    }
+                    deletedAt: {
+                        isSet: false
+                    },
+                    slug: appSlug,
+                    organisationId: org.id
                 }
             });
 
@@ -336,44 +395,55 @@ export const applicationRouter = createTRPCRouter({
                     op: 'scp.task',
                     description: 'Secretarium Task'
                 }, async () => {
+
+                    const newLimits = { ...(app.limits ?? {}) };
                     try {
-                        await scp.newTx<KlaveGetCreditResult>('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
+                        // await scp.newTx<KlaveGetCreditResult>('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
+                        //     app_id: app.id
+                        // }).send().then(async (result) => {
+                        //     if (result.kredit === undefined)
+                        //         throw (new Error('No credits returned'));
+                        //     return prisma.application.update({
+                        //         where: {
+                        //             id: app.id
+                        //         },
+                        //         data: {
+                        //             kredits: result.kredit
+                        //         }
+                        //     });
+                        // }).catch(() => {
+                        //     // Swallow this error
+                        // });
+                        await scp.newTx<KlaveGetCreditResult>('wasm-manager', 'get_allowed_kredit_per_query', `klave-app-get-query-limit-${app.id}`, {
                             app_id: app.id
-                        }).send().then(async (result) => {
-                            if (result.kredit === undefined)
-                                throw (new Error('No credits returned'));
-                            return prisma.application.update({
-                                where: {
-                                    id: app.id
-                                },
-                                data: {
-                                    kredits: result.kredit
-                                }
+                        }).send()
+                            .then(async (result) => {
+                                if (result.kredit === undefined)
+                                    throw (new Error('No credits returned'));
+                                newLimits.queryCallSpend = result.kredit ?? 0;
+                            }).catch(() => {
+                                // Swallow this error
                             });
-                        }).catch(() => {
-                            // Swallow this error
-                        });
                         await scp.newTx<KlaveGetCreditResult>('wasm-manager', 'get_allowed_kredit_per_transaction', `klave-app-get-transaction-limit-${app.id}`, {
                             app_id: app.id
                         }).send()
                             .then(async (result) => {
                                 if (result.kredit === undefined)
                                     throw (new Error('No credits returned'));
-                                return prisma.application.update({
-                                    where: {
-                                        id: app.id
-                                    },
-                                    data: {
-                                        limits: {
-                                            transactionCallSpend: result.kredit ?? 0
-                                        }
-                                    }
-                                });
+                                newLimits.transactionCallSpend = result.kredit ?? 0;
                             }).catch(() => {
                                 // Swallow this error
                             });
+                        await prisma.application.update({
+                            where: {
+                                id: app.id
+                            },
+                            data: {
+                                limits: newLimits
+                            }
+                        });
                     } catch (e) {
-                        console.error(e);
+                        console.error(e?.toString());
                         ///
                     }
                 });
@@ -382,6 +452,9 @@ export const applicationRouter = createTRPCRouter({
 
             return await prisma.application.findUnique({
                 where: {
+                    deletedAt: {
+                        isSet: false
+                    },
                     id: app.id,
                     OR: [{
                         organisation: {
@@ -470,6 +543,11 @@ export const applicationRouter = createTRPCRouter({
                 orderBy: {
                     id: 'asc'
                 },
+                where: {
+                    deletedAt: {
+                        isSet: false
+                    }
+                },
                 include: {
                     organisation: true,
                     deployments: true
@@ -503,6 +581,9 @@ export const applicationRouter = createTRPCRouter({
                 return [appName, await (async () => {
                     const existingApp = await prisma.application.findFirst({
                         where: {
+                            deletedAt: {
+                                isSet: false
+                            },
                             organisationId,
                             slug: appSlug
                         }
@@ -548,6 +629,9 @@ export const applicationRouter = createTRPCRouter({
                     const appSlug = appName.replaceAll(/\W/g, '-').toLocaleLowerCase();
                     const existingApp = await prisma.application.findFirst({
                         where: {
+                            deletedAt: {
+                                isSet: false
+                            },
                             organisationId,
                             slug: appSlug
                         }
@@ -612,6 +696,8 @@ export const applicationRouter = createTRPCRouter({
                             // owner: webId ?? emphemeralKlaveTag ?? sessionID lklk
                         }
                     });
+
+                    logger.debug(`Registering application ${appSlug} (${newApp.id})`);
 
                     const installationOctokit = await probot.auth(parseInt(deployableRepo.installationRemoteId));
 
@@ -690,15 +776,26 @@ export const applicationRouter = createTRPCRouter({
                         slug: orgSlug
                     }
                 });
+
                 if (!org)
+                    return null;
+
+                const app = await prisma.application.findFirst({
+                    where: {
+                        deletedAt: {
+                            isSet: false
+                        },
+                        slug: appSlug,
+                        organisationId: org.id
+                    }
+                });
+
+                if (!app)
                     return null;
 
                 await prisma.application.update({
                     where: {
-                        organisationId_slug: {
-                            slug: appSlug,
-                            organisationId: org.id
-                        }
+                        id: app.id
                     },
                     data
                 });
@@ -708,10 +805,7 @@ export const applicationRouter = createTRPCRouter({
                         class: 'environment',
                         application: {
                             connect: {
-                                organisationId_slug: {
-                                    slug: appSlug,
-                                    organisationId: org.id
-                                }
+                                id: app.id
                             }
                         },
                         context: {
@@ -769,12 +863,13 @@ export const applicationRouter = createTRPCRouter({
                     }
                 });
             else if (applicationSlug && organisationId)
-                app = await prisma.application.findUnique({
+                app = await prisma.application.findFirst({
                     where: {
-                        organisationId_slug: {
-                            slug: applicationSlug,
-                            organisationId: organisationId
-                        }
+                        deletedAt: {
+                            isSet: false
+                        },
+                        slug: applicationSlug,
+                        organisationId: organisationId
                     }
                 });
 
@@ -822,19 +917,78 @@ export const applicationRouter = createTRPCRouter({
 
             if (input.withSlug) {
                 const { applicationSlug, organisationId } = input;
-                app = await prisma.application.findUnique({
+                app = await prisma.application.findFirst({
                     where: {
-                        organisationId_slug: {
-                            slug: applicationSlug,
-                            organisationId: organisationId
-                        }
+                        deletedAt: {
+                            isSet: false
+                        },
+                        slug: applicationSlug,
+                        organisationId: organisationId,
+                        OR: [{
+                            organisation: {
+                                permissionGrants: {
+                                    some: {
+                                        userId: user?.id,
+                                        OR: [
+                                            {
+                                                write: true
+                                            },
+                                            {
+                                                admin: true
+                                            }]
+                                    }
+                                }
+                            }
+                        }, {
+                            permissionGrants: {
+                                some: {
+                                    userId: user?.id,
+                                    OR: [
+                                        {
+                                            write: true
+                                        },
+                                        {
+                                            admin: true
+                                        }]
+                                }
+                            }
+                        }]
                     }
                 });
             } else {
                 const { applicationId } = input;
                 app = await prisma.application.findFirst({
                     where: {
-                        id: applicationId
+                        id: applicationId,
+                        OR: [{
+                            organisation: {
+                                permissionGrants: {
+                                    some: {
+                                        userId: user?.id,
+                                        OR: [
+                                            {
+                                                write: true
+                                            },
+                                            {
+                                                admin: true
+                                            }]
+                                    }
+                                }
+                            }
+                        }, {
+                            permissionGrants: {
+                                some: {
+                                    userId: user?.id,
+                                    OR: [
+                                        {
+                                            write: true
+                                        },
+                                        {
+                                            admin: true
+                                        }]
+                                }
+                            }
+                        }]
                     }
                 });
             }
@@ -842,38 +996,31 @@ export const applicationRouter = createTRPCRouter({
             if (!app)
                 throw (new Error('No application found'));
 
-            const { limits } = input;
+            const limits = Object.fromEntries(Object.entries(input.limits).filter(([_u, v]) => v !== undefined));
             const combinedLimits = {
                 ...app.limits,
                 ...limits
             };
 
-            await prisma.$transaction([
-                prisma.application.update({
-                    where: {
-                        id: app.id
-                    },
-                    data: {
-                        limits: combinedLimits
-                    }
-                })
-            ]);
+            await prisma.application.update({
+                where: {
+                    id: app.id
+                },
+                data: {
+                    limits: combinedLimits
+                }
+            });
 
             await Sentry.startSpan({
                 name: 'SCP Subtask',
-                op: 'scp.task',
-                description: 'Secretarium Task'
+                op: 'scp.task.kredit.transaction.allow',
+                description: 'Secretarium Task Transaction Kredit Allocation'
             }, async () => {
                 return await new Promise((resolve, reject) => {
-
-                    if (!app)
-                        throw (new Error('No application found'));
 
                     scp.newTx('wasm-manager', 'set_allowed_kredit_per_transaction', `klave-app-set-transaction-limit-${app.id}`, {
                         app_id: app.id,
                         kredit: Number(combinedLimits.transactionCallSpend)
-                    }).onResult(result => {
-                        resolve(result);
                     }).onExecuted(result => {
                         resolve(result);
                     }).onError(error => {
@@ -882,6 +1029,141 @@ export const applicationRouter = createTRPCRouter({
                         .catch(reject);
                 });
             });
+
+            await Sentry.startSpan({
+                name: 'SCP Subtask',
+                op: 'scp.task.kredit.query.allow',
+                description: 'Secretarium Task Query Kredit Allocation'
+            }, async () => {
+                return await new Promise((resolve, reject) => {
+
+                    scp.newTx('wasm-manager', 'set_allowed_kredit_per_query', `klave-app-set-query-limit-${app.id}`, {
+                        app_id: app.id,
+                        kredit: Number(combinedLimits.queryCallSpend)
+                    }).onExecuted(result => {
+                        resolve(result);
+                    }).onError(error => {
+                        reject(error);
+                    }).send()
+                        .catch(reject);
+                });
+            });
+        }),
+    infiniteUsage: publicProcedure
+        .input(
+            z.object({
+                appSlug: z.string(),
+                orgSlug: z.string(),
+                limit: z.number().min(1).max(100).nullish(),
+                cursor: z.number().nullish() // <-- "cursor" needs to exist, but can be any type
+            })
+        )
+        .query(async ({ ctx: { session: { user }, prisma }, input }) => {
+
+            if (!user)
+                throw (new Error('You must be logged in to delete an application'));
+
+            const org = await prisma.organisation.findUnique({
+                where: {
+                    slug: input.orgSlug,
+                    permissionGrants: {
+                        some: {
+                            userId: user?.id,
+                            OR: [{
+                                read: true
+                            },
+                            {
+                                write: true
+                            },
+                            {
+                                admin: true
+                            }]
+                        }
+                    }
+                }
+            });
+
+            if (!org)
+                throw (new Error('No usage found'));
+
+            const app = await prisma.application.findFirst({
+                where: {
+                    deletedAt: {
+                        isSet: false
+                    },
+                    organisationId: org.id,
+                    slug: input.appSlug,
+                    OR: [{
+                        organisation: {
+                            permissionGrants: {
+                                some: {
+                                    userId: user?.id
+                                    , OR: [{
+                                        read: true
+                                    },
+                                    {
+                                        write: true
+                                    },
+                                    {
+                                        admin: true
+                                    }]
+                                }
+                            }
+                        }
+                    }, {
+                        permissionGrants: {
+                            some: {
+                                userId: user?.id,
+                                OR: [{
+                                    read: true
+                                },
+                                {
+                                    write: true
+                                },
+                                {
+                                    admin: true
+                                }]
+                            }
+                        }
+                    }]
+                },
+                include: {
+                    deployments: {
+                        select: {
+                            deploymentAddress: true
+                        }
+                    }
+                }
+            });
+
+            if (!app)
+                throw (new Error('No usage found'));
+
+            const deploymentAddresses = app.deployments.flatMap((deployment) => deployment.deploymentAddress).filter(Boolean).map(address => address.fqdn);
+
+            const { cursor } = input;
+            const limit = input.limit ?? 50;
+            const usages = (await prisma.usageRecord.findMany({
+                orderBy: {
+                    id: 'asc'
+                }
+            })).filter(usage => deploymentAddresses.includes(usage.data.consumption.fqdn));
+
+            const usagesSlice = usages
+                .sort((a, b) => b.data.consumption.timestamp - a.data.consumption.timestamp)
+                .slice(cursor ?? 0, (cursor ?? 0) + limit);
+
+            const usageCount = usages.length;
+            let nextCursor: typeof cursor | undefined = undefined;
+            if (usageCount > limit)
+                nextCursor = (cursor ?? 0) ? (cursor ?? 0) + limit : limit;
+            return {
+                data: usagesSlice,
+                meta: {
+                    totalRowCount: usageCount
+                },
+                nextCursor
+            };
         })
 });
 
