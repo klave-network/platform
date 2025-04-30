@@ -475,7 +475,7 @@ export const authRouter = createTRPCRouter({
                 expectedRPID: rpID,
                 authenticator: {
                     credentialPublicKey: Utils.fromBase64(authenticator.credentialPublicKey),
-                    credentialID: authenticator.credentialID,
+                    credentialID: Utils.fromBase64(authenticator.credentialID),
                     counter: authenticator.counter
                 }
             };
@@ -569,7 +569,7 @@ export const authRouter = createTRPCRouter({
                 rpID,
                 // We pretend we found a user with this email address
                 // TODO - Ensure we compute a fake UUID not based on email to avoid revealing registration status
-                userID: new TextEncoder().encode(user?.id ?? String(await webcrypto.subtle.digest('SHA-256', Buffer.from(email)))),
+                userID: user?.id ?? String(await webcrypto.subtle.digest('SHA-256', Buffer.from(email))),
                 userName: email,
                 userDisplayName: `${email} | ${process.env['KLAVE_WEBAUTHN_ORIGIN_NAME']}`,
                 timeout: 60000,
@@ -679,7 +679,7 @@ export const authRouter = createTRPCRouter({
                             }
                         },
                         credentialPublicKey: Utils.toBase64(credentialPublicKey, true),
-                        credentialID,
+                        credentialID: Utils.toBase64(credentialID, true),
                         credentialType,
                         credentialDeviceType,
                         credentialBackedUp,

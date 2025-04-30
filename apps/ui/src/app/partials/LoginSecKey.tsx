@@ -206,7 +206,7 @@ export const LoginSecKey: FC = () => {
                 .catch((e) => {
                     console.error(e);
                     setIsRequestingWebauthnInput(false);
-                    setError('An error occured while trying to register your secure key. Please try again later.');
+                    setError('An error occured while trying to register your passkey. Please try again later.');
                 });
             return;
         }
@@ -282,8 +282,8 @@ export const LoginSecKey: FC = () => {
         <div className='pb-5' >
             {isWebauthAvailable && screen === 'start'
                 ? <>
-                    <h1 className='text-xl font-bold'>Secure Key</h1>
-                    <span>Connect with your secure key.</span>
+                    <h1 className='text-xl font-bold'>Passkey Login</h1>
+                    <span>Connect with your Passkey.</span>
                 </>
                 : <>
                     <h1 className='text-xl font-bold'>Email Code</h1>
@@ -303,10 +303,10 @@ export const LoginSecKey: FC = () => {
                         : emailHint?.message
                             ? <span className="block mt-1 text-xs text-green-700 leading-tight">{emailHint?.message}</span>
                             : isCheckingEmailHint
-                                ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-full' /><br />&nbsp;</span>
+                                ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-5' /><br />&nbsp;</span>
                                 : <span className="block mt-1 text-xs leading-tight">&nbsp;<br />&nbsp;</span>}
                 </div>
-                <button disabled={isLoading || emailHint?.sucess === false} onClick={handleLoginSubmit} onSubmit={handleLoginSubmit} type='submit' className='btn btn-sm bg-blue-600 text-white hover:bg-blue-500 disabled:bg-slate-300 rounded-md'>{isLoading ? <UilSpinner className='inline-block animate-spin h-5' /> : isWebauthAvailable ? 'Log in with secure key' : 'Log in with email code'}</button><br />
+                <button disabled={isLoading || emailHint?.sucess === false} onClick={handleLoginSubmit} onSubmit={handleLoginSubmit} type='submit' className='btn btn-sm bg-blue-600 text-white hover:bg-blue-500 disabled:bg-slate-300 rounded-md'>{isLoading ? <UilSpinner className='inline-block animate-spin h-5' /> : isWebauthAvailable ? 'Log in with a passkey' : 'Log in with email code'}</button><br />
                 <button disabled={isLoading || emailHint?.sucess === false} onClick={handleLoginCodeSubmit} className='btn btn-sm bg-transparent border-0 shadow-none font-normal text-sm text-blue-600 disabled:text-slate-400 hover:text-blue-300 hover:cursor-pointer'>Use email code instead</button>
             </> : screen === 'code' ? <>
                 <input key='codeField' value={code} onInput={onChangeCode} alt='code' placeholder='Code' type='text' className='input input-bordered text-center rounded-md text-black dark:text-white' />
