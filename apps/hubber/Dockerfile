@@ -11,10 +11,10 @@ WORKDIR /app
 RUN addgroup --system hubber && \
     adduser --system -G hubber hubber
 
-COPY --chown=hubber:hubber dist/apps/hubber/package.json hubber/
-COPY --chown=hubber:hubber dist/apps/hubber/yarn.lock hubber/
-COPY --chown=hubber:hubber tools/fixtures/.yarnclean hubber/
-COPY --chown=hubber:hubber libs/db/src/prisma hubber/prisma
+COPY --chown=hubber:hubber --chmod=444 dist/apps/hubber/package.json hubber/
+COPY --chown=hubber:hubber --chmod=444 dist/apps/hubber/yarn.lock hubber/
+COPY --chown=hubber:hubber --chmod=444 tools/fixtures/.yarnclean hubber/
+COPY --chown=hubber:hubber --chmod=444 libs/db/src/prisma hubber/prisma
 
 RUN cd hubber && yarn install --production --no-cache && yarn cache clean
 
@@ -57,9 +57,9 @@ RUN addgroup --system hubber && \
 
 WORKDIR /app
 
-COPY --chown=hubber:hubber --from=builder /app/hubber/node_modules hubber/node_modules
-COPY --chown=hubber:hubber --from=db /app/hubber/node_modules/.prisma hubber/node_modules/.prisma
-COPY --chown=hubber:hubber dist/apps/hubber hubber
+COPY --chown=hubber:hubber --chmod=444 --from=builder /app/hubber/node_modules hubber/node_modules
+COPY --chown=hubber:hubber --chmod=444 --from=db /app/hubber/node_modules/.prisma hubber/node_modules/.prisma
+COPY --chown=hubber:hubber --chmod=444 dist/apps/hubber hubber
 
 WORKDIR /app/hubber
 

@@ -13,7 +13,7 @@ WORKDIR /app
 RUN addgroup --system cli && \
     adduser --system -G cli cli
 
-COPY --chown=cli:cli dist/apps/cli cli
+COPY --chown=cli:cli --chmod=444 dist/apps/cli cli
 
 # You can remove this install step if you build with `--bundle` option.
 # The bundled output will include external dependencies.

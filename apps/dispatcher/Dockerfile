@@ -15,7 +15,7 @@ WORKDIR /app
 RUN addgroup --system dispatcher && \
     adduser --system -G dispatcher dispatcher
 
-COPY --chown=dispatcher:dispatcher dist/apps/dispatcher dispatcher
+COPY --chown=dispatcher:dispatcher --chmod=444 dist/apps/dispatcher dispatcher
 RUN cd dispatcher && yarn install --no-cache && yarn cache clean && rm -rf /var/cache/yarn 
 
 EXPOSE 3000

@@ -15,8 +15,8 @@ WORKDIR /app
 RUN addgroup --system ui && \
     adduser --system -G ui ui
 
-COPY --chown=ui:ui apps/ui/tools/kube_inject.sh .
-COPY --chown=ui:ui dist/apps/ui ui
+COPY --chown=ui:ui --chmod=444 apps/ui/tools/kube_inject.sh .
+COPY --chown=ui:ui --chmod=444 dist/apps/ui ui
 
 RUN yarn add serve && yarn cache clean && rm -rf /var/cache/yarn
 
