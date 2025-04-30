@@ -9,12 +9,11 @@ import { replaceInFile } from 'replace-in-file';
 import { findGitHubEmail, findGitHubProfileUrl, findMyName, guessRepoUrl, isEmpty, isValidName, createTerminalLink } from './lib/utils';
 import { resolvePackageManager } from './lib/resolve-package-manager';
 import latestVersion from 'latest-version';
-import { DOCS_URL, KLAVE_PLATFORM_URL, DISCORD_URL } from './lib/constants';
+import { DOCS_URL, KLAVE_PLATFORM_URL, DISCORD_URL, KLAVE_CYAN_BG, KLAVE_LIGHT_BLUE } from './lib/constants';
 import { SubstitutionData } from './lib/types';
 import sanitize from 'sanitize-filename';
 import validateNpmPackage from 'validate-npm-package-name';
 import packageJson from '../package.json';
-import { KLAVE_CYAN_BG, KLAVE_LIGHT_BLUE } from './lib/constants';
 
 // `yarn run` may change the current working dir, then we should use `INIT_CWD` env.
 const CWD = process.env.INIT_CWD || process.cwd();
