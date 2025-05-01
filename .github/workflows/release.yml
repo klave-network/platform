@@ -1,4 +1,6 @@
 name: Release
+permissions:
+  contents: read
 
 on:
   push:
@@ -10,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
+      attestations: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
