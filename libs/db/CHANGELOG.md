@@ -1,4 +1,11 @@
 # Changelog
+## [1.3.2](https://github.com/klave-network/platform/compare/db@1.3.1...db@1.3.2) (2025-04-30)
+
+
+### Bug Fixes
+
+* **db:** New Usage field are missing in schema definition ([8f96966](https://github.com/klave-network/platform/commit/8f96966defc3384d6590ddbaf0b9be943e866f1b))
+
 ## [1.3.1](https://github.com/klave-network/platform/compare/db@1.3.0...db@1.3.1) (2025-04-11)
 
 

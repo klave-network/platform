@@ -1,4 +1,6 @@
 name: "Lock threads"
+permissions:
+  contents: read
 
 on:
   schedule:

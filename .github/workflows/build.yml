@@ -1,5 +1,6 @@
 name: Build
-
+permissions:
+  contents: read
 on:
   push:
     branches: [main, develop, "fix/*"]
@@ -13,7 +14,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node: [20.x]
+        node: [22.x]
 
     permissions:
       contents: "read"

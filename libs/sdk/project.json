@@ -6,7 +6,7 @@
     "tags": [],
     "targets": {
         "build": {
-            "executor": "@nx/js:swc",
+            "executor": "@nx/esbuild:esbuild",
             "outputs": [
                 "{options.outputPath}"
             ],
@@ -14,6 +14,9 @@
                 "outputPath": "dist/libs/sdk",
                 "tsConfig": "libs/sdk/tsconfig.lib.json",
                 "main": "libs/sdk/src/index.ts",
+                "additionalEntryPoints": [
+                    "libs/sdk/src/compile.ts"
+                ],
                 "assets": [
                     "libs/sdk/bin/*",
                     "libs/sdk/assembly/**",
@@ -21,10 +24,16 @@
                     "libs/sdk/sdk.json",
                     "libs/sdk/*.md"
                 ],
-                "external": [
-                    "compiler"
+                "format": [
+                    "esm",
+                    "cjs"
                 ],
-                "generateExportsField": true
+                "bundle": true,
+                "external": [
+                    "@klave/compiler"
+                ],
+                "generateExportsField": true,
+                "esbuildConfig": "libs/sdk/esbuild.config.cjs"
             },
             "configurations": {
                 "development": {

@@ -1,4 +1,17 @@
 # Changelog
+## [1.3.4](https://github.com/klave-network/platform/compare/api@1.3.3...api@1.3.4) (2025-04-30)
+
+### Dependency Updates
+
+* `db` updated to version `1.3.3`
+* `constants` updated to version `1.3.3`
+* `providers` updated to version `1.3.3`
+
+### Bug Fixes
+
+* **api:** Over targeting of deployment on hook ([f88653f](https://github.com/klave-network/platform/commit/f88653f2258f085951279cff30f5064b22a6e345))
+* **ui,api:** Realign after `simplewebauthn` revert ([e61157e](https://github.com/klave-network/platform/commit/e61157e3834b2cb85d301cc2edbd8fd262b8c4ee))
+
 ## [1.3.3](https://github.com/klave-network/platform/compare/api@1.3.2...api@1.3.3) (2025-04-29)
 
 

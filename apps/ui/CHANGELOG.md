@@ -1,4 +1,19 @@
 # Changelog
+## [1.3.4](https://github.com/klave-network/platform/compare/ui@1.3.3...ui@1.3.4) (2025-04-30)
+
+### Dependency Updates
+
+* `constants` updated to version `1.3.3`
+* `db` updated to version `1.3.3`
+* `api` updated to version `1.3.3`
+
+### Bug Fixes
+
+* **ui,api:** Realign after `simplewebauthn` revert ([e61157e](https://github.com/klave-network/platform/commit/e61157e3834b2cb85d301cc2edbd8fd262b8c4ee))
+* **ui:** Display item costs in usages ([99b135e](https://github.com/klave-network/platform/commit/99b135e1dcc56e324402366ad3dbed87f335c925))
+* **ui:** Make sure the argDigest is not a Promise object ([70e293b](https://github.com/klave-network/platform/commit/70e293bdb9ea4ce9fc83b308340c6532010e2144))
+* **ui:** Manually remove usage duplicates in infinite usage map ([d02e0ff](https://github.com/klave-network/platform/commit/d02e0ff2578f8ec3a676d296f1c029ee6d92fcac))
+
 ## [1.3.3](https://github.com/klave-network/platform/compare/ui@1.3.2...ui@1.3.3) (2025-04-29)
 
 

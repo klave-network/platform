@@ -412,7 +412,7 @@ export const authRouter = createTRPCRouter({
         .mutation(async ({ ctx: { prisma, session, sessionStore }, input: { email, data } }) => {
 
             const credId = data.id;
-            // const credId = data.id.padEnd(data.id.length + 4 - data.id.length % 4, '=');
+            const credIdPadded = data.id.padEnd(data.id.length + 4 - data.id.length % 4, '=');
             logger.debug(`wan: Seeking credID ${credId} for email ${email}`);
             const user = await prisma.user.findFirst({
                 where: {
@@ -421,7 +421,9 @@ export const authRouter = createTRPCRouter({
                     },
                     webauthCredentials: {
                         some: {
-                            credentialID: credId
+                            credentialID: {
+                                in: [credId, credIdPadded]
+                            }
                         }
                     }
                 },
