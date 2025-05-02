@@ -48,6 +48,41 @@ impl Table {
         Ok(obj)
     }
 
+    /// List all keys in the table
+    pub fn list_keys(&self) -> Result<Vec<String>, Box<dyn Error>> {
+        match sdk::list_keys_from_ledger(&self.name) {
+            Ok(res) => {
+                let v: serde_json::Value = serde_json::from_str(&res)?;
+                if let Some(keys) = v["keys"].as_array() {
+                    let keys_list = keys
+                        .iter()
+                        .filter_map(|key| {
+                            key.as_array().map(|key_bytes| {
+                                key_bytes
+                                    .iter()
+                                    .filter_map(|b| b.as_u64().map(|byte| byte as u8))
+                                    .collect::<Vec<_>>()
+                            })
+                        })
+                        .filter_map(|key| String::from_utf8(key).ok())
+                        .collect::<Vec<_>>();
+                    Ok(keys_list)
+                } else {
+                    Err("Invalid format: 'keys' is not an array".into())
+                }
+            }
+            Err(err) => {
+                let error_message = format!("Error while listing keys: {}", err);
+                Err(error_message.into())
+            }
+        }
+    }
+
+    /// Check if a key exists in the table
+    pub fn exists(&self, key: &str) -> Result<bool, Box<dyn Error>> {
+        sdk::key_exists_in_ledger(&self.name, key.as_bytes()).map_err(Into::into)
+    }
+
     /// Remove a key-value pair from the table
     pub fn remove(&self, key: &str) -> Result<(), Box<dyn Error>> {
         sdk::remove_from_ledger(&self.name, key.as_bytes()).map_err(Into::into)
