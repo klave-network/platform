@@ -15,9 +15,11 @@ import { UilInfoCircle, UilSpinner } from '@iconscout/react-unicons';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import api from '../../utils/api';
 import CostDisplay, { getIntegerCost } from '../../components/CostDisplay';
+import { useWindowSize } from 'usehooks-ts';
 
 function ApplicationUsage() {
 
+    const { height: windowHeight } = useWindowSize();
     const tableContainerRef = useRef<HTMLDivElement>(null);
     const [sorting, setSorting] = useState<SortingState>([]);
     const { appSlug, orgSlug } = useParams();
@@ -30,6 +32,14 @@ function ApplicationUsage() {
     }, {
         getNextPageParam: (lastPage) => lastPage.nextCursor
     });
+
+    const tableHeight = useMemo(() => {
+        const mainEl = document.getElementsByTagName('main')[0];
+        const mainElTopPadding = mainEl ? window.getComputedStyle(mainEl).paddingTop : 0;
+        const tableElOffetTop = tableContainerRef.current?.offsetTop ?? 500;
+        const tableHeight = windowHeight - parseInt(`${mainElTopPadding}`, 10) - tableElOffetTop;
+        return tableHeight;
+    }, [windowHeight, data, isFetching, isLoading]);
 
     type UsageResult = NonNullable<typeof data>['pages'][number]['data'][number];
     const columns = useMemo<ColumnDef<UsageResult>[]>(
@@ -268,17 +278,17 @@ function ApplicationUsage() {
     const rowVirtualizer = useVirtualizer({
         count: rows.length,
         getScrollElement: () => tableContainerRef.current,
-        estimateSize: () => 100,
+        estimateSize: () => 20,
         overscan: 10
     });
 
-    const totalSize = rowVirtualizer.getTotalSize();
+    // const totalSize = rowVirtualizer.getTotalSize();
     const virtualRows = rowVirtualizer.getVirtualItems();
-    const paddingTop = virtualRows.length > 0 ? virtualRows?.[0]?.start || 0 : 0;
-    const paddingBottom =
-        virtualRows.length > 0
-            ? totalSize - (virtualRows?.[virtualRows.length - 1]?.end || 0)
-            : 0;
+    // const paddingTop = virtualRows.length > 0 ? virtualRows?.[0]?.start || 0 : 0;
+    // const paddingBottom =
+    //     virtualRows.length > 0
+    //         ? totalSize - (virtualRows?.[virtualRows.length - 1]?.end || 0)
+    //         : 0;
 
     if (isLoading) {
         return <>
@@ -291,12 +301,20 @@ function ApplicationUsage() {
 
     return <div
         id="usage-table-container"
-        className="h-full w-full max-w-full overflow-auto"
+        className="w-full max-w-full overflow-auto relative"
+        style={{ height: tableHeight }}
         onScroll={e => fetchMoreOnBottomReached(e.target as HTMLDivElement)}
         ref={tableContainerRef}
     >
-        <table className='min-w-full'>
-            <thead>
+        <table className='f-hull min-w-full'>
+            <thead
+                style={{
+                    // display: 'grid',
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 1
+                }}
+            >
                 {table.getHeaderGroups().map(headerGroup => (
                     <tr key={headerGroup.id}>
                         {headerGroup.headers.map(header => {
@@ -332,16 +350,26 @@ function ApplicationUsage() {
                     </tr>
                 ))}
             </thead>
-            <tbody>
-                {paddingTop > 0 && (
+            <tbody
+            // style={{
+            //     // display: 'grid',
+            //     height: `${rowVirtualizer.getTotalSize()}px`, //tells scrollbar how big the table is
+            //     position: 'relative' //needed for absolute positioning of rows
+            // }}
+            >
+                {/* {paddingTop > 0 && (
                     <tr>
                         <td style={{ height: `${paddingTop}px` }} />
                     </tr>
-                )}
+                )} */}
                 {virtualRows.map(virtualRow => {
                     const row = rows[virtualRow.index] as Row<UsageResult>;
                     return (
-                        <tr key={row.id} className='hover:bg-slate-50'>
+                        <tr
+                            data-index={virtualRow.index}
+                            ref={node => rowVirtualizer.measureElement(node)}
+                            key={row.id}
+                            className='hover:bg-slate-50'>
                             {row.getVisibleCells().map(cell => {
                                 return (
                                     <td key={cell.id} className={`first-of-type:pl-3 p-2 ${(cell.column.columnDef as unknown as Record<string, string>).accessorKey === 'data.consumption.fqdn' ? 'truncate max-w-32' : ''}`}>
@@ -355,11 +383,11 @@ function ApplicationUsage() {
                         </tr>
                     );
                 })}
-                {paddingBottom > 0 && (
+                {/* {paddingBottom > 0 && (
                     <tr>
                         <td style={{ height: `${paddingBottom}px` }} />
                     </tr>
-                )}
+                )} */}
             </tbody>
         </table>
     </div>;
