@@ -1,4 +1,13 @@
 # Changelog
+## [1.3.5](https://github.com/klave-network/platform/compare/ui@1.3.4...ui@1.3.5) (2025-05-02)
+
+
+### Bug Fixes
+
+* **ui:** Attempt to sort out the flickering issue in usage table ([e08bfb9](https://github.com/klave-network/platform/commit/e08bfb96d999fab1dd8719162f58ff773f2254ad))
+* **ui:** Change price calculation basis ([2d1f41b](https://github.com/klave-network/platform/commit/2d1f41b9b70cb70a78e7aa67beb9809657a716d6))
+* **ui:** Provide usage with total currency amounts ([54c33f6](https://github.com/klave-network/platform/commit/54c33f6eb1c911fb2a3c7c715febb7084fd9fb3a))
+
 ## [1.3.4](https://github.com/klave-network/platform/compare/ui@1.3.3...ui@1.3.4) (2025-04-30)
 
 ### Dependency Updates
