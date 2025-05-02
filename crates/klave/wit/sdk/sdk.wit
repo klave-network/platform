@@ -19,6 +19,8 @@ interface sdk {
 
     // Ledger
     read-ledger: func(table: string, key: list<u8>) -> result<list<u8>, string>;
+    list-keys-from-ledger: func(table: string) -> result<string, string>;
+    key-exists-in-ledger: func(table: string, key: list<u8>) -> result<bool, string>;
     write-ledger: func(table: string, key: list<u8>, value: list<u8>) -> result<_, string>;
     remove-from-ledger: func(table: string, key: list<u8>) -> result<_, string>;
 
