@@ -13,7 +13,7 @@ import { useParams } from 'react-router-dom';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { UilSpinner } from '@iconscout/react-unicons';
 import api from '../../utils/api';
-import CostDisplay from '../../components/CostDisplay';
+import CostDisplay, { getIntegerCost } from '../../components/CostDisplay';
 
 function ApplicationUsage() {
 
@@ -60,58 +60,74 @@ function ApplicationUsage() {
                     return <span title={fqdn} className='font-mono bg-gray-100 py-1 px-2 rounded truncate'>{fqdn}</span>;
                 }
             },
+            // {
+            //     accessorKey: 'data.consumption.ingress_in_bytes',
+            //     header: 'Ingress',
+            //     cell: info => {
+            //         const bytes = info.getValue<UsageResult['data']['consumption']['ingress_in_bytes']>();
+            //         const isTransaction = info.row.getValue<UsageResult['data']['consumption']['is_transaction']>('is_transaction');
+            //         return <CostDisplay type='ingress' scope={isTransaction ? 'transaction' : 'query'} compact consumption={bytes} />;
+            //     }
+            // },
+            // {
+            //     accessorKey: 'data.consumption.egress_in_bytes',
+            //     header: 'Egress',
+            //     cell: info => {
+            //         const bytes = info.getValue<UsageResult['data']['consumption']['egress_in_bytes']>();
+            //         const isTransaction = info.row.getValue<UsageResult['data']['consumption']['is_transaction']>('is_transaction');
+            //         return <CostDisplay type='egress' scope={isTransaction ? 'transaction' : 'query'} compact consumption={bytes} />;
+            //     }
+            // },
+            // {
+            //     accessorKey: 'data.consumption.ledger_write_in_bytes',
+            //     header: 'Write',
+            //     cell: info => {
+            //         const bytes = info.getValue<UsageResult['data']['consumption']['ledger_write_in_bytes']>();
+            //         const isTransaction = info.row.getValue<UsageResult['data']['consumption']['is_transaction']>('is_transaction');
+            //         return <CostDisplay type='write' scope={isTransaction ? 'transaction' : 'query'} compact consumption={bytes} />;
+            //     }
+            // },
+            // {
+            //     accessorKey: 'data.consumption.ledger_read_in_bytes',
+            //     header: 'Read',
+            //     cell: info => {
+            //         const bytes = info.getValue<UsageResult['data']['consumption']['ledger_read_in_bytes']>();
+            //         const isTransaction = info.row.getValue<UsageResult['data']['consumption']['is_transaction']>('is_transaction');
+            //         return <CostDisplay type='read' scope={isTransaction ? 'transaction' : 'query'} compact consumption={bytes} />;
+            //     }
+            // },
+            // {
+            //     accessorKey: 'data.consumption.cpu_consumption',
+            //     header: 'WASM',
+            //     cell: info => {
+            //         const CPUConsumption = info.getValue<UsageResult['data']['consumption']['cpu_consumption']>();
+            //         const isTransaction = info.row.getValue<UsageResult['data']['consumption']['is_transaction']>('is_transaction');
+            //         return <CostDisplay type='wasm' scope={isTransaction ? 'transaction' : 'query'} compact consumption={CPUConsumption} />;
+            //     }
+            // },
+            // {
+            //     accessorKey: 'data.consumption.native_calls_consumption',
+            //     header: 'Native',
+            //     cell: info => {
+            //         const NativeConsumption = info.getValue<UsageResult['data']['consumption']['native_calls_consumption']>();
+            //         const isTransaction = info.row.getValue<UsageResult['data']['consumption']['is_transaction']>('is_transaction');
+            //         return <CostDisplay type='native' scope={isTransaction ? 'transaction' : 'query'} compact consumption={NativeConsumption} />;
+            //     }
+            // },
             {
-                accessorKey: 'data.consumption.ingress_in_bytes',
-                header: 'Ingress',
+                accessorKey: 'data.consumption',
+                header: 'Consumption',
                 cell: info => {
-                    const bytes = info.getValue<UsageResult['data']['consumption']['ingress_in_bytes']>();
-                    const isTransaction = info.row.getValue<UsageResult['data']['consumption']['is_transaction']>('is_transaction');
-                    return <CostDisplay type='ingress' scope={isTransaction ? 'transaction' : 'query'} compact consumption={bytes} />;
-                }
-            },
-            {
-                accessorKey: 'data.consumption.egress_in_bytes',
-                header: 'Egress',
-                cell: info => {
-                    const bytes = info.getValue<UsageResult['data']['consumption']['egress_in_bytes']>();
-                    const isTransaction = info.row.getValue<UsageResult['data']['consumption']['is_transaction']>('is_transaction');
-                    return <CostDisplay type='egress' scope={isTransaction ? 'transaction' : 'query'} compact consumption={bytes} />;
-                }
-            },
-            {
-                accessorKey: 'data.consumption.ledger_write_in_bytes',
-                header: 'Write',
-                cell: info => {
-                    const bytes = info.getValue<UsageResult['data']['consumption']['ledger_write_in_bytes']>();
-                    const isTransaction = info.row.getValue<UsageResult['data']['consumption']['is_transaction']>('is_transaction');
-                    return <CostDisplay type='write' scope={isTransaction ? 'transaction' : 'query'} compact consumption={bytes} />;
-                }
-            },
-            {
-                accessorKey: 'data.consumption.ledger_read_in_bytes',
-                header: 'Read',
-                cell: info => {
-                    const bytes = info.getValue<UsageResult['data']['consumption']['ledger_read_in_bytes']>();
-                    const isTransaction = info.row.getValue<UsageResult['data']['consumption']['is_transaction']>('is_transaction');
-                    return <CostDisplay type='read' scope={isTransaction ? 'transaction' : 'query'} compact consumption={bytes} />;
-                }
-            },
-            {
-                accessorKey: 'data.consumption.cpu_consumption',
-                header: 'WASM',
-                cell: info => {
-                    const CPUConsumption = info.getValue<UsageResult['data']['consumption']['cpu_consumption']>();
-                    const isTransaction = info.row.getValue<UsageResult['data']['consumption']['is_transaction']>('is_transaction');
-                    return <CostDisplay type='wasm' scope={isTransaction ? 'transaction' : 'query'} compact consumption={CPUConsumption} />;
-                }
-            },
-            {
-                accessorKey: 'data.consumption.native_calls_consumption',
-                header: 'Native',
-                cell: info => {
-                    const NativeConsumption = info.getValue<UsageResult['data']['consumption']['native_calls_consumption']>();
-                    const isTransaction = info.row.getValue<UsageResult['data']['consumption']['is_transaction']>('is_transaction');
-                    return <CostDisplay type='native' scope={isTransaction ? 'transaction' : 'query'} compact consumption={NativeConsumption} />;
+                    const consumption = info.getValue<UsageResult['data']['consumption']>();
+                    const isTransaction = consumption.is_transaction;
+                    const ingressCost = getIntegerCost({ consumption: consumption.ingress_in_bytes, type: 'ingress', scope: isTransaction ? 'transaction' : 'query' });
+                    const egressCost = getIntegerCost({ consumption: consumption.egress_in_bytes, type: 'egress', scope: isTransaction ? 'transaction' : 'query' });
+                    const readCost = getIntegerCost({ consumption: consumption.ledger_read_in_bytes, type: 'read', scope: isTransaction ? 'transaction' : 'query' });
+                    const writeCost = getIntegerCost({ consumption: consumption.ledger_write_in_bytes, type: 'write', scope: isTransaction ? 'transaction' : 'query' });
+                    const wasmCost = getIntegerCost({ consumption: consumption.cpu_consumption, type: 'wasm', scope: isTransaction ? 'transaction' : 'query' });
+                    const nativeCost = getIntegerCost({ consumption: consumption.native_calls_consumption, type: 'native', scope: isTransaction ? 'transaction' : 'query' });
+                    const totalCost = ingressCost + egressCost + readCost + writeCost + wasmCost + nativeCost;
+                    return <CostDisplay basis={{ type: 'total', amount: totalCost }} compact />;
                 }
             },
             {
@@ -127,6 +143,7 @@ function ApplicationUsage() {
         ],
         []
     );
+
 
     //we must flatten the array of arrays from the useInfiniteQuery hook
     const flatData = useMemo(
