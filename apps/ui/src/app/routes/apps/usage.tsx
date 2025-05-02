@@ -11,7 +11,8 @@ import {
 } from '@tanstack/react-table';
 import { useParams } from 'react-router-dom';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { UilSpinner } from '@iconscout/react-unicons';
+import { UilInfoCircle, UilSpinner } from '@iconscout/react-unicons';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import api from '../../utils/api';
 import CostDisplay, { getIntegerCost } from '../../components/CostDisplay';
 
@@ -127,7 +128,57 @@ function ApplicationUsage() {
                     const wasmCost = getIntegerCost({ consumption: consumption.cpu_consumption, type: 'wasm', scope: isTransaction ? 'transaction' : 'query' });
                     const nativeCost = getIntegerCost({ consumption: consumption.native_calls_consumption, type: 'native', scope: isTransaction ? 'transaction' : 'query' });
                     const totalCost = ingressCost + egressCost + readCost + writeCost + wasmCost + nativeCost;
-                    return <CostDisplay basis={{ type: 'total', amount: totalCost }} compact />;
+                    return <>
+                        <CostDisplay basis={{ type: 'total', amount: totalCost }} compact />
+                        <Tooltip.Provider delayDuration={100}>
+                            <Tooltip.Root>
+                                <Tooltip.Trigger asChild>
+                                    <span className={'text-xs text-slate-500 hover:cursor-pointer'}>
+                                        <UilInfoCircle className='inline-block px-2 -mt-1 h-4' color='grey' />
+                                    </span>
+                                </Tooltip.Trigger>
+                                <Tooltip.Portal>
+                                    <Tooltip.Content className="text-sm bg-white p-4 shadow" align='start' side="bottom">
+                                        <table>
+                                            <thead>
+                                                <tr className='text-left'>
+                                                    <th className='text-slate-500 p-1 mr-4'>Type</th>
+                                                    <th className='text-slate-500 p-1'>Cost</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr className='border-b border-slate-200'>
+                                                    <td className='p-1'>Ingress</td>
+                                                    <td className='p-1'><CostDisplay basis={{ type: 'ingress', scope: isTransaction ? 'transaction' : 'query', consumption: consumption.ingress_in_bytes }} compact /></td>
+                                                </tr>
+                                                <tr className='border-b border-slate-200'>
+                                                    <td className='p-1'>Egress</td>
+                                                    <td className='p-1'><CostDisplay basis={{ type: 'egress', scope: isTransaction ? 'transaction' : 'query', consumption: consumption.egress_in_bytes }} compact /></td>
+                                                </tr>
+                                                <tr className='border-b border-slate-200'>
+                                                    <td className='p-1'>Read</td>
+                                                    <td className='p-1'><CostDisplay basis={{ type: 'read', scope: isTransaction ? 'transaction' : 'query', consumption: consumption.ledger_read_in_bytes }} compact /></td>
+                                                </tr>
+                                                <tr className='border-b border-slate-200'>
+                                                    <td className='p-1'>Write</td>
+                                                    <td className='p-1'><CostDisplay basis={{ type: 'write', scope: isTransaction ? 'transaction' : 'query', consumption: consumption.ledger_write_in_bytes }} compact /></td>
+                                                </tr>
+                                                <tr className='border-b border-slate-200'>
+                                                    <td className='p-1'>WASM</td>
+                                                    <td className='p-1'><CostDisplay basis={{ type: 'wasm', scope: isTransaction ? 'transaction' : 'query', consumption: consumption.cpu_consumption }} compact /></td>
+                                                </tr>
+                                                <tr>
+                                                    <td className='p-1'>Native</td>
+                                                    <td className='p-1'><CostDisplay basis={{ type: 'native', scope: isTransaction ? 'transaction' : 'query', consumption: consumption.native_calls_consumption }} compact /></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <Tooltip.Arrow className="fill-slate-100" width={10} height={10} />
+                                    </Tooltip.Content>
+                                </Tooltip.Portal>
+                            </Tooltip.Root>
+                        </Tooltip.Provider>
+                    </>;
                 }
             },
             {
