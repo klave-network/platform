@@ -2713,12 +2713,13 @@
   dependencies:
     buffer "^6.0.3"
 
-"@klave/as-json@0.9.21":
-  version "0.9.21"
-  resolved "https://registry.yarnpkg.com/@klave/as-json/-/as-json-0.9.21.tgz#cbcb8dab1e972a9ed235729b2e7e4c5c003e2b95"
-  integrity sha512-bdI6ixZF2u2YaYFCzl+iUJVMbQde9XNtlzl5TiHDPxA+LRNHPstqNtpkhZDg/2/igjmCoRAr/uKnJXMEysGuOA==
+"@klave/as-json@0.9.23":
+  version "0.9.23"
+  resolved "https://registry.yarnpkg.com/@klave/as-json/-/as-json-0.9.23.tgz#677fca84c1224d85566c1424e4432bf0d37ffb4d"
+  integrity sha512-bgDBNenV6CjxHdyVVS1KOSw+VW2MCh1wdv7D9jxx400gwVUB9Qmj8xK9GXf8Na3KZ8h+JbPWyURchXbtcl662w==
   dependencies:
     as-virtual "^0.2.0"
+    chalk "^5.3.0"
 
 "@kwsites/file-exists@^1.1.1":
   version "1.1.1"
