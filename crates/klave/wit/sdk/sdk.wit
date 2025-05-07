@@ -68,6 +68,12 @@ interface sdk {
     get-quote: func(challenge: list<u8>) -> result<string, string>;
     verify-quote: func(current-time: s64, quote-binary: list<u8>) -> result<string, string>;
 
+    //SecretLlama
+    graph-load: func(input: string, encoding: s32, target: s32) -> result<_, string>;
+    graph-load-by-name: func(input: string) -> result<_, string>;
+    graph-init-execution-context: func(input: string) -> result<_, string>;
+    inference-compute: func(input: string, input-tensor: string) -> result<string, string>;
+
     //Subscription
     start-recording: func();
     stop-recording: func();
