@@ -24,3 +24,31 @@ pub fn infer_from_lightgbm_model(
         Err(err) => Err(err.into()),
     }
 }
+
+pub fn graph_load(input: &str, encoding: i32, target: i32) -> Result<(), Box<dyn std::error::Error>> {
+    match sdk::graph_load(input, encoding, target) {
+        Ok(_) => Ok(()),
+        Err(err) => Err(err.into()),
+    }
+}
+
+pub fn graph_load_by_name(input: &str) -> Result<(), Box<dyn std::error::Error>> {
+    match sdk::graph_load_by_name(input) {
+        Ok(_) => Ok(()),
+        Err(err) => Err(err.into()),
+    }
+}
+
+pub fn graph_init_execution_context(input: &str) -> Result<(), Box<dyn std::error::Error>> {
+    match sdk::graph_init_execution_context(input) {
+        Ok(_) => Ok(()),
+        Err(err) => Err(err.into()),
+    }
+}
+
+pub fn inference_compute(input: &str, input_tensor: &str) -> Result<String, Box<dyn std::error::Error>> {
+    match sdk::inference_compute(input, input_tensor) {
+        Ok(result) => Ok(result),
+        Err(err) => Err(err.into()),
+    }
+}
