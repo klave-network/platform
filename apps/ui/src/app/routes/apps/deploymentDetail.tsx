@@ -321,7 +321,7 @@ export const AppDeploymentDetail: FC = () => {
                 <Tabs.Content value="ui">
                     <div className='mt-10'>
                         <h2 className='font-bold mb-3'>UI configured to deploy with this application <a title="Open in a new tab or window" href={`https://${deployment.id}.${uiHostingDomain}?g=${secretariumNode}&d=${fqdn}`} target='_blank' rel='noreferrer' className='text-klave-light-blue hover:underline inline-block'><UilExternalLinkAlt className='inline-block h-4' /></a></h2>
-                        <iframe className='w-full h-[80vh] border-0' src={`https://${deployment.id}.${uiHostingDomain}?g=${secretariumNode}&d=${fqdn}`} title={`UI for ${fqdn}`} sandbox="allow-same-origin allow-scripts  allow-modals allow-forms allow-popups allow-presentation" />
+                        <iframe className='w-full h-[70vh] rounded-md border border-slate-400 border-dashed' src={`https://${deployment.id}.${uiHostingDomain}?g=${secretariumNode}&d=${fqdn}`} title={`UI for ${fqdn}`} sandbox="allow-same-origin allow-scripts  allow-modals allow-forms allow-popups allow-presentation" />
                     </div>
                 </Tabs.Content>
                 <Tabs.Content value="build">
