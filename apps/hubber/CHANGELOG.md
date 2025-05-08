@@ -1,4 +1,11 @@
 # Changelog
+## [1.2.2](https://github.com/klave-network/platform/compare/hubber@1.2.1...hubber@1.2.2) (2025-05-08)
+
+
+### Bug Fixes
+
+* **hubber:** Allow CORS `connect-src` to any endpoint ([edb958b](https://github.com/klave-network/platform/commit/edb958b4f664b07e7e758783e17a0be01254d0f9))
+
 ## [1.2.1](https://github.com/klave-network/platform/compare/hubber@1.2.0...hubber@1.2.1) (2025-05-08)
 
 ### Dependency Updates
