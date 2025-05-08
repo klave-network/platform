@@ -1,4 +1,9 @@
 # Changelog
+## [1.2.1](https://github.com/klave-network/platform/compare/hubber@1.2.0...hubber@1.2.1) (2025-05-08)
+
+### Dependency Updates
+
+* `api` updated to version `1.2.0`
 ## [1.2.0](https://github.com/klave-network/platform/compare/hubber@1.1.6...hubber@1.2.0) (2025-05-08)
 
 ### Dependency Updates
