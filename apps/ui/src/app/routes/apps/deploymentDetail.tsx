@@ -24,6 +24,7 @@ export const AppDeploymentDetail: FC = () => {
     const [shouldAutoScroll] = useState(false);
     const [effectiveClusterFQDN, setEffectiveClusterFQDN] = useState<string>();
     const [WASMFingerprint, setWASMFingerprint] = useState<string>();
+    const { data: secretariumNodeInfo, isLoading: isLoadingSecretariumNodeInfo } = api.v0.system.getSecretariumNode.useQuery();
     const { data: uiHostingInfo } = api.v0.system.getUIHostingDomain.useQuery();
     const { data: deployment, isLoading: isLoadingDeployments } = api.v0.deployments.getById.useQuery({ deploymentId: deploymentId ?? '' }, {
         refetchInterval: (s) => ['errored', 'terminated', 'deployed'].includes(s.state.data?.status ?? '') ? (Date.now() - (s.state.data?.createdAt.getTime() ?? 0) < 60000 ? 5000 : 60000) : 500
@@ -35,7 +36,20 @@ export const AppDeploymentDetail: FC = () => {
         const url = URL.parse(uiHostingInfo);
         if (url)
             return url.host;
+        return undefined;
     }, [uiHostingInfo]);
+
+    const secretariumNode = useMemo(() => {
+        if (!secretariumNodeInfo)
+            return undefined;
+        const node = secretariumNodeInfo.split('|')[0]
+        if (!node)
+            return undefined;
+        const url = URL.parse(node);
+        if (url)
+            return url.host;
+        return undefined;
+    }, [secretariumNodeInfo]);
 
     useEffect(() => {
 
@@ -127,7 +141,7 @@ export const AppDeploymentDetail: FC = () => {
         };
     }), [geoFeatures.features, datacentreMarkers]);
 
-    if (isLoadingDeployments || !deployment)
+    if (isLoadingDeployments || !deployment || isLoadingSecretariumNodeInfo)
         return <>
             We are fetching data about your deployment.<br />
             It will only take a moment...<br />
@@ -145,7 +159,7 @@ export const AppDeploymentDetail: FC = () => {
         }).catch(() => { return; });
     }
 
-    if (!deploymentAddress)
+    if (!deploymentAddress || !secretariumNode)
         return <>
             We experienced an issue fetching your deployment.<br />
         </>;
@@ -306,8 +320,8 @@ export const AppDeploymentDetail: FC = () => {
                 </Tabs.Content>
                 <Tabs.Content value="ui">
                     <div className='mt-10'>
-                        <h2 className='font-bold mb-3'>UI configured to deploy with this application <a title="Open in a new tab or window" href={`https://${deployment.id}.${uiHostingDomain}?d=${fqdn}`} target='_blank' rel='noreferrer' className='text-klave-light-blue hover:underline inline-block'><UilExternalLinkAlt className='inline-block h-4' /></a></h2>
-                        <iframe className='w-full h-[80vh] border-0' src={`https://${deployment.id}.${uiHostingDomain}?d=${fqdn}`} title={`UI for ${fqdn}`} sandbox="allow-same-origin allow-scripts  allow-modals allow-forms allow-popups allow-presentation" />
+                        <h2 className='font-bold mb-3'>UI configured to deploy with this application <a title="Open in a new tab or window" href={`https://${deployment.id}.${uiHostingDomain}?g=${secretariumNode}&d=${fqdn}`} target='_blank' rel='noreferrer' className='text-klave-light-blue hover:underline inline-block'><UilExternalLinkAlt className='inline-block h-4' /></a></h2>
+                        <iframe className='w-full h-[80vh] border-0' src={`https://${deployment.id}.${uiHostingDomain}?g=${secretariumNode}&d=${fqdn}`} title={`UI for ${fqdn}`} sandbox="allow-same-origin allow-scripts  allow-modals allow-forms allow-popups allow-presentation" />
                     </div>
                 </Tabs.Content>
                 <Tabs.Content value="build">
