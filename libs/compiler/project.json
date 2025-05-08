@@ -46,6 +46,12 @@
                 "jestConfig": "libs/compiler/jest.config.ts"
             }
         },
+        "sync-deps": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "node tools/scripts/syncDepVersion.mjs compiler"
+            }
+        },
         "version": {
             "executor": "@jscutlery/semver:version",
             "options": {
@@ -56,7 +62,7 @@
                 "commitMessageFormat": "chore({projectName}): Release version ${version}",
                 "postTargets": [
                     "compiler:build",
-                    "sdk:sync-deps"
+                    "compiler:sync-deps"
                 ]
             }
         }

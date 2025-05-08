@@ -1,4 +1,14 @@
 # Changelog
+## [1.1.0](https://github.com/klave-network/platform/compare/constants@1.0.11...constants@1.1.0) (2025-05-08)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.11`
+
+### Features
+
+* **db,api,providers,hubber,ui,dispatcher,constants:** Add Embedded UI Hosting ([5a748c8](https://github.com/klave-network/platform/commit/5a748c8b616ad3674058517f5bd9c040361fc3c4))
+
 ## [1.0.11](https://github.com/klave-network/platform/compare/constants@1.0.10...constants@1.0.11) (2025-04-30)
 
 ### Dependency Updates

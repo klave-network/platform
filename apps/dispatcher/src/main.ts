@@ -12,7 +12,7 @@ process.on('unhandledRejection', (reason, p) => {
     console.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
 });
 
-const host = process.env.HOST ?? 'localhost';
+const host = process.env.HOST ?? 'klave.dispatch.127.0.0.1.nip.io';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 const serverHandle = (async () => {

@@ -123,8 +123,12 @@ export const LoginSecKey: FC = () => {
                 .then((res) => res.data)
                 .then(async (options) => {
                     if (options) {
+                        options.allowCredentials;
                         setIsRequestingWebauthnInput(true);
-                        return startAuthentication(options);
+                        return startAuthentication({
+                            optionsJSON: options
+                            // useBrowserAutofill: true
+                        });
                     }
                     throw new Error('No authentication options available');
                 })
@@ -171,7 +175,10 @@ export const LoginSecKey: FC = () => {
                 .then(async (options) => {
                     if (options) {
                         setIsRequestingWebauthnInput(true);
-                        return startRegistration(options);
+                        return startRegistration({
+                            optionsJSON: options
+                            // useAutoRegister: true
+                        });
                     }
                     throw new Error('No registration options available');
                 })

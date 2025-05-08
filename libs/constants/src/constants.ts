@@ -3,7 +3,8 @@ import type { CommitVerificationReason } from '@klave/db';
 export const permissiblePeers = [
     /^chrome-extension:\/\//,
     /^http:\/\/localhost/,
-    /^http:\/\/127.0.0.1/,
+    /^http:\/\/127\.0\.0\.[0-9]+/,
+    /\.127\.0\.0\.[0-9]+\.nip\.io(:[0-9]+)$/,
     /\.klave\.network$/,
     /\.klave\.dev$/,
     /\.klave\.com$/,

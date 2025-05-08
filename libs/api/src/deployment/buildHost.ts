@@ -2,7 +2,9 @@ import { exec, ExecException } from 'node:child_process';
 import path from 'node:path';
 import fs from 'node:fs';
 import { v4 as uuid } from 'uuid';
+import mime from 'mime'
 import TOML from 'toml';
+import { logger, objectStore, Upload, PutObjectOutput } from '@klave/providers';
 import { getFinalParseConfig, StagedOutputGroups } from '@klave/constants';
 import { BuildDependenciesManifest, BuildMiniVMOptions } from './buildMiniVm';
 
@@ -57,6 +59,9 @@ type BuildHostMessage = {
     version: string;
 } | {
     type: 'compile';
+} | {
+    type: 'expand';
+    feature: 'ui';
 };
 
 export type BuildHostCreatorOptions = BuildMiniVMOptions & {
@@ -104,7 +109,7 @@ export class BuildHost {
         if (message.type === 'compile') {
             try {
 
-                const { token, workingDirectory, repo, context: { commit: { after } } } = this.options;
+                const { token, workingDirectory, repo, context: { commit: { after } }, deployment } = this.options;
                 type PackageManager = 'yarn' | 'npm' | 'cargo';
                 const packageManagerCommands: Record<PackageManager, [string[], string[]]> = {
                     yarn: [['yarn install'], ['yarn build']],
@@ -151,7 +156,6 @@ export class BuildHost {
                         this.consolePrint('fetch', { type: 'stderr', full: false, data });
                     });
                 })).then(async () => {
-
                     if (fs.existsSync(path.join(workingDirectory, 'yarn.lock')))
                         packageManager = 'yarn';
                     else if (fs.existsSync(path.join(workingDirectory, 'package-lock.json')))
@@ -226,6 +230,9 @@ export class BuildHost {
                     if (appIndex === undefined || appIndex === -1)
                         return reject(new Error('Application not found'));
 
+                    const appConfig = klaveConfig.data.applications?.[appIndex];
+                    const appPath = appConfig?.rootDir ?? '.';
+
                     if (packageManager === 'yarn' || packageManager === 'npm') {
                         const appCompiledPath = path.join(workingDirectory, '.klave');
                         fs.readdirSync(appCompiledPath).forEach(file => {
@@ -238,7 +245,6 @@ export class BuildHost {
                         });
                     } else if (packageManager === 'cargo') {
 
-                        const appPath = klaveConfig.data.applications?.[appIndex]?.rootDir ?? '.';
                         const tomlConf = TOML.parse(fs.readFileSync(path.join(workingDirectory, appPath, 'Cargo.toml'), 'utf-8'));
 
                         Object.entries(tomlConf.dependencies ?? {})?.forEach(([name, version]) => {
@@ -259,8 +265,53 @@ export class BuildHost {
                                 }));
                         });
                     }
+                    const appUiPath = path.normalize(path.join(workingDirectory, appPath, appConfig?.ui ?? 'ui'));
+                    let fileUploads: Array<Promise<PutObjectOutput | null>> = [];
+                    if (fs.existsSync(appUiPath)) {
+                        logger.debug(`Found UI artifacts for ${deployment.id}`, {
+                            parent: 'bmv'
+                        });
+                        this.listeners['message']?.forEach(listener => listener({
+                            type: 'expand',
+                            feature: 'ui'
+                        }));
+                        try {
+                            const dirContents = fs.readdirSync(appUiPath, { recursive: true, withFileTypes: true });
+                            fileUploads = dirContents.map(file => {
+                                if (!file.isFile())
+                                    return Promise.resolve(null);
+                                const normedPath = path.normalize(path.join(file.parentPath, file.name));
+                                const normedKey = path.normalize(`${deployment.id}/${normedPath.replace(/\\/g, '/').replace(appUiPath.replace(/\\/g, '/'), '')}`).replace(/\\/g, '/');
+                                if (!fs.existsSync(normedPath))
+                                    return Promise.resolve(null);
+                                const fileStream = fs.createReadStream(normedPath)
+                                const fileUpload = new Upload({
+                                    client: objectStore,
+                                    params: {
+                                        Bucket: process.env['KLAVE_BHDUI_S3_BUCKET_NAME'],
+                                        Key: normedKey,
+                                        Body: fileStream,
+                                        ContentType: mime.lookup(normedPath) ?? 'application/octet-stream'
+                                    },
+                                    leavePartsOnError: false
+                                });
+                                return fileUpload.done();
+                            });
+                        } catch (error) {
+                            logger.error(`Error uploading UI artifacts for ${deployment.id}: ${error}`, {
+                                parent: 'bmv'
+                            });
+                        }
+                    }
 
-                    resolve(packageManager);
+                    Promise.allSettled(fileUploads)
+                        .then((fileUploadResults) => {
+                            if (fileUploadResults.filter(result => result.status === 'rejected').length > 0)
+                                logger.debug(`Some UI artifacts failed to upload ${deployment.id}`, {
+                                    parent: 'bmv'
+                                });
+                            resolve(packageManager);
+                        })
 
                 })).then(async (packageManager) => {
                     this.listeners['message']?.forEach(listener => listener({ type: 'done', stats: {}, sourceType: packageManager === 'cargo' ? 'rust-component' : 'assemblyscript', output: this.outputProgress, dependencies: this.usedDependencies }));

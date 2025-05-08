@@ -59,7 +59,7 @@
         "sync-deps": {
             "executor": "nx:run-commands",
             "options": {
-                "command": "node tools/scripts/syncDepVersion.mjs"
+                "command": "node tools/scripts/syncDepVersion.mjs sdk"
             }
         },
         "version": {
@@ -71,7 +71,8 @@
                 "tagPrefix": "{projectName}@",
                 "commitMessageFormat": "chore({projectName}): Release version ${version}",
                 "postTargets": [
-                    "sdk:build"
+                    "sdk:build",
+                    "sdk:sync-deps"
                 ]
             }
         },

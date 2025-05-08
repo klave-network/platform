@@ -1,6 +1,7 @@
 import { defineConfig as defineViteConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
+import mkcert from 'vite-plugin-mkcert'
 import git from 'git-rev-sync';
 import { version } from './package.json';
 
@@ -13,7 +14,8 @@ export default defineViteConfig({
     },
 
     server: {
-        host: 'localhost',
+        host: 'klave.ui.127.0.0.1.nip.io',
+        https: {},
         fs: {
             // Allow serving files from one level up to the project root
             allow: ['..']
@@ -21,10 +23,13 @@ export default defineViteConfig({
     },
 
     preview: {
-        host: 'localhost'
+        host: 'klave.ui.127.0.0.1.nip.io'
     },
 
-    plugins: [react(), nxViteTsPaths()],
+    plugins: [mkcert({
+        keyFileName: 'klave-ui-dev-key.pem',
+        certFileName: 'klave-ui-dev-cert.pem',
+    }), react(), nxViteTsPaths()],
 
     // Uncomment this if you are using workers.
     // worker: {

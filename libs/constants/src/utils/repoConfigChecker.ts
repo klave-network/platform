@@ -25,6 +25,7 @@ const repoConfigSchemaV1 = z.object({
             description: z.string().optional(),
             version: z.string().optional(),
             index: z.string().optional(),
+            ui: z.string().optional(),
             rootDir: z.string()
         }
     )).optional()

@@ -46,12 +46,6 @@
                 "{workspaceRoot}/coverage/{projectRoot}"
             ]
         },
-        "sync-deps": {
-            "executor": "nx:run-commands",
-            "options": {
-                "command": "node tools/scripts/syncDepVersion.mjs ui-kit"
-            }
-        },
         "version": {
             "executor": "@jscutlery/semver:version",
             "options": {
@@ -61,18 +55,8 @@
                 "tagPrefix": "{projectName}@",
                 "commitMessageFormat": "chore({projectName}): Release version ${version}",
                 "postTargets": [
-                    "sdk:build",
-                    "sdk:sync-deps"
+                    "ui-kit:build"
                 ]
-            }
-        }
-    },
-    "release": {
-        "version": {
-            "generatorOptions": {
-                "packageRoot": "dist/{projectRoot}",
-                "currentVersionResolver": "git-tag",
-                "fallbackCurrentVersionResolver": "disk"
             }
         }
     }

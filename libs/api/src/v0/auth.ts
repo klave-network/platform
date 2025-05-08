@@ -5,9 +5,8 @@ import { publicProcedure, createTRPCRouter } from '../trpc';
 import { webcrypto } from 'node:crypto';
 import { createTransport } from 'nodemailer';
 import FakeMailGuard from 'fakemail-guard';
-import { GenerateRegistrationOptionsOpts, generateAuthenticationOptions, generateRegistrationOptions, verifyAuthenticationResponse, verifyRegistrationResponse } from '@simplewebauthn/server';
+import { AuthenticatorTransportFuture, GenerateRegistrationOptionsOpts, generateAuthenticationOptions, generateRegistrationOptions, verifyAuthenticationResponse, verifyRegistrationResponse } from '@simplewebauthn/server';
 import { type startRegistration, type startAuthentication } from '@simplewebauthn/browser';
-import { Utils } from '@secretarium/connector';
 // import * as passport from 'passport';
 import { z } from 'zod';
 import { render } from '@react-email/components';
@@ -23,7 +22,7 @@ let origin: string;
 let rpID: string;
 
 const setWebauthnPrimitives = () => {
-    origin = process.env['KLAVE_WEBAUTHN_ORIGIN'] ?? 'http://localhost';
+    origin = process.env['KLAVE_WEBAUTHN_ORIGIN'] ?? 'http://klave.ui.127.0.0.1.nip.io';
     rpID = new URL(origin).hostname;
 };
 
@@ -455,9 +454,9 @@ export const authRouter = createTRPCRouter({
                 };
             }
 
-            const authenticator = user?.webauthCredentials.find(cred => cred.credentialID === credId);
+            const credential = user?.webauthCredentials.find(cred => cred.credentialID === credId);
 
-            if (!authenticator) {
+            if (!credential) {
                 logger.debug('wan: Authenticator could not be found');
                 return {
                     ok: false,
@@ -473,10 +472,11 @@ export const authRouter = createTRPCRouter({
                 expectedChallenge: `${user.webauthChallenge}`,
                 expectedOrigin: origin,
                 expectedRPID: rpID,
-                authenticator: {
-                    credentialPublicKey: Utils.fromBase64(authenticator.credentialPublicKey),
-                    credentialID: Utils.fromBase64(authenticator.credentialID),
-                    counter: authenticator.counter
+                credential: {
+                    id: credential.credentialID,
+                    publicKey: new Uint8Array(credential.credentialPublicKey),
+                    counter: credential.counter,
+                    transports: credential.credentialTransport?.split(',') as AuthenticatorTransportFuture[]
                 }
             };
 
@@ -495,7 +495,7 @@ export const authRouter = createTRPCRouter({
 
             await prisma.webauthCredential.update({
                 where: {
-                    id: authenticator.id
+                    id: credential.id
                 },
                 data: {
                     counter: newCounter
@@ -557,7 +557,8 @@ export const authRouter = createTRPCRouter({
                     }
                 },
                 select: {
-                    id: true
+                    id: true,
+                    webauthCredentials: true
                 }
             });
 
@@ -569,7 +570,7 @@ export const authRouter = createTRPCRouter({
                 rpID,
                 // We pretend we found a user with this email address
                 // TODO - Ensure we compute a fake UUID not based on email to avoid revealing registration status
-                userID: user?.id ?? String(await webcrypto.subtle.digest('SHA-256', Buffer.from(email))),
+                userID: new TextEncoder().encode(user?.id ?? String(await webcrypto.subtle.digest('SHA-256', Buffer.from(email)))),
                 userName: email,
                 userDisplayName: `${email} | ${process.env['KLAVE_WEBAUTHN_ORIGIN_NAME']}`,
                 timeout: 60000,
@@ -587,8 +588,13 @@ export const authRouter = createTRPCRouter({
                 //     type: 'public-key',
                 //     transports: dev.transports
                 // })),
+                // excludeCredentials: user?.webauthCredentials.map(cred => ({
+                //     id: cred.credentialID
+                // })) ?? [],
                 authenticatorSelection: {
-                    residentKey: 'discouraged'
+                    residentKey: 'preferred',
+                    userVerification: 'preferred',
+                    authenticatorAttachment: 'platform'
                 },
                 // Support the two most common algorithms: ES256, and RS256
                 supportedAlgorithmIDs: [-7, -257]
@@ -660,13 +666,16 @@ export const authRouter = createTRPCRouter({
                 };
 
             const {
-                credentialPublicKey,
-                credentialID,
+                credential: {
+                    id: credentialID,
+                    publicKey: credentialPublicKey,
+                    counter,
+                    transports: credentialTransport
+                },
                 credentialType,
                 credentialDeviceType,
                 credentialBackedUp,
                 userVerified,
-                counter,
                 aaguid
             } = registrationInfo;
 
@@ -678,8 +687,9 @@ export const authRouter = createTRPCRouter({
                                 id: user.id
                             }
                         },
-                        credentialPublicKey: Utils.toBase64(credentialPublicKey, true),
-                        credentialID: Utils.toBase64(credentialID, true),
+                        credentialPublicKey: [...credentialPublicKey],
+                        credentialID,
+                        credentialTransport: credentialTransport?.join(','),
                         credentialType,
                         credentialDeviceType,
                         credentialBackedUp,

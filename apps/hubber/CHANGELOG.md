@@ -1,4 +1,22 @@
 # Changelog
+## [1.2.1](https://github.com/klave-network/platform/compare/hubber@1.2.0...hubber@1.2.1) (2025-05-08)
+
+### Dependency Updates
+
+* `api` updated to version `1.2.0`
+## [1.2.0](https://github.com/klave-network/platform/compare/hubber@1.1.6...hubber@1.2.0) (2025-05-08)
+
+### Dependency Updates
+
+* `db` updated to version `1.1.6`
+* `constants` updated to version `1.1.6`
+* `providers` updated to version `1.1.6`
+* `api` updated to version `1.1.6`
+
+### Features
+
+* **db,api,providers,hubber,ui,dispatcher,constants:** Add Embedded UI Hosting ([5a748c8](https://github.com/klave-network/platform/commit/5a748c8b616ad3674058517f5bd9c040361fc3c4))
+
 ## [1.1.6](https://github.com/klave-network/platform/compare/hubber@1.1.5...hubber@1.1.6) (2025-04-30)
 
 ## [1.1.5](https://github.com/klave-network/platform/compare/hubber@1.1.4...hubber@1.1.5) (2025-04-30)

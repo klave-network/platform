@@ -25,8 +25,10 @@ import { trcpMiddlware } from './middleware/trpc';
 import { usersRouter } from './routes';
 import { webLinkerMiddlware } from './middleware/webLinker';
 import { permissiblePeers } from '@klave/constants';
+import { uiHosterMiddleware } from './middleware/uiHoster';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+const bhuiHostDomain = URL.parse(process.env['KLAVE_BHDUI_DOMAIN'] ?? '')?.host
 
 const app = express();
 
@@ -73,7 +75,8 @@ export const start = async () => {
                 // 'default-src': ['"self"', 'data:', 'blob:'],
                 // 'script-src': ['"self"', 'unsafe-inline', 'unsafe-eval', 'https://*.klave.dev', 'https://*.klave.network', 'https://*.ingest.sentry.io'],
                 // 'style-src': ['"self"', 'unsafe-inline', 'https://*.klave.dev', 'https://*.klave.network'],
-                'frame-src': ['"self"', '"https://*.klave.dev"', '"https://*.klave.network"', '"https://klave.network"']
+                'frame-src': ['\'self\'', '*.127.0.0.1.nip.io:*', '*.klave.dev', '*.klave.network', 'klave.network', '*.klave.com', 'klave.com'].concat(bhuiHostDomain ? [`*.${bhuiHostDomain}`, bhuiHostDomain] : []),
+                'frame-ancestors': ['\'self\'', '*.127.0.0.1.nip.io:*', '*.klave.dev', '*.klave.network', 'klave.network', '*.klave.com', 'klave.com']
                 // upgradeInsecureRequests: true,
                 // blockAllMixedContent: true
             }
@@ -88,6 +91,7 @@ export const start = async () => {
 
     const corsConfiguration = cors({
         origin: permissiblePeers,
+        // preflightContinue: true,
         // allowedHeaders: ['Sentry-Trace', 'Baggage'],
         credentials: true
     });
@@ -159,6 +163,7 @@ export const start = async () => {
         });
     });
 
+    app.use(uiHosterMiddleware);
     app.use(session(sessionOptions));
     app.use('/', express.static(path.join(__dirname, 'public')));
     // app.get('/csrf-token', (req, res) => res.json({ token: generateToken(req) }));
