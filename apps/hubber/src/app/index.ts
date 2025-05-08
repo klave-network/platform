@@ -76,7 +76,8 @@ export const start = async () => {
                 // 'script-src': ['"self"', 'unsafe-inline', 'unsafe-eval', 'https://*.klave.dev', 'https://*.klave.network', 'https://*.ingest.sentry.io'],
                 // 'style-src': ['"self"', 'unsafe-inline', 'https://*.klave.dev', 'https://*.klave.network'],
                 'frame-src': ['\'self\'', '*.127.0.0.1.nip.io:*', '*.klave.dev', '*.klave.network', 'klave.network', '*.klave.com', 'klave.com'].concat(bhuiHostDomain ? [`*.${bhuiHostDomain}`, bhuiHostDomain] : []),
-                'frame-ancestors': ['\'self\'', '*.127.0.0.1.nip.io:*', '*.klave.dev', '*.klave.network', 'klave.network', '*.klave.com', 'klave.com']
+                'frame-ancestors': ['\'self\'', '*.127.0.0.1.nip.io:*', '*.klave.dev', '*.klave.network', 'klave.network', '*.klave.com', 'klave.com'],
+                'connect-src': ['\'self\'', '*']
                 // upgradeInsecureRequests: true,
                 // blockAllMixedContent: true
             }
