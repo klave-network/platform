@@ -1,4 +1,9 @@
 # Changelog
+## [1.4.1](https://github.com/klave-network/platform/compare/api@1.4.0...api@1.4.1) (2025-05-08)
+
+### Dependency Updates
+
+* `ui-kit` updated to version `1.4.0`
 ## [1.4.0](https://github.com/klave-network/platform/compare/api@1.3.4...api@1.4.0) (2025-05-08)
 
 ### Dependency Updates
