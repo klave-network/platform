@@ -7,6 +7,11 @@ import { logger } from './logger';
 export const githubOps = {
     initialize: async () => {
 
+        if (process.env.NODE_ENV === 'development') {
+            logger.info('Skipping GitHub Sync in development mode');
+            return;
+        }
+
         console.log('Initializing GitHub Sync');
         return trace({
             name: 'BOOT GitHub Sync',

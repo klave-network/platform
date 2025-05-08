@@ -169,6 +169,7 @@ export const deploymentRouter = createTRPCRouter({
                     buildOutputRoutes: true,
                     buildOutputWASM: true,
                     buildOutputDTS: true,
+                    buildOutputHasUI: true,
                     buildOutputs: true,
                     configSnapshot: true,
                     deploymentAddress: {

@@ -20,7 +20,7 @@ const planReconnection = async () => {
 export const dispatchOps = {
     initialize: async () => {
         try {
-            const dispatcherWs = process.env['KLAVE_DISPATCH_WS'] || 'ws://localhost:3334';
+            const dispatcherWs = process.env['KLAVE_DISPATCH_WS'] || 'ws://klave.dispatch.127.0.0.1.nip.io:3334';
             const dispatcherSecret = process.env['KLAVE_DISPATCH_SECRET'];
 
             if (!dispatcherSecret) {
@@ -63,7 +63,7 @@ export const dispatchOps = {
                     body: Array<number>
                 };
                 // TODO: Try to not use fetch on localhost here. Also get the actual port.
-                fetch('http://127.0.0.1:3333/hook', {
+                fetch('http://klave.api.127.0.0.1.nip.io:3333/hook', {
                     method: 'POST',
                     headers: message.headers,
                     body: Uint8Array.from(message.body)

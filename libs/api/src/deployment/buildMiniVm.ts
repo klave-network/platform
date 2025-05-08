@@ -36,6 +36,7 @@ type BuildOutput = {
         wasm: Uint8Array;
         wat?: string;
         dts?: string;
+        hasUI: boolean;
         routes: string[];
         signature?: sigstore.Bundle;
     };
@@ -330,6 +331,7 @@ export class BuildMiniVM {
                         success: true,
                         result: {
                             wasm: wasmBuffer,
+                            hasUI: false,
                             routes: []
                         },
                         sourceType: 'wasm',
@@ -383,6 +385,7 @@ export class BuildMiniVM {
             let compiledBinary = new Uint8Array(0);
             let compiledWAT: string | undefined;
             let compiledDTS: string | undefined;
+            let hasUI = false;
             try {
                 const authStruct = await this.options.context.octokit.auth({ type: 'installation' }) as InstallationAccessTokenAuthentication;
                 const buildHost = await createBuildHost({
@@ -431,6 +434,9 @@ export class BuildMiniVM {
                             }).catch(() => { return; });
                         } else if (message.type === 'diagnostic') {
                             //
+                        } else if (message.type === 'expand') {
+                            if (message.feature === 'ui')
+                                hasUI = true;
                         } else if (message.type === 'errored') {
                             logger.debug(`Build Host errored: ${message.error?.message ?? message.error ?? 'Unknown'}`, {
                                 parent: 'bmv'
@@ -479,6 +485,7 @@ export class BuildMiniVM {
                                             routes: validRoutes,
                                             wat: compiledWAT,
                                             dts: compiledDTS,
+                                            hasUI,
                                             signature
                                         },
                                         sourceType: message.sourceType,

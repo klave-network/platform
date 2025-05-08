@@ -15,7 +15,7 @@ import { permissiblePeers } from '@klave/constants';
 Sentry.init({
     dsn: import.meta.env['VITE_KLAVE_SENTRY_DSN'],
     release: `klave@${import.meta.env['VITE_REPO_VERSION']}`,
-    environment: ['localhost', '::', '127.0.0.1'].includes(window.location.hostname) ? 'development' : window.location.hostname,
+    environment: ['localhost', '::', '127.0.0.1', '127.0.0.1.nip.io'].includes(window.location.hostname) ? 'development' : window.location.hostname,
     integrations: [
         new BrowserTracing({
             enableHTTPTimings: true,

@@ -248,6 +248,7 @@ model Deployment {
     buildOutputDTS       String?
     buildOutputWAT       String?
     buildOutputWASM      String?
+    buildOutputHasUI     Boolean?
     buildOutputRoutes    String[]           @default([])
     buildOutputStdOut    String?
     buildOutputStdErr    String?

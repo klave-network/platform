@@ -12,6 +12,10 @@ export const systemRouter = createTRPCRouter({
         .query(async () => {
             return process.env['KLAVE_SECRETARIUM_NODE'];
         }),
+    getUIHostingDomain: publicProcedure
+        .query(async () => {
+            return process.env['KLAVE_BHDUI_DOMAIN'];
+        }),
     getStripeKey: publicProcedure
         .query(async () => {
             return process.env['KLAVE_STRIPE_PUB_KEY'];

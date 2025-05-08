@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 import { nxE2EPreset } from '@nx/playwright/preset';
 import { workspaceRoot } from '@nx/devkit';
 // For CI, you may want to set BASE_URL to the deployed application.
-const baseURL = process.env['BASE_URL'] || 'http://localhost:4220';
+const baseURL = process.env['BASE_URL'] || 'http://klave.ui.127.0.0.1.nip.io:4220';
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -24,7 +24,7 @@ export default defineConfig({
     /* Run your local dev server before starting the tests */
     webServer: {
         command: 'yarn nx serve ui',
-        url: 'http://localhost:4220',
+        url: baseURL,
         reuseExistingServer: !process.env.CI,
         cwd: workspaceRoot,
         stdout: 'pipe',
