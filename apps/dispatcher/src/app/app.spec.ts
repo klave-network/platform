@@ -15,7 +15,7 @@ describe('GET /', () => {
             url: '/'
         });
 
-        expect(response.json()).toEqual({ message: 'Route GET:/ not found', error: 'Not Found', statusCode: 404 });
+        expect(response.json()).toEqual({ ok: false });
     });
 
     it('should respond with a done statement', async () => {
