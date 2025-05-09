@@ -51,7 +51,7 @@ function ApplicationUsage() {
                 size: 50,
                 cell: info => {
                     const isTransaction = info.getValue<UsageResult['data']['consumption']['is_transaction']>();
-                    return isTransaction ? <span className="w-8 border rounded border-violet-400 bg-violet-100 text-violet-500 text-xs px-2">Tx</span> : <span className="w-8 border rounded border-blue-400 bg-blue-100 text-blue-500 text-xs px-2">Qy</span>;
+                    return isTransaction ? <span className="w-8 border rounded-sm border-violet-400 bg-violet-100 text-violet-500 text-xs px-2">Tx</span> : <span className="w-8 border rounded-sm border-blue-400 bg-blue-100 text-blue-500 text-xs px-2">Qy</span>;
                 }
             },
             {
@@ -60,7 +60,7 @@ function ApplicationUsage() {
                 size: 50,
                 cell: info => {
                     const callType = info.getValue<UsageResult['data']['consumption']['call_type']>();
-                    return <span className="w-8 border rounded border-gray-400 bg-gray-100 text-gray-500 text-xs px-2">{callType}</span>;
+                    return <span className="w-8 border rounded-sm border-gray-400 bg-gray-100 text-gray-500 text-xs px-2">{callType}</span>;
                 }
             },
             {
@@ -68,7 +68,7 @@ function ApplicationUsage() {
                 header: 'FQDN',
                 cell: info => {
                     const fqdn = info.getValue<UsageResult['data']['consumption']['fqdn']>();
-                    return <span title={fqdn} className='font-mono bg-gray-100 py-1 px-2 rounded truncate'>{fqdn}</span>;
+                    return <span title={fqdn} className='font-mono bg-gray-100 py-1 px-2 rounded-sm truncate'>{fqdn}</span>;
                 }
             },
             // {

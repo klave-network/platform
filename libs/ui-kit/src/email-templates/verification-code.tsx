@@ -17,7 +17,7 @@ export const VerificationCodeEmail = (props: { title: string, code: string }) =>
 
     return (
         <Html lang="en">
-            <Head/>
+            <Head />
             <Preview>Your login code for Klave</Preview>
             <Tailwind
                 config={{
@@ -57,7 +57,7 @@ export const VerificationCodeEmail = (props: { title: string, code: string }) =>
                             </Text>
                         </Section>
 
-                        <Section className="bg-gray-200 rounded flex items-center justify-center">
+                        <Section className="bg-gray-200 rounded-sm flex items-center justify-center">
                             <Text className="text-xl font-medium font-mono">
                                 {code}
                             </Text>

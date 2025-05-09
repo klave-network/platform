@@ -64,7 +64,7 @@ const OrganisationAddCredit = () => {
         <AlertDialog.Trigger asChild onClick={() => {
             setSearchParams();
         }}>
-            <button title='Add blance credits' className="btn btn-sm mt-3 h-8 inline-flex items-center justify-center text-slate-500 text-md font-normalmt-auto">
+            <button title='Add blance credits' className="btn btn-md h-8 mt-3 h-8 inline-flex items-center justify-center text-slate-500 text-md font-normalmt-auto">
                 <Uil0Plus className='inline-block h-4 w-4' /> Add blance credits
             </button>
         </AlertDialog.Trigger>
@@ -77,10 +77,10 @@ const OrganisationAddCredit = () => {
                 </AlertDialog.Description>
                 <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
-                        <button className="btn btn-sm ">{isPaymentComplete || isReturningFromCheckout ? 'Done' : 'Cancel'}</button>
+                        <button className="btn btn-md h-8 ">{isPaymentComplete || isReturningFromCheckout ? 'Done' : 'Cancel'}</button>
                     </AlertDialog.Cancel>
                     {/* <AlertDialog.Action asChild disabled={!canSubmit}>
-                        <button disabled={!canSubmit} className={`btn btn-sm  ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={() => deleteOrganisation()}>Yes, delete organisation</button>
+                        <button disabled={!canSubmit} className={`btn btn-md h-8  ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={() => deleteOrganisation()}>Yes, delete organisation</button>
                     </AlertDialog.Action> */}
                 </div>
             </AlertDialog.Content>
@@ -138,14 +138,14 @@ const CreditCellEdit: FC<{
                 <input title="Kredit" type="range" min={0} max={Number(kredits + max)} onChange={handleChange} value={currentValue} className={`range range-xs w-40 ${error ? 'range-error' : 'range-info'}`} /><br />
                 <span className='text-xs text-red-700'>{error?.message?.toString() ?? ''} &nbsp;</span>
             </div>
-            <button disabled={isPending} onClick={allocateCredit} className='btn btn-sm flex rounded-sm border border-slate-300 bg-slate-100 p-0 h-7 w-7 items-center justify-center hover:bg-slate-200 hover:cursor-pointer'>
+            <button disabled={isPending} onClick={allocateCredit} className='btn btn-md h-8 flex rounded-xs border border-slate-300 bg-slate-100 p-0 h-7 w-7 items-center justify-center hover:bg-slate-200 hover:cursor-pointer'>
                 {isPending ? <UilSpinner className='inline-block h-4 w-4 animate-spin h-5' /> : <UilCheck className='h-4 w-4' />}
             </button>
         </div>;
 
     return <div className='flex gap-4 items-center align-middle justify-end grow'>
         <BalanceDisplay kredits={kreditValue} size='small' justify='end' className='w-30' />
-        <button title="Edit" disabled={isPending} onClick={toggleEditing} className='btn btn-sm flex rounded-sm border border-slate-300 bg-slate-100 p-0 h-7 w-7 items-center justify-center hover:bg-slate-200 hover:cursor-pointer'>
+        <button title="Edit" disabled={isPending} onClick={toggleEditing} className='btn btn-md h-8 flex rounded-xs border border-slate-300 bg-slate-100 p-0 h-7 w-7 items-center justify-center hover:bg-slate-200 hover:cursor-pointer'>
             <UilEdit className='h-4 w-4' />
         </button>
     </div>;
@@ -202,7 +202,7 @@ export const OrganisationCredits: FC = () => {
             {isLoadingApps
                 ? <><UilSpinner className='inline-block animate-spin h-5' /></>
                 : <table className='w-full' cellPadding={10}>
-                    <thead className='bg-slate-100 border-slate-100 border rounded-sm p-2'>
+                    <thead className='bg-slate-100 border-slate-100 border rounded-xs p-2'>
                         <tr>
                             <th className='text-left'>
                                 Application
@@ -214,7 +214,7 @@ export const OrganisationCredits: FC = () => {
                     </thead>
                     <tbody>
                         {sortedApplications?.map((application, i) =>
-                            <tr key={i} className='border-slate-100 border border-t-0 rounded-sm p-2'>
+                            <tr key={i} className='border-slate-100 border border-t-0 rounded-xs p-2'>
                                 <td>
                                     <Link to={`/${orgSlug}/${application.slug}`} className='font-bold hover:cursor-pointer hover:text-klave-light-blue'>{application?.slug}</Link>
                                     <p>{application.slug}</p>

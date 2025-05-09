@@ -108,7 +108,7 @@ export const RepoAppSelect: FC = () => {
                     We looked hard but could not find this repo.<br />
                     Head over to the deployment section to find one.<br />
                     <br />
-                    <Link to="/deploy" className='btn btn-sm disabled:text-gray-300'>Go to deploy</Link>
+                    <Link to="/deploy" className='btn btn-md h-8 disabled:text-gray-300'>Go to deploy</Link>
                 </>}
             </div>
         </>;
@@ -135,7 +135,7 @@ export const RepoAppSelect: FC = () => {
                         <span>This is taking longer than usual</span><br />
                         <span>Klave still does&apos;t have access to your repository</span><br />
                         <br />
-                        <a href={githubAppInstall.toString()} type="submit" className='btn btn-sm mt-5 bg-yellow-800 text-white'>Try installing again</a>
+                        <a href={githubAppInstall.toString()} type="submit" className='btn btn-md h-8 mt-5 bg-yellow-800 text-white'>Try installing again</a>
                     </div>
                     We are waiting to hear from GitHub.<br />
                     This shouldn&apos;t be very long...<br />
@@ -167,7 +167,7 @@ export const RepoAppSelect: FC = () => {
             ? <div className='bg-yellow-200 p-5 mb-10 w-full text-center text-yellow-800'>
                 <UilExclamationTriangle className='inline-block mb-3' /><br />
                 <span>This repository doesn&apos;t have the Klave Github App installed</span><br />
-                <a href={githubAppInstall.toString()} type="submit" className='btn btn-sm mt-5 bg-yellow-800 text-white'>Install it now !</a>
+                <a href={githubAppInstall.toString()} type="submit" className='btn btn-md h-8 mt-5 bg-yellow-800 text-white'>Install it now !</a>
             </div>
             : null}
         <div className='relative'>
@@ -177,7 +177,7 @@ export const RepoAppSelect: FC = () => {
                     Make your selection and be ready in minutes<br />
                     <br />
                     {deployableRepo.configError ? <>
-                        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mx-auto" role="alert">
+                        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-sm relative mx-auto" role="alert">
                             We noticed some errors in your <code>klave.json</code> file.<br />
                             Checkout our documentation at <a rel="noopener" href="https://klave.com/docs" target='_blank' >https://klave.com/docs</a> to fix them.<br />
                         </div>
@@ -197,7 +197,7 @@ export const RepoAppSelect: FC = () => {
                     <br />
                     <br />
                     {mutationError ? <>
-                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative w-1/2 mx-auto" role="alert">
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-sm relative w-1/2 mx-auto" role="alert">
                             <strong className="font-bold">Holy smokes!</strong>
                             <span className="block sm:inline"> {mutationError.message}</span>
                         </div>
@@ -205,7 +205,7 @@ export const RepoAppSelect: FC = () => {
                     </> : null}
                 </div>
                 {/* <Link to="/deploy/select" className='mr-5 disabled:text-gray-300 hover:text-gray-500'>Go back</Link>
-                <button disabled={!appSelectionWatch.length || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave} type="submit" className='btn btn-sm disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Next</button> */}
+                <button disabled={!appSelectionWatch.length || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave} type="submit" className='btn btn-md h-8 disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Next</button> */}
             </form >
         </div >
         <div className='relative'>
@@ -270,15 +270,15 @@ export const RepoAppSelect: FC = () => {
             <br />
             <br />
             {Object.values(canRegisterData ?? {}).includes(false) ? <>
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mx-auto" role="alert">
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-sm relative mx-auto" role="alert">
                     We cannot register all the applications in the selected organisation.<br />
                     {Object.entries(canRegisterData ?? {}).filter(([, canRegister]) => !canRegister).map(([name]) => `"${name}"`).join(', ')} already exist in this organisation.<br />
                 </div>
                 <br />
             </> : null}
-            {/* <button type="button" onClick={() => setSelectedApplications([])} className='btn btn-sm mr-5 disabled:text-gray-300 hover:text-gray-500'>Go Back</button> */}
-            <Link to="/deploy/select" className='mr-5 disabled:text-gray-300 hover:text-gray-500'>Go back</Link>
-            <button onClick={registerApplications} disabled={!selectedApplications.length || !selectedOrgId || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave || Object.values(canRegisterData ?? {}).includes(false)} className='btn btn-sm disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Deploy</button>
+            {/* <button type="button" onClick={() => setSelectedApplications([])} className='btn btn-md h-8 mr-5 disabled:text-gray-300 hover:text-gray-500'>Go Back</button> */}
+            <Link to="/deploy/select" className='btn btn-md h-8 mr-5 disabled:text-gray-300 hover:text-gray-500'>Go back</Link>
+            <button onClick={registerApplications} disabled={!selectedApplications.length || !selectedOrgId || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave || Object.values(canRegisterData ?? {}).includes(false)} className='btn btn-md h-8 disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Deploy</button>
         </div>
     </>;
 
@@ -291,7 +291,7 @@ const SelectItem = forwardRef<HTMLDivElement, PropsWithChildren<{
     className?: string;
 }>>(({ children, className, ...props }, forwardedRef) => {
     return (
-        <Select.Item className={`flex h-9 items-center select-none relative px-5 data-[disabled]:text-slate-300 data-[disabled]:pointer-events-none data-[highlighted]:text-klave-light-blue data-[highlighted]:bg-blue-100 data-[highlighted]:outline-none ${className}`} {...props} ref={forwardedRef}>
+        <Select.Item className={`flex h-9 items-center select-none relative px-5 data-[disabled]:text-slate-300 data-[disabled]:pointer-events-none data-[highlighted]:text-klave-light-blue data-[highlighted]:bg-blue-100 data-[highlighted]:outline-hidden ${className}`} {...props} ref={forwardedRef}>
             <Select.ItemText>{children}</Select.ItemText>
             <Select.ItemIndicator className="SelectItemIndicator">
                 <CheckIcon />

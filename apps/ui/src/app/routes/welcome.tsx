@@ -16,11 +16,11 @@ function Welcome() {
         </div>
         <div className='mx-auto text-center prose block max-w-none w-2/3 p-8'>
             <div className='mx-auto w-2/3'>
-                <RocketIcon className='w-24 h-24 mb-5 border p-5 rounded-2xl border-slate-150 mx-auto bg-slate-50 text-slate-500' />
+                <RocketIcon className='w-24 h-24 mb-5 border border-gray-200 p-5 rounded-2xl border-slate-150 mx-auto bg-slate-50 text-slate-500' />
                 Get started with Klave by creating a new application in a GitHub repository and connecting it to Klave.<br />
                 If you would like, you can start with a template from our marketplace: <br />
                 <h2 className='mt-5'>Start from template</h2>
-                <a rel="noopener" className='btn my-8 w-auto h-auto py-6' href='https://klave.com/marketplace' target='_blank'>
+                <a rel="noopener" className='btn my-8 w-auto h-auto py-6 not-prose' href='https://klave.com/marketplace' target='_blank'>
                     <div className='grid grid-flow-row grid-cols-2 gap-2'>
                         <img alt='E1' title='E1' className='bg-slate-950 m-0 p-0 rounded-md w-32 h-24' src={Expl_1} />
                         <img alt='E2' title='E2' className='bg-slate-950 m-0 p-0 rounded-md w-32 h-24' src={Expl_2} />
@@ -30,7 +30,7 @@ function Welcome() {
                     </div>
                 </a><br /><br /><br />
             </div>
-            <Pencil2Icon className='w-24 h-24 mb-5 border p-5 rounded-2xl border-slate-150 mx-auto bg-slate-50 text-slate-500' />
+            <Pencil2Icon className='w-24 h-24 mb-5 border border-gray-200 p-5 rounded-2xl border-slate-150 mx-auto bg-slate-50 text-slate-500' />
             Or you can create a new application from scratch by following the steps below:<br /><br />
             <span className='inline-block h-8 w-8 -ml-1 mt-3 mb-3 border rounded-full font-bold text-center'>1</span>
             <h2 className='mt-0'>Check you have Node installed</h2>
@@ -75,7 +75,7 @@ function Welcome() {
                 &gt; git push --set-upstream origin master<br />
             </pre>
             <span className='inline-block h-8 w-8 -ml-1 mt-10 mb-3 border rounded-full font-bold text-center'>5</span>
-            <h2 className='mt-0'>Click on <Link to="/deploy" className="btn btn-sm text-white dark:text-black dark:bg-gradient-to-r dark:from-klave-cyan dark:to-klave-light-blue bg-black dark:hover:bg-gradient-to-l hover:bg-gray-800 ml-3">
+            <h2 className='mt-0'>Click on <Link to="/deploy" className="btn btn-md h-8 text-white dark:text-black dark:bg-gradient-to-r dark:from-klave-cyan dark:to-klave-light-blue bg-black dark:hover:bg-gradient-to-l hover:bg-gray-800 ml-3">
                 <span>Deploy now</span>
             </Link></h2>
         </div>

@@ -154,7 +154,7 @@ export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, 
                             {JSON.stringify(quoteErrors) ?? ''}{quoteErrors?.length ? <br /> : ''}
                             {JSON.stringify(verifyErrors) ?? ''}
                         </pre>
-                        <button onClick={resetTest} className='btn btn-sm text-slate-600 font-normal text-sm py-1 px-3 mt-5'>Retry</button>
+                        <button onClick={resetTest} className='btn btn-md h-8 text-slate-600 font-normal text-sm py-1 px-3 mt-5'>Retry</button>
                     </>
                     : <>
                         <h3 className='mt-5 mb-3'>Enclave Verification Outcome</h3>

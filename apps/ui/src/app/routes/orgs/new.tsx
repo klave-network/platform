@@ -80,12 +80,12 @@ export const OrgNew: FC = () => {
                 <button
                     type="submit"
                     disabled={mutation.isPending}
-                    className="btn btn-sm border bg-blue-600 text-white hover:bg-blue-500 mr-2 p-2"
+                    className="btn btn-md h-8 border bg-blue-600 text-white hover:bg-blue-500 mr-2 p-2"
                 >
                     {mutation.isPending ? 'Creating' : 'Create'}
                 </button>
                 <button
-                    className="btn btn-sm border p-2"
+                    className="btn btn-md h-8 border p-2"
                     onClick={() => navigate('/')}
                 >
                     Cancel

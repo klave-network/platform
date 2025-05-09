@@ -59,7 +59,7 @@ const AddMember = () => {
 
     return <AlertDialog.Root onOpenChange={handleOpen} open={isOpen}>
         <AlertDialog.Trigger asChild>
-            <button title='Invite a new member' className="btn btn-sm h-8 inline-flex items-center justify-center text-slate-800 text-md font-normal mt-auto">
+            <button title='Invite a new member' className="btn btn-md h-8 inline-flex items-center justify-center text-slate-800 text-md font-normal mt-auto">
                 <UilUserPlus className='inline-block h-4 w-4' /> Invite a new member
             </button>
         </AlertDialog.Trigger>
@@ -77,11 +77,11 @@ const AddMember = () => {
                             Select the access level you want to grant to the member.
                         </p>
                         <Select.Root value={permission} defaultValue={orgSlug} onValueChange={changeRight}>
-                            <Select.Trigger className={'select select-bordered select-sm inline-flex justify-between flex-grow w-full items-center text-klave-light-blue bg-white data-[placeholder]:text-klave-light-blue mt-3 mb-5'}>
+                            <Select.Trigger className={'select select-bordered select-md inline-flex justify-between flex-grow w-full items-center text-klave-light-blue bg-white data-[placeholder]:text-klave-light-blue mt-3 mb-5'}>
                                 <Select.Value placeholder="Select access level" />
                             </Select.Trigger>
                             <Select.Portal>
-                                <Select.Content className="overflow-hidden bg-white shadow-outline shadow rounded-lg w-full z-[1000]">
+                                <Select.Content className="overflow-hidden bg-white shadow-outline shadow-sm rounded-lg w-full z-[1000]">
                                     <Select.ScrollUpButton>
                                         <ChevronUpIcon />
                                     </Select.ScrollUpButton>
@@ -105,10 +105,10 @@ const AddMember = () => {
                     : null}
                 <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
-                        <button className="btn btn-sm ">{'Cancel'}</button>
+                        <button className="btn btn-md h-8 ">{'Cancel'}</button>
                     </AlertDialog.Cancel>
                     <AlertDialog.Action asChild disabled={!canSubmit}>
-                        <button disabled={!canSubmit} className={`btn btn-sm  ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={(e) => inviteMember(e)}>Invite</button>
+                        <button disabled={!canSubmit} className={`btn btn-md h-8  ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={(e) => inviteMember(e)}>Invite</button>
                     </AlertDialog.Action>
                 </div>
             </AlertDialog.Content>
@@ -122,7 +122,7 @@ const SelectItem = forwardRef<HTMLDivElement, PropsWithChildren<{
     className?: string;
 }>>(({ children, className, ...props }, forwardedRef) => {
     return (
-        <Select.Item className={`flex h-9 items-center select-none relative px-5 data-[disabled]:text-slate-300 data-[disabled]:pointer-events-none data-[highlighted]:text-klave-light-blue data-[highlighted]:bg-blue-100 data-[highlighted]:outline-none ${className}`} {...props} ref={forwardedRef}>
+        <Select.Item className={`flex h-9 items-center select-none relative px-5 data-[disabled]:text-slate-300 data-[disabled]:pointer-events-none data-[highlighted]:text-klave-light-blue data-[highlighted]:bg-blue-100 data-[highlighted]:outline-hidden ${className}`} {...props} ref={forwardedRef}>
             <Select.ItemText>{children}</Select.ItemText>
             <Select.ItemIndicator className="SelectItemIndicator">
                 <CheckIcon />
@@ -173,7 +173,7 @@ export const OrganisationMembers: FC = () => {
             <AddMember />
         </div>
         <table className='w-full col-span-3'>
-            <thead className='bg-slate-100 border-slate-100 border rounded-sm '>
+            <thead className='bg-slate-100 border-slate-100 border rounded-xs '>
                 <tr>
                     <th className='text-left p-3'>
                         Name
@@ -188,7 +188,7 @@ export const OrganisationMembers: FC = () => {
             </thead>
             <tbody>
                 {organisation.permissionGrants?.map((grant, i) =>
-                    <tr key={i} className='gap-3 border-slate-100 border border-t-0 rounded-sm p-2'>
+                    <tr key={i} className='gap-3 border-slate-100 border border-t-0 rounded-xs p-2'>
                         <td className='text-left p-3'>
                             <p className='font-bold'>{grant.user.slug.replace('~$~', '')}</p>
                             <p>{grant.userId ?? grant.organisationId}</p>
@@ -197,7 +197,7 @@ export const OrganisationMembers: FC = () => {
                             <p className='font-bold'>{organisation.personal ? 'Owner' : grant.admin ? 'Admin' : grant.write ? 'Write' : grant.read ? 'Read' : 'None'}</p>
                         </td>
                         <td className='text-right p-3'>
-                            <button title='Delete' className="btn btn-sm h-8 inline-flex items-center justify-center text-md font-normal text-red-700 mt-auto" onClick={() => removeGrant(grant.id)}>
+                            <button title='Delete' className="btn btn-md h-8 inline-flex items-center justify-center text-md font-normal text-red-700 mt-auto" onClick={() => removeGrant(grant.id)}>
                                 <UilTrash className='inline-block h-4 w-4' /> Delete
                             </button>
                         </td>
