@@ -123,7 +123,6 @@ export const LoginSecKey: FC = () => {
                 .then((res) => res.data)
                 .then(async (options) => {
                     if (options) {
-                        options.allowCredentials;
                         setIsRequestingWebauthnInput(true);
                         return startAuthentication({
                             optionsJSON: options
