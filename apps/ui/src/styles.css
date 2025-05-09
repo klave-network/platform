@@ -1,8 +1,19 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
-
+@import 'tailwindcss';
 @import '@primer/primitives/dist/css/functional/themes/light.css';
+
+@plugin '@tailwindcss/typography' {};
+@plugin '@tailwindcss/forms' { strategy: 'class' };
+@plugin "daisyui" {};
+
+@theme {
+    --color-klave-dark-blue: #00021A;
+    --color-klave-light-blue: #00BFFF;
+    --color-klave-cyan: #00FFD5;
+}
+
+:root {
+    --base-size-4: 2px
+}
 
 /* Additional Tailwind directives: https://tailwindcss.com/docs/functions-and-directives/#responsive */
 @layer utilities {

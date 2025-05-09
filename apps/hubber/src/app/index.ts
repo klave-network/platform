@@ -6,10 +6,7 @@ import session from 'express-session';
 import helmet from 'helmet';
 import multer from 'multer';
 import cors from 'cors';
-// import { csrfSync } from 'csrf-sync';
 import passport from 'passport';
-// import { Strategy as LocalStrategy } from 'passport-local';
-// import MongoStore from 'connect-mongo';
 import { v4 as uuid } from 'uuid';
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { prisma } from '@klave/db';
@@ -28,7 +25,7 @@ import { permissiblePeers } from '@klave/constants';
 import { uiHosterMiddleware } from './middleware/uiHoster';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-const bhuiHostDomain = URL.parse(process.env['KLAVE_BHDUI_DOMAIN'] ?? '')?.host
+const bhuiHostDomain = URL.parse(process.env['KLAVE_BHDUI_DOMAIN'] ?? '')?.host;
 
 const app = express();
 
@@ -167,8 +164,6 @@ export const start = async () => {
     app.use(uiHosterMiddleware);
     app.use(session(sessionOptions));
     app.use('/', express.static(path.join(__dirname, 'public')));
-    // app.get('/csrf-token', (req, res) => res.json({ token: generateToken(req) }));
-    // app.use(csrfSynchronisedProtection);
     app.use(passport.initialize());
     app.use(passport.session());
 
