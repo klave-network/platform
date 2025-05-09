@@ -3,8 +3,9 @@ import { start } from './app';
 import './i18n';
 import { dbOps } from './utils/db';
 import { sentryOps, scpOps, githubOps, envOps, dispatchOps, probotOps, objectStoreOps, logger } from '@klave/providers';
-import http from 'node:http'
-import https from 'node:https'
+import http from 'node:http';
+import https from 'node:https';
+import type { Plugin } from 'vite';
 
 const onlineChain = async () => process.env['KLAVE_OFFLINE_DEV'] === 'true'
     ? Promise.resolve()
@@ -37,33 +38,38 @@ const serverHandle = dbOps.initialize()
         let serverContainerDUI = http.createServer(expressApp);
         if (process.env.NODE_ENV === 'development') {
             try {
-                const viteMkcert = (await import('vite-plugin-mkcert')).default
+                const viteMkcert = (await import('vite-plugin-mkcert')).default;
                 const vitePlugin = (viteMkcert({
                     keyFileName: 'klave-api-dev-key.pem',
                     certFileName: 'klave-api-dev-cert.pem',
                     hosts: [host, bhuiHostDomain, `*.${bhuiHostDomain}`]
-                }) as any)
-                if (vitePlugin && vitePlugin.config) {
+                }) as unknown as Plugin);
+                if (vitePlugin && typeof vitePlugin.config === 'function') {
                     const vitePluginConfig = await vitePlugin.config({
                         logLevel: 'silent'
-                    })
+                    }, {
+                        mode: 'detached',
+                        command: 'serve'
+                    });
+                    if (!vitePluginConfig?.server?.https)
+                        return;
                     serverContainer = https.createServer({
                         key: vitePluginConfig.server.https.key,
-                        cert: vitePluginConfig.server.https.cert,
-                    }, expressApp)
+                        cert: vitePluginConfig.server.https.cert
+                    }, expressApp);
                     serverContainerDUI = https.createServer({
                         key: vitePluginConfig.server.https.key,
-                        cert: vitePluginConfig.server.https.cert,
-                    }, expressApp)
-                    protocol = 'https'
+                        cert: vitePluginConfig.server.https.cert
+                    }, expressApp);
+                    protocol = 'https';
                 }
             } catch (error) {
-                logger.warn('Error loading mkcert', error)
+                logger.warn('Error loading mkcert', error);
             }
         }
 
-        const server = serverContainer
-        const serverDUI = serverContainerDUI
+        const server = serverContainer;
+        const serverDUI = serverContainerDUI;
         server.on('error', (error) => {
             logger.error(error);
             dbOps.stop()
@@ -76,10 +82,10 @@ const serverHandle = dbOps.initialize()
         });
         server.listen(port, host, () => {
             logger.info(`Listening at ${protocol}://${host}:${port}`);
-        })
+        });
         serverContainerDUI.listen(bhuiHostPort, bhuiHostDomain, () => {
             logger.info(`Listening at ${protocol}://${bhuiHostDomain}:${bhuiHostPort}`);
-        })
+        });
 
         // startPruner();
 
