@@ -1,4 +1,15 @@
 # Changelog
+## [1.4.2](https://github.com/klave-network/platform/compare/api@1.4.1...api@1.4.2) (2025-05-09)
+
+### Dependency Updates
+
+* `providers` updated to version `1.4.1`
+* `ui-kit` updated to version `1.4.1`
+
+### Bug Fixes
+
+* **api,hubber:** Provide fallback default serve for Embedded UI for client routers compatbility ([9709b04](https://github.com/klave-network/platform/commit/9709b04d30d5125c5aa37c1258da8eb26a910813))
+
 ## [1.4.1](https://github.com/klave-network/platform/compare/api@1.4.0...api@1.4.1) (2025-05-08)
 
 ### Dependency Updates
