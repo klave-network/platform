@@ -1,6 +1,6 @@
 {
     "name": "@klave/hubber",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "private": false,
     "description": "Klave Platform server hub",
     "repository": {
