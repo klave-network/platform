@@ -23,6 +23,7 @@ declare global {
         interface Request {
             web: Web;
             webId: string;
+            forwardPath?: string;
         }
     }
 }

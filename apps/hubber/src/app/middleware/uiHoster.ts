@@ -4,7 +4,9 @@ import path from 'node:path';
 import { Readable } from 'node:stream';
 import type { ReadableStream } from 'node:stream/web';
 
+const DEFAULT_FILE = '/index.html';
 let noHostingAlertDone = false;
+
 export const uiHosterMiddleware: RequestHandler = (req, res, next) => {
 
     const domain = URL.parse(process.env['KLAVE_BHDUI_DOMAIN'] ?? '');
@@ -24,14 +26,16 @@ export const uiHosterMiddleware: RequestHandler = (req, res, next) => {
         return next();
 
     const deploymentId = host.split('.')[0];
-    let file = path.normalize(req.path.trim()).replace(/\\/g, '/');
+    const requestedPath = req.forwardPath ?? req.path;
+    let file = path.normalize(requestedPath.trim()).replace(/\\/g, '/');
     if (file.length === 0 || file === '/')
-        file = '/index.html';
+        file = DEFAULT_FILE;
     const objectKey = path.normalize(`${deploymentId}/${file}`).replace(/\\/g, '/');
 
     logger.debug(`Looking for ${file} from ${deploymentId}...`, {
         parent: 'dui'
     });
+
     objectStore.getObject({
         Bucket: process.env['KLAVE_BHDUI_S3_BUCKET_NAME'],
         Key: objectKey
@@ -50,13 +54,18 @@ export const uiHosterMiddleware: RequestHandler = (req, res, next) => {
             if (data.ContentLength)
                 res.setHeader('Content-Length', data.ContentLength.toString());
 
-            const nodeReadableStream = Readable.fromWeb(data.Body.transformToWebStream() as ReadableStream)
+            const nodeReadableStream = Readable.fromWeb(data.Body.transformToWebStream() as ReadableStream);
             nodeReadableStream.on('error', (err) => {
                 logger.error(`Error streaming object ${objectKey}: ${err}`);
                 res.status(500).send('Internal Server Error');
             });
             nodeReadableStream.pipe(res);
         }).catch(err => {
+            if (file !== DEFAULT_FILE && req.forwardPath === undefined) {
+                req.forwardPath = DEFAULT_FILE;
+                uiHosterMiddleware(req, res, next);
+                return;
+            }
             if (!(err instanceof NoSuchBucket))
                 logger.debug(`Error retrieving object ${objectKey}: ${err}`);
             res.status(404).json({ ok: false, message: 'Not Found' });
