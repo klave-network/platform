@@ -1,4 +1,15 @@
 # Changelog
+## [1.2.3](https://github.com/klave-network/platform/compare/hubber@1.2.2...hubber@1.2.3) (2025-05-09)
+
+### Dependency Updates
+
+* `providers` updated to version `1.2.2`
+* `api` updated to version `1.2.2`
+
+### Bug Fixes
+
+* **api,hubber:** Provide fallback default serve for Embedded UI for client routers compatbility ([9709b04](https://github.com/klave-network/platform/commit/9709b04d30d5125c5aa37c1258da8eb26a910813))
+
 ## [1.2.2](https://github.com/klave-network/platform/compare/hubber@1.2.1...hubber@1.2.2) (2025-05-08)
 
 
