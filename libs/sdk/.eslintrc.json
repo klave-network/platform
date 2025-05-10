@@ -5,6 +5,7 @@
     "ignorePatterns": [
         "!**/*",
         "index.ts",
+        "bin",
         "assembly"
     ],
     "overrides": [

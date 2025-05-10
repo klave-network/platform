@@ -44,7 +44,7 @@ const ApplicationDeletion = () => {
 
     return <AlertDialog.Root>
         <AlertDialog.Trigger asChild>
-            <button title='Delete' className="btn btn-sm h-8 inline-flex items-center justify-center text-md font-normal text-red-700 mt-auto">
+            <button title='Delete' className="btn btn-md h-8 inline-flex items-center justify-center text-md font-normal text-red-700 mt-auto">
                 <UilTrash className='inline-block h-4 w-4' /> Delete
             </button>
         </AlertDialog.Trigger>
@@ -68,10 +68,10 @@ const ApplicationDeletion = () => {
                 </AlertDialog.Description>
                 <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
-                        <button className="btn btn-sm">Cancel</button>
+                        <button className="btn btn-md h-8">Cancel</button>
                     </AlertDialog.Cancel>
                     <AlertDialog.Action asChild disabled={!canSubmit}>
-                        <button disabled={!canSubmit} className={`btn btn-sm ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={() => deleteApplication()}>Yes, delete application</button>
+                        <button disabled={!canSubmit} className={`btn btn-md h-8 ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={() => deleteApplication()}>Yes, delete application</button>
                     </AlertDialog.Action>
                 </div>
             </AlertDialog.Content>
@@ -134,7 +134,7 @@ const LimitEditor: FC<LimitEditorProps> = ({ type, kredits, application: { id } 
                     : <span className='text-xs text-red-700'>{error?.message?.toString() ?? ''} &nbsp;</span>
                 }
             </div>
-            <button disabled={isPending} type="submit" className='btn btn-sm border bg-primary-500 p-2' onClick={setLimits}>Save</button>
+            <button disabled={isPending} type="submit" className='btn btn-md h-8 border bg-primary-500 p-2' onClick={setLimits}>Save</button>
         </form >;
 
     if (kreditValue === 0)
@@ -302,7 +302,7 @@ export const AppSettings: FC = () => {
         </div>
         <div>
             <h1 className='font-bold text-xl mb-5'>Manage Access</h1>
-            <div className='flex flex-row gap-3 bg-slate-100 border-slate-100 border rounded-sm p-2'>
+            <div className='flex flex-row gap-3 bg-slate-100 border-slate-100 border rounded-xs p-2'>
                 <div className='flex flex-col gap-1 grow'>
                     Name
                 </div>
@@ -311,7 +311,7 @@ export const AppSettings: FC = () => {
                 </div>
             </div>
             {application.permissionGrants?.map((grant, i) =>
-                <div key={i} className='flex flex-row gap-3 border-slate-100 border border-t-0 rounded-sm p-2'>
+                <div key={i} className='flex flex-row gap-3 border-slate-100 border border-t-0 rounded-xs p-2'>
                     <div className='flex flex-col gap-1 grow'>
                         <p className='font-bold'>{grant.user.slug.replace('~$~', '')}</p>
                         <p>{grant.userId ?? grant.organisationId}</p>

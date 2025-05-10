@@ -1,6 +1,6 @@
 {
     "name": "@klave/ui-kit",
-    "version": "0.0.3",
+    "version": "0.0.5",
     "private": false,
     "description": "Klave UI components kit",
     "repository": {
@@ -27,6 +27,6 @@
         "@react-email/render": "^1.1.0",
         "@react-email/tailwind": "^1.0.5",
         "react": "19.1.0",
-        "react-email": "3.0.7"
+        "react-email": "4.0.11"
     }
 }

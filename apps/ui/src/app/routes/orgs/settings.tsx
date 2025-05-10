@@ -40,7 +40,7 @@ const OrganisationDeletion = () => {
 
     return <AlertDialog.Root>
         <AlertDialog.Trigger asChild>
-            <button title='Delete' className="btn btn-sm h-8 inline-flex items-center justify-center text-md font-normal text-red-700 mt-auto">
+            <button title='Delete' className="btn btn-md h-8 inline-flex items-center justify-center text-md font-normal text-red-700 mt-auto">
                 <UilTrash className='inline-block h-4 w-4' /> Delete
             </button>
         </AlertDialog.Trigger>
@@ -64,10 +64,10 @@ const OrganisationDeletion = () => {
                 </AlertDialog.Description>
                 <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
-                        <button className="btn btn-sm">Cancel</button>
+                        <button className="btn btn-md h-8">Cancel</button>
                     </AlertDialog.Cancel>
                     <AlertDialog.Action asChild disabled={!canSubmit}>
-                        <button disabled={!canSubmit} className={`btn btn-sm ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={() => deleteOrganisation()}>Yes, delete organisation</button>
+                        <button disabled={!canSubmit} className={`btn btn-md h-8 ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={() => deleteOrganisation()}>Yes, delete organisation</button>
                     </AlertDialog.Action>
                 </div>
             </AlertDialog.Content>
@@ -135,7 +135,7 @@ export const OrganisationSettings: FC = () => {
             <button
                 type="submit"
                 disabled={mutation.isPending}
-                className="btn btn-sm border bg-primary-500 p-2"
+                className="btn btn-md h-8 border bg-primary-500 p-2"
             >
                 {mutation.isPending ? 'Loading' : 'Submit'}
             </button>

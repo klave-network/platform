@@ -211,7 +211,7 @@ export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = 
                 </select>
                 : <input title='Route name' type='text' value={route} onChange={({ target }) => setRoute(target.value)} className="h-9 font-mono mb-2 bg-gray-900 text-gray-100 border border-gray-300 dark:border-gray-700 dark:text-white w-full text-sm" />
             }
-            <button onClick={() => refetch()} className='btn btn-sm h-9 ml-1 mb-2 bg-gray-800 hover:bg-gray-600 text-gray-100 border border-gray-300 dark:border-gray-700 dark:text-white rounded-none text-sm font-normal'>Go</button>
+            <button onClick={() => refetch()} className='btn btn-md h-8 h-9 ml-1 mb-2 bg-gray-800 hover:bg-gray-600 text-gray-100 border border-gray-300 dark:border-gray-700 dark:text-white rounded-none text-sm font-normal'>Go</button>
         </div>
         <Editor
             key={`args.${address}`}

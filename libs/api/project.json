@@ -41,10 +41,7 @@
                 "trackDeps": true,
                 "changelogHeader": "# Changelog",
                 "tagPrefix": "{projectName}@",
-                "commitMessageFormat": "chore({projectName}): Release version ${version}",
-                "postTargets": [
-                    "api:build"
-                ]
+                "commitMessageFormat": "chore({projectName}): Release version ${version}"
             }
         }
     }

@@ -7,6 +7,10 @@ on:
   pull_request:
     branches: [main, develop]
 
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.NX_CACHE_AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.NX_CACHE_AWS_SECRET_ACCESS_KEY }}
+
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -51,7 +55,22 @@ jobs:
           fi
 
       - name: Install repo dependencies
-        run: yarn install --network-timeout 1000000 --forzen-lockfile
+        run: yarn install --network-timeout 1000000 --frozen-lockfile
+
+      - name: Install mkcert tool
+        run: |
+            if [ "$RUNNER_OS" == "Linux" ]; then
+                sudo apt-get install -y libnss3-tools
+                curl -JLO "https://dl.filippo.io/mkcert/latest?for=linux/amd64"
+                chmod +x mkcert-v*-linux-amd64
+                sudo cp mkcert-v*-linux-amd64 /usr/local/bin/mkcert
+            elif [ "$RUNNER_OS" == "macOS" ]; then
+                brew install mkcert nss
+            else
+                echo "$RUNNER_OS not supported"
+                exit 0
+            fi;
+            mkcert -install;
 
       - name: Get installed Playwright version
         id: playwright-version

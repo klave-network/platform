@@ -71,7 +71,6 @@
                 "tagPrefix": "{projectName}@",
                 "commitMessageFormat": "chore({projectName}): Release version ${version}",
                 "postTargets": [
-                    "sdk:build",
                     "sdk:sync-deps"
                 ]
             }

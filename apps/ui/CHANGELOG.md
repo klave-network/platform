@@ -1,4 +1,11 @@
 # Changelog
+## [1.4.2](https://github.com/klave-network/platform/compare/ui@1.4.1...ui@1.4.2) (2025-05-09)
+
+### Dependency Updates
+
+* `constants` updated to version `1.4.1`
+* `db` updated to version `1.4.1`
+* `api` updated to version `1.4.1`
 ## [1.4.1](https://github.com/klave-network/platform/compare/ui@1.4.0...ui@1.4.1) (2025-05-08)
 
 ## [1.4.0](https://github.com/klave-network/platform/compare/ui@1.3.5...ui@1.4.0) (2025-05-08)

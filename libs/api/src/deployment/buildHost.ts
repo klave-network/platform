@@ -2,7 +2,7 @@ import { exec, ExecException } from 'node:child_process';
 import path from 'node:path';
 import fs from 'node:fs';
 import { v4 as uuid } from 'uuid';
-import mime from 'mime'
+import mime from 'mime';
 import TOML from 'toml';
 import { logger, objectStore, Upload, PutObjectOutput } from '@klave/providers';
 import { getFinalParseConfig, StagedOutputGroups } from '@klave/constants';
@@ -277,14 +277,14 @@ export class BuildHost {
                         }));
                         try {
                             const dirContents = fs.readdirSync(appUiPath, { recursive: true, withFileTypes: true });
-                            fileUploads = dirContents.map(file => {
+                            fileUploads = dirContents.map(async file => {
                                 if (!file.isFile())
                                     return Promise.resolve(null);
                                 const normedPath = path.normalize(path.join(file.parentPath, file.name));
                                 const normedKey = path.normalize(`${deployment.id}/${normedPath.replace(/\\/g, '/').replace(appUiPath.replace(/\\/g, '/'), '')}`).replace(/\\/g, '/');
                                 if (!fs.existsSync(normedPath))
                                     return Promise.resolve(null);
-                                const fileStream = fs.createReadStream(normedPath)
+                                const fileStream = fs.createReadStream(normedPath);
                                 const fileUpload = new Upload({
                                     client: objectStore,
                                     params: {
@@ -311,7 +311,11 @@ export class BuildHost {
                                     parent: 'bmv'
                                 });
                             resolve(packageManager);
-                        })
+                        }).catch((error) => {
+                            logger.error(`Error uploading UI artifacts for ${deployment.id}: ${error}`, {
+                                parent: 'bmv'
+                            });
+                        });
 
                 })).then(async (packageManager) => {
                     this.listeners['message']?.forEach(listener => listener({ type: 'done', stats: {}, sourceType: packageManager === 'cargo' ? 'rust-component' : 'assemblyscript', output: this.outputProgress, dependencies: this.usedDependencies }));

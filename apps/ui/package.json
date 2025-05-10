@@ -1,6 +1,6 @@
 {
     "name": "@klave/ui",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "private": false,
     "description": "Klave Platform UI",
     "repository": {
@@ -13,5 +13,5 @@
         "name": "Florian Guitton",
         "email": "florian@secretarium.com"
     },
-    "type": "commonjs"
+    "type": "module"
 }

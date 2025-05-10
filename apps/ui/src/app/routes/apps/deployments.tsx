@@ -31,7 +31,7 @@ export const DeploymentPromotion: FC<DeploymentContextProps> = ({ deployment: { 
 
     return <AlertDialog.Root>
         <AlertDialog.Trigger asChild onClick={e => e.stopPropagation()}>
-            <button title='Release' className="btn btn-sm h-8 inline-flex items-center justify-center font-normal ml-auto">
+            <button title='Release' className="btn btn-md h-8 inline-flex items-center justify-center font-normal ml-auto">
                 Release
             </button>
         </AlertDialog.Trigger>
@@ -45,10 +45,10 @@ export const DeploymentPromotion: FC<DeploymentContextProps> = ({ deployment: { 
                 </AlertDialog.Description>
                 <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
-                        <button className="btn btn-sm">Cancel</button>
+                        <button className="btn btn-md h-8">Cancel</button>
                     </AlertDialog.Cancel>
                     <AlertDialog.Action asChild>
-                        <button className='btn btn-sm' onClick={() => promoteDeployment(id)}>Yes, release</button>
+                        <button className='btn btn-md h-8' onClick={() => promoteDeployment(id)}>Yes, release</button>
                     </AlertDialog.Action>
                 </div>
             </AlertDialog.Content>
@@ -77,7 +77,7 @@ export const DeploymentDeletion: FC<DeploymentContextProps> = ({ deployment: { i
 
     return <AlertDialog.Root>
         <AlertDialog.Trigger asChild onClick={e => { e.stopPropagation(); }}>
-            <button title='Delete' className="btn btn-sm h-8 inline-flex items-center justify-center font-normal text-red-400 mt-auto">
+            <button title='Delete' className="btn btn-md h-8 inline-flex items-center justify-center font-normal text-red-400 mt-auto">
                 <UilTrash className='inline-block h-4 w-4' />
             </button>
         </AlertDialog.Trigger>
@@ -91,10 +91,10 @@ export const DeploymentDeletion: FC<DeploymentContextProps> = ({ deployment: { i
                 </AlertDialog.Description>
                 <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
-                        <button className="btn btn-sm">Cancel</button>
+                        <button className="btn btn-md h-8">Cancel</button>
                     </AlertDialog.Cancel>
                     <AlertDialog.Action asChild>
-                        <button className="btn btn-sm bg-red-700 text-white" onClick={() => deleteDeployment(id)}>Yes, delete deployment</button>
+                        <button className="btn btn-md h-8 bg-red-700 text-white" onClick={() => deleteDeployment(id)}>Yes, delete deployment</button>
                     </AlertDialog.Action>
                 </div>
             </AlertDialog.Content>
@@ -146,7 +146,7 @@ export const Deployments: FC = () => {
 
     return <>
         <div className="hidden w-full items-center mb-7">
-            <button className="btn btn-sm inline-flex mr-3 items-center h-8 pl-2.5 pr-2 rounded-md shadow dark:text-slate-400 dark:bg-slate-800 text-gray-700 dark:border-gray-800 border border-gray-200 leading-none py-0">
+            <button className="btn btn-md h-8 inline-flex mr-3 items-center h-8 pl-2.5 pr-2 rounded-md shadow-sm dark:text-slate-400 dark:bg-slate-800 text-gray-700 dark:border-gray-800 border border-gray-200 leading-none py-0">
                 <svg viewBox="0 0 24 24" className="w-4 mr-2 text-gray-400 dark:text-gray-600" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                     <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -191,9 +191,9 @@ export const Deployments: FC = () => {
                                 if (!deploymentAddress?.fqdn)
                                     return null;
                                 return <div key={id} onClick={() => navigate(`./${id}`)} className='mb-3'>
-                                    <span className='font-mono inline-block rounded dark:text-slate-400 dark:bg-slate-800 text-slate-900 bg-slate-100 px-2 py-1 mb-1 whitespace-nowrap hover:cursor-pointer hover:bg-klave-dark-blue hover:text-slate-100'>{deploymentAddress.fqdn}</span><br />
-                                    <span className={`rounded inline-block text-xs px-1 py-0 mr-2 text-white ${life === 'long' ? 'bg-green-600' : 'bg-slate-500'}`}>{life === 'long' ? 'Production' : 'Preview'}</span>
-                                    <span className={`rounded inline-block text-xs px-1 py-0 text-white ${status === 'errored' ? 'bg-red-700' : status === 'deployed' ? 'bg-blue-500' : 'bg-stone-300'}`}>{status}</span>
+                                    <span className='font-mono inline-block rounded-sm dark:text-slate-400 dark:bg-slate-800 text-slate-900 bg-slate-100 px-2 py-1 mb-1 whitespace-nowrap hover:cursor-pointer hover:bg-klave-dark-blue hover:text-slate-100'>{deploymentAddress.fqdn}</span><br />
+                                    <span className={`rounded-sm inline-block text-xs px-1 py-0 mr-2 text-white ${life === 'long' ? 'bg-green-600' : 'bg-slate-500'}`}>{life === 'long' ? 'Production' : 'Preview'}</span>
+                                    <span className={`rounded-sm inline-block text-xs px-1 py-0 text-white ${status === 'errored' ? 'bg-red-700' : status === 'deployed' ? 'bg-blue-500' : 'bg-stone-300'}`}>{status}</span>
                                     {life === 'short' ? <span className={'inline-block text-xs text-slate-500 px-2'}>{hasExpired ? 'Expired' : 'Expires'} {formatTimeAgo(expiresOn)}</span> : <span></span>}
                                 </div>;
                             })
@@ -210,7 +210,7 @@ export const Deployments: FC = () => {
                         <td className="sm:p-3 py-2 px-1 align-top border-b border-gray-200 dark:border-gray-800 md:table-cell hidden">
                             <div className="flex items-center">
                                 <div className="sm:flex hidden flex-col">
-                                    <span className='font-mono inline-block rounded dark:text-slate-400 dark:bg-slate-800 text-slate-900 bg-slate-100 px-2 py-1 mb-1 whitespace-nowrap' title={!setBranch ? undefined : setBranch}>{setBranch?.replace('refs/heads/', '')}</span><br />
+                                    <span className='font-mono inline-block rounded-sm dark:text-slate-400 dark:bg-slate-800 text-slate-900 bg-slate-100 px-2 py-1 mb-1 whitespace-nowrap' title={!setBranch ? undefined : setBranch}>{setBranch?.replace('refs/heads/', '')}</span><br />
                                 </div>
                             </div>
                         </td>
@@ -274,13 +274,13 @@ export const Deployments: FC = () => {
                                 </td>
                                 */}
                                 <td className={'sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800'}>
-                                    <span className='font-mono inline-block rounded dark:text-slate-400 dark:bg-slate-800 text-slate-900 bg-slate-100 px-2 py-1 mb-1 whitespace-nowrap'>{deploymentAddress.fqdn}</span><br />
-                                    <span className={`rounded inline-block text-xs px-1 py-0 mr-2 text-white ${life === 'long' ? 'bg-green-600' : 'bg-slate-500'}`}>{life === 'long' ? 'Production' : 'Preview'}</span>
-                                    <span className={`rounded inline-block text-xs px-1 py-0 text-white ${status === 'errored' ? 'bg-red-700' : status === 'deployed' ? 'bg-blue-500' : 'bg-stone-300'}`}>{status}</span>
+                                    <span className='font-mono inline-block rounded-sm dark:text-slate-400 dark:bg-slate-800 text-slate-900 bg-slate-100 px-2 py-1 mb-1 whitespace-nowrap'>{deploymentAddress.fqdn}</span><br />
+                                    <span className={`rounded-sm inline-block text-xs px-1 py-0 mr-2 text-white ${life === 'long' ? 'bg-green-600' : 'bg-slate-500'}`}>{life === 'long' ? 'Production' : 'Preview'}</span>
+                                    <span className={`rounded-sm inline-block text-xs px-1 py-0 text-white ${status === 'errored' ? 'bg-red-700' : status === 'deployed' ? 'bg-blue-500' : 'bg-stone-300'}`}>{status}</span>
                                 </td>
                                 {/* <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800">{life === 'long' ? 'prod' : 'dev'}</td> */}
                                 {/* <td className={'sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800'}>{status}</td> */}
-                                {/* <td className={'sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800'}><span className='font-mono rounded bg-slate-100 px-2 py-1 whitespace-nowrap'>1.0.3</span></td> */}
+                                {/* <td className={'sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800'}><span className='font-mono rounded-sm bg-slate-100 px-2 py-1 whitespace-nowrap'>1.0.3</span></td> */}
                                 <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 md:table-cell hidden">
                                     <div className="flex items-center">
                                         <div className="sm:flex hidden flex-col">
@@ -292,7 +292,7 @@ export const Deployments: FC = () => {
                                 <td className="sm:p-3 py-2 px-1 border-b border-gray-200 dark:border-gray-800 md:table-cell hidden">
                                     <div className="flex items-center">
                                         <div className="sm:flex hidden flex-col">
-                                            <span className='font-mono inline-block rounded dark:text-slate-400 dark:bg-slate-800 text-slate-900 bg-slate-100 px-2 py-1 mb-1 whitespace-nowrap' title={!branch ? undefined : branch}>{branch?.replace('refs/heads/', '')}</span><br />
+                                            <span className='font-mono inline-block rounded-sm dark:text-slate-400 dark:bg-slate-800 text-slate-900 bg-slate-100 px-2 py-1 mb-1 whitespace-nowrap' title={!branch ? undefined : branch}>{branch?.replace('refs/heads/', '')}</span><br />
                                         </div>
                                     </div>
                                 </td>

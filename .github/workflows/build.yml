@@ -7,6 +7,10 @@ on:
   pull_request:
     branches: [main, develop]
 
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.NX_CACHE_AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.NX_CACHE_AWS_SECRET_ACCESS_KEY }}
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -55,6 +59,12 @@ jobs:
             echo "$RUNNER_OS not supported"
             exit 0
           fi
+
+      - name: Install tooling
+        run: |
+          rustup target add wasm32-unknown-unknown;
+          cargo install cargo-quickinstall;
+          cargo quickinstall cargo-component;
 
       - name: Install repo dependencies
         run: yarn install --network-timeout 1000000 --forzen-lockfile

@@ -61,7 +61,7 @@ const AddCluster = () => {
 
     return <AlertDialog.Root onOpenChange={handleOpen} open={isOpen}>
         <AlertDialog.Trigger asChild>
-            <button title='Add a cluster' className="btn btn-sm h-8 inline-flex items-center justify-center text-slate-800 text-md font-normal mt-auto">
+            <button title='Add a cluster' className="btn btn-md h-8 inline-flex items-center justify-center text-slate-800 text-md font-normal mt-auto">
                 <UilUserPlus className='inline-block h-4 w-4' /> Add a cluster
             </button>
         </AlertDialog.Trigger>
@@ -86,10 +86,10 @@ const AddCluster = () => {
                     : null}
                 <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
-                        <button className="btn btn-sm ">{'Cancel'}</button>
+                        <button className="btn btn-md h-8 ">{'Cancel'}</button>
                     </AlertDialog.Cancel>
                     <AlertDialog.Action asChild disabled={!canSubmit}>
-                        <button disabled={!canSubmit} className={`btn btn-sm  ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={(e) => inviteMember(e)}>Invite</button>
+                        <button disabled={!canSubmit} className={`btn btn-md h-8  ${canSubmit ? 'bg-red-700' : 'bg-slate-300'} text-white`} onClick={(e) => inviteMember(e)}>Invite</button>
                     </AlertDialog.Action>
                 </div>
             </AlertDialog.Content>
@@ -118,7 +118,7 @@ const ClusterDeletion: FC<ClusterContextProps> = ({ cluster: { id } }) => {
 
     return <AlertDialog.Root>
         <AlertDialog.Trigger asChild>
-            <button title='Delete' className="btn btn-sm h-8 inline-flex items-center justify-center font-normal text-red-400 mt-auto">
+            <button title='Delete' className="btn btn-md h-8 inline-flex items-center justify-center font-normal text-red-400 mt-auto">
                 <UilTrash className='inline-block h-4 w-4' />
             </button>
         </AlertDialog.Trigger>
@@ -131,10 +131,10 @@ const ClusterDeletion: FC<ClusterContextProps> = ({ cluster: { id } }) => {
                 </AlertDialog.Description>
                 <div className='flex gap-6 justify-end mt-5'>
                     <AlertDialog.Cancel asChild>
-                        <button className="btn btn-sm">Cancel</button>
+                        <button className="btn btn-md h-8">Cancel</button>
                     </AlertDialog.Cancel>
                     <AlertDialog.Action asChild>
-                        <button className="btn btn-sm bg-red-700 text-white" onClick={() => deleteCluster(id)}>Yes, delete cluster</button>
+                        <button className="btn btn-md h-8 bg-red-700 text-white" onClick={() => deleteCluster(id)}>Yes, delete cluster</button>
                     </AlertDialog.Action>
                 </div>
             </AlertDialog.Content>

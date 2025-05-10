@@ -60,7 +60,7 @@ function Organisations() {
             {
                 accessorKey: 'id',
                 header: 'ID',
-                cell: info => <span className='font-mono kbd kbd-xs text-nowrap mx-1 px-1 py-0 rounded-sm'>{info.getValue<string>()}</span>
+                cell: info => <span className='font-mono kbd kbd-xs text-nowrap mx-1 px-1 py-0 rounded-xs'>{info.getValue<string>()}</span>
             },
             {
                 accessorKey: 'createdAt',
@@ -145,7 +145,7 @@ function Organisations() {
             </div>
             <div className="sm:px-7 sm:pt-7 px-4 py-4 flex flex-col w-full bg-white dark:bg-gray-900 dark:text-white dark:border-gray-800 sticky top-0">
                 <div className="flex w-full items-center">
-                    Loading... <UilSpinner className='inline-block animate-spin h-8' />
+                    Loading... <UilSpinner className='inline-block animate-spin h-5' />
                 </div>
             </div>
         </>;

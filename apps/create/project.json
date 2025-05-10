@@ -62,10 +62,7 @@
                 "trackDeps": true,
                 "changelogHeader": "# Changelog",
                 "tagPrefix": "{projectName}@",
-                "commitMessageFormat": "chore({projectName}): Release version ${version}",
-                "postTargets": [
-                    "create:build"
-                ]
+                "commitMessageFormat": "chore({projectName}): Release version ${version}"
             }
         },
         "publish": {

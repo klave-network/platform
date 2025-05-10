@@ -1,8 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 import { nxE2EPreset } from '@nx/playwright/preset';
 import { workspaceRoot } from '@nx/devkit';
+
 // For CI, you may want to set BASE_URL to the deployed application.
-const baseURL = process.env['BASE_URL'] || 'http://klave.ui.127.0.0.1.nip.io:4220';
+const baseURL = process.env['BASE_URL'] ?? 'https://klave.ui.127.0.0.1.nip.io:4220';
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -19,7 +20,12 @@ export default defineConfig({
     use: {
         baseURL,
         /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-        trace: 'on-first-retry'
+        trace: 'on-first-retry',
+        // bypassCSP: true,
+        // launchOptions: {
+        //     args: ['--disable-web-security']
+        // },
+        ignoreHTTPSErrors: true
     },
     /* Run your local dev server before starting the tests */
     webServer: {
@@ -27,6 +33,7 @@ export default defineConfig({
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         cwd: workspaceRoot,
+        ignoreHTTPSErrors: true,
         stdout: 'pipe',
         stderr: 'pipe'
     }, projects: [

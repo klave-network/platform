@@ -90,7 +90,7 @@ export const Index: FC = () => {
                                 We were unable to create a new repository in your GitHub account.<br />
                                 Kalve needs to be installed in your GitHub account to proceed.<br />
                                 Make sure you have installed Klave on your GitHub account and try again.<br /><br />
-                                <a href={githubAppInstall.toString()} className='btn btn-sm bg-blue-600 text-white hover:bg-blue-500 rounded-md disabled:text-gray-300'>Install Klave now</a><br /><br /><br />
+                                <a href={githubAppInstall.toString()} className='btn btn-md h-8 bg-blue-600 text-white hover:bg-blue-500 rounded-md disabled:text-gray-300'>Install Klave now</a><br /><br /><br />
                                 Other you may attemp at a later time.
                             </div>
                         </div>
@@ -112,8 +112,8 @@ export const Index: FC = () => {
                                 <p>To deploy a new Project, we will create a new repository for you</p>
                             </div>
                             <div className='relative h-[300px]'>
-                                <a href={githubAuth.toString()} className='btn btn-sm mb-3 rounded-full bg-black hover:bg-gray-900 text-white'><UilGithub color='white' className='inline-block h-5' />&nbsp;Connect to GitHub</a><br />
-                                <a href={gitlabAuth.toString()} className='btn btn-sm rounded-full bg-[#db7130] hover:bg-[#bb472d] text-white hidden'><UilGitlab color='white' className='inline-block h-5' />&nbsp;Connect to GitLab</a>
+                                <a href={githubAuth.toString()} className='btn btn-md h-8 mb-3 rounded-full bg-black hover:bg-gray-900 text-white'><UilGithub color='white' className='inline-block h-5' />&nbsp;Connect to GitHub</a><br />
+                                <a href={gitlabAuth.toString()} className='btn btn-md h-8 rounded-full bg-[#db7130] hover:bg-[#bb472d] text-white hidden'><UilGitlab color='white' className='inline-block h-5' />&nbsp;Connect to GitLab</a>
                             </div>
                         </div>
                     </div>

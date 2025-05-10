@@ -22,7 +22,7 @@ let origin: string;
 let rpID: string;
 
 const setWebauthnPrimitives = () => {
-    origin = process.env['KLAVE_WEBAUTHN_ORIGIN'] ?? 'http://klave.ui.127.0.0.1.nip.io';
+    origin = process.env['KLAVE_WEBAUTHN_ORIGIN'] ?? 'https://klave.ui.127.0.0.1.nip.io';
     rpID = new URL(origin).hostname;
 };
 

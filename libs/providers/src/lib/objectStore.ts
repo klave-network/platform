@@ -1,7 +1,7 @@
 import AWS from '@aws-sdk/client-s3';
 export { NoSuchBucket } from '@aws-sdk/client-s3';
 export type { PutObjectOutput } from '@aws-sdk/client-s3';
-export { Upload } from "@aws-sdk/lib-storage";
+export { Upload } from '@aws-sdk/lib-storage';
 import { logger } from './logger';
 
 
@@ -24,7 +24,7 @@ export const objectStoreOps = {
             region: process.env['KLAVE_BHDUI_S3_REGION'],
             credentials: {
                 accessKeyId: process.env['KLAVE_BHDUI_S3_ACCESS_KEY'] ?? '',
-                secretAccessKey: process.env['KLAVE_BHDUI_S3_SECRET'] ?? '',
+                secretAccessKey: process.env['KLAVE_BHDUI_S3_SECRET'] ?? ''
             }
         });
     }

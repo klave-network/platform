@@ -109,14 +109,14 @@ export const Login: FC = () => {
                                     <button
                                         type="submit"
                                         disabled={isChangingSlug}
-                                        className="btn btn-sm border text-white bg-blue-500 hover:bg-blue-400 p-2"
+                                        className="btn btn-md h-8 border text-white bg-blue-500 hover:bg-blue-400 p-2"
                                     >
                                         {isChangingSlug ? 'Setting up your pseudonym' : 'Set my pseudonymm'}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setSkipAskName(true)}
-                                        className="btn btn-sm border bg-slate-200 hover:bg-slate-300 p-2"
+                                        className="btn btn-md h-8 border bg-slate-200 hover:bg-slate-300 p-2"
                                     >
                                         Skip for now
                                     </button>

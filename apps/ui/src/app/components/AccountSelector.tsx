@@ -20,11 +20,11 @@ const AccountSelector: FC<{ className?: string; }> = ({ className }) => {
     };
 
     return <Select.Root value={orgSlug} defaultValue={orgSlug} onValueChange={changeValue}>
-        <Select.Trigger className={`select select-bordered select-sm inline-flex justify-between flex-grow w-full items-center text-klave-light-blue bg-white data-[placeholder]:text-klave-light-blue mt-3 mb-5 ${className}`}>
+        <Select.Trigger className={`select select-bordered select-md inline-flex justify-between flex-grow w-full items-center text-klave-light-blue bg-white data-[placeholder]:text-klave-light-blue mt-3 mb-5 ${className}`}>
             <Select.Value placeholder="Select an account" />
         </Select.Trigger>
         <Select.Portal>
-            <Select.Content className="overflow-hidden bg-white shadow-outline shadow rounded-lg w-full z-[1000]">
+            <Select.Content className="overflow-hidden bg-white shadow-outline shadow-sm rounded-lg w-full z-[1000]">
                 <Select.ScrollUpButton>
                     <ChevronUpIcon />
                 </Select.ScrollUpButton>
@@ -66,7 +66,7 @@ const SelectItem = forwardRef<HTMLDivElement, PropsWithChildren<{
     className?: string;
 }>>(({ children, className, ...props }, forwardedRef) => {
     return (
-        <Select.Item className={`flex h-9 items-center select-none relative px-5 data-[disabled]:text-slate-300 data-[disabled]:pointer-events-none data-[highlighted]:text-klave-light-blue data-[highlighted]:bg-blue-100 data-[highlighted]:outline-none ${className}`} {...props} ref={forwardedRef}>
+        <Select.Item className={`flex h-9 items-center select-none relative px-5 data-[disabled]:text-slate-300 data-[disabled]:pointer-events-none data-[highlighted]:text-klave-light-blue data-[highlighted]:bg-blue-100 data-[highlighted]:outline-hidden ${className}`} {...props} ref={forwardedRef}>
             <Select.ItemText>{children}</Select.ItemText>
             <Select.ItemIndicator className="SelectItemIndicator">
                 <CheckIcon />

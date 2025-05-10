@@ -42,7 +42,7 @@ export const AppDeploymentDetail: FC = () => {
     const secretariumNode = useMemo(() => {
         if (!secretariumNodeInfo)
             return undefined;
-        const node = secretariumNodeInfo.split('|')[0]
+        const node = secretariumNodeInfo.split('|')[0];
         if (!node)
             return undefined;
         const url = URL.parse(node);
@@ -168,10 +168,10 @@ export const AppDeploymentDetail: FC = () => {
     const verification = commit?.verification;
     const { verified, reason } = verification || {};
     const badge = !verification ? null : verified
-        ? <div className="badge badge-xs py-2 text-lime-500 border-lime-400"><UilLock className='h-3 w-3 mr-1' />{commitVerificationReasons[reason ?? 'unknown']}</div>
+        ? <div className="badge badge-sm py-2 text-lime-500 border-lime-400"><UilLock className='h-3 w-3' />{commitVerificationReasons[reason ?? 'unknown']}</div>
         : reason === 'unsigned'
-            ? <div className="badge badge-xs py-2 text-slate-400 border-slate-500"><UilLockSlash className='h-3 w-3 mr-1' />{commitVerificationReasons[reason ?? 'unknown']}</div>
-            : <div className="badge badge-xs py-2 text-red-400 border-red-400"><UilLockSlash className='h-3 w-3 mr-1' />{commitVerificationReasons[reason ?? 'unknown']}</div>;
+            ? <div className="badge badge-sm py-2 text-slate-400 border-slate-500"><UilLockSlash className='h-3 w-3' />{commitVerificationReasons[reason ?? 'unknown']}</div>
+            : <div className="badge badge-sm py-2 text-red-400 border-red-400"><UilLockSlash className='h-3 w-3' />{commitVerificationReasons[reason ?? 'unknown']}</div>;
 
     const buildOutputs = deployment.buildOutputs as StagedOutputGroups ?? {
         clone: [],
@@ -183,9 +183,9 @@ export const AppDeploymentDetail: FC = () => {
         <div className="flex w-full justify-between">
             <div className='mb-10'>
                 <h2 className='font-bold mb-3'>Addresses of the honest application</h2>
-                <span className='font-mono inline-block rounded dark:text-slate-400 dark:bg-slate-800 text-slate-900 bg-slate-100 px-2 py-1 mb-1 whitespace-nowrap'>{fqdn}</span><br />
-                <span className={`rounded inline-block text-xs px-1 py-0 mr-2 text-white ${life === 'long' ? 'bg-green-600' : 'bg-slate-500'}`}>{life === 'long' ? 'Production' : 'Preview'}</span>
-                <span className={`rounded inline-block text-xs px-1 py-0 text-white ${status === 'errored' ? 'bg-red-700' : status === 'deployed' ? 'bg-blue-500' : 'bg-stone-300'}`}>{status}</span>
+                <span className='font-mono inline-block rounded-sm dark:text-slate-400 dark:bg-slate-800 text-slate-900 bg-slate-100 px-2 py-1 mb-1 whitespace-nowrap'>{fqdn}</span><br />
+                <span className={`rounded-sm inline-block text-xs px-1 py-0 mr-2 text-white ${life === 'long' ? 'bg-green-600' : 'bg-slate-500'}`}>{life === 'long' ? 'Production' : 'Preview'}</span>
+                <span className={`rounded-sm inline-block text-xs px-1 py-0 text-white ${status === 'errored' ? 'bg-red-700' : status === 'deployed' ? 'bg-blue-500' : 'bg-stone-300'}`}>{status}</span>
             </div>
             <div className='mb-10 sm:block hidden'>
                 <h2 className='font-bold mb-3'>Version</h2>
@@ -258,7 +258,7 @@ export const AppDeploymentDetail: FC = () => {
                 <h2 className='font-bold mb-3'>Branch</h2>
                 <div className="flex items-center">
                     <div className="sm:flex hidden flex-row align-middle gap-2 items-center">
-                        <span className='font-mono inline rounded dark:text-slate-400 dark:bg-slate-800 text-slate-900 bg-slate-100 px-2 py-1 mb-1 whitespace-nowrap' title={!branch ? undefined : branch}>{branch?.replace('refs/heads/', '')}</span>
+                        <span className='font-mono inline rounded-sm dark:text-slate-400 dark:bg-slate-800 text-slate-900 bg-slate-100 px-2 py-1 mb-1 whitespace-nowrap' title={!branch ? undefined : branch}>{branch?.replace('refs/heads/', '')}</span>
                         <span className='pb-1'>{badge}</span>
                     </div>
                 </div>
@@ -268,7 +268,7 @@ export const AppDeploymentDetail: FC = () => {
                     <h2 className='font-bold mb-3'>Custom Endpoint</h2>
                     <div className="flex items-center">
                         <div className="sm:flex hidden flex-row align-middle gap-2 items-center">
-                            <span className='font-mono inline rounded dark:text-slate-400 dark:bg-slate-800 text-slate-900 bg-slate-100 px-2 py-1 mb-1 whitespace-nowrap' title={effectiveClusterFQDN}>{effectiveClusterFQDN}</span>
+                            <span className='font-mono inline rounded-sm dark:text-slate-400 dark:bg-slate-800 text-slate-900 bg-slate-100 px-2 py-1 mb-1 whitespace-nowrap' title={effectiveClusterFQDN}>{effectiveClusterFQDN}</span>
                         </div>
                     </div>
                 </div>
@@ -286,7 +286,7 @@ export const AppDeploymentDetail: FC = () => {
         </div>
         {status === 'deployed'
             ? <Tabs.Root defaultValue="inspect" className='flex flex-col w-full'>
-                <Tabs.List className='flex flex-shrink-0 border-b'>
+                <Tabs.List className='flex shrink-0 border-b border-gray-200'>
                     <Tabs.Trigger value="inspect" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Inspect</Tabs.Trigger>
                     {deployment.buildOutputHasUI ? <Tabs.Trigger value="ui" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Embedded UI</Tabs.Trigger> : null}
                     <Tabs.Trigger value="configuration" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Configuration</Tabs.Trigger>
@@ -373,7 +373,7 @@ export const AppDeploymentDetail: FC = () => {
             </Tabs.Root>
             : status === 'errored'
                 ? <Tabs.Root defaultValue="inspect" className='flex flex-col w-full'>
-                    <Tabs.List className='flex flex-shrink-0 border-b'>
+                    <Tabs.List className='flex shrink-0 border-b border-gray-200'>
                         <Tabs.Trigger value="inspect" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Inspect</Tabs.Trigger>
                         <Tabs.Trigger value="configuration" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Configuration</Tabs.Trigger>
                         <Tabs.Trigger value="build" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Build and Dependencies</Tabs.Trigger>
@@ -438,7 +438,7 @@ export const AppDeploymentDetail: FC = () => {
                     </Tabs.Content>
                 </Tabs.Root>
                 : <Tabs.Root defaultValue="build" className='flex flex-col w-full'>
-                    <Tabs.List className='flex flex-shrink-0 border-b'>
+                    <Tabs.List className='flex shrink-0 border-b border-gray-200'>
                         <Tabs.Trigger value="build" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Build and Dependencies</Tabs.Trigger>
                         <Tabs.Trigger value="configuration" className='flex-1 border-0 border-b-2 border-transparent rounded-none data-[state=active]:border-klave-light-blue shadow-none text-sm font-normal text-gray-600 dark:text-gray-400 hover:text-klave-light-blue data-[state=active]:font-bold data-[state=active]:text-klave-light-blue'>Configuration</Tabs.Trigger>
                     </Tabs.List>
