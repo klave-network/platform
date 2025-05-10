@@ -43,6 +43,9 @@
             ]
         },
         "test": {
+            "dependsOn": [
+                "db:compile"
+            ],
             "executor": "@nx/jest:jest",
             "outputs": [
                 "{workspaceRoot}/coverage/{projectRoot}"
@@ -53,7 +56,12 @@
         },
         "docker-build": {
             "dependsOn": [
-                "build"
+                {
+                    "projects": [
+                        "db"
+                    ],
+                    "target": "compile"
+                }
             ],
             "executor": "nx:run-commands",
             "options": {

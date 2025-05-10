@@ -60,6 +60,12 @@ jobs:
             exit 0
           fi
 
+      - name: Install tooling
+        run: |
+          rustup target add wasm32-unknown-unknown;
+          cargo install cargo-quickinstall;
+          cargo quickinstall cargo-component;
+
       - name: Install repo dependencies
         run: yarn install --network-timeout 1000000 --forzen-lockfile
 
