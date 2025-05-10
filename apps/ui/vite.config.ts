@@ -2,8 +2,11 @@ import { defineConfig as defineViteConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import mkcert from 'vite-plugin-mkcert';
-import git from 'git-rev-sync';
+import tailwindcss from '@tailwindcss/vite';
+import { createRequire } from 'module';
 import { version } from './package.json';
+
+const git = createRequire(import.meta.url)('git-rev-sync');
 
 export default defineViteConfig({
     cacheDir: '../../node_modules/.vite/ui',
@@ -29,7 +32,7 @@ export default defineViteConfig({
     plugins: [mkcert({
         keyFileName: 'klave-ui-dev-key.pem',
         certFileName: 'klave-ui-dev-cert.pem'
-    }), react(), nxViteTsPaths()],
+    }), tailwindcss(), react(), nxViteTsPaths()],
 
     // Uncomment this if you are using workers.
     // worker: {

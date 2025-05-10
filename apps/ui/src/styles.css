@@ -1,9 +1,9 @@
 @import 'tailwindcss';
 @import '@primer/primitives/dist/css/functional/themes/light.css';
 
-@plugin '@tailwindcss/typography' {};
-@plugin '@tailwindcss/forms' { strategy: 'class' };
-@plugin "daisyui" {};
+@plugin '@tailwindcss/typography' {}
+@plugin '@tailwindcss/forms' { strategy: 'class' }
+@plugin 'daisyui' {}
 
 @theme {
     --color-klave-dark-blue: #00021A;
