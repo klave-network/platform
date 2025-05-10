@@ -63,7 +63,7 @@ export const dispatchOps = {
                     body: Array<number>
                 };
                 // TODO: Try to not use fetch on localhost here. Also get the actual port.
-                fetch('http://klave.api.127.0.0.1.nip.io:3333/hook', {
+                fetch('https://klave.api.127.0.0.1.nip.io:3333/hook', {
                     method: 'POST',
                     headers: message.headers,
                     body: Uint8Array.from(message.body)
