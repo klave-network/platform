@@ -17,5 +17,9 @@
         "src/**/*.spec.js",
         "src/**/*.d.ts",
         "types/**/*.d.ts"
+    ],
+    "exclude": [
+        "index.ts",
+        "assembly/*"
     ]
 }
