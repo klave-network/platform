@@ -1,4 +1,14 @@
 # Changelog
+## [1.4.4](https://github.com/klave-network/platform/compare/api@1.4.3...api@1.4.4) (2025-05-11)
+
+### Dependency Updates
+
+* `providers` updated to version `1.4.3`
+
+### Bug Fixes
+
+* **api,providers,ui:** Ensure HTTPS is correctly configured for run and test ([eb732a7](https://github.com/klave-network/platform/commit/eb732a7f8910b3fe340b5ba9c210e4ed222dae29))
+
 ## [1.4.3](https://github.com/klave-network/platform/compare/api@1.4.2...api@1.4.3) (2025-05-09)
 
 ### Dependency Updates
