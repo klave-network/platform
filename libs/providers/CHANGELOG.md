@@ -1,4 +1,11 @@
 # Changelog
+## [1.3.3](https://github.com/klave-network/platform/compare/providers@1.3.2...providers@1.3.3) (2025-05-11)
+
+
+### Bug Fixes
+
+* **api,providers,ui:** Ensure HTTPS is correctly configured for run and test ([eb732a7](https://github.com/klave-network/platform/commit/eb732a7f8910b3fe340b5ba9c210e4ed222dae29))
+
 ## [1.3.2](https://github.com/klave-network/platform/compare/providers@1.3.1...providers@1.3.2) (2025-05-09)
 
 ### Dependency Updates
