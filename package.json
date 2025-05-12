@@ -160,7 +160,7 @@
         "stripe": "18.1.0",
         "styled-components": "6.1.18",
         "superjson": "2.2.2",
-        "tailwindcss": "4.1.5",
+        "tailwindcss": "4.1.6",
         "terminal-link": "^4.0.0",
         "toml": "3.0.0",
         "ts-case-convert": "2.1.0",
