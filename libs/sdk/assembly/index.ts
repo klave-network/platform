@@ -9,6 +9,10 @@ import * as Crypto from "./crypto"
 export { Crypto }
 import * as Attestation from "./attestation"
 export { Attestation }
+import * as LLM from "./llm/llm"
+export { LLM }
+import * as FileSystem from "./file_system/file_system"
+export { FileSystem }
 
 // @ts-ignore: decorator
 @external("env", "add_user_query")
@@ -46,18 +50,6 @@ declare function runtime_unload_lightgbm_model(name: ArrayBuffer, error: ArrayBu
 // @ts-ignore: decorator
 @external("env", "infer_from_lightgbm_model")
 declare function runtime_infer_from_lightgbm_model(name: ArrayBuffer, data: ArrayBuffer, data_size: i32, nb_outputs: i32, result: ArrayBuffer, result_size: i32): i32;
-// @ts-ignore: decorator
-@external("env", "graph_load")
-declare function runtime_graph_load(input: ArrayBuffer, encoding: i32, target: i32): i32;
-// @ts-ignore: decorator
-@external("env", "graph_load_by_name")
-declare function runtime_graph_load_by_name(input: ArrayBuffer): i32;
-// @ts-ignore: decorator
-@external("env", "graph_init_execution_context")
-declare function runtime_graph_init_execution_context(input: ArrayBuffer): i32;
-// @ts-ignore: decorator
-@external("env", "inference_compute")
-declare function runtime_inference_compute(input: ArrayBuffer, input_tensor: ArrayBuffer, output_tensor: ArrayBuffer): i32;
 
 // @ts-ignore: decorator
 @external("env", "https_query")
@@ -313,36 +305,6 @@ export class ML {
         if (result < 0)
             return new Float64Array(0); //TODO: Report errors
         return Float64Array.wrap(value.slice(0, result));
-    }
-
-    static graphLoad(input: string, encoding: i32, target: i32): i32 {
-        let inputBuf = String.UTF8.encode(input, true);
-        return runtime_graph_load(inputBuf, encoding, target);
-    }
-
-    static graphLoadByName(input: string): i32 {
-        let inputBuf = String.UTF8.encode(input, true);
-        return runtime_graph_load_by_name(inputBuf);
-    }
-
-    static graphInitExecutionContext(input: string): i32 {
-        let inputBuf = String.UTF8.encode(input, true);
-        return runtime_graph_init_execution_context(inputBuf);
-    }
-
-    static inferenceCompute(input: string, input_tensor: string): string | null {
-        let inputBuf = String.UTF8.encode(input, true);
-        let inputTensorBuf = String.UTF8.encode(input_tensor, true);
-        let outputTensorBuf = new ArrayBuffer(64);        
-        let result = runtime_load_lightgbm_model(inputBuf, inputTensorBuf, outputTensorBuf, outputTensorBuf.byteLength);
-        if (abs(result) > outputTensorBuf.byteLength) {
-            // buffer not big enough, retry with a properly sized one
-            outputTensorBuf = new ArrayBuffer(abs(result));
-            result = runtime_load_lightgbm_model(inputBuf, inputTensorBuf, outputTensorBuf, outputTensorBuf.byteLength);
-        }
-        if (result < 0)
-            return null; // todo : report error
-        return String.UTF8.decode(outputTensorBuf.slice(0, result));
     }
 }
 
