@@ -11,3 +11,4 @@ pub mod ml;
 pub mod notifier;
 pub mod router;
 pub mod subscription;
+pub mod attestation;
