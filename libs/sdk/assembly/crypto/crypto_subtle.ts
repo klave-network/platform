@@ -52,6 +52,11 @@ export class AesKeyGenParams {
     length: u32 = 256;
 }
 
+@json
+export class HmacKeyGenParams {
+    hash: string = 'SHA2-256';
+}
+
 export class RsaOaepParams {
     label: ArrayBuffer = new ArrayBuffer(0);
 }
@@ -145,7 +150,22 @@ export class SubtleCrypto {
             }
             else
                 return { data: null, err: new Error('Failed to generate AES metadata') };
+        } else if (algorithm instanceof HmacKeyGenParams) {
+            const metadata = CryptoUtil.getHMACMetadata(algorithm);
+            if (metadata.data) {
+                const hmacMetadata = metadata.data as idlV1.hmac_metadata;
+                const key = CryptoImpl.generateKey(idlV1.key_algorithm.hmac, String.UTF8.encode(JSON.stringify(hmacMetadata), true), extractable, usages, "");
+                if (key.data) {
+                    const cryptoKeyJson = String.UTF8.decode(key.data!, true);
+                    let cryptoKey = JSON.parse<CryptoKey>(cryptoKeyJson);
+                    return { data: cryptoKey, err: null };
+                } else
+                    return { data: null, err: new Error('Failed to generate HMAC key') };
+            }
+            else
+                return { data: null, err: new Error('Failed to generate HMAC metadata') };
         }
+
         return { data: null, err: new Error('Invalid algorithm') };
     }
 
@@ -203,6 +223,8 @@ export class SubtleCrypto {
         } else if (algorithm instanceof RsaPssParams) {
             const metadata: idlV1.rsa_pss_signature_metadata = { saltLength: algorithm.saltLength };
             return CryptoImpl.sign(key.id, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata), true), data);
+        } else if (algorithm instanceof HmacKeyGenParams) {
+            return CryptoImpl.sign(key.id, idlV1.signing_algorithm.hmac, String.UTF8.encode("", true), data);
         }
 
         return { data: null, err: new Error('Invalid algorithm') };
@@ -226,6 +248,12 @@ export class SubtleCrypto {
         } else if (algorithm instanceof RsaPssParams) {
             const metadata: idlV1.rsa_pss_signature_metadata = { saltLength: algorithm.saltLength };
             return CryptoImpl.verify(key.id, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata), true), data, signature);
+        } else if (algorithm instanceof HmacKeyGenParams) {
+            const metadata = CryptoUtil.getHMACMetadata(algorithm);
+            if (!metadata.data)
+                return { data: null, err: metadata.err };
+            const hmacMetadata = metadata.data as idlV1.hmac_metadata;
+            return CryptoImpl.verify(key.id, idlV1.signing_algorithm.hmac, String.UTF8.encode(JSON.stringify(hmacMetadata), true), data, signature);
         }
 
         return { data: null, err: new Error('Invalid algorithm') };
@@ -296,6 +324,15 @@ export class SubtleCrypto {
             }
             else
                 return { data: null, err: new Error('Failed to generate RSA metadata') };
+        } else if (algorithm instanceof HmacKeyGenParams) {
+            keyAlgo = idlV1.key_algorithm.hmac;
+            const hmacMetadata = CryptoUtil.getHMACMetadata(algorithm);
+            if (hmacMetadata.data) {
+                const metadata = hmacMetadata.data as idlV1.hmac_metadata;
+                algoMetadata = String.UTF8.encode(JSON.stringify(metadata), true);
+            }
+            else
+                return { data: null, err: new Error('Failed to generate HMAC metadata') };
         } else
             return { data: null, err: new Error('Invalid algorithm') };
 
