@@ -30,6 +30,11 @@ pub struct TaggedShaMetadata {
 }
 
 #[derive(Deserialize, Serialize)]
+pub struct HmacMetadata {
+    pub sha_metadata: ShaMetadata,
+}
+
+#[derive(Deserialize, Serialize)]
 pub struct SecpR1Metadata {
     pub length: SecpR1KeyBitsize,
 }
@@ -64,6 +69,11 @@ pub struct SchnorrSignatureMetadata {
 
 #[derive(Deserialize, Serialize)]
 pub struct EcdsaSignatureMetadata {
+    pub sha_metadata: ShaMetadata,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct HmacSignatureMetadata {
     pub sha_metadata: ShaMetadata,
 }
 

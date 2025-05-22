@@ -8,6 +8,7 @@ use std::fmt::Display;
 
 use super::sdk_wrapper::CryptoImpl;
 use super::sdk_wrapper::VerifySignResult;
+use super::subtle_idl_v1::HmacSignatureMetadata;
 use super::subtle_idl_v1::{
     AesGcmEncryptionMetadata, AesKwWrappingMetadata, EcdsaSignatureMetadata,
     RsaOaepEncryptionMetadata, RsaPssSignatureMetadata,
@@ -116,6 +117,19 @@ impl Default for EcKeyGenParams {
 }
 
 #[derive(Deserialize, Serialize)]
+pub struct HmacKeyGenParams {
+    pub hash: String,
+}
+
+impl Default for HmacKeyGenParams {
+    fn default() -> Self {
+        HmacKeyGenParams {
+            hash: "SHA2-256".to_string(),
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize)]
 pub struct AesGcmParams {
     pub iv: Vec<u8>,
     pub additional_data: Vec<u8>,
@@ -143,6 +157,19 @@ pub struct RsaPssParams {
 }
 
 #[derive(Deserialize, Serialize)]
+pub struct HmacParams {
+    pub hash: String,
+}
+
+impl Default for HmacParams {
+    fn default() -> Self {
+        HmacParams {
+            hash: "SHA2-256".to_string(),
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize)]
 pub struct EcdsaParams {
     pub hash: String,
 }
@@ -160,6 +187,7 @@ pub enum KeyGenAlgorithm {
     Rsa(RsaHashedKeyGenParams),
     Ecc(EcKeyGenParams),
     Aes(AesKeyGenParams),
+    Hmac(HmacKeyGenParams),
 }
 
 #[derive(Deserialize, Serialize)]
@@ -172,6 +200,7 @@ pub enum EncryptAlgorithm {
 pub enum SignAlgorithm {
     Ecdsa(EcdsaParams),
     RsaPss(RsaPssParams),
+    Hmac(HmacParams),
 }
 
 #[derive(Deserialize, Serialize)]
@@ -301,6 +330,30 @@ pub fn generate_key(
             let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json)?;
             Ok(crypto_key)
         }
+        KeyGenAlgorithm::Hmac(params) => {
+            let hmac_metadata = match util::get_hmac_metadata(params) {
+                Ok(hmac_metadata) => hmac_metadata,
+                Err(e) => {
+                    return Err(e);
+                }
+            };
+            let str_hmac_metadata = match serde_json::to_string(&hmac_metadata) {
+                Ok(str_hmac_metadata) => str_hmac_metadata,
+                Err(e) => {
+                    return Err(e.into());
+                }
+            };
+            let key = CryptoImpl::generate_key(
+                "",
+                KeyAlgorithm::Hmac as u32,
+                &str_hmac_metadata,
+                extractable,
+                usages,
+            )?;
+            let crypto_key_json = String::from_utf8(key)?;
+            let crypto_key: CryptoKey = serde_json::from_str(&crypto_key_json)?;
+            Ok(crypto_key)
+        }
     }
 }
 
@@ -419,6 +472,19 @@ pub fn sign(
             )?;
             Ok(result)
         }
+        SignAlgorithm::Hmac(params) => {
+            let sha_metadata = util::get_sha_metadata(&params.hash)?;
+            let metadata = HmacSignatureMetadata {
+                sha_metadata,
+            };
+            let result = CryptoImpl::sign(
+                key_name,
+                SigningAlgorithm::Hmac as u32,
+                &serde_json::to_string(&metadata)?,
+                data,
+            )?;
+            Ok(result)
+        }
     }
 }
 
@@ -454,6 +520,20 @@ pub fn verify(
             let result = CryptoImpl::verify(
                 key_name,
                 SigningAlgorithm::Ecdsa as u32,
+                &serde_json::to_string(&metadata)?,
+                data,
+                signature,
+            )?;
+            Ok(result)
+        }
+        SignAlgorithm::Hmac(params) => {
+            let sha_metadata = util::get_sha_metadata(&params.hash)?;
+            let metadata = HmacSignatureMetadata {
+                sha_metadata,
+            };
+            let result = CryptoImpl::verify(
+                key_name,
+                SigningAlgorithm::Hmac as u32,
                 &serde_json::to_string(&metadata)?,
                 data,
                 signature,
@@ -523,6 +603,16 @@ pub fn import_key(
             };
             algo_metadata = serde_json::to_string(&aes_metadata)?;
             algo_id = KeyAlgorithm::Aes;
+        }
+        KeyGenAlgorithm::Hmac(params) => {
+            let hmac_metadata = match util::get_hmac_metadata(params) {
+                Ok(hmac_metadata) => hmac_metadata,
+                Err(e) => {
+                    return Err(e);
+                }
+            };
+            algo_metadata = serde_json::to_string(&hmac_metadata)?;
+            algo_id = KeyAlgorithm::Hmac;
         }
     }
 
@@ -681,6 +771,16 @@ pub fn unwrap_key(
             };
             key_gen_algo_metadata = serde_json::to_string(&aes_metadata)?;
             key_gen_algo_id = KeyAlgorithm::Aes;
+        }
+        KeyGenAlgorithm::Hmac(params) => {
+            let hmac_metadata = match util::get_hmac_metadata(params) {
+                Ok(hmac_metadata) => hmac_metadata,
+                Err(e) => {
+                    return Err(e);
+                }
+            };
+            key_gen_algo_metadata = serde_json::to_string(&hmac_metadata)?;
+            key_gen_algo_id = KeyAlgorithm::Hmac;
         }
     }
 

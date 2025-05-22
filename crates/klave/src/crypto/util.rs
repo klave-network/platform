@@ -1,9 +1,8 @@
 use super::subtle::{
-    AesKeyGenParams, EcKeyGenParams, EcdhDerivParams, HkdfDerivParams, RsaHashedKeyGenParams,
+    AesKeyGenParams, EcKeyGenParams, EcdhDerivParams, HkdfDerivParams, HmacKeyGenParams, RsaHashedKeyGenParams
 };
 use super::subtle_idl_v1::{
-    AesMetadata, EcdhMetadata, HkdfMetadata, RsaMetadata, SecpK1Metadata, SecpR1Metadata,
-    ShaMetadata,
+    AesMetadata, EcdhMetadata, HkdfMetadata, HmacMetadata, RsaMetadata, SecpK1Metadata, SecpR1Metadata, ShaMetadata
 };
 use super::subtle_idl_v1_enums::{
     AesKeyBitsize, AesTagLength, KeyFormat, RsaKeyBitsize, SecpK1KeyBitsize, SecpR1KeyBitsize,
@@ -19,7 +18,7 @@ struct KeyFormatWrapper {
 
 pub fn is_valid_hash_algorithm(algorithm: &str) -> bool {
     matches!(
-        algorithm,        
+        algorithm,
               "sha-256"
             | "sha-384"
             | "sha-512"
@@ -160,6 +159,16 @@ pub fn get_aes_metadata(params: &AesKeyGenParams) -> Result<AesMetadata, Box<dyn
             length: AesKeyBitsize::Aes256,
         }),
         _ => Err("Invalid AES key length".into()),
+    }
+}
+
+pub fn get_hmac_metadata(params: &HmacKeyGenParams) -> Result<HmacMetadata, Box<dyn Error>> {
+    let hash = params.hash.as_str();
+    match get_sha_metadata(hash){
+        Ok(sha_metadata) => Ok(HmacMetadata {
+            sha_metadata,
+        }),
+        Err(_) => Err("Invalid hash algorithm".into()),
     }
 }
 
