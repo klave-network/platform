@@ -3903,7 +3903,7 @@
     fast-content-type-parse "^3.0.0"
     universal-user-agent "^7.0.2"
 
-"@octokit/rest@^21", "@octokit/rest@^21.1.1":
+"@octokit/rest@^21.1.1":
   version "21.1.1"
   resolved "https://registry.yarnpkg.com/@octokit/rest/-/rest-21.1.1.tgz#7a70455ca451b1d253e5b706f35178ceefb74de2"
   integrity sha512-sTQV7va0IUVZcntzy1q3QqPm/r8rWtDCqpRAmb8eXXnKkjoQEtFe3Nt5GTVsHft+R6jJoHeSiVLcgcvhtue/rg==
@@ -3913,7 +3913,7 @@
     "@octokit/plugin-request-log" "^5.3.1"
     "@octokit/plugin-rest-endpoint-methods" "^13.3.0"
 
-"@octokit/types@^14", "@octokit/types@^14.0.0":
+"@octokit/types@^14.0.0":
   version "14.0.0"
   resolved "https://registry.yarnpkg.com/@octokit/types/-/types-14.0.0.tgz#bbd1d31e2269940789ef143b1c37918aae09adc4"
   integrity sha512-VVmZP0lEhbo2O1pdq63gZFiGCKkm8PPp8AUOijlwPO6hojEVjspA0MWKP7E4hbvGxzFKNqKr6p0IYtOH/Wf/zA==
@@ -5011,6 +5011,13 @@
     domhandler "^5.0.3"
     selderee "^0.11.0"
 
+"@sentry-internal/browser-utils@9.22.0":
+  version "9.22.0"
+  resolved "https://registry.yarnpkg.com/@sentry-internal/browser-utils/-/browser-utils-9.22.0.tgz#dd05ac2ed925b70a0ca9bdec472f2566761dad91"
+  integrity sha512-Ou1tBnVxFAIn8i9gvrWzRotNJQYiu3awNXpsFCw6qFwmiKAVPa6b13vCdolhXnrIiuR77jY1LQnKh9hXpoRzsg==
+  dependencies:
+    "@sentry/core" "9.22.0"
+
 "@sentry-internal/feedback@7.120.3":
   version "7.120.3"
   resolved "https://registry.yarnpkg.com/@sentry-internal/feedback/-/feedback-7.120.3.tgz#e37c9fe42f361963710c040727dcc8975fbd0fcd"
@@ -5019,6 +5026,13 @@
     "@sentry/core" "7.120.3"
     "@sentry/types" "7.120.3"
     "@sentry/utils" "7.120.3"
+
+"@sentry-internal/feedback@9.22.0":
+  version "9.22.0"
+  resolved "https://registry.yarnpkg.com/@sentry-internal/feedback/-/feedback-9.22.0.tgz#760f86903fde91a840bc77fc104b39a873301983"
+  integrity sha512-zgMVkoC61fgi41zLcSZA59vOtKxcLrKBo1ECYhPD1hxEaneNqY5fhXDwlQBw96P5l2yqkgfX6YZtSdU4ejI9yA==
+  dependencies:
+    "@sentry/core" "9.22.0"
 
 "@sentry-internal/replay-canvas@7.120.3":
   version "7.120.3"
@@ -5029,6 +5043,22 @@
     "@sentry/replay" "7.120.3"
     "@sentry/types" "7.120.3"
     "@sentry/utils" "7.120.3"
+
+"@sentry-internal/replay-canvas@9.22.0":
+  version "9.22.0"
+  resolved "https://registry.yarnpkg.com/@sentry-internal/replay-canvas/-/replay-canvas-9.22.0.tgz#431e289a5db247265e640a1e7aecf9ff2dba6a70"
+  integrity sha512-EcG9IMSEalFe49kowBTJObWjof/iHteDwpyuAszsFDdQUYATrVUtwpwN7o52vDYWJud4arhjrQnMamIGxa79eQ==
+  dependencies:
+    "@sentry-internal/replay" "9.22.0"
+    "@sentry/core" "9.22.0"
+
+"@sentry-internal/replay@9.22.0":
+  version "9.22.0"
+  resolved "https://registry.yarnpkg.com/@sentry-internal/replay/-/replay-9.22.0.tgz#e67ed6cee4cf481d428986e4419ee099669df9ef"
+  integrity sha512-9GOycoKbrclcRXfcbNV8svbmAsOS5R4wXBQmKF4pFLkmFA/lJv9kdZSNYkRvkrxdNfbMIJXP+DV9EqTZcryXig==
+  dependencies:
+    "@sentry-internal/browser-utils" "9.22.0"
+    "@sentry/core" "9.22.0"
 
 "@sentry-internal/tracing@7.120.3":
   version "7.120.3"
@@ -5057,6 +5087,17 @@
     "@sentry/replay" "7.120.3"
     "@sentry/types" "7.120.3"
     "@sentry/utils" "7.120.3"
+
+"@sentry/browser@9.22.0":
+  version "9.22.0"
+  resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-9.22.0.tgz#6eee0c047612b35e7ab4960350a57ffcc51f76f4"
+  integrity sha512-3TeRm74dvX0JdjX0AgkQa+22iUHwHnY+Q6M05NZ+tDeCNHGK/mEBTeqquS1oQX67jWyuvYmG3VV6RJUxtG9Paw==
+  dependencies:
+    "@sentry-internal/browser-utils" "9.22.0"
+    "@sentry-internal/feedback" "9.22.0"
+    "@sentry-internal/replay" "9.22.0"
+    "@sentry-internal/replay-canvas" "9.22.0"
+    "@sentry/core" "9.22.0"
 
 "@sentry/bundler-plugin-core@3.5.0":
   version "3.5.0"
@@ -5134,6 +5175,11 @@
     "@sentry/types" "7.120.3"
     "@sentry/utils" "7.120.3"
 
+"@sentry/core@9.22.0":
+  version "9.22.0"
+  resolved "https://registry.yarnpkg.com/@sentry/core/-/core-9.22.0.tgz#b35113bcba24a6ae437c548c2cbac941302a60ef"
+  integrity sha512-ixvtKmPF42Y6ckGUbFlB54OWI75H2gO5UYHojO6eXFpS7xO3ZGgV/QH6wb40mWK+0w5XZ0233FuU9VpsuE6mKA==
+
 "@sentry/esbuild-plugin@3.5.0":
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/@sentry/esbuild-plugin/-/esbuild-plugin-3.5.0.tgz#2df2434d9a3dbb5dc61f6cb9dfea54f06c9818a4"
@@ -5172,15 +5218,13 @@
     detect-libc "^2.0.2"
     node-abi "^3.61.0"
 
-"@sentry/react@7.120.3":
-  version "7.120.3"
-  resolved "https://registry.yarnpkg.com/@sentry/react/-/react-7.120.3.tgz#4d11803db3fd6dadc265cd521151f4b7b36d20b1"
-  integrity sha512-BcpoK9dwblfb20xwjn/1DRtplvPEXFc3XCRkYSnTfnfZNU8yPOcVX4X2X0I8R+/gsg+MWiFOdEtXJ3FqpJiJ4Q==
+"@sentry/react@9.22.0":
+  version "9.22.0"
+  resolved "https://registry.yarnpkg.com/@sentry/react/-/react-9.22.0.tgz#4d9b3c011ced48a55ac32067caa1d5ad850b185c"
+  integrity sha512-mI43NnioBYdG5TiXqRlhV1feZs9bnrrl+k5HOHBK7VQtymaXO0fkcsRLZTkdSgLRLMJGasZuvVhq2xK+18QyWQ==
   dependencies:
-    "@sentry/browser" "7.120.3"
-    "@sentry/core" "7.120.3"
-    "@sentry/types" "7.120.3"
-    "@sentry/utils" "7.120.3"
+    "@sentry/browser" "9.22.0"
+    "@sentry/core" "9.22.0"
     hoist-non-react-statics "^3.3.2"
 
 "@sentry/replay@7.120.3":
