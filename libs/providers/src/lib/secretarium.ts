@@ -134,8 +134,12 @@ export const scpOps = {
                 }
             }
             await client.connect(node, connectionKey, trustKey);
-            logger.info(`Connected to Secretarium ${node}`);
+            const sessionInfo = client.getSessionInfo();
+            const connectionInfo = client.getConnectionInfo();
             const cryptoContext = client.getCryptoContext();
+            logger.info(`Connected to Secretarium ${node} (${connectionInfo.protocol}:${connectionInfo.protocolVersion}${connectionInfo.server ? ` via ${connectionInfo.server}:${connectionInfo.serverVersion}` : ''} - ${connectionInfo.serverComment})`);
+            if (sessionInfo.gatewaySessionId)
+                logger.info(`Session via gateway G:${sessionInfo.gatewaySessionId} S:${sessionInfo.sessionId} (N:${sessionInfo.nodeId})`);
             logger.info(`CS ${cryptoContext.type} (${cryptoContext.version})`);
             logger.info(`PK ${await connectionKey.getRawPublicKeyHex()}`);
             await getBackendVersions();

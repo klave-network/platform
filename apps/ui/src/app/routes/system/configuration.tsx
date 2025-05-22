@@ -10,13 +10,22 @@ import {
     useReactTable
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { UilSpinner } from '@iconscout/react-unicons';
+import { UilPen, UilSpinner } from '@iconscout/react-unicons';
 import api from '../../utils/api';
 
 function RunningConfiguration() {
 
     const tableContainerRef = useRef<HTMLDivElement>(null);
     const [sorting, setSorting] = useState<SortingState>([]);
+    const [editingNumber, setEditingNumber] = useState<string>();
+    const { mutate: mutateConfigVariable } = api.v0.system.setConfigurationVariable.useMutation({
+        onSuccess: () => {
+            setEditingNumber(undefined);
+        },
+        onError: (error) => {
+            console.error('Error updating configuration variable', error);
+        }
+    });
 
     //react-query has an useInfiniteQuery hook just for this situation!
     const { data, isLoading } = api.v0.system.getRunningConfiguration.useQuery();
@@ -30,10 +39,47 @@ function RunningConfiguration() {
             },
             {
                 accessorKey: 'value',
-                header: 'Value'
+                header: 'Value',
+                cell: ({ row }) => {
+                    const value = row.getValue<string>('value');
+                    if (editingNumber === row.id) {
+                        return (
+                            <input
+                                title='Edit'
+                                type='text'
+                                className='border border-gray-300 rounded-md p-1 w-full'
+                                defaultValue={value}
+                                onBlur={(e) => {
+                                    mutateConfigVariable({
+                                        name: row.getValue('name'),
+                                        value: e.target.value
+                                    });
+                                }}
+                            />
+                        );
+                    }
+                    return value;
+                }
+            },
+            {
+                header: ' ',
+                cell: ({ row }) => {
+                    return (
+                        <button
+                            type='button'
+                            title='Edit'
+                            className='btn btn-sm bg-transparent opacity-0 group-hover:opacity-100 h-8 items-center justify-center font-normal ml-auto'
+                            onClick={() => {
+                                setEditingNumber(row.id);
+                            }}
+                        >
+                            <UilPen className='inline-block h-4' color='grey' />
+                        </button>
+                    );
+                }
             }
         ],
-        []
+        [editingNumber, mutateConfigVariable]
     );
 
     //we must flatten the array of arrays from the useInfiniteQuery hook
@@ -148,7 +194,7 @@ function RunningConfiguration() {
                             {virtualRows.map(virtualRow => {
                                 const row = rows[virtualRow.index] as Row<AppResult>;
                                 return (
-                                    <tr key={row.id} className='hover:bg-slate-50'>
+                                    <tr key={row.id} className='hover:bg-slate-50 group'>
                                         {row.getVisibleCells().map(cell => {
                                             return (
                                                 <td key={cell.id} className='first-of-type:pl-3 p-2'>
