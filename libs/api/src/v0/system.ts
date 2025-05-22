@@ -1,5 +1,6 @@
 import { scpOps } from '@klave/providers';
 import { createTRPCRouter, publicProcedure } from '../trpc';
+import z from 'zod';
 
 export const systemRouter = createTRPCRouter({
     isSystemReady: publicProcedure
@@ -50,10 +51,30 @@ export const systemRouter = createTRPCRouter({
                     if (['KLAVE_SECRETARIUM_NODE'].includes(normKey))
                         return;
                     env[key] = normValue.substring(0, 10) + '***';
-                    return;
                 }
             });
             return env;
+        }),
+    setConfigurationVariable: publicProcedure
+        .input(z.object({
+            name: z.string(),
+            value: z.string()
+        }))
+        .mutation(async ({ ctx: { prisma, session: { user } }, input }) => {
+            if (user?.globalAdmin !== true)
+                return false;
+            if (input.name === 'KLAVE_MONGODB_URL'
+                || input.name === 'KLAVE_PROBOT_APPID'
+                || input.name === 'NODE_ENV'
+                || input.name === 'NODE'
+                || input.name === 'HOSTNAME'
+            )
+                return false;
+            await prisma.environment.updateMany({
+                where: { name: input.name },
+                data: { value: input.value }
+            });
+            return true;
         }),
     version: publicProcedure
         .query(async () => {
