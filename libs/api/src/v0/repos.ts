@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { objectToCamel } from 'ts-case-convert';
 import { isTruthy } from '../utils/isTruthy';
 import type { DeployableRepo, GitHubToken, PrismaClient } from '@klave/db';
-import { getFinalParseConfig } from '@klave/constants';
+import { config, getFinalParseConfig } from '@klave/constants';
 import { probot } from '@klave/providers';
 
 export const reposRouter = createTRPCRouter({
@@ -68,8 +68,8 @@ export const reposRouter = createTRPCRouter({
                             'Accept': 'application/json'
                         },
                         body: JSON.stringify({
-                            client_id: process.env['KLAVE_GITHUB_CLIENTID'],
-                            client_secret: process.env['KLAVE_GITHUB_CLIENTSECRET'],
+                            client_id: config.get('KLAVE_GITHUB_CLIENTID'),
+                            client_secret: config.get('KLAVE_GITHUB_CLIENTSECRET'),
                             grant_type: 'refreshToken',
                             refreshToken
                         })
@@ -262,8 +262,8 @@ export const reposRouter = createTRPCRouter({
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    client_id: process.env['KLAVE_GITHUB_CLIENTID'],
-                    client_secret: process.env['KLAVE_GITHUB_CLIENTSECRET'],
+                    client_id: config.get('KLAVE_GITHUB_CLIENTID'),
+                    client_secret: config.get('KLAVE_GITHUB_CLIENTSECRET'),
                     code
                 })
             });

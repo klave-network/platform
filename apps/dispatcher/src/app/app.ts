@@ -2,9 +2,9 @@ import { FastifyInstance, RouteHandler } from 'fastify';
 import type { WebSocket } from 'ws';
 import { v4 as uuid } from 'uuid';
 import { collection } from '../utils/mongo';
-import { getFinalParseUsage } from '@klave/constants';
+import { config, getFinalParseUsage } from '@klave/constants';
 
-const definitions = process.env.KLAVE_DISPATCH_ENDPOINTS?.split(',') ?? [];
+const definitions = config.get('KLAVE_DISPATCH_ENDPOINTS').split(',') ?? [];
 const endpoints = definitions.map(def => def.split('#') as [string, string]).filter(def => def.length === 2);
 const connectionPool = new Map<string, WebSocket>();
 
@@ -15,10 +15,10 @@ export interface AppOptions { }
 
 export async function app(fastify: FastifyInstance) {
 
-    const __hostname = process.env['HOSTNAME'] ?? 'unknown';
+    const __hostname = config.get('HOSTNAME', 'unknown');
 
     fastify.log.info(endpoints, 'Preparing for enpoints ');
-    const secrets = process.env.KLAVE_DISPATCH_SECRETS?.split(',') ?? [];
+    const secrets = config.get('KLAVE_DISPATCH_SECRETS').split(',') ?? [];
 
     fastify.get('/dev', { websocket: true }, (connection) => {
         connection.on('message', (data) => {

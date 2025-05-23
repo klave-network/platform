@@ -10,6 +10,7 @@ import passport from 'passport';
 import { v4 as uuid } from 'uuid';
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { prisma } from '@klave/db';
+import { config } from '@klave/constants';
 import { rateLimiterMiddleware } from './middleware/rateLimiter';
 import { morganLoggerMiddleware } from './middleware/morganLogger';
 import { probotMiddleware } from './middleware/probot';
@@ -25,13 +26,13 @@ import { permissiblePeers } from '@klave/constants';
 import { uiHosterMiddleware } from './middleware/uiHoster';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-const bhuiHostDomain = URL.parse(process.env['KLAVE_BHDUI_DOMAIN'] ?? '')?.host;
+const bhuiHostDomain = URL.parse(config.get('KLAVE_BHDUI_DOMAIN'))?.host;
 
 const app = express();
 
 export const start = async () => {
 
-    const __hostname = process.env['HOSTNAME'] ?? 'unknown';
+    const __hostname = config.get('HOSTNAME', 'unknown');
 
     app.use(sentryRequestMiddleware);
     app.use(sentryTracingMiddleware);
@@ -115,7 +116,7 @@ export const start = async () => {
     });
 
     const sessionOptions: session.SessionOptions = {
-        secret: process.env.KLAVE_EXPRESS_SESSION_SECRETS?.split(',') ?? [],
+        secret: config.get('KLAVE_EXPRESS_SESSION_SECRETS').split(',') ?? [],
         // Don't save session if unmodified
         resave: true,
         // Don't create session until something stored

@@ -221,8 +221,8 @@ export const organisationRouter = createTRPCRouter({
             if (!fetchedUser)
                 throw new Error('User does not exist');
 
-            const transporter = createTransport(process.env['KLAVE_SMTP_HOST']);
-            const [keySelector, domainName] = (process.env['KLAVE_DKIM_DOMAIN'] ?? '@').split('@');
+            const transporter = createTransport(config.get('KLAVE_SMTP_HOST'));
+            const [keySelector, domainName] = config.get('KLAVE_DKIM_DOMAIN', '@').split('@');
             const confirmationEmail = await render(OrganisationConfirmationEmail({ userSlug: fetchedUser.slug, orgSlug: slug }));
 
             if (!keySelector || !domainName)
@@ -233,14 +233,14 @@ export const organisationRouter = createTRPCRouter({
                 op: 'mailer.send',
                 description: 'Email Transport'
             }, async () => transporter.sendMail({
-                from: process.env['KLAVE_NOREPLY_ADDRESS'],
+                from: config.get('KLAVE_NOREPLY_ADDRESS'),
                 to: fetchedUser.emails[0], // unsure if we should send email to all addresses
                 subject: 'Your organisation is now live on Klave',
                 html: confirmationEmail,
                 dkim: {
                     domainName,
                     keySelector,
-                    privateKey: process.env['KLAVE_DKIM_PRIVATE_KEY'] ?? ''
+                    privateKey: config.get('KLAVE_DKIM_PRIVATE_KEY')
                 }
             }));
 

@@ -1,5 +1,5 @@
 export const config = {
-    get: (prop: string): string => {
-        return process.env[prop] ?? '';
+    get: (prop: string, fallback = ''): string => {
+        return config.get(prop) ?? fallback;
     }
 };

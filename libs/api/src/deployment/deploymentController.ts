@@ -494,7 +494,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                             if (error instanceof Error) {
                                 error = {
                                     message: error.message,
-                                    stack: process.env['NODE_ENV'] === 'development' ? error.stack : undefined
+                                    stack: config.get('NODE_ENV') === 'development' ? error.stack : undefined
                                 };
                             }
                             try {

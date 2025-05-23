@@ -13,7 +13,7 @@ import { DeploymentPushPayload } from '../types';
 import { Deployment, Repo, prisma } from '@klave/db';
 import { dummyMap } from './dummyVmFs';
 import { logger } from '@klave/providers';
-import { RepoConfigSchemaLatest, StagedOutputGroups } from '@klave/constants';
+import { config, RepoConfigSchemaLatest, StagedOutputGroups } from '@klave/constants';
 import { Worker } from 'node:worker_threads';
 import { watExtractorModuleFunction } from './watExtractorModule';
 import { createBuildHost } from './buildHost';
@@ -66,8 +66,8 @@ export class BuildMiniVM {
     private dependencies: Record<string, string> = {};
 
     constructor(private options: BuildMiniVMOptions) {
-        if (process.env['KLAVE_SQUID_URL'])
-            this.proxyAgent = new HttpsProxyAgent(process.env['KLAVE_SQUID_URL']);
+        if (config.get('KLAVE_SQUID_URL'))
+            this.proxyAgent = new HttpsProxyAgent(config.get('KLAVE_SQUID_URL'));
     }
 
     getContentSync(path: string): string | null {
@@ -398,7 +398,7 @@ export class BuildMiniVM {
                             this.usedDependencies['@klave/compiler'] = {
                                 version: '*',
                                 digests: {
-                                    ['git:*']: process.env['GIT_REPO_COMMIT'] ?? 'unknown'
+                                    ['git:*']: config.get('GIT_REPO_COMMIT', 'unknown')
                                 }
                             };
                             this.usedDependencies['assemblyscript'] = {

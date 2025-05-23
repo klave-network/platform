@@ -1,5 +1,6 @@
 import WebSocket from 'ws';
 import { logger } from './logger';
+import { config } from '@klave/constants';
 
 let reconnectAttempt = 0;
 let pingInterval: NodeJS.Timeout | undefined = undefined;
@@ -20,8 +21,8 @@ const planReconnection = async () => {
 export const dispatchOps = {
     initialize: async () => {
         try {
-            const dispatcherWs = process.env['KLAVE_DISPATCH_WS'] || 'ws://klave.dispatch.127.0.0.1.nip.io:3334';
-            const dispatcherSecret = process.env['KLAVE_DISPATCH_SECRET'];
+            const dispatcherWs = config.get('KLAVE_DISPATCH_WS', 'ws://klave.dispatch.127.0.0.1.nip.io:3334');
+            const dispatcherSecret = config.get('KLAVE_DISPATCH_SECRET');
 
             if (!dispatcherSecret) {
                 logger.error('Dispatcher secret is not set');
