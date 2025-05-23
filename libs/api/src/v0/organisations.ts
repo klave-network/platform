@@ -3,7 +3,7 @@ import * as Sentry from '@sentry/node';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import { Organisation } from '@klave/db';
 import { scp } from '@klave/providers';
-import { reservedNames } from '@klave/constants';
+import { config, reservedNames } from '@klave/constants';
 import { createTransport } from 'nodemailer';
 import { render } from '@react-email/components';
 import { OrganisationConfirmationEmail } from '@klave/ui-kit';
@@ -380,7 +380,7 @@ export const organisationRouter = createTRPCRouter({
                 description: 'Secretarium Task'
             }, async () => {
                 return await new Promise((resolve, reject) => {
-                    scp.newTx('wasm-manager', 'add_kredit', `klave-app-set-kredit-${application.id}`, {
+                    scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'add_kredit', `klave-app-set-kredit-${application.id}`, {
                         app_id: application.id,
                         kredit: amount
                     }).onResult(result => {

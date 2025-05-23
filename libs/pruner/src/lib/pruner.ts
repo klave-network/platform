@@ -2,7 +2,7 @@ import { trace } from '@sentry/core';
 import { prisma } from '@klave/db';
 import { Context, createCallerFactory, router } from '@klave/api';
 import { logger, scp, scpOps } from '@klave/providers';
-import { KlaveGetCreditResult } from '@klave/constants';
+import { config, KlaveGetCreditResult } from '@klave/constants';
 
 let intervalTimer: NodeJS.Timeout;
 
@@ -181,7 +181,7 @@ async function __unusedReconcileApplicationKredits() {
         return new Promise((resolve, reject) => {
             if (!scpOps.isConnected())
                 return reject('Secretarium is not connected');
-            scp.newTx<KlaveGetCreditResult>('wasm-manager', 'get_kredit', `klave-app-get-kredit-${application.id}`, {
+            scp.newTx<KlaveGetCreditResult>(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_kredit', `klave-app-get-kredit-${application.id}`, {
                 app_id: application.id
             }).onResult((result) => {
                 resolve(result);

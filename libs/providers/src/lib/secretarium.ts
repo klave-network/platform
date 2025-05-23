@@ -1,7 +1,7 @@
 import { SCP, Key, Constants, EncryptedKeyPair } from '@secretarium/connector';
 import { prisma } from '@klave/db';
 import { logger } from './logger';
-import { BackendVersion } from '@klave/constants';
+import { BackendVersion, config } from '@klave/constants';
 
 export const defaultSCPOptions: ConstructorParameters<typeof SCP>[0] = {
     logger: process.env['NODE_ENV'] === 'development' ? {
@@ -53,7 +53,7 @@ const getBackendVersions = async () => {
         const previousSecretariumWasmVersion = secretariumWasmVersion;
         const previousSecretariumCoreBuild = secretariumBackendVersions?.core_version?.build_number;
         const previousSecretariumWasmBuild = secretariumBackendVersions?.wasm_version?.build_number;
-        const version = await client.newTx<BackendVersion>('wasm-manager', 'version', 'version', '').send().catch((e) => {
+        const version = await client.newTx<BackendVersion>(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'version', 'version', '').send().catch((e) => {
             console.error(e);
         });
         secretariumBackendVersions = version?.version;
@@ -72,15 +72,15 @@ const getBackendVersions = async () => {
 
 const getKreditPipelineInformation = async () => {
     if (client.isConnected()) {
-        await client.newTx('wasm-manager', 'configure_kredit_reporting', 'configure_kredit_reporting', {
+        await client.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'configure_kredit_reporting', 'configure_kredit_reporting', {
             report_url: process.env['KLAVE_KREDIT_REPORTING_URL']
         }).send().catch((e) => {
             console.error(e);
         });
-        const kreditReportPK = (await client.newTx('wasm-manager', 'get_kredit_pk', 'get_kredit_pk', '').send().catch((e) => {
+        const kreditReportPK = (await client.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_kredit_pk', 'get_kredit_pk', '').send().catch((e) => {
             console.error(e);
         }))?.pk;
-        const kreditCosts = (await client.newTx('wasm-manager', 'get_kredit_costs', 'get_kredit_costs', '').send().catch((e) => {
+        const kreditCosts = (await client.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_kredit_costs', 'get_kredit_costs', '').send().catch((e) => {
             console.error(e);
         }))?.kredit_costs;
 
