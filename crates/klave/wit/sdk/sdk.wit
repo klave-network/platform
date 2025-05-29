@@ -21,6 +21,8 @@ interface sdk {
     read-ledger: func(table: string, key: list<u8>) -> result<list<u8>, string>;
     write-ledger: func(table: string, key: list<u8>, value: list<u8>) -> result<_, string>;
     remove-from-ledger: func(table: string, key: list<u8>) -> result<_, string>;
+    list-keys-from-ledger: func(table: string) -> result<list<string>, string>;
+    key-exists-in-ledger: func(table: string, key: list<u8>) -> result<bool, string>;
 
     // LLM - Inference
     load-lightgbm-model: func(name: string, model: string) -> result<_, string>;

@@ -52,6 +52,17 @@ impl Table {
     pub fn remove(&self, key: &str) -> Result<(), Box<dyn Error>> {
         sdk::remove_from_ledger(&self.name, key.as_bytes()).map_err(Into::into)
     }
+
+    /// List all keys in the table
+    pub fn list_keys(&self) -> Result<Vec<String>, Box<dyn Error>> {
+        sdk::list_keys_from_ledger(&self.name).map_err(Into::into)
+    }
+
+    /// Check if a key exists in the table
+    pub fn exists(&self, key: &str) -> Result<bool, Box<dyn Error>> {
+        sdk::key_exists_in_ledger(&self.name, key.as_bytes())
+            .map_err(Into::into)
+    }
 }
 
 /// Retrieve a Table instance

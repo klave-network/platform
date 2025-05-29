@@ -444,6 +444,183 @@ pub mod klave {
                 }
             }
             #[allow(unused_unsafe, clippy::all)]
+            pub fn list_keys_from_ledger(
+                table: &str,
+            ) -> Result<_rt::Vec<_rt::String>, _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = table;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "list-keys-from-ledger"]
+                        fn wit_import2(_: *mut u8, _: usize, _: *mut u8);
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import2(_: *mut u8, _: usize, _: *mut u8) {
+                        unreachable!()
+                    }
+                    unsafe { wit_import2(ptr0.cast_mut(), len0, ptr1) };
+                    let l3 = i32::from(*ptr1.add(0).cast::<u8>());
+                    let result13 = match l3 {
+                        0 => {
+                            let e = {
+                                let l4 = *ptr1
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l5 = *ptr1
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let base9 = l4;
+                                let len9 = l5;
+                                let mut result9 = _rt::Vec::with_capacity(len9);
+                                for i in 0..len9 {
+                                    let base = base9
+                                        .add(i * (2 * ::core::mem::size_of::<*const u8>()));
+                                    let e9 = {
+                                        let l6 = *base.add(0).cast::<*mut u8>();
+                                        let l7 = *base
+                                            .add(::core::mem::size_of::<*const u8>())
+                                            .cast::<usize>();
+                                        let len8 = l7;
+                                        let bytes8 = _rt::Vec::from_raw_parts(
+                                            l6.cast(),
+                                            len8,
+                                            len8,
+                                        );
+                                        _rt::string_lift(bytes8)
+                                    };
+                                    result9.push(e9);
+                                }
+                                _rt::cabi_dealloc(
+                                    base9,
+                                    len9 * (2 * ::core::mem::size_of::<*const u8>()),
+                                    ::core::mem::size_of::<*const u8>(),
+                                );
+                                result9
+                            };
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l10 = *ptr1
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l11 = *ptr1
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len12 = l11;
+                                let bytes12 = _rt::Vec::from_raw_parts(
+                                    l10.cast(),
+                                    len12,
+                                    len12,
+                                );
+                                _rt::string_lift(bytes12)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result13
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn key_exists_in_ledger(
+                table: &str,
+                key: &[u8],
+            ) -> Result<bool, _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = table;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let vec1 = key;
+                    let ptr1 = vec1.as_ptr().cast::<u8>();
+                    let len1 = vec1.len();
+                    let ptr2 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "key-exists-in-ledger"]
+                        fn wit_import3(
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                        );
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import3(
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                    ) {
+                        unreachable!()
+                    }
+                    unsafe {
+                        wit_import3(ptr0.cast_mut(), len0, ptr1.cast_mut(), len1, ptr2)
+                    };
+                    let l4 = i32::from(*ptr2.add(0).cast::<u8>());
+                    let result9 = match l4 {
+                        0 => {
+                            let e = {
+                                let l5 = i32::from(
+                                    *ptr2.add(::core::mem::size_of::<*const u8>()).cast::<u8>(),
+                                );
+                                _rt::bool_lift(l5 as u8)
+                            };
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l6 = *ptr2
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l7 = *ptr2
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len8 = l7;
+                                let bytes8 = _rt::Vec::from_raw_parts(
+                                    l6.cast(),
+                                    len8,
+                                    len8,
+                                );
+                                _rt::string_lift(bytes8)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result9
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
             /// LLM - Inference
             pub fn load_lightgbm_model(
                 name: &str,
@@ -3301,6 +3478,24 @@ mod _rt {
             unsafe { core::hint::unreachable_unchecked() }
         }
     }
+    pub unsafe fn cabi_dealloc(ptr: *mut u8, size: usize, align: usize) {
+        if size == 0 {
+            return;
+        }
+        let layout = alloc::Layout::from_size_align_unchecked(size, align);
+        alloc::dealloc(ptr, layout);
+    }
+    pub unsafe fn bool_lift(val: u8) -> bool {
+        if cfg!(debug_assertions) {
+            match val {
+                0 => false,
+                1 => true,
+                _ => panic!("invalid bool discriminant"),
+            }
+        } else {
+            val != 0
+        }
+    }
     pub fn as_i32<T: AsI32>(t: T) -> i32 {
         t.as_i32()
     }
@@ -3360,17 +3555,6 @@ mod _rt {
             self as i32
         }
     }
-    pub unsafe fn bool_lift(val: u8) -> bool {
-        if cfg!(debug_assertions) {
-            match val {
-                0 => false,
-                1 => true,
-                _ => panic!("invalid bool discriminant"),
-            }
-        } else {
-            val != 0
-        }
-    }
     pub fn as_i64<T: AsI64>(t: T) -> i64 {
         t.as_i64()
     }
@@ -3395,6 +3579,7 @@ mod _rt {
         }
     }
     extern crate alloc as alloc_crate;
+    pub use alloc_crate::alloc;
 }
 #[cfg(target_arch = "wasm32")]
 #[unsafe(
@@ -3402,54 +3587,55 @@ mod _rt {
 )]
 #[doc(hidden)]
 #[allow(clippy::octal_escapes)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 2295] = *b"\
-\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xf7\x10\x01A\x02\x01\
-A\x02\x01BW\x01@\x01\x0aquery-names\x01\0\x04\0\x0eadd-user-query\x01\0\x01@\x01\
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 2384] = *b"\
+\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xd0\x11\x01A\x02\x01\
+A\x02\x01B]\x01@\x01\x0aquery-names\x01\0\x04\0\x0eadd-user-query\x01\0\x01@\x01\
 \x10transaction-names\x01\0\x04\0\x14add-user-transaction\x01\x01\x01@\x01\x03ms\
 gs\x01\0\x04\0\x06notify\x01\x02\x04\0\x0cnotify-error\x01\x02\x04\0\x11on-succe\
 ss-notify\x01\x02\x01j\x01s\x01s\x01@\x01\x05params\0\x03\x04\0\x0dquery-context\
 \x01\x04\x01p}\x01j\x01\x05\x01s\x01@\x02\x05tables\x03key\x05\0\x06\x04\0\x0bre\
 ad-ledger\x01\x07\x01j\0\x01s\x01@\x03\x05tables\x03key\x05\x05value\x05\0\x08\x04\
 \0\x0cwrite-ledger\x01\x09\x01@\x02\x05tables\x03key\x05\0\x08\x04\0\x12remove-f\
-rom-ledger\x01\x0a\x01@\x02\x04names\x05models\0\x08\x04\0\x13load-lightgbm-mode\
-l\x01\x0b\x01@\x01\x04names\0\x08\x04\0\x15unload-lightgbm-model\x01\x0c\x01pu\x01\
-j\x01\x0d\x01s\x01@\x03\x04names\x04data\x0d\x0anb-outputsz\0\x0e\x04\0\x19infer\
--from-lightgbm-model\x01\x0f\x01j\x01\x7f\x01s\x01@\x01\x08key-names\0\x10\x04\0\
-\x0akey-exists\x01\x11\x01@\x05\x08key-names\x09algorithmz\x0dalgo-metadatas\x0b\
-extractablez\x06usages\x05\0\x03\x04\0\x0cgenerate-key\x01\x12\x01@\x07\x08key-n\
+rom-ledger\x01\x0a\x01ps\x01j\x01\x0b\x01s\x01@\x01\x05tables\0\x0c\x04\0\x15lis\
+t-keys-from-ledger\x01\x0d\x01j\x01\x7f\x01s\x01@\x02\x05tables\x03key\x05\0\x0e\
+\x04\0\x14key-exists-in-ledger\x01\x0f\x01@\x02\x04names\x05models\0\x08\x04\0\x13\
+load-lightgbm-model\x01\x10\x01@\x01\x04names\0\x08\x04\0\x15unload-lightgbm-mod\
+el\x01\x11\x01pu\x01j\x01\x12\x01s\x01@\x03\x04names\x04data\x12\x0anb-outputsz\0\
+\x13\x04\0\x19infer-from-lightgbm-model\x01\x14\x01@\x01\x08key-names\0\x0e\x04\0\
+\x0akey-exists\x01\x15\x01@\x05\x08key-names\x09algorithmz\x0dalgo-metadatas\x0b\
+extractablez\x06usages\x05\0\x03\x04\0\x0cgenerate-key\x01\x16\x01@\x07\x08key-n\
 ames\x0akey-formatz\x08key-data\x05\x09algorithmz\x0dalgo-metadatas\x0bextractab\
-lez\x06usages\x05\0\x03\x04\0\x0aimport-key\x01\x13\x01@\x02\x08key-names\x0akey\
--formatz\0\x06\x04\0\x0aexport-key\x01\x14\x01@\x01\x08key-names\0\x06\x04\0\x0e\
-get-public-key\x01\x15\x01@\x01\x08key-names\0\x03\x04\0\x1bget-public-key-as-cr\
-yptokey\x01\x16\x01@\x07\x0dbase-key-names\x14derivation-algorithmz\x13derivatio\
+lez\x06usages\x05\0\x03\x04\0\x0aimport-key\x01\x17\x01@\x02\x08key-names\x0akey\
+-formatz\0\x06\x04\0\x0aexport-key\x01\x18\x01@\x01\x08key-names\0\x06\x04\0\x0e\
+get-public-key\x01\x19\x01@\x01\x08key-names\0\x03\x04\0\x1bget-public-key-as-cr\
+yptokey\x01\x1a\x01@\x07\x0dbase-key-names\x14derivation-algorithmz\x13derivatio\
 n-metadatas\x15derived-key-algorithmz\x14derived-key-metadatas\x0bextractablez\x06\
-usages\x05\0\x03\x04\0\x0aderive-key\x01\x17\x01@\x04\x08key-names\x0fencrypt-al\
-go-idz\x10encrypt-metadatas\x09plain-txt\x05\0\x06\x04\0\x07encrypt\x01\x18\x01@\
+usages\x05\0\x03\x04\0\x0aderive-key\x01\x1b\x01@\x04\x08key-names\x0fencrypt-al\
+go-idz\x10encrypt-metadatas\x09plain-txt\x05\0\x06\x04\0\x07encrypt\x01\x1c\x01@\
 \x04\x08key-names\x0fdecrypt-algo-idz\x10decrypt-metadatas\x0acipher-txt\x05\0\x06\
-\x04\0\x07decrypt\x01\x19\x01@\x04\x08key-names\x0csign-algo-idz\x0dsign-metadat\
-as\x03txt\x05\0\x06\x04\0\x04sign\x01\x1a\x01@\x05\x08key-names\x0csign-algo-idz\
-\x0dsign-metadatas\x03txt\x05\x09signature\x05\0\x10\x04\0\x06verify\x01\x1b\x01\
-@\x03\x07algo-idz\x0dhash-metadatas\x03txt\x05\0\x06\x04\0\x06digest\x01\x1c\x01\
+\x04\0\x07decrypt\x01\x1d\x01@\x04\x08key-names\x0csign-algo-idz\x0dsign-metadat\
+as\x03txt\x05\0\x06\x04\0\x04sign\x01\x1e\x01@\x05\x08key-names\x0csign-algo-idz\
+\x0dsign-metadatas\x03txt\x05\x09signature\x05\0\x0e\x04\0\x06verify\x01\x1f\x01\
+@\x03\x07algo-idz\x0dhash-metadatas\x03txt\x05\0\x06\x04\0\x06digest\x01\x20\x01\
 @\x0a\x10decrypt-key-names\x0fdecrypt-algo-idz\x10decrypt-metadatas\x12key-name-\
 to-imports\x0akey-formatz\x10wrapped-key-data\x05\x09algorithmz\x0dalgo-metadata\
-s\x0bextractablez\x06usages\x05\0\x03\x04\0\x0aunwrap-key\x01\x1d\x01@\x05\x12ke\
-y-name-to-exports\x0akey-formatz\x10encrypt-key-names\x0fencrypt-algo-idz\x10enc\
-rypt-metadatas\0\x06\x04\0\x08wrap-key\x01\x1e\x01@\x01\x08key-names\0\x08\x04\0\
-\x08save-key\x01\x1f\x01@\x01\x12key-persist-paramss\0\x08\x04\0\x0bpersist-key\x01\
-\x20\x04\0\x08load-key\x01\x16\x04\0\x0adelete-key\x01\x1f\x04\0\x1egenerate-sim\
-ple-encryption-key\x01\x1f\x04\0\x1bgenerate-simple-signing-key\x01\x1f\x01@\x02\
-\x08key-names\x09plain-txt\x05\0\x06\x04\0\x0esimple-encrypt\x01!\x01@\x02\x08ke\
-y-names\x0acipher-txt\x05\0\x06\x04\0\x0esimple-decrypt\x01\"\x01@\x02\x08key-na\
-mes\x03txt\x05\0\x06\x04\0\x0bsimple-sign\x01#\x01@\x03\x08key-names\x03txt\x05\x09\
-signature\x05\0\x10\x04\0\x0dsimple-verify\x01$\x01@\x01\x03txt\x05\0\x06\x04\0\x0d\
-simple-digest\x01%\x01@\x01\x03lenz\0\x06\x04\0\x10get-random-bytes\x01&\x01@\x01\
-\x07requests\0\x03\x04\0\x0bhttps-query\x01'\x01@\x01\x09challenge\x05\0\x03\x04\
-\0\x09get-quote\x01(\x01@\x02\x0ccurrent-timex\x0cquote-binary\x05\0\x03\x04\0\x0c\
-verify-quote\x01)\x01@\0\x01\0\x04\0\x0fstart-recording\x01*\x04\0\x0estop-recor\
-ding\x01*\x04\0\x12cancel-transaction\x01*\x03\0\x0dklave:sdk/sdk\x05\0\x04\0\x1d\
-component:klave-sdk/klave-sdk\x04\0\x0b\x0f\x01\0\x09klave-sdk\x03\0\0\0G\x09pro\
-ducers\x01\x0cprocessed-by\x02\x0dwit-component\x070.227.1\x10wit-bindgen-rust\x06\
-0.41.0";
+s\x0bextractablez\x06usages\x05\0\x03\x04\0\x0aunwrap-key\x01!\x01@\x05\x12key-n\
+ame-to-exports\x0akey-formatz\x10encrypt-key-names\x0fencrypt-algo-idz\x10encryp\
+t-metadatas\0\x06\x04\0\x08wrap-key\x01\"\x01@\x01\x08key-names\0\x08\x04\0\x08s\
+ave-key\x01#\x01@\x01\x12key-persist-paramss\0\x08\x04\0\x0bpersist-key\x01$\x04\
+\0\x08load-key\x01\x1a\x04\0\x0adelete-key\x01#\x04\0\x1egenerate-simple-encrypt\
+ion-key\x01#\x04\0\x1bgenerate-simple-signing-key\x01#\x01@\x02\x08key-names\x09\
+plain-txt\x05\0\x06\x04\0\x0esimple-encrypt\x01%\x01@\x02\x08key-names\x0acipher\
+-txt\x05\0\x06\x04\0\x0esimple-decrypt\x01&\x01@\x02\x08key-names\x03txt\x05\0\x06\
+\x04\0\x0bsimple-sign\x01'\x01@\x03\x08key-names\x03txt\x05\x09signature\x05\0\x0e\
+\x04\0\x0dsimple-verify\x01(\x01@\x01\x03txt\x05\0\x06\x04\0\x0dsimple-digest\x01\
+)\x01@\x01\x03lenz\0\x06\x04\0\x10get-random-bytes\x01*\x01@\x01\x07requests\0\x03\
+\x04\0\x0bhttps-query\x01+\x01@\x01\x09challenge\x05\0\x03\x04\0\x09get-quote\x01\
+,\x01@\x02\x0ccurrent-timex\x0cquote-binary\x05\0\x03\x04\0\x0cverify-quote\x01-\
+\x01@\0\x01\0\x04\0\x0fstart-recording\x01.\x04\0\x0estop-recording\x01.\x04\0\x12\
+cancel-transaction\x01.\x03\0\x0dklave:sdk/sdk\x05\0\x04\0\x1dcomponent:klave-sd\
+k/klave-sdk\x04\0\x0b\x0f\x01\0\x09klave-sdk\x03\0\0\0G\x09producers\x01\x0cproc\
+essed-by\x02\x0dwit-component\x070.227.1\x10wit-bindgen-rust\x060.41.0";
 #[inline(never)]
 #[doc(hidden)]
 pub fn __link_custom_section_describing_imports() {
