@@ -61,6 +61,7 @@ pub enum KeyAlgorithm {
     SecpK1 = 1,
     Aes = 2,
     Rsa = 3,
+    Hmac = 4,
 }
 
 serialize_copy!(KeyAlgorithm);
@@ -110,6 +111,7 @@ pub enum SigningAlgorithm {
     Ecdsa,
     Schnorr,
     RsaPss,
+    Hmac,
 }
 serialize_copy!(SigningAlgorithm);
 deserialize_copy!(SigningAlgorithm,
