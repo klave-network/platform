@@ -80,7 +80,7 @@
         "@radix-ui/react-select": "2.2.4",
         "@radix-ui/react-tabs": "1.1.11",
         "@radix-ui/react-tooltip": "1.2.6",
-        "@react-email/components": "^0.0.38",
+        "@react-email/components": "^0.0.39",
         "@react-email/render": "^1.1.0",
         "@react-email/tailwind": "^1.0.5",
         "@secretarium/connector": "0.19.1",
