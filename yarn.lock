@@ -16435,10 +16435,10 @@ react-dom@19.1.0, react-dom@^19:
   dependencies:
     scheduler "^0.26.0"
 
-react-email@4.0.11:
-  version "4.0.11"
-  resolved "https://registry.yarnpkg.com/react-email/-/react-email-4.0.11.tgz#5fcea73315cb73716c2b88a99ffe12300dbc6196"
-  integrity sha512-t/8ZlVSOXVlmtbLLAinTePYefdx1FipPiu9a4RmFar7vizevrDoTNz8mEzOBEMTJp/OhloP3UOkLJN0iCjBDrg==
+react-email@4.0.13:
+  version "4.0.13"
+  resolved "https://registry.yarnpkg.com/react-email/-/react-email-4.0.13.tgz#0b9ea48f617615126d48e5608b7af01e4ede109e"
+  integrity sha512-U858xl3mferQ3nkkCA5mG9tkAMuMpdVFS4bU8TLZv8eG6+kQDGI9gbfB+YVpD+IzUjJZB2ft+LBsEs4k0Sav9A==
   dependencies:
     "@babel/parser" "^7.27.0"
     "@babel/traverse" "^7.27.0"
