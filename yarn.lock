@@ -3925,10 +3925,10 @@
     "@octokit/request-error" "^6.1.7"
     "@octokit/webhooks-methods" "^5.1.1"
 
-"@oddbird/popover-polyfill@^0.4.4":
-  version "0.4.4"
-  resolved "https://registry.yarnpkg.com/@oddbird/popover-polyfill/-/popover-polyfill-0.4.4.tgz#6f87d81861c37bb1ff983b7522adfad3c2210232"
-  integrity sha512-n9q0ZXYRct6aYmOjjF5E+i5i0RSjVCkoKDJWILzJAkDBk4jmWOAZFjQfExtcAiJa0buX/Lx/CzBdGgiSSAlbrw==
+"@oddbird/popover-polyfill@^0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@oddbird/popover-polyfill/-/popover-polyfill-0.5.2.tgz#9a142cae54b6e48824bec61e94e39541c9746b69"
+  integrity sha512-iFrvar5SOMtKFOSjYvs4z9UlLqDdJbMx0mgISLcPedv+g0ac5sgeETLGtipHCVIae6HJPclNEH5aCyD1RZaEHw==
 
 "@oxc-resolver/binding-darwin-arm64@5.3.0":
   version "5.3.0"
@@ -4224,29 +4224,29 @@
   resolved "https://registry.yarnpkg.com/@primer/octicons-react/-/octicons-react-19.15.1.tgz#d1407f586e1cb4cc08bedc22ab3444030c970391"
   integrity sha512-U9g8sj2ON2cKF1jvs3cEfhW51BNkOXjbdi5qPMSY5e4T7KVKR1gK9BZ/gpB4oTqkjoL2dikaWXdnH8vhwyR6lg==
 
-"@primer/primitives@9.x || 10.x":
-  version "10.6.0"
-  resolved "https://registry.yarnpkg.com/@primer/primitives/-/primitives-10.6.0.tgz#0c1a0f122da468d9b2667872d2fdc3c8865d6720"
-  integrity sha512-W5fyBRS/Q0TVSkhaOQ5W4psAXfXhPoWzdgzDQz0lTyNFZTUM8+LbW6xEAigYusiFl15aMPZCLJ/fZlUDOUvvyg==
+"@primer/primitives@10.x || 11.x":
+  version "10.7.0"
+  resolved "https://registry.yarnpkg.com/@primer/primitives/-/primitives-10.7.0.tgz#76b18cf020b0a3246a9f498ab9641b65e33e10de"
+  integrity sha512-732Dq7c4znkewwRkXldV0NLLppfGrDJHPXsXO2QLHwJxKLwi2icKkzcOR77vb5g0ThObZJrRqlB/4DYajIiyyQ==
 
-"@primer/react@^37.22.0":
-  version "37.22.0"
-  resolved "https://registry.yarnpkg.com/@primer/react/-/react-37.22.0.tgz#3f1c37b1e9ab7c4e464b7ce24f5df548bc6a11bd"
-  integrity sha512-DB/EYTx5A8OctihvjZhK/h/0GUmqooMHoE4a5bl91Rcq8z2+vwPmi/ldZ1ACoClg7ePhLgZzPTGliYKBE2zk9w==
+"@primer/react@^37.23.0":
+  version "37.25.0"
+  resolved "https://registry.yarnpkg.com/@primer/react/-/react-37.25.0.tgz#ba8c4f4b760053c89e85f57bea31e2b5eac7f290"
+  integrity sha512-43QcjCDuyHUb62Lgk9at+/zUdJaD7zTiwarQpMSgfvBvnIqDsIQvBOQrD9keBMTOkjokDnx78qNRwWkhWbhsZg==
   dependencies:
     "@github/relative-time-element" "^4.4.5"
     "@github/tab-container-element" "4.8.2"
     "@lit-labs/react" "1.2.1"
-    "@oddbird/popover-polyfill" "^0.4.4"
+    "@oddbird/popover-polyfill" "^0.5.2"
     "@primer/behaviors" "^1.8.0"
     "@primer/live-region-element" "^0.7.1"
     "@primer/octicons-react" "^19.13.0"
-    "@primer/primitives" "9.x || 10.x"
+    "@primer/primitives" "10.x || 11.x"
     "@styled-system/css" "^5.1.5"
     "@styled-system/props" "^5.1.5"
     "@styled-system/theme-get" "^5.1.2"
     "@types/react-is" "^18.2.1"
-    "@types/styled-system" "^5.1.12"
+    "@types/styled-system" "^5.1.23"
     "@types/styled-system__css" "^5.0.16"
     "@types/styled-system__theme-get" "^5.0.1"
     clsx "^2.1.1"
@@ -7033,7 +7033,7 @@
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-2.0.3.tgz#6209321eb2c1712a7e7466422b8cb1fc0d9dd5d8"
   integrity sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==
 
-"@types/styled-system@^5.1.12":
+"@types/styled-system@^5.1.23":
   version "5.1.23"
   resolved "https://registry.yarnpkg.com/@types/styled-system/-/styled-system-5.1.23.tgz#6b1db0fc9518f7aadfa4462dbd43813d02e24208"
   integrity sha512-mIwCCdhDa2ifdQCEm8ZeD8m4UEbFsokqEoT9YNOUv4alUJ8jbMKxvpr+oOwfuZgwqLh5HjWuEzwnX7DzWvjFBg==
