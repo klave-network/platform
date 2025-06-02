@@ -9,6 +9,12 @@ import * as Crypto from "./crypto"
 export { Crypto }
 import * as Attestation from "./attestation"
 export { Attestation }
+import * as LLM from "./llm/llm"
+export { LLM }
+import * as FileSystem from "./file_system/file_system"
+export { FileSystem }
+import * as PostgreSQL from "./postgre_sql/postgre_sql"
+export { PostgreSQL }
 
 // @ts-ignore: decorator
 @external("env", "add_user_query")
@@ -46,6 +52,7 @@ declare function runtime_unload_lightgbm_model(name: ArrayBuffer, error: ArrayBu
 // @ts-ignore: decorator
 @external("env", "infer_from_lightgbm_model")
 declare function runtime_infer_from_lightgbm_model(name: ArrayBuffer, data: ArrayBuffer, data_size: i32, nb_outputs: i32, result: ArrayBuffer, result_size: i32): i32;
+
 // @ts-ignore: decorator
 @external("env", "https_query")
 declare function https_query_raw(query: ArrayBuffer, result: ArrayBuffer, result_size: i32): i32;

@@ -120,6 +120,7 @@
         "express": "4.21.2",
         "express-session": "1.18.1",
         "fakemail-guard": "1.0.0",
+        "file-entry-cache": "^10",
         "fs-extra": "^11.3.0",
         "github-username": "9.0.0",
         "helmet": "8.1.0",
@@ -130,6 +131,7 @@
         "imurmurhash": "^0.1.4",
         "latest-version": "9.0.0",
         "localforage": "1.10.0",
+        "memfs": "^4",
         "mongodb": "6.16.0",
         "morgan": "1.10.0",
         "multer": "2.0.0",
@@ -171,6 +173,7 @@
         "validate-npm-package-name": "6.0.0",
         "visitor-as": "^0.11.4",
         "wabt": "1.0.37",
+        "webpack": "^5",
         "winston": "3.17.0",
         "ws": "8.18.2",
         "zod": "^3.25.20"
@@ -280,6 +283,6 @@
         "vitest": "^3.1.4"
     },
     "engines": {
-        "node": "^24"
+        "node": "^22"
     }
 }

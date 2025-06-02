@@ -3230,6 +3230,1380 @@ pub mod klave {
                 }
             }
             #[allow(unused_unsafe, clippy::all)]
+            /// PostGreSql
+            pub fn pgsql_connection_open(uri: &str) -> Result<(), _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = uri;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "pgsql-connection-open"]
+                        fn wit_import2(_: *mut u8, _: usize, _: *mut u8);
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import2(_: *mut u8, _: usize, _: *mut u8) {
+                        unreachable!()
+                    }
+                    unsafe { wit_import2(ptr0.cast_mut(), len0, ptr1) };
+                    let l3 = i32::from(*ptr1.add(0).cast::<u8>());
+                    let result7 = match l3 {
+                        0 => {
+                            let e = ();
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l4 = *ptr1
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l5 = *ptr1
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len6 = l5;
+                                let bytes6 = _rt::Vec::from_raw_parts(
+                                    l4.cast(),
+                                    len6,
+                                    len6,
+                                );
+                                _rt::string_lift(bytes6)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result7
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn pgsql_query(
+                connection: &str,
+                query: &str,
+            ) -> Result<_rt::String, _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = connection;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let vec1 = query;
+                    let ptr1 = vec1.as_ptr().cast::<u8>();
+                    let len1 = vec1.len();
+                    let ptr2 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "pgsql-query"]
+                        fn wit_import3(
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                        );
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import3(
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                    ) {
+                        unreachable!()
+                    }
+                    unsafe {
+                        wit_import3(ptr0.cast_mut(), len0, ptr1.cast_mut(), len1, ptr2)
+                    };
+                    let l4 = i32::from(*ptr2.add(0).cast::<u8>());
+                    let result11 = match l4 {
+                        0 => {
+                            let e = {
+                                let l5 = *ptr2
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l6 = *ptr2
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len7 = l6;
+                                let bytes7 = _rt::Vec::from_raw_parts(
+                                    l5.cast(),
+                                    len7,
+                                    len7,
+                                );
+                                _rt::string_lift(bytes7)
+                            };
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l8 = *ptr2
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l9 = *ptr2
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len10 = l9;
+                                let bytes10 = _rt::Vec::from_raw_parts(
+                                    l8.cast(),
+                                    len10,
+                                    len10,
+                                );
+                                _rt::string_lift(bytes10)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result11
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn pgsql_exec(
+                connection: &str,
+                command: &str,
+            ) -> Result<_rt::String, _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = connection;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let vec1 = command;
+                    let ptr1 = vec1.as_ptr().cast::<u8>();
+                    let len1 = vec1.len();
+                    let ptr2 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "pgsql-exec"]
+                        fn wit_import3(
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                        );
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import3(
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                    ) {
+                        unreachable!()
+                    }
+                    unsafe {
+                        wit_import3(ptr0.cast_mut(), len0, ptr1.cast_mut(), len1, ptr2)
+                    };
+                    let l4 = i32::from(*ptr2.add(0).cast::<u8>());
+                    let result11 = match l4 {
+                        0 => {
+                            let e = {
+                                let l5 = *ptr2
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l6 = *ptr2
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len7 = l6;
+                                let bytes7 = _rt::Vec::from_raw_parts(
+                                    l5.cast(),
+                                    len7,
+                                    len7,
+                                );
+                                _rt::string_lift(bytes7)
+                            };
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l8 = *ptr2
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l9 = *ptr2
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len10 = l9;
+                                let bytes10 = _rt::Vec::from_raw_parts(
+                                    l8.cast(),
+                                    len10,
+                                    len10,
+                                );
+                                _rt::string_lift(bytes10)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result11
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            /// SecretLlama
+            pub fn graph_models() -> Result<_rt::Vec<_rt::String>, _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "graph-models"]
+                        fn wit_import1(_: *mut u8);
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import1(_: *mut u8) {
+                        unreachable!()
+                    }
+                    unsafe { wit_import1(ptr0) };
+                    let l2 = i32::from(*ptr0.add(0).cast::<u8>());
+                    let result12 = match l2 {
+                        0 => {
+                            let e = {
+                                let l3 = *ptr0
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l4 = *ptr0
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let base8 = l3;
+                                let len8 = l4;
+                                let mut result8 = _rt::Vec::with_capacity(len8);
+                                for i in 0..len8 {
+                                    let base = base8
+                                        .add(i * (2 * ::core::mem::size_of::<*const u8>()));
+                                    let e8 = {
+                                        let l5 = *base.add(0).cast::<*mut u8>();
+                                        let l6 = *base
+                                            .add(::core::mem::size_of::<*const u8>())
+                                            .cast::<usize>();
+                                        let len7 = l6;
+                                        let bytes7 = _rt::Vec::from_raw_parts(
+                                            l5.cast(),
+                                            len7,
+                                            len7,
+                                        );
+                                        _rt::string_lift(bytes7)
+                                    };
+                                    result8.push(e8);
+                                }
+                                _rt::cabi_dealloc(
+                                    base8,
+                                    len8 * (2 * ::core::mem::size_of::<*const u8>()),
+                                    ::core::mem::size_of::<*const u8>(),
+                                );
+                                result8
+                            };
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l9 = *ptr0
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l10 = *ptr0
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len11 = l10;
+                                let bytes11 = _rt::Vec::from_raw_parts(
+                                    l9.cast(),
+                                    len11,
+                                    len11,
+                                );
+                                _rt::string_lift(bytes11)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result12
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn graph_tokenizers() -> Result<_rt::Vec<_rt::String>, _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "graph-tokenizers"]
+                        fn wit_import1(_: *mut u8);
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import1(_: *mut u8) {
+                        unreachable!()
+                    }
+                    unsafe { wit_import1(ptr0) };
+                    let l2 = i32::from(*ptr0.add(0).cast::<u8>());
+                    let result12 = match l2 {
+                        0 => {
+                            let e = {
+                                let l3 = *ptr0
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l4 = *ptr0
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let base8 = l3;
+                                let len8 = l4;
+                                let mut result8 = _rt::Vec::with_capacity(len8);
+                                for i in 0..len8 {
+                                    let base = base8
+                                        .add(i * (2 * ::core::mem::size_of::<*const u8>()));
+                                    let e8 = {
+                                        let l5 = *base.add(0).cast::<*mut u8>();
+                                        let l6 = *base
+                                            .add(::core::mem::size_of::<*const u8>())
+                                            .cast::<usize>();
+                                        let len7 = l6;
+                                        let bytes7 = _rt::Vec::from_raw_parts(
+                                            l5.cast(),
+                                            len7,
+                                            len7,
+                                        );
+                                        _rt::string_lift(bytes7)
+                                    };
+                                    result8.push(e8);
+                                }
+                                _rt::cabi_dealloc(
+                                    base8,
+                                    len8 * (2 * ::core::mem::size_of::<*const u8>()),
+                                    ::core::mem::size_of::<*const u8>(),
+                                );
+                                result8
+                            };
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l9 = *ptr0
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l10 = *ptr0
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len11 = l10;
+                                let bytes11 = _rt::Vec::from_raw_parts(
+                                    l9.cast(),
+                                    len11,
+                                    len11,
+                                );
+                                _rt::string_lift(bytes11)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result12
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn graph_load(
+                input: &str,
+                encoding: i32,
+                target: i32,
+            ) -> Result<(), _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = input;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "graph-load"]
+                        fn wit_import2(_: *mut u8, _: usize, _: i32, _: i32, _: *mut u8);
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import2(
+                        _: *mut u8,
+                        _: usize,
+                        _: i32,
+                        _: i32,
+                        _: *mut u8,
+                    ) {
+                        unreachable!()
+                    }
+                    unsafe {
+                        wit_import2(
+                            ptr0.cast_mut(),
+                            len0,
+                            _rt::as_i32(&encoding),
+                            _rt::as_i32(&target),
+                            ptr1,
+                        )
+                    };
+                    let l3 = i32::from(*ptr1.add(0).cast::<u8>());
+                    let result7 = match l3 {
+                        0 => {
+                            let e = ();
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l4 = *ptr1
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l5 = *ptr1
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len6 = l5;
+                                let bytes6 = _rt::Vec::from_raw_parts(
+                                    l4.cast(),
+                                    len6,
+                                    len6,
+                                );
+                                _rt::string_lift(bytes6)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result7
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn graph_load_by_name(input: &str) -> Result<(), _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = input;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "graph-load-by-name"]
+                        fn wit_import2(_: *mut u8, _: usize, _: *mut u8);
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import2(_: *mut u8, _: usize, _: *mut u8) {
+                        unreachable!()
+                    }
+                    unsafe { wit_import2(ptr0.cast_mut(), len0, ptr1) };
+                    let l3 = i32::from(*ptr1.add(0).cast::<u8>());
+                    let result7 = match l3 {
+                        0 => {
+                            let e = ();
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l4 = *ptr1
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l5 = *ptr1
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len6 = l5;
+                                let bytes6 = _rt::Vec::from_raw_parts(
+                                    l4.cast(),
+                                    len6,
+                                    len6,
+                                );
+                                _rt::string_lift(bytes6)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result7
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn graph_unload_by_name(input: &str) -> Result<(), _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = input;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "graph-unload-by-name"]
+                        fn wit_import2(_: *mut u8, _: usize, _: *mut u8);
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import2(_: *mut u8, _: usize, _: *mut u8) {
+                        unreachable!()
+                    }
+                    unsafe { wit_import2(ptr0.cast_mut(), len0, ptr1) };
+                    let l3 = i32::from(*ptr1.add(0).cast::<u8>());
+                    let result7 = match l3 {
+                        0 => {
+                            let e = ();
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l4 = *ptr1
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l5 = *ptr1
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len6 = l5;
+                                let bytes6 = _rt::Vec::from_raw_parts(
+                                    l4.cast(),
+                                    len6,
+                                    len6,
+                                );
+                                _rt::string_lift(bytes6)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result7
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn graph_init_execution_context(
+                input: &str,
+            ) -> Result<_rt::String, _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = input;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "graph-init-execution-context"]
+                        fn wit_import2(_: *mut u8, _: usize, _: *mut u8);
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import2(_: *mut u8, _: usize, _: *mut u8) {
+                        unreachable!()
+                    }
+                    unsafe { wit_import2(ptr0.cast_mut(), len0, ptr1) };
+                    let l3 = i32::from(*ptr1.add(0).cast::<u8>());
+                    let result10 = match l3 {
+                        0 => {
+                            let e = {
+                                let l4 = *ptr1
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l5 = *ptr1
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len6 = l5;
+                                let bytes6 = _rt::Vec::from_raw_parts(
+                                    l4.cast(),
+                                    len6,
+                                    len6,
+                                );
+                                _rt::string_lift(bytes6)
+                            };
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l7 = *ptr1
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l8 = *ptr1
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len9 = l8;
+                                let bytes9 = _rt::Vec::from_raw_parts(
+                                    l7.cast(),
+                                    len9,
+                                    len9,
+                                );
+                                _rt::string_lift(bytes9)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result10
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn graph_delete_execution_context(
+                context_name: &str,
+            ) -> Result<(), _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = context_name;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "graph-delete-execution-context"]
+                        fn wit_import2(_: *mut u8, _: usize, _: *mut u8);
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import2(_: *mut u8, _: usize, _: *mut u8) {
+                        unreachable!()
+                    }
+                    unsafe { wit_import2(ptr0.cast_mut(), len0, ptr1) };
+                    let l3 = i32::from(*ptr1.add(0).cast::<u8>());
+                    let result7 = match l3 {
+                        0 => {
+                            let e = ();
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l4 = *ptr1
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l5 = *ptr1
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len6 = l5;
+                                let bytes6 = _rt::Vec::from_raw_parts(
+                                    l4.cast(),
+                                    len6,
+                                    len6,
+                                );
+                                _rt::string_lift(bytes6)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result7
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn graph_delete_all_execution_contexts() -> Result<(), _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "graph-delete-all-execution-contexts"]
+                        fn wit_import1(_: *mut u8);
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import1(_: *mut u8) {
+                        unreachable!()
+                    }
+                    unsafe { wit_import1(ptr0) };
+                    let l2 = i32::from(*ptr0.add(0).cast::<u8>());
+                    let result6 = match l2 {
+                        0 => {
+                            let e = ();
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l3 = *ptr0
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l4 = *ptr0
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len5 = l4;
+                                let bytes5 = _rt::Vec::from_raw_parts(
+                                    l3.cast(),
+                                    len5,
+                                    len5,
+                                );
+                                _rt::string_lift(bytes5)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result6
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn inference_compute(
+                input: &str,
+                input_tensor: &[u8],
+            ) -> Result<_rt::Vec<u8>, _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = input;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let vec1 = input_tensor;
+                    let ptr1 = vec1.as_ptr().cast::<u8>();
+                    let len1 = vec1.len();
+                    let ptr2 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "inference-compute"]
+                        fn wit_import3(
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                        );
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import3(
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                    ) {
+                        unreachable!()
+                    }
+                    unsafe {
+                        wit_import3(ptr0.cast_mut(), len0, ptr1.cast_mut(), len1, ptr2)
+                    };
+                    let l4 = i32::from(*ptr2.add(0).cast::<u8>());
+                    let result11 = match l4 {
+                        0 => {
+                            let e = {
+                                let l5 = *ptr2
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l6 = *ptr2
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len7 = l6;
+                                _rt::Vec::from_raw_parts(l5.cast(), len7, len7)
+                            };
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l8 = *ptr2
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l9 = *ptr2
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len10 = l9;
+                                let bytes10 = _rt::Vec::from_raw_parts(
+                                    l8.cast(),
+                                    len10,
+                                    len10,
+                                );
+                                _rt::string_lift(bytes10)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result11
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn inference_add_prompt(
+                context_name: &str,
+                prompt: &[u8],
+            ) -> Result<(), _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = context_name;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let vec1 = prompt;
+                    let ptr1 = vec1.as_ptr().cast::<u8>();
+                    let len1 = vec1.len();
+                    let ptr2 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "inference-add-prompt"]
+                        fn wit_import3(
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                        );
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import3(
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                    ) {
+                        unreachable!()
+                    }
+                    unsafe {
+                        wit_import3(ptr0.cast_mut(), len0, ptr1.cast_mut(), len1, ptr2)
+                    };
+                    let l4 = i32::from(*ptr2.add(0).cast::<u8>());
+                    let result8 = match l4 {
+                        0 => {
+                            let e = ();
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l5 = *ptr2
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l6 = *ptr2
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len7 = l6;
+                                let bytes7 = _rt::Vec::from_raw_parts(
+                                    l5.cast(),
+                                    len7,
+                                    len7,
+                                );
+                                _rt::string_lift(bytes7)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result8
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn inference_get_piece(
+                context_name: &str,
+            ) -> Result<_rt::Vec<u8>, _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = context_name;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "inference-get-piece"]
+                        fn wit_import2(_: *mut u8, _: usize, _: *mut u8);
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import2(_: *mut u8, _: usize, _: *mut u8) {
+                        unreachable!()
+                    }
+                    unsafe { wit_import2(ptr0.cast_mut(), len0, ptr1) };
+                    let l3 = i32::from(*ptr1.add(0).cast::<u8>());
+                    let result10 = match l3 {
+                        0 => {
+                            let e = {
+                                let l4 = *ptr1
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l5 = *ptr1
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len6 = l5;
+                                _rt::Vec::from_raw_parts(l4.cast(), len6, len6)
+                            };
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l7 = *ptr1
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l8 = *ptr1
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len9 = l8;
+                                let bytes9 = _rt::Vec::from_raw_parts(
+                                    l7.cast(),
+                                    len9,
+                                    len9,
+                                );
+                                _rt::string_lift(bytes9)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result10
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn inference_get_aggregate_embeddings(
+                context_name: &str,
+                window_size: i32,
+                agg_rule: i32,
+            ) -> Result<_rt::Vec<u8>, _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = context_name;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "inference-get-aggregate-embeddings"]
+                        fn wit_import2(_: *mut u8, _: usize, _: i32, _: i32, _: *mut u8);
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import2(
+                        _: *mut u8,
+                        _: usize,
+                        _: i32,
+                        _: i32,
+                        _: *mut u8,
+                    ) {
+                        unreachable!()
+                    }
+                    unsafe {
+                        wit_import2(
+                            ptr0.cast_mut(),
+                            len0,
+                            _rt::as_i32(&window_size),
+                            _rt::as_i32(&agg_rule),
+                            ptr1,
+                        )
+                    };
+                    let l3 = i32::from(*ptr1.add(0).cast::<u8>());
+                    let result10 = match l3 {
+                        0 => {
+                            let e = {
+                                let l4 = *ptr1
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l5 = *ptr1
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len6 = l5;
+                                _rt::Vec::from_raw_parts(l4.cast(), len6, len6)
+                            };
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l7 = *ptr1
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l8 = *ptr1
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len9 = l8;
+                                let bytes9 = _rt::Vec::from_raw_parts(
+                                    l7.cast(),
+                                    len9,
+                                    len9,
+                                );
+                                _rt::string_lift(bytes9)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result10
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn inference_encode(
+                context_name: &str,
+                prompt: &[u8],
+            ) -> Result<_rt::Vec<u8>, _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = context_name;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let vec1 = prompt;
+                    let ptr1 = vec1.as_ptr().cast::<u8>();
+                    let len1 = vec1.len();
+                    let ptr2 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "inference-encode"]
+                        fn wit_import3(
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                        );
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import3(
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                    ) {
+                        unreachable!()
+                    }
+                    unsafe {
+                        wit_import3(ptr0.cast_mut(), len0, ptr1.cast_mut(), len1, ptr2)
+                    };
+                    let l4 = i32::from(*ptr2.add(0).cast::<u8>());
+                    let result11 = match l4 {
+                        0 => {
+                            let e = {
+                                let l5 = *ptr2
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l6 = *ptr2
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len7 = l6;
+                                _rt::Vec::from_raw_parts(l5.cast(), len7, len7)
+                            };
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l8 = *ptr2
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l9 = *ptr2
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len10 = l9;
+                                let bytes10 = _rt::Vec::from_raw_parts(
+                                    l8.cast(),
+                                    len10,
+                                    len10,
+                                );
+                                _rt::string_lift(bytes10)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result11
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn inference_decode(
+                context_name: &str,
+                token_ids: &[u8],
+            ) -> Result<_rt::Vec<u8>, _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = context_name;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let vec1 = token_ids;
+                    let ptr1 = vec1.as_ptr().cast::<u8>();
+                    let len1 = vec1.len();
+                    let ptr2 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "inference-decode"]
+                        fn wit_import3(
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                        );
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import3(
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                    ) {
+                        unreachable!()
+                    }
+                    unsafe {
+                        wit_import3(ptr0.cast_mut(), len0, ptr1.cast_mut(), len1, ptr2)
+                    };
+                    let l4 = i32::from(*ptr2.add(0).cast::<u8>());
+                    let result11 = match l4 {
+                        0 => {
+                            let e = {
+                                let l5 = *ptr2
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l6 = *ptr2
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len7 = l6;
+                                _rt::Vec::from_raw_parts(l5.cast(), len7, len7)
+                            };
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l8 = *ptr2
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l9 = *ptr2
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len10 = l9;
+                                let bytes10 = _rt::Vec::from_raw_parts(
+                                    l8.cast(),
+                                    len10,
+                                    len10,
+                                );
+                                _rt::string_lift(bytes10)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result11
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn inference_ingest(
+                context_name: &str,
+                token_ids: &[u8],
+            ) -> Result<(), _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = context_name;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let vec1 = token_ids;
+                    let ptr1 = vec1.as_ptr().cast::<u8>();
+                    let len1 = vec1.len();
+                    let ptr2 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "klave:sdk/sdk")]
+                    unsafe extern "C" {
+                        #[link_name = "inference-ingest"]
+                        fn wit_import3(
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                        );
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import3(
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                    ) {
+                        unreachable!()
+                    }
+                    unsafe {
+                        wit_import3(ptr0.cast_mut(), len0, ptr1.cast_mut(), len1, ptr2)
+                    };
+                    let l4 = i32::from(*ptr2.add(0).cast::<u8>());
+                    let result8 = match l4 {
+                        0 => {
+                            let e = ();
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l5 = *ptr2
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l6 = *ptr2
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len7 = l6;
+                                let bytes7 = _rt::Vec::from_raw_parts(
+                                    l5.cast(),
+                                    len7,
+                                    len7,
+                                );
+                                _rt::string_lift(bytes7)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result8
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
             /// Subscription
             pub fn start_recording() -> () {
                 unsafe {
@@ -3394,7 +4768,15 @@ mod _rt {
             self as i64
         }
     }
+    pub unsafe fn cabi_dealloc(ptr: *mut u8, size: usize, align: usize) {
+        if size == 0 {
+            return;
+        }
+        let layout = alloc::Layout::from_size_align_unchecked(size, align);
+        alloc::dealloc(ptr, layout);
+    }
     extern crate alloc as alloc_crate;
+    pub use alloc_crate::alloc;
 }
 #[cfg(target_arch = "wasm32")]
 #[unsafe(
@@ -3402,9 +4784,9 @@ mod _rt {
 )]
 #[doc(hidden)]
 #[allow(clippy::octal_escapes)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 2295] = *b"\
-\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xf7\x10\x01A\x02\x01\
-A\x02\x01BW\x01@\x01\x0aquery-names\x01\0\x04\0\x0eadd-user-query\x01\0\x01@\x01\
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 3087] = *b"\
+\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\x8f\x17\x01A\x02\x01\
+A\x02\x01B{\x01@\x01\x0aquery-names\x01\0\x04\0\x0eadd-user-query\x01\0\x01@\x01\
 \x10transaction-names\x01\0\x04\0\x14add-user-transaction\x01\x01\x01@\x01\x03ms\
 gs\x01\0\x04\0\x06notify\x01\x02\x04\0\x0cnotify-error\x01\x02\x04\0\x11on-succe\
 ss-notify\x01\x02\x01j\x01s\x01s\x01@\x01\x05params\0\x03\x04\0\x0dquery-context\
@@ -3445,11 +4827,26 @@ signature\x05\0\x10\x04\0\x0dsimple-verify\x01$\x01@\x01\x03txt\x05\0\x06\x04\0\
 simple-digest\x01%\x01@\x01\x03lenz\0\x06\x04\0\x10get-random-bytes\x01&\x01@\x01\
 \x07requests\0\x03\x04\0\x0bhttps-query\x01'\x01@\x01\x09challenge\x05\0\x03\x04\
 \0\x09get-quote\x01(\x01@\x02\x0ccurrent-timex\x0cquote-binary\x05\0\x03\x04\0\x0c\
-verify-quote\x01)\x01@\0\x01\0\x04\0\x0fstart-recording\x01*\x04\0\x0estop-recor\
-ding\x01*\x04\0\x12cancel-transaction\x01*\x03\0\x0dklave:sdk/sdk\x05\0\x04\0\x1d\
-component:klave-sdk/klave-sdk\x04\0\x0b\x0f\x01\0\x09klave-sdk\x03\0\0\0G\x09pro\
-ducers\x01\x0cprocessed-by\x02\x0dwit-component\x070.227.1\x10wit-bindgen-rust\x06\
-0.41.0";
+verify-quote\x01)\x01@\x01\x03uris\0\x08\x04\0\x15pgsql-connection-open\x01*\x01\
+@\x02\x0aconnections\x05querys\0\x03\x04\0\x0bpgsql-query\x01+\x01@\x02\x0aconne\
+ctions\x07commands\0\x03\x04\0\x0apgsql-exec\x01,\x01ps\x01j\x01-\x01s\x01@\0\0.\
+\x04\0\x0cgraph-models\x01/\x04\0\x10graph-tokenizers\x01/\x01@\x03\x05inputs\x08\
+encodingz\x06targetz\0\x08\x04\0\x0agraph-load\x010\x01@\x01\x05inputs\0\x08\x04\
+\0\x12graph-load-by-name\x011\x04\0\x14graph-unload-by-name\x011\x01@\x01\x05inp\
+uts\0\x03\x04\0\x1cgraph-init-execution-context\x012\x01@\x01\x0ccontext-names\0\
+\x08\x04\0\x1egraph-delete-execution-context\x013\x01@\0\0\x08\x04\0#graph-delet\
+e-all-execution-contexts\x014\x01@\x02\x05inputs\x0cinput-tensor\x05\0\x06\x04\0\
+\x11inference-compute\x015\x01@\x02\x0ccontext-names\x06prompt\x05\0\x08\x04\0\x14\
+inference-add-prompt\x016\x01@\x01\x0ccontext-names\0\x06\x04\0\x13inference-get\
+-piece\x017\x01@\x03\x0ccontext-names\x0bwindow-sizez\x08agg-rulez\0\x06\x04\0\"\
+inference-get-aggregate-embeddings\x018\x01@\x02\x0ccontext-names\x06prompt\x05\0\
+\x06\x04\0\x10inference-encode\x019\x01@\x02\x0ccontext-names\x09token-ids\x05\0\
+\x06\x04\0\x10inference-decode\x01:\x01@\x02\x0ccontext-names\x09token-ids\x05\0\
+\x08\x04\0\x10inference-ingest\x01;\x01@\0\x01\0\x04\0\x0fstart-recording\x01<\x04\
+\0\x0estop-recording\x01<\x04\0\x12cancel-transaction\x01<\x03\0\x0dklave:sdk/sd\
+k\x05\0\x04\0\x1dcomponent:klave-sdk/klave-sdk\x04\0\x0b\x0f\x01\0\x09klave-sdk\x03\
+\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.227.1\x10wit-\
+bindgen-rust\x060.41.0";
 #[inline(never)]
 #[doc(hidden)]
 pub fn __link_custom_section_describing_imports() {

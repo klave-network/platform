@@ -4758,6 +4758,15 @@
     prettier "^3.5.3"
     react-promise-suspense "^0.3.4"
 
+"@react-email/render@^1.0.6":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@react-email/render/-/render-1.1.0.tgz#62db5fa271a695503ec750f262b798a65446337c"
+  integrity sha512-X4CsHvXi5X7kTn5NgXNGg8Y5U1VtVJmlpNLlTc2E8RVHKFS3bpr+o/ZXhEPN4yRkdY+ZYN5eqVTV922Hujqsxw==
+  dependencies:
+    html-to-text "^9.0.5"
+    prettier "^3.5.3"
+    react-promise-suspense "^0.3.4"
+
 "@react-email/row@0.0.12":
   version "0.0.12"
   resolved "https://registry.yarnpkg.com/@react-email/row/-/row-0.0.12.tgz#c9d18f6d4b173e95787949909a48ad5a5633bbf2"
