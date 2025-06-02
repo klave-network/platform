@@ -68,11 +68,28 @@ interface sdk {
     get-quote: func(challenge: list<u8>) -> result<string, string>;
     verify-quote: func(current-time: s64, quote-binary: list<u8>) -> result<string, string>;
 
+    //PostGreSql
+    pgsql-connection-open: func(uri: string) -> result<_, string>;
+    pgsql-query: func(connection: string, query: string) -> result<string, string>;
+    pgsql-exec: func(connection: string, command: string) -> result<string, string>;
+
     //SecretLlama
+    graph-models: func() -> result<list<string>, string>;
+    graph-tokenizers: func() -> result<list<string>, string>;
     graph-load: func(input: string, encoding: s32, target: s32) -> result<_, string>;
     graph-load-by-name: func(input: string) -> result<_, string>;
-    graph-init-execution-context: func(input: string) -> result<_, string>;
-    inference-compute: func(input: string, input-tensor: string) -> result<string, string>;
+    graph-unload-by-name: func(input: string) -> result<_, string>;
+    graph-init-execution-context: func(input: string) -> result<string, string>;
+    graph-delete-execution-context: func(context-name: string) -> result<_, string>;
+    graph-delete-all-execution-contexts: func() -> result<_, string>;
+
+    inference-compute: func(input: string, input-tensor: list<u8>) -> result<list<u8>, string>;
+    inference-add-prompt: func(context-name: string, prompt: list<u8>) -> result<_, string>;
+    inference-get-piece: func(context-name: string) -> result<list<u8>, string>;
+    inference-get-aggregate-embeddings: func(context-name: string, window-size: s32, agg-rule: s32) -> result<list<u8>, string>;
+    inference-encode: func(context-name: string, prompt: list<u8>) -> result<list<u8>, string>;
+    inference-decode: func(context-name: string, token-ids: list<u8>) -> result<list<u8>, string>;
+    inference-ingest: func(context-name: string, token-ids: list<u8>) -> result<_, string>;
 
     //Subscription
     start-recording: func();
