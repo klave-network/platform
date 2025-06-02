@@ -13,6 +13,8 @@ import * as LLM from "./llm/llm"
 export { LLM }
 import * as FileSystem from "./file_system/file_system"
 export { FileSystem }
+import * as PostgreSQL from "./postgre_sql/postgre_sql"
+export { PostgreSQL }
 
 // @ts-ignore: decorator
 @external("env", "add_user_query")
