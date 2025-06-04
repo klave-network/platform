@@ -496,7 +496,7 @@ export class SubtleCrypto {
             if (algorithm.name != 'ECDH')
                 return { data: null, err: new Error('Invalid ECDH parameters: invalid algorithm') };
 
-            const derivationMetadataEcdh = {public_key: algorithm.publicKey} as idlV1.derivation_ecdh_metadata;
+            const derivationMetadataEcdh = {public_key: algorithm.publicKey} as idlV1.ecdh_derivation_metadata;
 
             if (derivedKeyAlgorithm instanceof AesKeyGenParams) {
                 const aesMetadata = CryptoUtil.getAESMetadata(derivedKeyAlgorithm);

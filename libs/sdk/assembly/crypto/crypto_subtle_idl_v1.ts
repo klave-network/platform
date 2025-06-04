@@ -175,7 +175,7 @@ export class hmac_signature_metadata {
 }
 
 @json
-export class derivation_ecdh_metadata {
+export class ecdh_derivation_metadata {
     public_key!: string;
 }
 
