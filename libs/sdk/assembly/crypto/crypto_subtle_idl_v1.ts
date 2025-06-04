@@ -175,6 +175,11 @@ export class hmac_signature_metadata {
 }
 
 @json
+export class ecdh_derivation_metadata {
+    public_key!: string;
+}
+
+@json
 export class signature_info {
     algo_id!: signing_algorithm;
     algo_metadata!: string;
