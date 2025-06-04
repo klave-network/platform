@@ -12,16 +12,21 @@ import { Result } from '../index';
 declare function wasm_key_exists(key_name: ArrayBuffer, result: ArrayBuffer, result_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "encrypt")
-declare function wasm_encrypt(key_name: ArrayBuffer, encrypt_algo_id: i32, encrypt_metadata: ArrayBuffer, clear_text: ArrayBuffer, clear_text_size: i32, cipher_text: ArrayBuffer, cipher_text_size: i32): i32;
+declare function wasm_encrypt(key_name: ArrayBuffer, encrypt_algo_id: i32, encrypt_metadata: ArrayBuffer,
+    clear_text: ArrayBuffer, clear_text_size: i32, cipher_text: ArrayBuffer, cipher_text_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "decrypt")
-declare function wasm_decrypt(key_name: ArrayBuffer, decrypt_algo_id: i32, decrypt_metadata: ArrayBuffer, cipher_text: ArrayBuffer, cipher_text_size: i32, clear_text: ArrayBuffer, clear_text_size: i32): i32;
+declare function wasm_decrypt(key_name: ArrayBuffer, decrypt_algo_id: i32, decrypt_metadata: ArrayBuffer,
+    cipher_text: ArrayBuffer, cipher_text_size: i32, clear_text: ArrayBuffer, clear_text_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "generate_key")
-declare function wasm_generate_key(key_name: ArrayBuffer, key_algo_id: i32, key_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32, error: ArrayBuffer, error_size: i32): i32;
+declare function wasm_generate_key(key_name: ArrayBuffer, key_algo_id: i32, key_metadata: ArrayBuffer,
+    extractable: i32, usages: ArrayBuffer, usages_size: i32, error: ArrayBuffer, error_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "import_key")
-declare function wasm_import_key(key_name: ArrayBuffer, key_format: i32, key_data: ArrayBuffer, key_data_size: i32, key_algo_id: i32, key_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32, error: ArrayBuffer, error_size: i32): i32;
+declare function wasm_import_key(key_name: ArrayBuffer, key_format: i32, key_data: ArrayBuffer,
+    key_data_size: i32, key_algo_id: i32, key_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32,
+    error: ArrayBuffer, error_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "export_key")
 declare function wasm_export_key(key_name: ArrayBuffer, key_format: i32, key: ArrayBuffer, key_size: i32): i32;
@@ -33,19 +38,30 @@ declare function wasm_get_public_key(key_name: ArrayBuffer, result: ArrayBuffer,
 declare function wasm_get_public_key_as_cryptokey(key_name: ArrayBuffer, result: ArrayBuffer, result_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "sign")
-declare function wasm_sign(key_name: ArrayBuffer, sign_algo_id: i32, sign_metadata: ArrayBuffer, text: ArrayBuffer, text_size: i32, signature: ArrayBuffer, signature_size: i32): i32;
+declare function wasm_sign(key_name: ArrayBuffer, sign_algo_id: i32, sign_metadata: ArrayBuffer,
+    text: ArrayBuffer, text_size: i32, signature: ArrayBuffer, signature_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "verify")
-declare function wasm_verify(key_name: ArrayBuffer, sign_algo_id: i32, sign_metadata: ArrayBuffer, text: ArrayBuffer, text_size: i32, signature: ArrayBuffer, signature_size: i32, result: ArrayBuffer, result_size: i32): i32;
+declare function wasm_verify(key_name: ArrayBuffer, sign_algo_id: i32, sign_metadata: ArrayBuffer,
+    text: ArrayBuffer, text_size: i32, signature: ArrayBuffer, signature_size: i32, result: ArrayBuffer, result_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "digest")
-declare function wasm_digest(hash_algo_id: i32, hash_metadata: ArrayBuffer, text: ArrayBuffer, text_size: i32, digest: ArrayBuffer, digest_size: i32): i32;
+declare function wasm_digest(hash_algo_id: i32, hash_metadata: ArrayBuffer, text: ArrayBuffer, text_size: i32,
+    digest: ArrayBuffer, digest_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "unwrap_key")
-declare function wasm_unwrap_key(decryption_key_name: ArrayBuffer, encrypt_algo_id: i32, encrypt_metadata: ArrayBuffer, key_name_to_import: ArrayBuffer, key_format: i32, key_data: ArrayBuffer, key_data_size: i32, key_algo_id: i32, key_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32, error: ArrayBuffer, error_size: i32): i32;
+declare function wasm_unwrap_key(decryption_key_name: ArrayBuffer, encrypt_algo_id: i32, encrypt_metadata: ArrayBuffer,
+    key_name_to_import: ArrayBuffer, key_format: i32, key_data: ArrayBuffer, key_data_size: i32, key_algo_id: i32,
+    key_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32, error: ArrayBuffer, error_size: i32): i32;
 // @ts-ignore: decorator
 @external("env", "wrap_key")
-declare function wasm_wrap_key(key_name_to_export: ArrayBuffer, key_format: i32, encryption_key_name: ArrayBuffer, encrypt_algo_id: i32, encrypt_metadata: ArrayBuffer, key: ArrayBuffer, key_size: i32): i32;
+declare function wasm_wrap_key(key_name_to_export: ArrayBuffer, key_format: i32, encryption_key_name: ArrayBuffer,
+    encrypt_algo_id: i32, encrypt_metadata: ArrayBuffer, key: ArrayBuffer, key_size: i32): i32;
+// @ts-ignore: decorator
+@external("env", "derive_key")
+declare function wasm_derive_key(base_key_name: ArrayBuffer, derivation_algo_id: i32, derivation_metadata: ArrayBuffer,
+    derived_key_algo_id: i32, derived_key_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32,
+    error: ArrayBuffer, error_size: i32): i32;
 
 // @ts-ignore: decorator
 @external("env", "save_key")
@@ -287,6 +303,27 @@ export class CryptoImpl {
             return { data: null, err: new Error("Failed to wrap key : " + String.UTF8.decode(key.slice(0, -result))) };
 
         return { data: key.slice(0, result), err: null };
+    }
+
+    static deriveKey(baseKeyName: string, derivationAlgorithm: u32, derivationMetadata: string, derivedKeyAlgorithm: u32, derivedKeyMetadata: string, extractable: boolean, usages: string[]): Result<ArrayBuffer, Error> {
+        const local_usages = new Uint8Array(usages.length);
+        for (let i = 0; i < usages.length; i++) {
+            local_usages[i] = this.usage(usages[i]);
+        }
+
+        let buf = new ArrayBuffer(64);
+        let result = wasm_derive_key(String.UTF8.encode(baseKeyName, true), derivationAlgorithm, String.UTF8.encode(derivationMetadata, true), derivedKeyAlgorithm, String.UTF8.encode(derivedKeyMetadata, true),
+            extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength, buf, buf.byteLength);
+        if (abs(result) > buf.byteLength) {
+            // buffer not big enough, retry with a properly sized one
+            buf = new ArrayBuffer(abs(result));
+            result = wasm_derive_key(String.UTF8.encode(baseKeyName, true), derivationAlgorithm, String.UTF8.encode(derivationMetadata, true), derivedKeyAlgorithm, String.UTF8.encode(derivedKeyMetadata, true),
+                extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength, buf, buf.byteLength);
+        }
+        if (result < 0)
+            return { data: null, err: new Error("Failed to derive key : " + String.UTF8.decode(buf.slice(0, -result))) };
+
+        return { data: buf.slice(0, result), err: null };
     }
 
     static getPublicKey(keyName: string): Result<ArrayBuffer, Error> {
