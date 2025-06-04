@@ -298,7 +298,7 @@ export class CryptoImpl {
             local_usages[i] = this.usage(usages[i]);
         }
 
-        let buf = new ArrayBuffer(64);
+        let buf = new ArrayBuffer(200);
         let result = wasm_derive_key(String.UTF8.encode(baseKeyName, true), derivationAlgorithm, String.UTF8.encode(derivationMetadata, true), derivedKeyAlgorithm, String.UTF8.encode(derivedKeyMetadata, true),
             extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength, buf, buf.byteLength);
         if (abs(result) > buf.byteLength) {
