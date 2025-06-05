@@ -70,6 +70,7 @@
         "@iconscout/react-unicons": "2.2.4",
         "@ideafast/idgen": "0.2.1",
         "@klave/as-json": "0.9.21",
+        "@modelcontextprotocol/sdk": "^1.12.1",
         "@monaco-editor/react": "4.7.0",
         "@nivo/geo": "0.98.0",
         "@primer/react": "^37.24.0",

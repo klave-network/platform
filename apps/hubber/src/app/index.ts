@@ -24,6 +24,7 @@ import { usersRouter } from './routes';
 import { webLinkerMiddlware } from './middleware/webLinker';
 import { permissiblePeers } from '@klave/constants';
 import { uiHosterMiddleware } from './middleware/uiHoster';
+import { mcpMiddleware } from './middleware/mcp';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 const bhuiHostDomain = URL.parse(config.get('KLAVE_BHDUI_DOMAIN'))?.host;
@@ -172,6 +173,7 @@ export const start = async () => {
     app.use(webLinkerMiddlware);
 
     app.use(passportLoginCheckMiddleware);
+    app.use('/mcp', mcpMiddleware);
     app.use('/trpc', trcpMiddlware);
     app.use(usersRouter);
     app.use(sentryErrorMiddleware);
