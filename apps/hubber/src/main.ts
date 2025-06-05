@@ -12,6 +12,10 @@ process.on('unhandledRejection', (reason, p) => {
     console.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
 });
 
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+});
+
 const onlineChain = async () => config.get('KLAVE_OFFLINE_DEV') === 'true'
     ? Promise.resolve()
     : Promise.resolve()
