@@ -478,7 +478,7 @@ const updateInstalledRepos = async (prisma: PrismaClient, octokit: Octokit) => {
 
         const installationOctokit = await probot.auth(installation.id);
         const repos = await installationOctokit.paginate(
-            installationOctokit.apps.listReposAccessibleToInstallation,
+            installationOctokit.rest.apps.listReposAccessibleToInstallation,
             {
                 per_page: 100
             }

@@ -36,7 +36,7 @@ export const probotOps = {
             });
 
             const octokit = await probotReference.auth();
-            await octokit.apps.listInstallations({
+            await octokit.rest.apps.listInstallations({
                 per_page: 1
             });
             logger.info('Connected to GitHub via Probot');

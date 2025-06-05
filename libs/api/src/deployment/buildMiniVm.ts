@@ -75,7 +75,7 @@ export class BuildMiniVM {
         return dummyMap[normalisedPath] ?? null;
     }
 
-    async getContent(path?: string, atAbsoluteRoot = false): Promise<Awaited<ReturnType<Context['octokit']['repos']['getContent']>> | { data: string | null }> {
+    async getContent(path?: string, atAbsoluteRoot = false): Promise<Awaited<ReturnType<Context['octokit']['rest']['repos']['getContent']>> | { data: string | null }> {
 
         const { context: { octokit, ...context }, repo } = this.options;
         const normalisedPath = path === '.' ? '' : path?.split(/[\\/]/).filter((s, i) => !(i === 0 && s === '.')).join(nodePath.posix.sep);
@@ -90,7 +90,7 @@ export class BuildMiniVM {
             });
             try {
                 const fetchRoot = (atAbsoluteRoot ? '' : this.options.application?.rootDir ?? '').replace(/\/*$/g, '');
-                return await octokit.repos.getContent({
+                return await octokit.rest.repos.getContent({
                     owner: repo.owner,
                     repo: repo.name,
                     ref: context.commit.ref,

@@ -15,12 +15,12 @@ import { createCallerFactory } from '../trpc';
 export const deployToSubstrate = async (deploymentContext: DeploymentContext<DeploymentPushPayload>, options?: { onlyApp?: string }) => {
 
     const { octokit, ...context } = deploymentContext;
-    let files: NonNullable<Awaited<ReturnType<typeof octokit.repos.compareCommits>>['data']['files']> = [];
+    let files: NonNullable<Awaited<ReturnType<typeof octokit.rest.repos.compareCommits>>['data']['files']> = [];
     let commit: Commit | null = null;
 
     if (context.commit.before) {
         try {
-            const { data } = await octokit.repos.compareCommits({
+            const { data } = await octokit.rest.repos.compareCommits({
                 owner: context.repo.owner,
                 repo: context.repo.name,
                 base: context.commit.before,
@@ -54,7 +54,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
 
     if (!files?.length) {
         try {
-            const { data } = await octokit.repos.getCommit({
+            const { data } = await octokit.rest.repos.getCommit({
                 owner: context.repo.owner,
                 repo: context.repo.name,
                 ref: context.commit.after
@@ -110,7 +110,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
     if (!repo)
         return;
 
-    const klaveConfigurationResponse = await octokit.repos.getContent({
+    const klaveConfigurationResponse = await octokit.rest.repos.getContent({
         owner: repo.owner,
         repo: repo.name,
         ref: context.commit.ref,

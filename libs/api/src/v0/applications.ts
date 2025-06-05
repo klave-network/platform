@@ -701,7 +701,7 @@ export const applicationRouter = createTRPCRouter({
 
                     const installationOctokit = await probot.auth(parseInt(deployableRepo.installationRemoteId));
 
-                    const lastCommits = await installationOctokit.repos.listCommits({
+                    const lastCommits = await installationOctokit.rest.repos.listCommits({
                         owner: deployableRepo.owner,
                         repo: deployableRepo.name,
                         per_page: 2
