@@ -159,7 +159,7 @@ export const authRouter = createTRPCRouter({
             if (hint.errors.includes('disposable'))
                 throw new Error('We do not accept disposable email addresses.');
 
-            const betaDomainsAllowed = config.get('KLAVE_BETA_DOMAIN_FILTER').split(',') ?? [];
+            const betaDomainsAllowed = config.get('KLAVE_BETA_DOMAIN_FILTER').split(',').filter(d => d.trim() !== '') ?? [];
             const emailDomain = hint.domain;
 
             if (!emailDomain || (betaDomainsAllowed.length > 0 && !betaDomainsAllowed.includes(emailDomain)))
@@ -347,8 +347,10 @@ export const authRouter = createTRPCRouter({
             if (hint.errors.includes('disposable'))
                 throw new Error('We do not accept disposable email addresses.');
 
-            const betaDomainsAllowed = config.get('KLAVE_BETA_DOMAIN_FILTER').split(',') ?? [];
+            const betaDomainsAllowed = config.get('KLAVE_BETA_DOMAIN_FILTER').split(',').filter(d => d.trim() !== '') ?? [];
             const emailDomain = hint.domain;
+
+            console.log('betaDomainsAllowed', betaDomainsAllowed);
 
             if (!emailDomain || (betaDomainsAllowed.length > 0 && !betaDomainsAllowed.includes(emailDomain)))
                 throw new Error('It looks like you are not part of Klave\'s beta program');
@@ -545,7 +547,7 @@ export const authRouter = createTRPCRouter({
             if (hint.errors.includes('disposable'))
                 throw new Error('We do not accept disposable email addresses.');
 
-            const betaDomainsAllowed = config.get('KLAVE_BETA_DOMAIN_FILTER').split(',') ?? [];
+            const betaDomainsAllowed = config.get('KLAVE_BETA_DOMAIN_FILTER').split(',').filter(d => d.trim() !== '') ?? [];
             const emailDomain = hint.domain;
 
             if (!emailDomain || (betaDomainsAllowed.length > 0 && !betaDomainsAllowed.includes(emailDomain)))
