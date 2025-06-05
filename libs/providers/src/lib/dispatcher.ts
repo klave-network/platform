@@ -1,6 +1,7 @@
 import WebSocket from 'ws';
 import { logger } from './logger';
 import { config } from '@klave/constants';
+import { Utils } from '@secretarium/connector';
 
 let reconnectAttempt = 0;
 let pingInterval: NodeJS.Timeout | undefined = undefined;
@@ -8,15 +9,15 @@ let reconnectionTimeout: NodeJS.Timeout | undefined;
 
 const planReconnection = async () => {
     return new Promise((resolve) => {
-        if (!reconnectionTimeout) {
-            reconnectionTimeout = setTimeout(() => {
-                clearTimeout(reconnectionTimeout);
-                reconnectionTimeout = undefined;
-                dispatchOps.initialize().then(resolve).catch(() => { return; });
-            }, 3000);
-        }
+        reconnectionTimeout ??= setTimeout(() => {
+            clearTimeout(reconnectionTimeout);
+            reconnectionTimeout = undefined;
+            dispatchOps.initialize().then(resolve).catch(() => { return; });
+        }, 3000);
     });
 };
+
+let hookHandler: (reqInfo: Pick<RequestInit, 'headers' | 'body'>) => void | undefined;
 
 export const dispatchOps = {
     initialize: async () => {
@@ -63,18 +64,23 @@ export const dispatchOps = {
                     headers: Record<string, string>;
                     body: Array<number>
                 };
-                // TODO: Try to not use fetch on localhost here. Also get the actual port.
-                fetch('https://klave.api.127.0.0.1.nip.io:3333/hook', {
-                    method: 'POST',
-                    headers: message.headers,
-                    body: Uint8Array.from(message.body)
-                }).catch(reason => {
-                    logger.warn(`Hook passover failed: ${reason}`);
-                });
+                let effectiveBody: BodyInit = Uint8Array.from(message.body);
+                if (message.headers['content-type']?.includes('application/json') || message.headers['Content-Type']?.includes('application/json'))
+                    effectiveBody = Utils.decode(Uint8Array.from(message.body)).toString();
+                if (hookHandler)
+                    hookHandler({
+                        headers: message.headers,
+                        body: effectiveBody
+                    });
+                else
+                    logger.warn('No hook handler registered, dispatcher message will not be processed');
             });
         } catch (e) {
             console.error(e?.toString());
             await planReconnection();
         }
+    },
+    registerHookHandler: (handler: typeof hookHandler) => {
+        hookHandler = handler;
     }
 };

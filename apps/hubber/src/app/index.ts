@@ -10,10 +10,9 @@ import passport from 'passport';
 import { v4 as uuid } from 'uuid';
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { prisma } from '@klave/db';
-import { config } from '@klave/constants';
 import { rateLimiterMiddleware } from './middleware/rateLimiter';
 import { morganLoggerMiddleware } from './middleware/morganLogger';
-import { probotMiddleware } from './middleware/probot';
+import { probotMiddleware, probotMiddlewareHandlerRegistration } from './middleware/probot';
 import { stripeMiddlware } from './middleware/stripe';
 import { sentryRequestMiddleware, sentryTracingMiddleware, sentryErrorMiddleware } from './middleware/sentry';
 import { passportLoginCheckMiddleware } from './middleware/passport';
@@ -22,7 +21,7 @@ import { trcpMiddlware } from './middleware/trpc';
 // import { getDriverSubstrate } from '../utils/db';
 import { usersRouter } from './routes';
 import { webLinkerMiddlware } from './middleware/webLinker';
-import { permissiblePeers } from '@klave/constants';
+import { config, permissiblePeers } from '@klave/constants';
 import { uiHosterMiddleware } from './middleware/uiHoster';
 import { mcpMiddleware } from './middleware/mcp';
 
@@ -107,6 +106,7 @@ export const start = async () => {
     );
 
     // Plug Probot for GitHub Apps
+    probotMiddlewareHandlerRegistration(app);
     app.use('/hook', (req, res, next) => {
         if (req.headers['x-github-event'])
             probotMiddleware(req, res, next);
