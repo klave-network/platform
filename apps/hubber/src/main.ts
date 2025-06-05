@@ -8,6 +8,10 @@ import http from 'node:http';
 import https from 'node:https';
 import type { Plugin } from 'vite';
 
+process.on('unhandledRejection', (reason, p) => {
+    console.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
+});
+
 const onlineChain = async () => config.get('KLAVE_OFFLINE_DEV') === 'true'
     ? Promise.resolve()
     : Promise.resolve()
