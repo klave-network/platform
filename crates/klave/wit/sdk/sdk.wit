@@ -69,7 +69,7 @@ interface sdk {
     verify-quote: func(current-time: s64, quote-binary: list<u8>) -> result<string, string>;
 
     //PostGreSql
-    pgsql-connection-open: func(uri: string) -> result<_, string>;
+    pgsql-connection-open: func(uri: string) -> result<string, string>;
     pgsql-query: func(connection: string, query: string) -> result<string, string>;
     pgsql-exec: func(connection: string, command: string) -> result<string, string>;
 
@@ -77,15 +77,17 @@ interface sdk {
     graph-models: func() -> result<list<string>, string>;
     graph-tokenizers: func() -> result<list<string>, string>;
     graph-load: func(input: string, encoding: s32, target: s32) -> result<_, string>;
-    graph-load-by-name: func(input: string) -> result<_, string>;
-    graph-unload-by-name: func(input: string) -> result<_, string>;
+    graph-load-by-name: func(model-name: string) -> result<_, string>;
+    graph-unload-by-name: func(model-name: string) -> result<_, string>;
     graph-init-execution-context: func(input: string) -> result<string, string>;
     graph-delete-execution-context: func(context-name: string) -> result<_, string>;
     graph-delete-all-execution-contexts: func() -> result<_, string>;
+    graph-model-n-embd: func(model-name: string) -> result<string, string>;
 
     inference-compute: func(input: string, input-tensor: list<u8>) -> result<list<u8>, string>;
     inference-add-prompt: func(context-name: string, prompt: list<u8>) -> result<_, string>;
     inference-get-piece: func(context-name: string) -> result<list<u8>, string>;
+    inference-model-n-embd: func(context-name: string) -> result<string, string>;
     inference-get-aggregate-embeddings: func(context-name: string, window-size: s32, agg-rule: s32) -> result<list<u8>, string>;
     inference-encode: func(context-name: string, prompt: list<u8>) -> result<list<u8>, string>;
     inference-decode: func(context-name: string, token-ids: list<u8>) -> result<list<u8>, string>;

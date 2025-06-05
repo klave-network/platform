@@ -9,7 +9,7 @@ pub mod crypto;
 pub mod https;
 pub mod ledger;
 pub mod llm;
-pub mod postgre_sql;
+pub mod pgsql;
 pub mod ml;
 pub mod notifier;
 pub mod router;
