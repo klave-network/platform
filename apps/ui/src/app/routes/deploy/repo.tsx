@@ -131,7 +131,7 @@ export const RepoAppSelect: FC = () => {
             <div className='relative'>
                 {isPostInstallStuck ? <>
                     <div className='bg-yellow-200 p-5 mb-10 w-full text-center text-yellow-800'>
-                        <UilExclamationTriangle className='inline-block mb-3' /><br />
+                        <UilExclamationTriangle className='inline-block mb-3 h-8' /><br />
                         <span>This is taking longer than usual</span><br />
                         <span>Klave still does&apos;t have access to your repository</span><br />
                         <br />
@@ -165,7 +165,7 @@ export const RepoAppSelect: FC = () => {
         </div>
         {!deployableRepo.isAvailableToKlave
             ? <div className='bg-yellow-200 p-5 mb-10 w-full text-center text-yellow-800'>
-                <UilExclamationTriangle className='inline-block mb-3' /><br />
+                <UilExclamationTriangle className='inline-block mb-3 h-8' /><br />
                 <span>This repository doesn&apos;t have the Klave Github App installed</span><br />
                 <a href={githubAppInstall.toString()} type="submit" className='btn btn-md h-8 mt-5 bg-yellow-800 text-white'>Install it now !</a>
             </div>
