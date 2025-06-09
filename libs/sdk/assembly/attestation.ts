@@ -17,6 +17,11 @@ declare function verify_quote(current_time: i64, quote_binary: ArrayBuffer, quot
 declare function parse_quote(quote_binary: ArrayBuffer, quote_binary_size: i32, result: ArrayBuffer, result_size: i32): i32;
 
 @json
+export class GenericUint {
+    data!: u32;
+}
+
+@json
 export class Quote3 {
     header!: Quote3Header;
     @alias("report_body")
@@ -33,9 +38,9 @@ export class Quote3Header {
     @alias("att_key_data_0")
     attKeyData!: u32;
     @alias("qe_svn")
-    qeSvn!: u16;
+    qeSvn!: GenericUint;
     @alias("pce_svn")
-    pceSvn!: u16;
+    pceSvn!: GenericUint;
     @alias("vendor_id")
     vendorId!: Array<u8>;
     @alias("user_data")
@@ -47,7 +52,7 @@ export class ReportBody {
     @alias("cpu_svn")
     cpuSvn!: Array<u8>;
     @alias("misc_select")
-    miscSelect!: u32;
+    miscSelect!: GenericUint;
     reserved1!: Array<u8>;
     @alias("isv_ext_prod_id")
     isvExtProdId!: Array<u8>;
@@ -61,11 +66,11 @@ export class ReportBody {
     @alias("config_id")
     configId!: Array<u8>;
     @alias("isv_prod_id")
-    isvProdId!: u16;
+    isvProdId!: GenericUint;
     @alias("isv_svn")
-    isvSvn!: u16;
+    isvSvn!: GenericUint;
     @alias("config_svn")
-    configSvn!: u16;
+    configSvn!: GenericUint;
     reserved4!: Array<u8>;
     @alias("isv_family_id")
     isvFamilyId!: Array<u8>;
@@ -133,7 +138,7 @@ export class Report2Body {
 
 @json
 export class ParsedQuote {
-    version!: u16;
+    version!: string;
     quote4!: Quote4 | null;
     quote3!: Quote3 | null;
 }
@@ -151,6 +156,8 @@ export class QuoteVerificationResponse {
     collateralExpirationStatus!: u32;
     @alias("quote_verification_result")
     quoteVerificationResult!: i32;
+    @alias("qve_report_info")
+    qveReportInfo!: QlQeReportInfo;
     @alias("quote_verification_result_description")
     quoteVerificationResultDescription!: string;
     @alias("sa_list")
@@ -159,12 +166,45 @@ export class QuoteVerificationResponse {
     supp_data!: TeeSuppDataDescriptor;
 }
 
+@json
+export class TargetInfo {
+    @alias("mr_enclave")
+    mrenclave!: Array<u8>;
+    attributes!: QuoteAttributes;
+    reserved1!: Array<u8>;
+    @alias("config_svn")
+    configSvn!: GenericUint;
+    @alias("misc_select")
+    miscSelect!: GenericUint;
+    reserved2!: Array<u8>;
+    @alias("config_id")
+    configId!: Array<u8>;
+    reserved3!: Array<u8>;
+}
+
+@json
+export class Report {
+    body!: ReportBody;
+    @alias("key_id")
+    KeyId!: Array<u8>;
+    mac!: Array<u8>;
+}
+
+@json
+export class QlQeReportInfo {
+    nonce!: Array<u8>;
+    @alias("enclave_target_info")
+    enclaveTargetInfo!: TargetInfo;
+    @alias("qe_report")
+    qeReport!: Report;
+}
+
 export function getQuote(challenge: u8[]): Result<Uint8Array, Error> {
     let challengeBuf = new Uint8Array(challenge.length);
     for (let i = 0; i < challenge.length; ++i) {
         challengeBuf[i] = challenge[i];
     }
-    let result = new ArrayBuffer(20000);
+    let result = new ArrayBuffer(10000);
     let res = get_quote(challengeBuf.buffer, challengeBuf.buffer.byteLength, result, result.byteLength);
     if (abs(res) > result.byteLength) {
         // buffer not big enough, retry with a properly sized one
@@ -178,7 +218,7 @@ export function getQuote(challenge: u8[]): Result<Uint8Array, Error> {
 }
 
 export function verifyQuote(current_time: i64, binaryQuote: Uint8Array): Result<QuoteVerificationResponse, Error> {
-    let result = new ArrayBuffer(2000);
+    let result = new ArrayBuffer(10000);
     let res = verify_quote(current_time, binaryQuote.buffer, binaryQuote.buffer.byteLength, result, result.byteLength);
     if (abs(res) > result.byteLength) {
         // buffer not big enough, retry with a properly sized one
@@ -190,11 +230,11 @@ export function verifyQuote(current_time: i64, binaryQuote: Uint8Array): Result<
 
     let quoteString = String.UTF8.decode(result.slice(0, res), true);
     let quote = JSON.parse<QuoteVerificationResponse>(quoteString);
-    return { data: quote, err: null };
+    return { data: quote, err: null};
 }
 
 export function parseQuote(binaryQuote: Uint8Array): Result<ParsedQuote, Error> {
-    let result = new ArrayBuffer(20000);
+    let result = new ArrayBuffer(10000);
     let res = parse_quote(binaryQuote.buffer, binaryQuote.buffer.byteLength, result, result.byteLength);
     if (abs(res) > result.byteLength) {
         // buffer not big enough, retry with a properly sized one
@@ -209,11 +249,11 @@ export function parseQuote(binaryQuote: Uint8Array): Result<ParsedQuote, Error> 
     if(binaryQuote[0] === 4) {
         // Quote4
         let quote = JSON.parse<Quote4>(quoteString);
-        return { data: { version: 4, quote4: quote, quote3: null }, err: null };
+        return { data: { version: "V4", quote4: quote, quote3: null }, err: null };
     }else if(binaryQuote[0] === 3) {
         // Quote3
         let quote = JSON.parse<Quote3>(quoteString);
-        return { data: { version: 3, quote4: null, quote3: quote }, err: null };
+        return { data: { version: "V3", quote4: null, quote3: quote }, err: null };
     }else {
         // Unknown version
         return { data: null, err: new Error("Unknown quote version: " + binaryQuote[0].toString()) };
