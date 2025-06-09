@@ -138,7 +138,7 @@ export class Report2Body {
 
 @json
 export class ParsedQuote {
-    version!: u16;
+    version!: string;
     quote4!: Quote4 | null;
     quote3!: Quote3 | null;
 }
@@ -218,7 +218,7 @@ export function getQuote(challenge: u8[]): Result<Uint8Array, Error> {
 }
 
 export function verifyQuote(current_time: i64, binaryQuote: Uint8Array): Result<QuoteVerificationResponse, Error> {
-    let result = new ArrayBuffer(2000);
+    let result = new ArrayBuffer(10000);
     let res = verify_quote(current_time, binaryQuote.buffer, binaryQuote.buffer.byteLength, result, result.byteLength);
     if (abs(res) > result.byteLength) {
         // buffer not big enough, retry with a properly sized one
@@ -249,11 +249,11 @@ export function parseQuote(binaryQuote: Uint8Array): Result<ParsedQuote, Error> 
     if(binaryQuote[0] === 4) {
         // Quote4
         let quote = JSON.parse<Quote4>(quoteString);
-        return { data: { version: 4, quote4: quote, quote3: null }, err: null };
+        return { data: { version: "V4", quote4: quote, quote3: null }, err: null };
     }else if(binaryQuote[0] === 3) {
         // Quote3
         let quote = JSON.parse<Quote3>(quoteString);
-        return { data: { version: 3, quote4: null, quote3: quote }, err: null };
+        return { data: { version: "V3", quote4: null, quote3: quote }, err: null };
     }else {
         // Unknown version
         return { data: null, err: new Error("Unknown quote version: " + binaryQuote[0].toString()) };
