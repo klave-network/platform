@@ -2772,7 +2772,7 @@ pub mod klave {
             }
             #[allow(unused_unsafe, clippy::all)]
             /// PostGreSql
-            pub fn sql_connection_open(uri: &str) -> Result<_rt::String, _rt::String> {
+            pub fn connection_open(uri: &str) -> Result<_rt::String, _rt::String> {
                 unsafe {
                     #[repr(align(4))]
                     struct RetArea([::core::mem::MaybeUninit<u8>; 12]);
@@ -2784,7 +2784,7 @@ pub mod klave {
                     #[cfg(target_arch = "wasm32")]
                     #[link(wasm_import_module = "klave:sdk/sdk")]
                     extern "C" {
-                        #[link_name = "sql-connection-open"]
+                        #[link_name = "connection-open"]
                         fn wit_import(_: *mut u8, _: usize, _: *mut u8);
                     }
                     #[cfg(not(target_arch = "wasm32"))]
@@ -3141,8 +3141,8 @@ mod _rt {
 #[cfg(target_arch = "wasm32")]
 #[link_section = "component-type:wit-bindgen:0.36.0:component:klave-sdk:klave-sdk:encoded world"]
 #[doc(hidden)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 2514] = *b"\
-\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xd2\x12\x01A\x02\x01\
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 2510] = *b"\
+\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xce\x12\x01A\x02\x01\
 A\x02\x01Bc\x01@\x01\x0aquery-names\x01\0\x04\0\x0eadd-user-query\x01\0\x01@\x01\
 \x10transaction-names\x01\0\x04\0\x14add-user-transaction\x01\x01\x01@\x01\x03ms\
 gs\x01\0\x04\0\x06notify\x01\x02\x04\0\x0cnotify-error\x01\x02\x04\0\x11on-succe\
@@ -3186,13 +3186,13 @@ e-decrypt\x01$\x01@\x02\x08key-names\x03txt\x05\0\x06\x04\0\x0bsimple-sign\x01%\
 \0\x10get-random-bytes\x01(\x01@\x01\x07requests\0\x03\x04\0\x0bhttps-query\x01)\
 \x01@\x01\x09challenge\x05\0\x06\x04\0\x09get-quote\x01*\x01@\x02\x0ccurrent-tim\
 ex\x0cquote-binary\x05\0\x03\x04\0\x0cverify-quote\x01+\x01@\x01\x05quote\x05\0\x03\
-\x04\0\x0bparse-quote\x01,\x01@\x01\x03uris\0\x03\x04\0\x13sql-connection-open\x01\
--\x01@\x02\x0aconnections\x05querys\0\x03\x04\0\x09sql-query\x01.\x01@\x02\x0aco\
-nnections\x07commands\0\x03\x04\0\x08sql-exec\x01/\x01@\0\x01\0\x04\0\x0fstart-r\
-ecording\x010\x04\0\x0estop-recording\x010\x04\0\x12cancel-transaction\x010\x03\0\
-\x0dklave:sdk/sdk\x05\0\x04\0\x1dcomponent:klave-sdk/klave-sdk\x04\0\x0b\x0f\x01\
-\0\x09klave-sdk\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\
-\x070.220.1\x10wit-bindgen-rust\x060.36.0";
+\x04\0\x0bparse-quote\x01,\x01@\x01\x03uris\0\x03\x04\0\x0fconnection-open\x01-\x01\
+@\x02\x0aconnections\x05querys\0\x03\x04\0\x09sql-query\x01.\x01@\x02\x0aconnect\
+ions\x07commands\0\x03\x04\0\x08sql-exec\x01/\x01@\0\x01\0\x04\0\x0fstart-record\
+ing\x010\x04\0\x0estop-recording\x010\x04\0\x12cancel-transaction\x010\x03\0\x0d\
+klave:sdk/sdk\x05\0\x04\0\x1dcomponent:klave-sdk/klave-sdk\x04\0\x0b\x0f\x01\0\x09\
+klave-sdk\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.\
+220.1\x10wit-bindgen-rust\x060.36.0";
 #[inline(never)]
 #[doc(hidden)]
 pub fn __link_custom_section_describing_imports() {

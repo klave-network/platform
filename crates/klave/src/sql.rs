@@ -1,7 +1,7 @@
 use crate::sdk;
 
 pub fn connection_open(uri: &str) -> Result<String, Box<dyn std::error::Error>> {
-    match sdk::sql_connection_open(uri) {
+    match sdk::connection_open(uri) {
         Ok(opaque_handle) => Ok(opaque_handle),
         Err(err) => Err(err.into()),
     }
