@@ -71,6 +71,11 @@ interface sdk {
     verify-quote: func(current-time: s64, quote-binary: list<u8>) -> result<string, string>;
     parse-quote: func(quote: list<u8>)-> result<string, string>;
 
+    //PostGreSql
+    sql-connection-open: func(uri: string) -> result<string, string>;
+    sql-query: func(connection: string, query: string) -> result<string, string>;
+    sql-exec: func(connection: string, command: string) -> result<string, string>;
+
     //Subscription
     start-recording: func();
     stop-recording: func();
