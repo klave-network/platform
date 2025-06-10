@@ -10,5 +10,6 @@ pub mod https;
 pub mod ledger;
 pub mod ml;
 pub mod notifier;
+pub mod sql;
 pub mod router;
 pub mod subscription;
