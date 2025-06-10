@@ -72,7 +72,7 @@ interface sdk {
     parse-quote: func(quote: list<u8>)-> result<string, string>;
 
     //PostGreSql
-    sql-connection-open: func(uri: string) -> result<string, string>;
+    connection-open: func(uri: string) -> result<string, string>;
     sql-query: func(connection: string, query: string) -> result<string, string>;
     sql-exec: func(connection: string, command: string) -> result<string, string>;
 
