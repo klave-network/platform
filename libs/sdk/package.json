@@ -25,7 +25,7 @@
     },
     "dependencies": {
         "@klave/as-json": "0.9.21",
-        "@klave/compiler": "0.5.0",
+        "@klave/compiler": "1.0.5",
         "as-base64": "0.2.0",
         "chalk": "^4.1.2",
         "fs-extra": "^11.3.0",

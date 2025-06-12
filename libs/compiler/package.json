@@ -1,6 +1,6 @@
 {
     "name": "@klave/compiler",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "private": false,
     "description": "Klave AssemblyScript compiling wrapper",
     "repository": {
