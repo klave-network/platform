@@ -1,4 +1,7 @@
 # Changelog
+
+## [0.17.0](https://github.com/klave-network/platform/compare/sdk@0.16.0...sdk@0.17.0) (2025-06-12)
+
 ## [0.16.0](https://github.com/klave-network/platform/compare/sdk@0.15.0...sdk@0.16.0) (2025-06-12)
 
 ### Dependency Updates
@@ -14,7 +17,6 @@
 * **sdk:** Add qlqereportinfo management in Attestation ([24bd468](https://github.com/klave-network/platform/commit/24bd468ed04924ebc662c625e5886adaf8cc5082))
 * **sdk:** KN-307 - Add HMAC in AssemblyScript SDK ([#337](https://github.com/klave-network/platform/issues/337)) ([9df8dad](https://github.com/klave-network/platform/commit/9df8dad8a9148cde1aedc35f05495b0749da5040))
 * **sdk:** Update Quote version attribute from int to string to reflect Rust SDK ([af4878a](https://github.com/klave-network/platform/commit/af4878aeb5d48310c6dddd42c807631c18bb1fd0))
-
 
 ### Bug Fixes
 
