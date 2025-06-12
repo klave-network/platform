@@ -1,4 +1,28 @@
 # Changelog
+## [0.16.0](https://github.com/klave-network/platform/compare/sdk@0.15.0...sdk@0.16.0) (2025-06-12)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.15.0`
+* `constants` updated to version `0.15.0`
+
+### Features
+
+* **sdk:** Add deriveKey method in AS SDK ([#350](https://github.com/klave-network/platform/issues/350)) ([506d331](https://github.com/klave-network/platform/commit/506d331294d21e3c5661623b7353b19ba16cdf2e))
+* **sdk:** Add listKeys and keyExists ledger methods ([ce2b08e](https://github.com/klave-network/platform/commit/ce2b08ef4ce0d319cc42c5f3fd39de802cfdc065))
+* **sdk:** Add parse_quote method ([05fb1cd](https://github.com/klave-network/platform/commit/05fb1cd7d79eaa6248690a119362ec02ddac6d47))
+* **sdk:** Add qlqereportinfo management in Attestation ([24bd468](https://github.com/klave-network/platform/commit/24bd468ed04924ebc662c625e5886adaf8cc5082))
+* **sdk:** KN-307 - Add HMAC in AssemblyScript SDK ([#337](https://github.com/klave-network/platform/issues/337)) ([9df8dad](https://github.com/klave-network/platform/commit/9df8dad8a9148cde1aedc35f05495b0749da5040))
+* **sdk:** Update Quote version attribute from int to string to reflect Rust SDK ([af4878a](https://github.com/klave-network/platform/commit/af4878aeb5d48310c6dddd42c807631c18bb1fd0))
+
+
+### Bug Fixes
+
+* **compiler,sdk,ui-kit:** Wrong dependencies synching done ([f85c41e](https://github.com/klave-network/platform/commit/f85c41eebeeec291692b2c45579ede4f89d6ac94))
+* **sdk:** Crypto entry was not cleaned up properly ([bae04eb](https://github.com/klave-network/platform/commit/bae04eb8db33d718186a6acbe04bead21caed29f))
+* **sdk:** Revert SWC compiling to ESbuild ([7838266](https://github.com/klave-network/platform/commit/78382661b557cd71894ec3097031f9be2a334ab7))
+* **sdk:** Revert to earlier version of `@klave/as-json` ([5ab7f67](https://github.com/klave-network/platform/commit/5ab7f672af061b00c0dcad6b649c3173cd6f443a))
+
 ## [0.16.0](https://github.com/klave-network/platform/compare/sdk@0.15.0...sdk@0.16.0) (2025-04-10)
 
 ## [0.15.0](https://github.com/klave-network/platform/compare/sdk@0.14.5...sdk@0.15.0) (2025-04-09)
