@@ -6,6 +6,7 @@
         "allowSyntheticDefaultImports": true,
         "resolveJsonModule": true,
         "strict": true,
+        "moduleResolution": "bundler",
         "types": [
             "vite/client",
             "vitest"

@@ -1,4 +1,14 @@
 # Changelog
+## [1.4.3](https://github.com/klave-network/platform/compare/ui@1.4.2...ui@1.4.3) (2025-05-11)
+
+### Dependency Updates
+
+* `api` updated to version `1.4.2`
+
+### Bug Fixes
+
+* **ui:** Ensure Tailwind is wired up correctly ([cb70f25](https://github.com/klave-network/platform/commit/cb70f259068285b1b70312b8b99a7c0b4cd3612d))
+
 ## [1.4.2](https://github.com/klave-network/platform/compare/ui@1.4.1...ui@1.4.2) (2025-05-09)
 
 ### Dependency Updates
