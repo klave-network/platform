@@ -1,6 +1,6 @@
 {
     "name": "@klave/compiler",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "private": false,
     "description": "Klave AssemblyScript compiling wrapper",
     "repository": {
@@ -16,7 +16,7 @@
     "type": "commonjs",
     "dependencies": {
         "@klave/as-json": "0.9.21",
-        "assemblyscript": "0.27.36",
+        "assemblyscript": "0.28.2",
         "serialize-error": "8.1.0",
         "typescript": "^5.8.3",
         "uuid": "^11.1.0"

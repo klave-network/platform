@@ -1,4 +1,12 @@
 # Changelog
+## [1.0.5](https://github.com/klave-network/platform/compare/compiler@1.0.4...compiler@1.0.5) (2025-06-12)
+
+
+### Bug Fixes
+
+* **compiler,sdk,ui-kit:** Wrong dependencies synching done ([f85c41e](https://github.com/klave-network/platform/commit/f85c41eebeeec291692b2c45579ede4f89d6ac94))
+* **sdk:** Revert to earlier version of `@klave/as-json` ([5ab7f67](https://github.com/klave-network/platform/commit/5ab7f672af061b00c0dcad6b649c3173cd6f443a))
+
 ## [1.0.4](https://github.com/klave-network/platform/compare/compiler@1.0.3...compiler@1.0.4) (2025-04-09)
 
 ## [1.0.3](https://github.com/klave-network/platform/compare/compiler@1.0.2...compiler@1.0.3) (2025-01-24)

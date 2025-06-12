@@ -12,7 +12,7 @@ import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { prisma } from '@klave/db';
 import { rateLimiterMiddleware } from './middleware/rateLimiter';
 import { morganLoggerMiddleware } from './middleware/morganLogger';
-import { probotMiddleware } from './middleware/probot';
+import { probotMiddleware, probotMiddlewareHandlerRegistration } from './middleware/probot';
 import { stripeMiddlware } from './middleware/stripe';
 import { sentryRequestMiddleware, sentryTracingMiddleware, sentryErrorMiddleware } from './middleware/sentry';
 import { passportLoginCheckMiddleware } from './middleware/passport';
@@ -21,17 +21,18 @@ import { trcpMiddlware } from './middleware/trpc';
 // import { getDriverSubstrate } from '../utils/db';
 import { usersRouter } from './routes';
 import { webLinkerMiddlware } from './middleware/webLinker';
-import { permissiblePeers } from '@klave/constants';
+import { config, permissiblePeers } from '@klave/constants';
 import { uiHosterMiddleware } from './middleware/uiHoster';
+import { mcpMiddleware } from './middleware/mcp';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-const bhuiHostDomain = URL.parse(process.env['KLAVE_BHDUI_DOMAIN'] ?? '')?.host;
+const bhuiHostDomain = URL.parse(config.get('KLAVE_BHDUI_DOMAIN'))?.host;
 
 const app = express();
 
 export const start = async () => {
 
-    const __hostname = process.env['HOSTNAME'] ?? 'unknown';
+    const __hostname = config.get('HOSTNAME', 'unknown');
 
     app.use(sentryRequestMiddleware);
     app.use(sentryTracingMiddleware);
@@ -105,6 +106,7 @@ export const start = async () => {
     );
 
     // Plug Probot for GitHub Apps
+    probotMiddlewareHandlerRegistration(app);
     app.use('/hook', (req, res, next) => {
         if (req.headers['x-github-event'])
             probotMiddleware(req, res, next);
@@ -115,7 +117,7 @@ export const start = async () => {
     });
 
     const sessionOptions: session.SessionOptions = {
-        secret: process.env.KLAVE_EXPRESS_SESSION_SECRETS?.split(',') ?? [],
+        secret: config.get('KLAVE_EXPRESS_SESSION_SECRETS').split(',') ?? [],
         // Don't save session if unmodified
         resave: true,
         // Don't create session until something stored
@@ -171,6 +173,7 @@ export const start = async () => {
     app.use(webLinkerMiddlware);
 
     app.use(passportLoginCheckMiddleware);
+    app.use('/mcp', mcpMiddleware);
     app.use('/trpc', trcpMiddlware);
     app.use(usersRouter);
     app.use(sentryErrorMiddleware);

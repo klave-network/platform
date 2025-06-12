@@ -3,10 +3,10 @@ import * as path from 'node:path';
 import chalk from 'chalk';
 import { posix as pathCompleteExtname } from 'path-complete-extname';
 import { createCompiler, type CompilerHost } from '@klave/compiler';
-import { getFinalParseConfig } from '@klave/constants';
+import { config, getFinalParseConfig } from '@klave/constants';
 
 // `yarn run` may change the current working dir, then we should use `INIT_CWD` env.
-const CWD = process.env['INIT_CWD'] || process.cwd();
+const CWD = config.get('INIT_CWD', process.cwd());
 
 const compile = () => {
     try {
@@ -37,7 +37,7 @@ const compile = () => {
                                 console.log(`Using Klave compiler v${compiler.version}\nAssemblyScript v${compiler.ascVersion ?? message.version}`);
                             }
                             if (message.type === 'read') {
-                                if (process.env['DEBUG'] === 'true')
+                                if (config.get('DEBUG') === 'true')
                                     console.debug('file_read_try:' + path.resolve(appPathRoot, message.filename));
                                 fs.readFile(path.resolve(appPathRoot, message.filename)).then(contents => {
                                     compiler.postMessage({
@@ -59,7 +59,7 @@ const compile = () => {
                                 if (message.contents)
                                     fs.writeFileSync(`${path.join(CWD, '.klave', `${index.toString()}-${app.slug.toLocaleLowerCase().replace(/\s/g, '-')}`)}${ext}`, message.contents);
                             } else if (message.type === 'diagnostic') {
-                                if (process.env['DEBUG'] === 'true')
+                                if (config.get('DEBUG') === 'true')
                                     console.debug(message.diagnostics);
                             } else if (message.type === 'errored') {
                                 compiler.terminate().finally(() => {

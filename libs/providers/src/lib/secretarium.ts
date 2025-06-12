@@ -1,10 +1,10 @@
 import { SCP, Key, Constants, EncryptedKeyPair } from '@secretarium/connector';
 import { prisma } from '@klave/db';
 import { logger } from './logger';
-import { BackendVersion } from '@klave/constants';
+import { BackendVersion, config } from '@klave/constants';
 
 export const defaultSCPOptions: ConstructorParameters<typeof SCP>[0] = {
-    logger: process.env['NODE_ENV'] === 'development' ? {
+    logger: config.get('NODE_ENV') === 'development' ? {
         debug: (message: string, obj) => {
             if (obj) {
                 if (obj.requestId && obj.dcapp && obj.function)
@@ -53,7 +53,7 @@ const getBackendVersions = async () => {
         const previousSecretariumWasmVersion = secretariumWasmVersion;
         const previousSecretariumCoreBuild = secretariumBackendVersions?.core_version?.build_number;
         const previousSecretariumWasmBuild = secretariumBackendVersions?.wasm_version?.build_number;
-        const version = await client.newTx<BackendVersion>('wasm-manager', 'version', 'version', '').send().catch((e) => {
+        const version = await client.newTx<BackendVersion>(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'version', 'version', '').send().catch((e) => {
             console.error(e);
         });
         secretariumBackendVersions = version?.version;
@@ -72,15 +72,15 @@ const getBackendVersions = async () => {
 
 const getKreditPipelineInformation = async () => {
     if (client.isConnected()) {
-        await client.newTx('wasm-manager', 'configure_kredit_reporting', 'configure_kredit_reporting', {
-            report_url: process.env['KLAVE_KREDIT_REPORTING_URL']
+        await client.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'configure_kredit_reporting', 'configure_kredit_reporting', {
+            report_url: config.get('KLAVE_KREDIT_REPORTING_URL')
         }).send().catch((e) => {
             console.error(e);
         });
-        const kreditReportPK = (await client.newTx('wasm-manager', 'get_kredit_pk', 'get_kredit_pk', '').send().catch((e) => {
+        const kreditReportPK = (await client.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_kredit_pk', 'get_kredit_pk', '').send().catch((e) => {
             console.error(e);
         }))?.pk;
-        const kreditCosts = (await client.newTx('wasm-manager', 'get_kredit_costs', 'get_kredit_costs', '').send().catch((e) => {
+        const kreditCosts = (await client.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_kredit_costs', 'get_kredit_costs', '').send().catch((e) => {
             console.error(e);
         }))?.kredit_costs;
 
@@ -108,15 +108,15 @@ client.onStateChange((state) => {
 
 export const scpOps = {
     initialize: async () => {
-        const [node, trustKey] = process.env['KLAVE_SECRETARIUM_NODE']?.split('|') ?? [];
+        const [node, trustKey] = config.get('KLAVE_SECRETARIUM_NODE').split('|') ?? [];
         if (!node || !trustKey)
             throw new Error('Missing Secretarium node or trust key');
         try {
-            const dbSecret = process.env['KLAVE_SECRETARIUM_SECRET'];
+            const dbSecret = config.get('KLAVE_SECRETARIUM_SECRET');
             if (!dbSecret || (dbSecret?.length ?? 0) === 0)
                 throw new Error('Missing Secretarium secret');
             if (!connectionKey) {
-                const dbKey = process.env['KLAVE_SECRETARIUM_KEY'];
+                const dbKey = config.get('KLAVE_SECRETARIUM_KEY');
                 if (!dbKey || (dbKey?.length ?? 0) === 0) {
                     const newKey = await Key.createKey();
                     await newKey.seal(dbSecret);
@@ -134,8 +134,12 @@ export const scpOps = {
                 }
             }
             await client.connect(node, connectionKey, trustKey);
-            logger.info(`Connected to Secretarium ${node}`);
+            const sessionInfo = client.getSessionInfo();
+            const connectionInfo = client.getConnectionInfo();
             const cryptoContext = client.getCryptoContext();
+            logger.info(`Connected to Secretarium ${node} (${connectionInfo.protocol}:${connectionInfo.protocolVersion}${connectionInfo.server ? ` via ${connectionInfo.server}:${connectionInfo.serverVersion}` : ''} - ${connectionInfo.serverComment})`);
+            if (sessionInfo.gatewaySessionId)
+                logger.info(`Session via gateway G:${sessionInfo.gatewaySessionId} S:${sessionInfo.sessionId} (N:${sessionInfo.nodeId})`);
             logger.info(`CS ${cryptoContext.type} (${cryptoContext.version})`);
             logger.info(`PK ${await connectionKey.getRawPublicKeyHex()}`);
             await getBackendVersions();

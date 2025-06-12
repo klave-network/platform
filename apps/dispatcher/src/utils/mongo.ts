@@ -1,5 +1,5 @@
 import { MongoClient, Collection } from 'mongodb';
-import { getFinalParseUsage } from '@klave/constants';
+import { config, getFinalParseUsage } from '@klave/constants';
 
 type UsageRecord = {
     type: string;
@@ -14,14 +14,14 @@ export const mongoOps = {
     initialize: async () => {
         try {
             console.info('Initializing MongoDB connection');
-            const uri = process.env['KLAVE_DISPATCH_MONGODB_URL'];
+            const uri = config.get('KLAVE_DISPATCH_MONGODB_URL');
             if (!uri)
                 throw new Error('MongoDB URI is not provided');
             client = new MongoClient(uri);
             await client.connect();
             collection = client.db(client.options.dbName).collection<UsageRecord>('UsageRecord');
 
-            const uriDev = process.env['KLAVE_DISPATCH_DEV_MONGODB_URL'];
+            const uriDev = config.get('KLAVE_DISPATCH_DEV_MONGODB_URL');
             if (uriDev) {
                 // Bifurcate data storage for dev and prod
                 // TODO: This must be removed eventually

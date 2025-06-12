@@ -2,12 +2,12 @@ import { z } from 'zod';
 import Stripe from 'stripe';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import idgen from '@ideafast/idgen';
+import { config } from '@klave/constants';
 
 let stripe: Stripe | undefined;
 
 const checkStripeInit = () => {
-    if (!stripe)
-        stripe = new Stripe(process.env['KLAVE_STRIPE_SRV_KEY'] ?? '');
+    stripe ??= new Stripe(config.get('KLAVE_STRIPE_SRV_KEY'));
 };
 
 export const creditsRouter = createTRPCRouter({
@@ -18,8 +18,8 @@ export const creditsRouter = createTRPCRouter({
         .query(async ({ ctx: { prisma, session: { user } }, input: { pathname } }) => {
             if (!user)
                 throw new Error('Not logged in');
-            const origin = process.env['KLAVE_WEBAUTHN_ORIGIN'];
-            const priceId = process.env['KLAVE_STRIPE_PRICE_ID'];
+            const origin = config.get('KLAVE_WEBAUTHN_ORIGIN');
+            const priceId = config.get('KLAVE_STRIPE_PRICE_ID');
             if (!origin || !priceId)
                 throw new Error('Missing environment variables');
             const returnURL = new URL(`${origin}${pathname}?return=true&checkoutSessionId={CHECKOUT_SESSION_ID}`);

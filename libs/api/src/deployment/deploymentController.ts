@@ -9,18 +9,18 @@ import prettyBytes from 'pretty-bytes';
 import BuildMiniVM, { DeploymentContext } from './buildMiniVm';
 import { router } from '../router';
 import { Context } from '../context';
-import { getFinalParseConfig } from '@klave/constants';
+import { config, getFinalParseConfig } from '@klave/constants';
 import { createCallerFactory } from '../trpc';
 
 export const deployToSubstrate = async (deploymentContext: DeploymentContext<DeploymentPushPayload>, options?: { onlyApp?: string }) => {
 
     const { octokit, ...context } = deploymentContext;
-    let files: NonNullable<Awaited<ReturnType<typeof octokit.repos.compareCommits>>['data']['files']> = [];
+    let files: NonNullable<Awaited<ReturnType<typeof octokit.rest.repos.compareCommits>>['data']['files']> = [];
     let commit: Commit | null = null;
 
     if (context.commit.before) {
         try {
-            const { data } = await octokit.repos.compareCommits({
+            const { data } = await octokit.rest.repos.compareCommits({
                 owner: context.repo.owner,
                 repo: context.repo.name,
                 base: context.commit.before,
@@ -54,7 +54,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
 
     if (!files?.length) {
         try {
-            const { data } = await octokit.repos.getCommit({
+            const { data } = await octokit.rest.repos.getCommit({
                 owner: context.repo.owner,
                 repo: context.repo.name,
                 ref: context.commit.after
@@ -110,7 +110,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
     if (!repo)
         return;
 
-    const klaveConfigurationResponse = await octokit.repos.getContent({
+    const klaveConfigurationResponse = await octokit.rest.repos.getContent({
         owner: repo.owner,
         repo: repo.name,
         ref: context.commit.ref,
@@ -494,7 +494,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                             if (error instanceof Error) {
                                 error = {
                                     message: error.message,
-                                    stack: process.env['NODE_ENV'] === 'development' ? error.stack : undefined
+                                    stack: config.get('NODE_ENV') === 'development' ? error.stack : undefined
                                 };
                             }
                             try {
@@ -599,7 +599,7 @@ export const sendToSecretarium = async ({
         }, async () => {
             return await new Promise((resolve, reject) => {
 
-                currentSCP.newTx('wasm-manager', 'set_allowed_kredit_per_transaction', `klave-app-set-transaction-limit-${deployment.applicationId}`, {
+                currentSCP.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'set_allowed_kredit_per_transaction', `klave-app-set-transaction-limit-${deployment.applicationId}`, {
                     app_id: deployment.applicationId,
                     kredit: 100_000_000
                 }).onExecuted(result => {
@@ -618,7 +618,7 @@ export const sendToSecretarium = async ({
         }, async () => {
             return await new Promise((resolve, reject) => {
 
-                currentSCP.newTx('wasm-manager', 'set_allowed_kredit_per_query', `klave-app-set-query-limit-${deployment.applicationId}`, {
+                currentSCP.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'set_allowed_kredit_per_query', `klave-app-set-query-limit-${deployment.applicationId}`, {
                     app_id: deployment.applicationId,
                     kredit: 1_000_000_000
                 }).onExecuted(result => {
@@ -667,7 +667,7 @@ export const sendToSecretarium = async ({
     }, async () => {
         if (wasmB64) {
             logger.debug(`${targetRef ? 'Updating' : 'Registering'} smart contract: ${target}`);
-            await currentSCP.newTx('wasm-manager', 'deploy_instance', `klave-${targetRef ? 'update' : 'register'}-${deployment.id}`, {
+            await currentSCP.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'deploy_instance', `klave-${targetRef ? 'update' : 'register'}-${deployment.id}`, {
                 app_id: deployment.applicationId,
                 fqdn: target,
                 wasm_bytes_b64: wasmB64
@@ -707,7 +707,7 @@ export const sendToSecretarium = async ({
                 });
             // } else if (previousDeployment?.deploymentAddress?.fqdn && deployment?.deploymentAddress?.fqdn) {
             //     logger.debug(`Releasing smart contract: ${deployment.deploymentAddress.fqdn} as ${target}`);
-            //     await currentSCP.newTx('wasm-manager', 'clone_instance', `klave-release-${deployment.id}`, {
+            //     await currentSCP.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'clone_instance', `klave-release-${deployment.id}`, {
             //         app_id: deployment.applicationId,
             //         fqdn: target,
             //         source_fqdn: previousDeployment.deploymentAddress.fqdn

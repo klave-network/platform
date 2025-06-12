@@ -19,6 +19,8 @@ interface sdk {
 
     // Ledger
     read-ledger: func(table: string, key: list<u8>) -> result<list<u8>, string>;
+    list-keys-from-ledger: func(table: string) -> result<string, string>;
+    key-exists-in-ledger: func(table: string, key: list<u8>) -> result<bool, string>;
     write-ledger: func(table: string, key: list<u8>, value: list<u8>) -> result<_, string>;
     remove-from-ledger: func(table: string, key: list<u8>) -> result<_, string>;
 
@@ -63,6 +65,16 @@ interface sdk {
 
     //HTTP
     https-query: func(request: string) -> result<string, string>;
+
+    //Attestation
+    get-quote: func(challenge: list<u8>) -> result<list<u8>, string>;
+    verify-quote: func(current-time: s64, quote-binary: list<u8>) -> result<string, string>;
+    parse-quote: func(quote: list<u8>)-> result<string, string>;
+
+    //PostGreSql
+    connection-open: func(uri: string) -> result<string, string>;
+    sql-query: func(connection: string, query: string) -> result<string, string>;
+    sql-exec: func(connection: string, command: string) -> result<string, string>;
 
     //Subscription
     start-recording: func();
