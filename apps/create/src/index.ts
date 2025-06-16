@@ -36,7 +36,7 @@ async function main() {
                     if (!value)
                         return 'Please enter a path.';
 
-                    if (value[0] !== '.')
+                    if (!value.startsWith('.'))
                         return 'Please enter a relative path.';
 
                     if (!isEmpty(value))
@@ -53,8 +53,7 @@ async function main() {
 
                     if (!isValidName(normalizedSlug ?? ''))
                         return 'The name can only contain ASCII letters, digits, and the characters ., -, and _';
-
-                    return;
+                    return undefined;
                 }
             }),
             // Ask for the name of the project
@@ -62,11 +61,11 @@ async function main() {
                 message: 'What is the name of your honest application?',
                 initialValue: 'hello-world',
                 validate(value) {
-                    if (value.length === 0)
+                    if (value.trim().length === 0)
                         return 'Project name is required';
                     if (!validateNpmPackage(sanitize(value)).validForNewPackages)
                         return 'The name can only contain ASCII letters, digits, and the characters ., -, and _';
-                    return;
+                    return undefined;
                 }
             }),
             // Ask for the description of the project
@@ -74,9 +73,9 @@ async function main() {
                 message: 'How would you describe your honest application?',
                 initialValue: 'This is an honest application for the Klave Network',
                 validate(value) {
-                    if (value.length === 0)
+                    if (value.trim().length === 0)
                         return 'Project description is required.';
-                    return;
+                    return undefined;
                 }
             }),
             // Ask for the author name
@@ -84,9 +83,9 @@ async function main() {
                 message: 'What is the name of the author?',
                 initialValue: await findMyName(),
                 validate(value) {
-                    if (value.length === 0)
+                    if (value.trim().length === 0)
                         return 'Author name is required.';
-                    return;
+                    return undefined;
                 }
             }),
             // Ask for the author email
@@ -94,9 +93,9 @@ async function main() {
                 message: 'What is the email address of the author?',
                 initialValue: await findGitHubEmail(),
                 validate(value) {
-                    if (value.length === 0)
+                    if (value.trim().length === 0)
                         return 'Author email is required.';
-                    return;
+                    return undefined;
                 }
             }),
             // Ask for the author URL
@@ -104,9 +103,9 @@ async function main() {
                 message: 'What is the URL to the author\'s GitHub profile?',
                 initialValue: await findGitHubProfileUrl(results.authorEmail as string),
                 validate(value) {
-                    if (value.length === 0)
+                    if (value.trim().length === 0)
                         return 'Author URL is required.';
-                    return;
+                    return undefined;
                 }
             }),
             // Ask for the repository URL
@@ -114,9 +113,9 @@ async function main() {
                 message: 'What is the URL for the repository?',
                 initialValue: await guessRepoUrl(results.authorUrl as string, results.dir as string),
                 validate(value) {
-                    if (value.length === 0)
+                    if (value.trim().length === 0)
                         return 'Repository URL is required.';
-                    return;
+                    return undefined;
                 }
             }),
             // Ask if the user wants to install dependencies
@@ -145,11 +144,11 @@ async function main() {
     // Create the project template
     await createTemplateAsync(targetDir, {
         project: {
-            slug: name as string,
+            slug: name,
             version: '0.0.1',
-            description: description as string
+            description: description
         },
-        author: `${authorName as string} <${authorEmail as string}> (${authorUrl as string})`,
+        author: `${authorName} <${authorEmail}> (${authorUrl})`,
         license: 'MIT',
         repo: repo as string
     });
@@ -163,9 +162,7 @@ async function main() {
 
         let args = ['install', '--legacy-peer-deps'];
 
-        if (packageManager === 'yarn') {
-            args = [];
-        } else if (packageManager === 'pnpm') {
+        if (packageManager === 'yarn' || packageManager === 'pnpm') {
             args = [];
         }
 
