@@ -1,1 +1,1 @@
-export * from './compilerWorker';
+export * from './compilerWorker.js';

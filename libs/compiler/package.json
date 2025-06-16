@@ -13,7 +13,7 @@
         "name": "Florian Guitton",
         "email": "florian@secretarium.com"
     },
-    "type": "commonjs",
+    "type": "module",
     "dependencies": {
         "@klave/as-json": "0.9.21",
         "assemblyscript": "0.28.2",
