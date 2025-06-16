@@ -17,7 +17,7 @@
     "dependencies": {
         "@klave/as-json": "0.9.21",
         "assemblyscript": "0.28.2",
-        "serialize-error": "8.1.0",
+        "serialize-error": "12.0.0",
         "typescript": "^5.8.3",
         "uuid": "^11.1.0"
     }
