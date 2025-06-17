@@ -3,7 +3,7 @@ import * as Sentry from '@sentry/node';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import { logger, scp } from '@klave/providers';
 import { sendToSecretarium } from '../deployment/deploymentController';
-import { RepoConfigSchemaLatest } from '@klave/constants';
+import { config, RepoConfigSchemaLatest } from '@klave/constants';
 
 export const deploymentRouter = createTRPCRouter({
     getByApplication: publicProcedure
@@ -412,7 +412,7 @@ export const deploymentRouter = createTRPCRouter({
                 op: 'scp.task',
                 description: 'Secretarium Task'
             }, async () => {
-                return await scp.newTx('wasm-manager', 'deactivate_instance', `klave-termination-${deploymentId}`, {
+                return await scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'deactivate_instance', `klave-termination-${deploymentId}`, {
                     app_id: dep.applicationId,
                     fqdn: dep.deploymentAddress?.fqdn
                 }).onExecuted(() => {

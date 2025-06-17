@@ -21,7 +21,7 @@ export const githubOps = {
         }, async (span) => {
             const octokit = await probot.auth();
             const installations = await octokit.paginate(
-                octokit.apps.listInstallations,
+                octokit.rest.apps.listInstallations,
                 {
                     per_page: 100
                 },
@@ -66,7 +66,7 @@ export const githubOps = {
 
                         const installationOctokit = await probot.auth(installation.id);
                         const repos = await installationOctokit.paginate(
-                            installationOctokit.apps.listReposAccessibleToInstallation,
+                            installationOctokit.rest.apps.listReposAccessibleToInstallation,
                             {
                                 per_page: 100
                             }

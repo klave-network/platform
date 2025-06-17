@@ -64,6 +64,10 @@ interface sdk {
     //HTTP
     https-query: func(request: string) -> result<string, string>;
 
+    //Attestation
+    get-quote: func(challenge: list<u8>) -> result<string, string>;
+    verify-quote: func(current-time: s64, quote-binary: list<u8>) -> result<string, string>;
+
     //Subscription
     start-recording: func();
     stop-recording: func();

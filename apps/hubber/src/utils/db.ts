@@ -1,6 +1,7 @@
 // import i18n from '../i18n';
 import { logger } from '@klave/providers';
 import { prisma } from '@klave/db';
+import { config } from '@klave/constants';
 
 export const client = prisma;
 
@@ -26,7 +27,7 @@ export const dbOps = {
             await client.$runCommandRaw({
                 count: 'deployment'
             });
-            const sanitizedUrl = process.env['KLAVE_MONGODB_URL']?.replace(/\/\/.*@/, '//***@');
+            const sanitizedUrl = config.get('KLAVE_MONGODB_URL')?.replace(/\/\/.*@/, '//***@');
             logger.info(`Connected to Mongo via Prisma ${sanitizedUrl}`);
             reconnectAttempt = 0;
             return;

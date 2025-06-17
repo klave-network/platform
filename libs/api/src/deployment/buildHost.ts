@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 import mime from 'mime';
 import TOML from 'toml';
 import { logger, objectStore, Upload, PutObjectOutput } from '@klave/providers';
-import { getFinalParseConfig, StagedOutputGroups } from '@klave/constants';
+import { config, getFinalParseConfig, StagedOutputGroups } from '@klave/constants';
 import { BuildDependenciesManifest, BuildMiniVMOptions } from './buildMiniVm';
 
 export type ParentMessage = {
@@ -195,18 +195,18 @@ export class BuildHost {
                         env: {
                             ...process.env,
                             INIT_CWD: workingDirectory,
-                            PATH: process.env['PATH'],
-                            PATHEXT: process.env['PATHEXT'],
-                            HOMEPATH: process.env['HOMEPATH'],
-                            HOME: process.env['HOME'],
-                            RUSTUP_HOME: process.env['RUSTUP_HOME'],
-                            RUSTUP_TOOLCHAIN: process.env['RUSTUP_TOOLCHAIN'],
-                            CARGO_HOME: process.env['CARGO_HOME'],
-                            CARGO_TARGET_DIR: process.env['CARGO_TARGET_DIR'],
-                            RUSTFLAGS: `${process.env['RUSTFLAGS'] ?? ''} \
+                            PATH: config.get('PATH'),
+                            PATHEXT: config.get('PATHEXT'),
+                            HOMEPATH: config.get('HOMEPATH'),
+                            HOME: config.get('HOME'),
+                            RUSTUP_HOME: config.get('RUSTUP_HOME'),
+                            RUSTUP_TOOLCHAIN: config.get('RUSTUP_TOOLCHAIN'),
+                            CARGO_HOME: config.get('CARGO_HOME'),
+                            CARGO_TARGET_DIR: config.get('CARGO_TARGET_DIR'),
+                            RUSTFLAGS: `${config.get('RUSTFLAGS')} \
                             --remap-path-prefix ${workingDirectory}=/klave \
-                            --remap-path-prefix ${process.env['CARGO_HOME']}=/klave/.cargo
-                            --remap-path-prefix ${process.env['RUSTUP_HOME']}=/klave/.rustup`
+                            --remap-path-prefix ${config.get('CARGO_HOME')}=/klave/.cargo
+                            --remap-path-prefix ${config.get('RUSTUP_HOME')}=/klave/.rustup`
                         }
                     }, (error, stdout, stderr) => {
                         if (error) return reject(error);
@@ -288,7 +288,7 @@ export class BuildHost {
                                 const fileUpload = new Upload({
                                     client: objectStore,
                                     params: {
-                                        Bucket: process.env['KLAVE_BHDUI_S3_BUCKET_NAME'],
+                                        Bucket: config.get('KLAVE_BHDUI_S3_BUCKET_NAME'),
                                         Key: normedKey,
                                         Body: fileStream,
                                         ContentType: mime.lookup(normedPath) ?? 'application/octet-stream'
@@ -347,7 +347,7 @@ export class BuildHost {
 export const createBuildHost = async (options: BuildHostCreatorOptions) => {
 
     const compilationId = uuid();
-    const workingDirectory = path.join(process.env['NODE_ENV'] === 'development' ? process.cwd() : '/', 'tmp', '.klave', 'buildHost', compilationId);
+    const workingDirectory = path.join(config.get('NODE_ENV') === 'development' ? process.cwd() : '/', 'tmp', '.klave', 'buildHost', compilationId);
 
     if (!fs.existsSync(workingDirectory))
         fs.mkdirSync(workingDirectory, { recursive: true });

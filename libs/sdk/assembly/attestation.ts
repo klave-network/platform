@@ -12,10 +12,13 @@ declare function get_quote(challenge: ArrayBuffer, challenge_size: i32, result: 
 // @ts-ignore: decorator
 @external("env", "verify_quote")
 declare function verify_quote(current_time: i64, quote_binary: ArrayBuffer, quote_binary_size: i32, result: ArrayBuffer, result_size: i32): i32;
+// @ts-ignore: decorator
+@external("env", "parse_quote")
+declare function parse_quote(quote_binary: ArrayBuffer, quote_binary_size: i32, result: ArrayBuffer, result_size: i32): i32;
 
 @json
-export class Quote {
-    header!: QuoteHeader;
+export class Quote3 {
+    header!: Quote3Header;
     @alias("report_body")
     reportBody!: ReportBody;
     @alias("signature_data")
@@ -23,7 +26,7 @@ export class Quote {
 }
 
 @json
-export class QuoteHeader {
+export class Quote3Header {
     version!: u16;
     @alias("att_key_type")
     attKeyType!: u16;
@@ -77,10 +80,62 @@ export class QuoteAttributes {
 }
 
 @json
-export class QuoteResponse {
-    quote!: Quote;
-    @alias("quote_binary")
-    quoteBinary!: Array<u8>;
+export class Quote4 {
+    header!: Quote4Header;
+    @alias("report_body")
+    reportBody!: Report2Body;
+    @alias("signature_data")
+    signatureData!: Array<u8>;
+}
+
+@json
+export class Quote4Header {
+    version!: u16;
+    @alias("att_key_type")
+    attKeyType!: u16;
+    @alias("tee_type")
+    teeType!: u32;
+    @alias("reserved")
+    reserved!: u32;
+    @alias("vendor_id")
+    vendorId!: Array<u8>;
+    @alias("user_data")
+    userData!: Array<u8>;
+}
+
+@json
+export class Report2Body {
+    @alias("tee_tcb_svn")
+    teeTcbSvn!: Array<u8>;
+    @alias("mr_seam")
+    mrSeam!: Array<u8>;
+    @alias("mr_signer_seam")
+    mrSignerSeam!: Array<u8>;
+    @alias("seam_attributes")
+    seamAttributes!: Array<u32>;
+    @alias("td_attributes")
+    tdAttributes!: Array<u32>;
+    @alias("xfam")
+    xfam!: Array<u32>;
+    @alias("mr_td")
+    mrTd!: Array<u8>;
+    @alias("mr_config_id")
+    mrConfigId!: Array<u8>;
+    @alias("mr_owner")
+    mrOwner!: Array<u8>;
+    @alias("mr_owner_config")
+    mrOwnerConfig!: Array<u8>;
+    @alias("rt_mr")
+    rtMr!: Array<Array<u8>>;
+    @alias("report_data")
+    reportData!: Array<u8>;
+}
+
+@json
+export class ParsedQuote {
+    version!: u16;
+    quote4!: Quote4 | null;
+    quote3!: Quote3 | null;
 }
 
 @json
@@ -104,7 +159,7 @@ export class QuoteVerificationResponse {
     supp_data!: TeeSuppDataDescriptor;
 }
 
-export function getQuote(challenge: u8[]): Result<QuoteResponse, Error> {
+export function getQuote(challenge: u8[]): Result<Uint8Array, Error> {
     let challengeBuf = new Uint8Array(challenge.length);
     for (let i = 0; i < challenge.length; ++i) {
         challengeBuf[i] = challenge[i];
@@ -119,23 +174,16 @@ export function getQuote(challenge: u8[]): Result<QuoteResponse, Error> {
     if (res < 0)
         return { data: null, err: new Error("Failed to get quote : " + String.UTF8.decode(result.slice(0, -res))) };
 
-    let quoteString = String.UTF8.decode(result.slice(0, res), true);
-    let quote = JSON.parse<QuoteResponse>(quoteString);
-
-    return { data: quote, err: null };
+    return { data: Uint8Array.wrap(result.slice(0, res)), err: null };
 }
 
-export function verifyQuote(current_time: i64, binaryQuote: Array<u8>): Result<QuoteVerificationResponse, Error> {
-    let binaryQuoteBuf = new Uint8Array(binaryQuote.length);
-    for (let i = 0; i < binaryQuote.length; ++i) {
-        binaryQuoteBuf[i] = binaryQuote[i];
-    }
+export function verifyQuote(current_time: i64, binaryQuote: Uint8Array): Result<QuoteVerificationResponse, Error> {
     let result = new ArrayBuffer(2000);
-    let res = verify_quote(current_time, binaryQuoteBuf.buffer, binaryQuoteBuf.buffer.byteLength, result, result.byteLength);
+    let res = verify_quote(current_time, binaryQuote.buffer, binaryQuote.buffer.byteLength, result, result.byteLength);
     if (abs(res) > result.byteLength) {
         // buffer not big enough, retry with a properly sized one
         result = new ArrayBuffer(abs(res));
-        res = verify_quote(current_time, binaryQuoteBuf.buffer, binaryQuoteBuf.buffer.byteLength, result, result.byteLength);
+        res = verify_quote(current_time, binaryQuote.buffer, binaryQuote.buffer.byteLength, result, result.byteLength);
     }
     if (res < 0)
         return { data: null, err: new Error("Failed to verify quote : " + String.UTF8.decode(result.slice(0, -res))) };
@@ -143,4 +191,31 @@ export function verifyQuote(current_time: i64, binaryQuote: Array<u8>): Result<Q
     let quoteString = String.UTF8.decode(result.slice(0, res), true);
     let quote = JSON.parse<QuoteVerificationResponse>(quoteString);
     return { data: quote, err: null };
+}
+
+export function parseQuote(binaryQuote: Uint8Array): Result<ParsedQuote, Error> {
+    let result = new ArrayBuffer(20000);
+    let res = parse_quote(binaryQuote.buffer, binaryQuote.buffer.byteLength, result, result.byteLength);
+    if (abs(res) > result.byteLength) {
+        // buffer not big enough, retry with a properly sized one
+        result = new ArrayBuffer(abs(res));
+        res = parse_quote(binaryQuote.buffer, binaryQuote.buffer.byteLength, result, result.byteLength);
+    }
+    if (res < 0)
+        return { data: null, err: new Error("Failed to parse quote : " + String.UTF8.decode(result.slice(0, -res))) };
+
+    let quoteString = String.UTF8.decode(result.slice(0, res), true);
+
+    if(binaryQuote[0] === 4) {
+        // Quote4
+        let quote = JSON.parse<Quote4>(quoteString);
+        return { data: { version: 4, quote4: quote, quote3: null }, err: null };
+    }else if(binaryQuote[0] === 3) {
+        // Quote3
+        let quote = JSON.parse<Quote3>(quoteString);
+        return { data: { version: 3, quote4: null, quote3: quote }, err: null };
+    }else {
+        // Unknown version
+        return { data: null, err: new Error("Unknown quote version: " + binaryQuote[0].toString()) };
+    }
 }

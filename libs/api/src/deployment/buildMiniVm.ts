@@ -13,7 +13,7 @@ import { DeploymentPushPayload } from '../types';
 import { Deployment, Repo, prisma } from '@klave/db';
 import { dummyMap } from './dummyVmFs';
 import { logger } from '@klave/providers';
-import { RepoConfigSchemaLatest, StagedOutputGroups } from '@klave/constants';
+import { config, RepoConfigSchemaLatest, StagedOutputGroups } from '@klave/constants';
 import { Worker } from 'node:worker_threads';
 import { watExtractorModuleFunction } from './watExtractorModule';
 import { createBuildHost } from './buildHost';
@@ -66,8 +66,8 @@ export class BuildMiniVM {
     private dependencies: Record<string, string> = {};
 
     constructor(private options: BuildMiniVMOptions) {
-        if (process.env['KLAVE_SQUID_URL'])
-            this.proxyAgent = new HttpsProxyAgent(process.env['KLAVE_SQUID_URL']);
+        if (config.get('KLAVE_SQUID_URL'))
+            this.proxyAgent = new HttpsProxyAgent(config.get('KLAVE_SQUID_URL'));
     }
 
     getContentSync(path: string): string | null {
@@ -75,7 +75,7 @@ export class BuildMiniVM {
         return dummyMap[normalisedPath] ?? null;
     }
 
-    async getContent(path?: string, atAbsoluteRoot = false): Promise<Awaited<ReturnType<Context['octokit']['repos']['getContent']>> | { data: string | null }> {
+    async getContent(path?: string, atAbsoluteRoot = false): Promise<Awaited<ReturnType<Context['octokit']['rest']['repos']['getContent']>> | { data: string | null }> {
 
         const { context: { octokit, ...context }, repo } = this.options;
         const normalisedPath = path === '.' ? '' : path?.split(/[\\/]/).filter((s, i) => !(i === 0 && s === '.')).join(nodePath.posix.sep);
@@ -90,7 +90,7 @@ export class BuildMiniVM {
             });
             try {
                 const fetchRoot = (atAbsoluteRoot ? '' : this.options.application?.rootDir ?? '').replace(/\/*$/g, '');
-                return await octokit.repos.getContent({
+                return await octokit.rest.repos.getContent({
                     owner: repo.owner,
                     repo: repo.name,
                     ref: context.commit.ref,
@@ -398,7 +398,7 @@ export class BuildMiniVM {
                             this.usedDependencies['@klave/compiler'] = {
                                 version: '*',
                                 digests: {
-                                    ['git:*']: process.env['GIT_REPO_COMMIT'] ?? 'unknown'
+                                    ['git:*']: config.get('GIT_REPO_COMMIT', 'unknown')
                                 }
                             };
                             this.usedDependencies['assemblyscript'] = {

@@ -3,15 +3,16 @@ import { logger, objectStore, NoSuchBucket } from '@klave/providers';
 import path from 'node:path';
 import { Readable } from 'node:stream';
 import type { ReadableStream } from 'node:stream/web';
+import { config } from '@klave/constants';
 
 const DEFAULT_FILE = '/index.html';
 let noHostingAlertDone = false;
 
 export const uiHosterMiddleware: RequestHandler = (req, res, next) => {
 
-    const domain = URL.parse(process.env['KLAVE_BHDUI_DOMAIN'] ?? '');
+    const domain = URL.parse(config.get('KLAVE_BHDUI_DOMAIN'));
 
-    if (!domain || !domain.host || domain.host.trim().length === 0) {
+    if (!domain?.host || domain.host.trim().length === 0) {
         if (!noHostingAlertDone) {
             noHostingAlertDone = true;
             logger.warn('KLAVE_BHDUI_DOMAIN is not set. Skipping UI hosting serving.');
@@ -37,7 +38,7 @@ export const uiHosterMiddleware: RequestHandler = (req, res, next) => {
     });
 
     objectStore.getObject({
-        Bucket: process.env['KLAVE_BHDUI_S3_BUCKET_NAME'],
+        Bucket: config.get('KLAVE_BHDUI_S3_BUCKET_NAME'),
         Key: objectKey
     })
         .then(data => {

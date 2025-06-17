@@ -16,6 +16,7 @@ export {
     AesGcmParams, AesKeyGenParams,
     CryptoKey,
     EcdsaParams, EcKeyGenParams,
+    HmacKeyGenParams,
     NamedAlgorithm,
     RsaHashedKeyGenParams, RsaOaepParams, RsaPssParams,
     SubtleCrypto as Subtle

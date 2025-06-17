@@ -2,6 +2,7 @@ import { RequestHandler } from 'express-serve-static-core';
 import { prisma } from '@klave/db';
 import Stripe from 'stripe';
 import { logger } from '@klave/providers';
+import { config } from '@klave/constants';
 
 export const stripeMiddlware: RequestHandler = (req, __unusedRes, next) => {
 
@@ -9,7 +10,7 @@ export const stripeMiddlware: RequestHandler = (req, __unusedRes, next) => {
 
         try {
             const webhookSignature = req.headers['stripe-signature']?.toString();
-            const webhookSecret = process.env.KLAVE_STRIPE_SIG_SECRET;
+            const webhookSecret = config.get('KLAVE_STRIPE_SIG_SECRET');
 
             if (!webhookSignature || !webhookSecret) {
                 logger.warn('Stripe webhook signature or secret not found');

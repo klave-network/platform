@@ -11,6 +11,7 @@ import { type startRegistration, type startAuthentication } from '@simplewebauth
 import { z } from 'zod';
 import { render } from '@react-email/components';
 import { VerificationCodeEmail, RegistrationFollowUpEmail } from '@klave/ui-kit';
+import { config } from '@klave/constants';
 
 const mailGuard = new FakeMailGuard({
     allowDisposable: false,
@@ -22,7 +23,7 @@ let origin: string;
 let rpID: string;
 
 const setWebauthnPrimitives = () => {
-    origin = process.env['KLAVE_WEBAUTHN_ORIGIN'] ?? 'https://klave.ui.127.0.0.1.nip.io';
+    origin = config.get('KLAVE_WEBAUTHN_ORIGIN', 'https://klave.ui.127.0.0.1.nip.io');
     rpID = new URL(origin).hostname;
 };
 
@@ -82,8 +83,8 @@ export const authRouter = createTRPCRouter({
                 }
             });
 
-            const transporter = createTransport(process.env['KLAVE_SMTP_HOST']);
-            const [keySelector, domainName] = (process.env['KLAVE_DKIM_DOMAIN'] ?? '@').split('@');
+            const transporter = createTransport(config.get('KLAVE_SMTP_HOST'));
+            const [keySelector, domainName] = config.get('KLAVE_DKIM_DOMAIN', '@').split('@');
             const followUpEmail = await render(RegistrationFollowUpEmail({ slug: newSlug }));
 
             if (!keySelector || !domainName)
@@ -94,14 +95,14 @@ export const authRouter = createTRPCRouter({
                 op: 'mailer.send',
                 description: 'Email Transport'
             }, async () => transporter.sendMail({
-                from: process.env['KLAVE_NOREPLY_ADDRESS'],
+                from: config.get('KLAVE_NOREPLY_ADDRESS'),
                 to: user.emails[0], // unsure if we should send email to all addresses
                 subject: 'Welcome to Klave',
                 html: followUpEmail,
                 dkim: {
                     domainName,
                     keySelector,
-                    privateKey: process.env['KLAVE_DKIM_PRIVATE_KEY'] ?? ''
+                    privateKey: config.get('KLAVE_DKIM_PRIVATE_KEY')
                 }
             }));
 
@@ -158,7 +159,7 @@ export const authRouter = createTRPCRouter({
             if (hint.errors.includes('disposable'))
                 throw new Error('We do not accept disposable email addresses.');
 
-            const betaDomainsAllowed = process.env['KLAVE_BETA_DOMAIN_FILTER']?.split(',') ?? [];
+            const betaDomainsAllowed = config.get('KLAVE_BETA_DOMAIN_FILTER').split(',').filter(d => d.trim() !== '') ?? [];
             const emailDomain = hint.domain;
 
             if (!emailDomain || (betaDomainsAllowed.length > 0 && !betaDomainsAllowed.includes(emailDomain)))
@@ -220,7 +221,7 @@ export const authRouter = createTRPCRouter({
                 }
 
                 const temporaryCode = `${Math.random()}`.substring(2, 11);
-                const transporter = createTransport(process.env['KLAVE_SMTP_HOST']);
+                const transporter = createTransport(config.get('KLAVE_SMTP_HOST'));
                 await prisma.user.update({
                     where: {
                         id: user.id
@@ -230,7 +231,7 @@ export const authRouter = createTRPCRouter({
                         loginCodeCreatedAt: new Date()
                     }
                 });
-                const [keySelector, domainName] = (process.env['KLAVE_DKIM_DOMAIN'] ?? '@').split('@');
+                const [keySelector, domainName] = config.get('KLAVE_DKIM_DOMAIN', '@').split('@');
                 if (!keySelector || !domainName)
                     throw new Error('DKIM domain not set');
 
@@ -243,14 +244,14 @@ export const authRouter = createTRPCRouter({
                     op: 'mailer.send',
                     description: 'Email Transport'
                 }, async () => transporter.sendMail({
-                    from: process.env['KLAVE_NOREPLY_ADDRESS'],
+                    from: config.get('KLAVE_NOREPLY_ADDRESS'),
                     to: email,
                     subject: 'Klave login code',
                     html: verificationCodeEmail,
                     dkim: {
                         domainName,
                         keySelector,
-                        privateKey: process.env['KLAVE_DKIM_PRIVATE_KEY'] ?? ''
+                        privateKey: config.get('KLAVE_DKIM_PRIVATE_KEY')
                     }
                 }));
                 return {
@@ -346,8 +347,10 @@ export const authRouter = createTRPCRouter({
             if (hint.errors.includes('disposable'))
                 throw new Error('We do not accept disposable email addresses.');
 
-            const betaDomainsAllowed = process.env['KLAVE_BETA_DOMAIN_FILTER']?.split(',') ?? [];
+            const betaDomainsAllowed = config.get('KLAVE_BETA_DOMAIN_FILTER').split(',').filter(d => d.trim() !== '') ?? [];
             const emailDomain = hint.domain;
+
+            console.log('betaDomainsAllowed', betaDomainsAllowed);
 
             if (!emailDomain || (betaDomainsAllowed.length > 0 && !betaDomainsAllowed.includes(emailDomain)))
                 throw new Error('It looks like you are not part of Klave\'s beta program');
@@ -544,7 +547,7 @@ export const authRouter = createTRPCRouter({
             if (hint.errors.includes('disposable'))
                 throw new Error('We do not accept disposable email addresses.');
 
-            const betaDomainsAllowed = process.env['KLAVE_BETA_DOMAIN_FILTER']?.split(',') ?? [];
+            const betaDomainsAllowed = config.get('KLAVE_BETA_DOMAIN_FILTER').split(',').filter(d => d.trim() !== '') ?? [];
             const emailDomain = hint.domain;
 
             if (!emailDomain || (betaDomainsAllowed.length > 0 && !betaDomainsAllowed.includes(emailDomain)))
@@ -572,7 +575,7 @@ export const authRouter = createTRPCRouter({
                 // TODO - Ensure we compute a fake UUID not based on email to avoid revealing registration status
                 userID: new TextEncoder().encode(user?.id ?? String(await webcrypto.subtle.digest('SHA-256', Buffer.from(email)))),
                 userName: email,
-                userDisplayName: `${email} | ${process.env['KLAVE_WEBAUTHN_ORIGIN_NAME']}`,
+                userDisplayName: `${email} | ${config.get('KLAVE_WEBAUTHN_ORIGIN_NAME')}`,
                 timeout: 60000,
                 // Don't prompt users for additional information about the authenticator
                 // (Recommended for smoother UX)

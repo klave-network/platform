@@ -3,16 +3,16 @@ import { ProfilingIntegration } from '@sentry/profiling-node';
 import * as SecretariumInstruments from '@secretarium/instrumentation';
 import { prisma } from '@klave/db';
 import { logger, scp as scpClient, scpOps } from '..';
-import { permissiblePeers } from '@klave/constants';
+import { config, permissiblePeers } from '@klave/constants';
 
 export const sentryOps = {
     initialize: async () => {
         try {
             logger.info('Initializing Sentry');
             Sentry.init({
-                dsn: process.env['KLAVE_SENTRY_DSN'],
-                release: `klave@${process.env['GIT_REPO_VERSION']}`,
-                environment: process.env['KLAVE_SENTRY_ENV'] ?? process.env['NODE_ENV'] ?? 'development',
+                dsn: config.get('KLAVE_SENTRY_DSN'),
+                release: `klave@${config.get('GIT_REPO_VERSION')}`,
+                environment: config.get('KLAVE_SENTRY_ENV', process.env['NODE_ENV'] ?? 'development'),
                 integrations: [
                     // enable HTTP calls tracing
                     new Sentry.Integrations.Http({ tracing: true }),
@@ -29,7 +29,7 @@ export const sentryOps = {
                         connector: scpClient,
                         domains: ['.klave.network']
                     })
-                ].concat(process.env['NODE_ENV'] === 'development' ? [new ProfilingIntegration()] : []),
+                ].concat(config.get('NODE_ENV') === 'development' ? [new ProfilingIntegration()] : []),
                 // Set tracesSampleRate to 1.0 to capture 100%
                 // of transactions for performance monitoring.
                 // We recommend adjusting this value in production

@@ -3,6 +3,7 @@ mod bindings;
 
 use bindings::klave::sdk::sdk;
 
+pub mod attestation;
 pub mod context;
 pub mod crypto;
 pub mod https;

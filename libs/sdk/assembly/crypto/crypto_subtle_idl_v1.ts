@@ -7,7 +7,8 @@ export enum key_algorithm {
     secp_r1 = 0,
     secp_k1 = 1,
     aes = 2,
-    rsa = 3
+    rsa = 3,
+    hmac = 4
 }
 
 @json
@@ -91,6 +92,11 @@ export class aes_metadata {
 }
 
 @json
+export class hmac_metadata {
+    sha_metadata!: sha_metadata;
+}
+
+@json
 export class hash_info {
     algo_id!: hash_algorithm;
     algo_metadata!: string;
@@ -144,7 +150,8 @@ export enum aes_tag_length {
 export enum signing_algorithm {
     ecdsa,
     schnorr,
-    rsa_pss
+    rsa_pss,
+    hmac
 }
 
 @json
@@ -160,6 +167,16 @@ export class ecdsa_signature_metadata {
 @json
 export class rsa_pss_signature_metadata {
     saltLength!: u64;
+}
+
+@json
+export class hmac_signature_metadata {
+    sha_metadata!: sha_metadata;
+}
+
+@json
+export class ecdh_derivation_metadata {
+    public_key!: string;
 }
 
 @json

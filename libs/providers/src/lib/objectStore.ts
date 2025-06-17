@@ -3,6 +3,7 @@ export { NoSuchBucket } from '@aws-sdk/client-s3';
 export type { PutObjectOutput } from '@aws-sdk/client-s3';
 export { Upload } from '@aws-sdk/lib-storage';
 import { logger } from './logger';
+import { config } from '@klave/constants';
 
 
 let objectStoreReference: AWS.S3 | undefined;
@@ -20,11 +21,11 @@ export const objectStoreOps = {
     initialize: async () => {
         logger.info('Configuring Klave BHDUI ObjectStore...');
         objectStoreReference = new AWS.S3({
-            endpoint: process.env['KLAVE_BHDUI_S3_ENDPOINT'],
-            region: process.env['KLAVE_BHDUI_S3_REGION'],
+            endpoint: config.get('KLAVE_BHDUI_S3_ENDPOINT'),
+            region: config.get('KLAVE_BHDUI_S3_REGION'),
             credentials: {
-                accessKeyId: process.env['KLAVE_BHDUI_S3_ACCESS_KEY'] ?? '',
-                secretAccessKey: process.env['KLAVE_BHDUI_S3_SECRET'] ?? ''
+                accessKeyId: config.get('KLAVE_BHDUI_S3_ACCESS_KEY'),
+                secretAccessKey: config.get('KLAVE_BHDUI_S3_SECRET')
             }
         });
     }
