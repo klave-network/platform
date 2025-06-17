@@ -1,4 +1,6 @@
 # Changelog
+## [1.4.5](https://github.com/klave-network/platform/compare/ui@1.4.4...ui@1.4.5) (2025-06-17)
+
 ## [1.4.4](https://github.com/klave-network/platform/compare/ui@1.4.3...ui@1.4.4) (2025-06-16)
 
 ## [1.4.3](https://github.com/klave-network/platform/compare/ui@1.4.2...ui@1.4.3) (2025-05-11)
