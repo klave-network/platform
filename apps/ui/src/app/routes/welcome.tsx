@@ -34,28 +34,27 @@ function Welcome() {
             Or you can create a new application from scratch by following the steps below:<br /><br />
             <span className='inline-block h-8 w-8 -ml-1 mt-3 mb-3 border rounded-full font-bold text-center'>1</span>
             <h2 className='mt-0'>Check you have Node installed</h2>
-            You will need Node version 20 or greater for the best experience.<br />
+            You will need Node version 24 or greater for the best experience.<br />
             Get info on how to install Node at <a rel="noopener" href='https://nodejs.org' target='_blank'>https://nodejs.org</a><br />
             <pre className='text-left'>
                 &gt; node -v<br />
-                v20.9.0
+                v24.0.2
             </pre>
             <span className='inline-block h-8 w-8 -ml-1 mt-10 mb-3 border rounded-full font-bold text-center'>2</span>
             <h2 className='mt-0'>Scaffold your Klave application</h2>
             <pre className='text-left'>
                 &gt; yarn create on-klave<br />
-                yarn create v1.22.21<br />
+                yarn create v1.22.22<br />
                 [1/4] Resolving packages...<br />
                 [2/4] Fetching packages...<br />
                 [3/4] Linking dependencies...<br />
                 [4/4] Building fresh packages...<br />
                 <br />
-                success Installed "create-on-klave@0.3.19" with binaries:<br />
+                success Installed "create-on-klave@0.4.1" with binaries:<br />
                 - create-on-klave<br />
-                - create-trustless-app<br />
-                √ What is the npm package name? ... my-trustless-app<br />
-                √ What is the name of your trustless application? ... My trustless application<br />
-                √ How would you describe the trustless application? ... This is a trustless application for the Klave Network<br />
+                √ What is the npm package name? ... my-honest-app<br />
+                √ What is the name of your honest application? ... My honest application<br />
+                √ How would you describe the honest application? ... This is a honest application for Klave<br />
                 √ What is the name of the author? ... John Doe<br />
                 √ What is the email address of the author? ... me@example.com<br />
                 √ What is the URL to the author's GitHub profile? ...<br />
