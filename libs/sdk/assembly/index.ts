@@ -9,7 +9,7 @@ import * as Crypto from "./crypto"
 export { Crypto }
 import * as Attestation from "./attestation"
 export { Attestation }
-import * as PostGreSQL from "./postgre_sql"
+import * as PostGreSQL from "./postgre_sql/postgre_sql"
 export { PostGreSQL }
 
 // @ts-ignore: decorator
