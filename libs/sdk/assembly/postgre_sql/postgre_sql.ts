@@ -14,6 +14,11 @@ declare function wasm_sql_query(connection: ArrayBuffer, query: ArrayBuffer, res
 @external("env", "sql_exec")
 declare function wasm_sql_exec(connection: ArrayBuffer, command: ArrayBuffer, result: ArrayBuffer, result_size: i32): i32;
 
+
+function connectionString(host: string, dbname: string, user: string, password: string): string
+{
+    return `host=${host} dbname=${dbname} user=${user} password=${password}`;
+}
 function connectionOpen(connection_string: string): Result<string, Error>
 {
     let s = String.UTF8.encode(connection_string, true);
