@@ -15,11 +15,11 @@ declare function wasm_sql_query(connection: ArrayBuffer, query: ArrayBuffer, res
 declare function wasm_sql_exec(connection: ArrayBuffer, command: ArrayBuffer, result: ArrayBuffer, result_size: i32): i32;
 
 
-function connectionString(host: string, dbname: string, user: string, password: string): string
+export function connectionString(host: string, dbname: string, user: string, password: string): string
 {
     return `host=${host} dbname=${dbname} user=${user} password=${password}`;
 }
-function connectionOpen(connection_string: string): Result<string, Error>
+export function connectionOpen(connection_string: string): Result<string, Error>
 {
     let s = String.UTF8.encode(connection_string, true);
     let error = new ArrayBuffer(64);
@@ -33,7 +33,7 @@ function connectionOpen(connection_string: string): Result<string, Error>
         return { data: "", err: new Error(String.UTF8.decode(error.slice(0, -result))) };
     return { data: "", err: null };
 }
-function sqlQuery(connection: string, query: string): Result<string, Error>
+export function sqlQuery(connection: string, query: string): Result<string, Error>
 {
     let cnx = String.UTF8.encode(connection, true);
     let q = String.UTF8.encode(query, true);
@@ -48,7 +48,7 @@ function sqlQuery(connection: string, query: string): Result<string, Error>
         return { data: "", err: new Error(String.UTF8.decode(query_response.slice(0, -result))) };
     return { data: String.UTF8.decode(query_response.slice(0, result)) , err: null };
 }
-function sqlExec(connection: string, command: string): Result<string, Error>
+export function sqlExec(connection: string, command: string): Result<string, Error>
 {
     let cnx = String.UTF8.encode(connection, true);
     let cmd = String.UTF8.encode(command, true);
