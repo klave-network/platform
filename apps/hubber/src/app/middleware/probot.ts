@@ -9,10 +9,16 @@ let middlewareReference: RequestHandler | undefined;
 export const probotMiddleware: RequestHandler = (req, res, next) => {
 
     if (!middlewareReference && !(probot as Probot & { uninitialized?: boolean }).uninitialized) {
-        middlewareReference = createNodeMiddleware(probotApp, {
+        createNodeMiddleware(probotApp, {
             probot,
             webhooksPath: '/'
-        }) as RequestHandler;
+        }).then((middleware) => {
+            middlewareReference = middleware as RequestHandler;
+            middlewareReference(req, res, next);
+        }).catch((error) => {
+            console.error('Error creating Probot middleware:', error);
+            next(error);
+        });
     }
 
     if (middlewareReference)
