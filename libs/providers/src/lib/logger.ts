@@ -1,5 +1,6 @@
 import * as winston from 'winston';
 import { SentryBreadcrumb } from './winstonSentryBreadcrumTransport';
+import { config } from '@klave/constants';
 
 // Define your severity levels.
 // With them, You can create log files,
@@ -17,7 +18,7 @@ const levels = {
 // if the server was run in development mode; otherwise,
 // if it was run in production, show only warn and error messages.
 const level = () => {
-    const env = process.env['NODE_ENV'] || 'development';
+    const env = config.get('NODE_ENV') || 'development';
     const isDevelopment = env === 'development';
     return isDevelopment ? 'debug' : 'warn';
 };
@@ -47,7 +48,7 @@ const format = winston.format.combine(
     winston.format.printf((info) => {
         const deepLevel = info[Symbol.for('level')] as string;
         const meta = (info[Symbol.for('splat')] as Array<Record<string, string>>)?.[0] ?? {};
-        return `${info['timestamp']} ${process.env['NX_TASK_TARGET_PROJECT']} > ${meta['parent'] ? `${info.level.replace(deepLevel, `${deepLevel}(${meta['parent']})`)}` : info.level}: ${info.message}`;
+        return `${info['timestamp']} ${config.get('NX_TASK_TARGET_PROJECT')} > ${meta['parent'] ? `${info.level.replace(deepLevel, `${deepLevel}(${meta['parent']})`)}` : info.level}: ${info.message}`;
     })
 );
 

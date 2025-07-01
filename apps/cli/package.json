@@ -18,6 +18,6 @@
         "klave": "./bin/klave.js"
     },
     "dependencies": {
-        "@klave/sdk": "0.16.0"
+        "@klave/sdk": "0.17.1"
     }
 }

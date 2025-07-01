@@ -46,6 +46,9 @@ declare function wasm_unwrap_key(decryption_key_name: ArrayBuffer, encrypt_algo_
 // @ts-ignore: decorator
 @external("env", "wrap_key")
 declare function wasm_wrap_key(key_name_to_export: ArrayBuffer, key_format: i32, encryption_key_name: ArrayBuffer, encrypt_algo_id: i32, encrypt_metadata: ArrayBuffer, key: ArrayBuffer, key_size: i32): i32;
+// @ts-ignore: decorator
+@external("env", "derive_key")
+declare function wasm_derive_key(base_key_name: ArrayBuffer, derivation_algo_id: i32, derivation_metadata: ArrayBuffer, derived_key_algo_id: i32, derived_key_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32, error: ArrayBuffer, error_size: i32): i32;
 
 // @ts-ignore: decorator
 @external("env", "save_key")
@@ -287,6 +290,27 @@ export class CryptoImpl {
             return { data: null, err: new Error("Failed to wrap key : " + String.UTF8.decode(key.slice(0, -result))) };
 
         return { data: key.slice(0, result), err: null };
+    }
+
+    static deriveKey(baseKeyName: string, derivationAlgorithm: u32, derivationMetadata: string, derivedKeyAlgorithm: u32, derivedKeyMetadata: string, extractable: boolean, usages: string[]): Result<ArrayBuffer, Error> {
+        const local_usages = new Uint8Array(usages.length);
+        for (let i = 0; i < usages.length; i++) {
+            local_usages[i] = this.usage(usages[i]);
+        }
+
+        let buf = new ArrayBuffer(200);
+        let result = wasm_derive_key(String.UTF8.encode(baseKeyName, true), derivationAlgorithm, String.UTF8.encode(derivationMetadata, true), derivedKeyAlgorithm, String.UTF8.encode(derivedKeyMetadata, true),
+            extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength, buf, buf.byteLength);
+        if (abs(result) > buf.byteLength) {
+            // buffer not big enough, retry with a properly sized one
+            buf = new ArrayBuffer(abs(result));
+            result = wasm_derive_key(String.UTF8.encode(baseKeyName, true), derivationAlgorithm, String.UTF8.encode(derivationMetadata, true), derivedKeyAlgorithm, String.UTF8.encode(derivedKeyMetadata, true),
+                extractable ? 1 : 0, local_usages.buffer, local_usages.byteLength, buf, buf.byteLength);
+        }
+        if (result < 0)
+            return { data: null, err: new Error("Failed to derive key : " + String.UTF8.decode(buf.slice(0, -result))) };
+
+        return { data: buf.slice(0, result), err: null };
     }
 
     static getPublicKey(keyName: string): Result<ArrayBuffer, Error> {

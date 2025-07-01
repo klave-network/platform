@@ -4,7 +4,7 @@ import { logger, probot, scp, scpOps } from '@klave/providers';
 import type { Application, Limits } from '@klave/db';
 import { z } from 'zod';
 import { deployToSubstrate } from '../deployment/deploymentController';
-import { getFinalParseConfig, KlaveGetCreditResult } from '@klave/constants';
+import { config, getFinalParseConfig, KlaveGetCreditResult } from '@klave/constants';
 
 export const applicationRouter = createTRPCRouter({
     getAll: publicProcedure
@@ -139,7 +139,7 @@ export const applicationRouter = createTRPCRouter({
             // if (scpOps.isConnected()) {
             //     apps.forEach(async (app, idx) => {
             //         try {
-            //             await scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
+            //             await scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_kredit', `klave-app-get-kredit-${app.id}`, {
             //                 app_id: app.id
             //             }).send().then((result) => {
             //                 if (result.kredit === undefined)
@@ -158,7 +158,7 @@ export const applicationRouter = createTRPCRouter({
             //             }).catch(() => {
             //                 // Swallow this error
             //             });
-            //             await scp.newTx('wasm-manager', 'get_allowed_kredit_per_query', `klave-app-get-query-limit-${appId}`, {
+            //             await scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_allowed_kredit_per_query', `klave-app-get-query-limit-${appId}`, {
             //                 app_id: appId
             //             }).send()
             //                 .then(async (result) => {
@@ -183,7 +183,7 @@ export const applicationRouter = createTRPCRouter({
             //                     }
             //                 });
             //             }
-            //             await scp.newTx('wasm-manager', 'get_allowed_kredit_per_transaction', `klave-app-get-transaction-limit-${appId}`, {
+            //             await scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_allowed_kredit_per_transaction', `klave-app-get-transaction-limit-${appId}`, {
             //                 app_id: appId
             //             }).send()
             //                 .then(async (result) => {
@@ -228,7 +228,7 @@ export const applicationRouter = createTRPCRouter({
                     description: 'Secretarium Task'
                 }, async () => {
                     try {
-                        // await scp.newTx('wasm-manager', 'get_kredit', `klave-app-get-kredit-${appId}`, {
+                        // await scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_kredit', `klave-app-get-kredit-${appId}`, {
                         //     app_id: appId
                         // }).send()
                         //     .then(async (result) => {
@@ -245,7 +245,7 @@ export const applicationRouter = createTRPCRouter({
                         //     }).catch(() => {
                         //         // Swallow this error
                         //     });
-                        await scp.newTx('wasm-manager', 'get_allowed_kredit_per_query', `klave-app-get-query-limit-${appId}`, {
+                        await scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_allowed_kredit_per_query', `klave-app-get-query-limit-${appId}`, {
                             app_id: appId
                         }).send()
                             .then(async (result) => {
@@ -264,7 +264,7 @@ export const applicationRouter = createTRPCRouter({
                             }).catch(() => {
                                 // Swallow this error
                             });
-                        await scp.newTx('wasm-manager', 'get_allowed_kredit_per_transaction', `klave-app-get-transaction-limit-${appId}`, {
+                        await scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_allowed_kredit_per_transaction', `klave-app-get-transaction-limit-${appId}`, {
                             app_id: appId
                         }).send()
                             .then(async (result) => {
@@ -398,7 +398,7 @@ export const applicationRouter = createTRPCRouter({
 
                     const newLimits = { ...(app.limits ?? {}) };
                     try {
-                        // await scp.newTx<KlaveGetCreditResult>('wasm-manager', 'get_kredit', `klave-app-get-kredit-${app.id}`, {
+                        // await scp.newTx<KlaveGetCreditResult>(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_kredit', `klave-app-get-kredit-${app.id}`, {
                         //     app_id: app.id
                         // }).send().then(async (result) => {
                         //     if (result.kredit === undefined)
@@ -414,7 +414,7 @@ export const applicationRouter = createTRPCRouter({
                         // }).catch(() => {
                         //     // Swallow this error
                         // });
-                        await scp.newTx<KlaveGetCreditResult>('wasm-manager', 'get_allowed_kredit_per_query', `klave-app-get-query-limit-${app.id}`, {
+                        await scp.newTx<KlaveGetCreditResult>(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_allowed_kredit_per_query', `klave-app-get-query-limit-${app.id}`, {
                             app_id: app.id
                         }).send()
                             .then(async (result) => {
@@ -424,7 +424,7 @@ export const applicationRouter = createTRPCRouter({
                             }).catch(() => {
                                 // Swallow this error
                             });
-                        await scp.newTx<KlaveGetCreditResult>('wasm-manager', 'get_allowed_kredit_per_transaction', `klave-app-get-transaction-limit-${app.id}`, {
+                        await scp.newTx<KlaveGetCreditResult>(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_allowed_kredit_per_transaction', `klave-app-get-transaction-limit-${app.id}`, {
                             app_id: app.id
                         }).send()
                             .then(async (result) => {
@@ -701,7 +701,7 @@ export const applicationRouter = createTRPCRouter({
 
                     const installationOctokit = await probot.auth(parseInt(deployableRepo.installationRemoteId));
 
-                    const lastCommits = await installationOctokit.repos.listCommits({
+                    const lastCommits = await installationOctokit.rest.repos.listCommits({
                         owner: deployableRepo.owner,
                         repo: deployableRepo.name,
                         per_page: 2
@@ -1018,7 +1018,7 @@ export const applicationRouter = createTRPCRouter({
             }, async () => {
                 return await new Promise((resolve, reject) => {
 
-                    scp.newTx('wasm-manager', 'set_allowed_kredit_per_transaction', `klave-app-set-transaction-limit-${app.id}`, {
+                    scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'set_allowed_kredit_per_transaction', `klave-app-set-transaction-limit-${app.id}`, {
                         app_id: app.id,
                         kredit: Number(combinedLimits.transactionCallSpend)
                     }).onExecuted(result => {
@@ -1037,7 +1037,7 @@ export const applicationRouter = createTRPCRouter({
             }, async () => {
                 return await new Promise((resolve, reject) => {
 
-                    scp.newTx('wasm-manager', 'set_allowed_kredit_per_query', `klave-app-set-query-limit-${app.id}`, {
+                    scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'set_allowed_kredit_per_query', `klave-app-set-query-limit-${app.id}`, {
                         app_id: app.id,
                         kredit: Number(combinedLimits.queryCallSpend)
                     }).onExecuted(result => {

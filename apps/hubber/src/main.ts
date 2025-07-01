@@ -1,4 +1,5 @@
 // import { startPruner } from '@klave/pruner';
+import { config } from '@klave/constants';
 import { start } from './app';
 import './i18n';
 import { dbOps } from './utils/db';
@@ -7,7 +8,15 @@ import http from 'node:http';
 import https from 'node:https';
 import type { Plugin } from 'vite';
 
-const onlineChain = async () => process.env['KLAVE_OFFLINE_DEV'] === 'true'
+process.on('unhandledRejection', (reason, p) => {
+    console.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+});
+
+const onlineChain = async () => config.get('KLAVE_OFFLINE_DEV') === 'true'
     ? Promise.resolve()
     : Promise.resolve()
         .then(dispatchOps.initialize)
@@ -26,10 +35,10 @@ const serverHandle = dbOps.initialize()
     .then(onlineChain)
     .then(async () => {
 
-        const port = Number(process.env.PORT) || 3333;
-        const host = process.env.HOST || 'klave.api.127.0.0.1.nip.io';
-        const bhuiHostPort = Number(URL.parse(process.env['KLAVE_BHDUI_DOMAIN'] ?? '')?.port) || port;
-        const bhuiHostDomain = URL.parse(process.env['KLAVE_BHDUI_DOMAIN'] ?? '')?.hostname || 'klave.api.127.0.0.2.nip.io';
+        const port = Number(config.get('PORT')) || 3333;
+        const host = config.get('HOST', 'klave.api.127.0.0.1.nip.io');
+        const bhuiHostPort = Number(URL.parse(config.get('KLAVE_BHDUI_DOMAIN'))?.port) || port;
+        const bhuiHostDomain = URL.parse(config.get('KLAVE_BHDUI_DOMAIN'))?.hostname ?? 'klave.api.127.0.0.2.nip.io';
 
         let protocol = 'http';
         const expressApp = await start();
@@ -45,12 +54,21 @@ const serverHandle = dbOps.initialize()
                     hosts: [host, bhuiHostDomain, `*.${bhuiHostDomain}`]
                 }) as unknown as Plugin);
                 if (vitePlugin && typeof vitePlugin.config === 'function') {
-                    const vitePluginConfig = await vitePlugin.config({
+                    const vitePluginConfig = await vitePlugin.config.apply({
+                        debug: console.log,
+                        error: console.error as () => never,
+                        info: console.info,
+                        warn: console.warn,
+                        meta: {
+                            rollupVersion: '*',
+                            viteVersion: '*'
+                        }
+                    }, [{
                         logLevel: 'silent'
                     }, {
                         mode: 'detached',
                         command: 'serve'
-                    });
+                    }]);
                     if (!vitePluginConfig?.server?.https)
                         return;
                     serverContainer = https.createServer({

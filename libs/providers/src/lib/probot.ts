@@ -1,5 +1,6 @@
 import { Probot } from 'probot';
 import { logger } from './logger';
+import { config } from '@klave/constants';
 
 let probotReference: Probot | undefined;
 
@@ -15,9 +16,9 @@ export const probot = new Proxy<Probot>({} as Probot, {
 export const probotOps = {
     initialize: async () => {
 
-        const appId = process.env['KLAVE_PROBOT_APPID'];
-        const privateKey = `-----BEGIN RSA PRIVATE KEY-----\n${process.env['KLAVE_PROBOT_PRIVATE_KEY']}\n-----END RSA PRIVATE KEY-----`;
-        const secret = process.env['KLAVE_PROBOT_WEBHOOK_SECRET'];
+        const appId = config.get('KLAVE_PROBOT_APPID');
+        const privateKey = `-----BEGIN RSA PRIVATE KEY-----\n${config.get('KLAVE_PROBOT_PRIVATE_KEY')}\n-----END RSA PRIVATE KEY-----`;
+        const secret = config.get('KLAVE_PROBOT_WEBHOOK_SECRET');
 
         if (!appId || appId.length === 0)
             throw new Error('Missing KLAVE_PROBOT_APPID environment variable');
@@ -31,11 +32,11 @@ export const probotOps = {
                 appId,
                 privateKey,
                 secret,
-                logLevel: process.env['NODE_ENV'] === 'production' ? 'error' : 'debug'
+                logLevel: config.get('NODE_ENV') === 'production' ? 'error' : 'debug'
             });
 
             const octokit = await probotReference.auth();
-            await octokit.apps.listInstallations({
+            await octokit.rest.apps.listInstallations({
                 per_page: 1
             });
             logger.info('Connected to GitHub via Probot');

@@ -1,10 +1,10 @@
-import { TransferListItem, Worker } from 'node:worker_threads';
+import { Transferable, Worker } from 'node:worker_threads';
 import ts from 'typescript';
 import { v4 as uuid } from 'uuid';
 import type { Stats } from 'assemblyscript/dist/asc';
-import { formatter } from './languageService';
-import { compilerModuleFunction } from './compilerModule';
-import localPackageJson from '../package.json';
+import { formatter } from './languageService.js';
+import { compilerModuleFunction } from './compilerModule.js';
+import localPackageJson from '../package.json' with { type: 'json' };
 
 const deferredMarker = '__klave_deferred__';
 
@@ -109,7 +109,7 @@ export class CompilerHost {
         return this;
     }
 
-    postMessage(value: ParentMessage, transferList?: ReadonlyArray<TransferListItem>): void {
+    postMessage(value: ParentMessage, transferList?: ReadonlyArray<Transferable>): void {
         if (value.type === 'read')
             if (value.id === this.entryFile && value.contents) {
 

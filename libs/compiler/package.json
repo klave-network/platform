@@ -1,6 +1,6 @@
 {
     "name": "@klave/compiler",
-    "version": "1.0.4",
+    "version": "1.0.6",
     "private": false,
     "description": "Klave AssemblyScript compiling wrapper",
     "repository": {
@@ -13,11 +13,11 @@
         "name": "Florian Guitton",
         "email": "florian@secretarium.com"
     },
-    "type": "commonjs",
+    "type": "module",
     "dependencies": {
         "@klave/as-json": "0.9.21",
-        "assemblyscript": "0.27.36",
-        "serialize-error": "8.1.0",
+        "assemblyscript": "0.28.2",
+        "serialize-error": "12.0.0",
         "typescript": "^5.8.3",
         "uuid": "^11.1.0"
     }

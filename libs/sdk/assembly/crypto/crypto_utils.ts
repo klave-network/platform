@@ -4,7 +4,7 @@
  */
 
 import * as idlV1 from './crypto_subtle_idl_v1';
-import { RsaHashedKeyGenParams, EcKeyGenParams, AesKeyGenParams } from './crypto_subtle';
+import { RsaHashedKeyGenParams, EcKeyGenParams, AesKeyGenParams, HmacKeyGenParams } from './crypto_subtle';
 import { Result } from '../index';
 
 export class KeyFormatWrapper
@@ -16,7 +16,7 @@ export class CryptoUtil
 {
     static isValidAlgorithm(algorithm: string): boolean {
         if (algorithm != 'sha1-160' && algorithm != 'SHA1-160' && algorithm != 'sha1' && algorithm != 'SHA1' &&
-            algorithm != 'sha2-256' && algorithm != 'SHA2-256' && algorithm != 'sha-256' && algorithm != 'SHA-256' && 
+            algorithm != 'sha2-256' && algorithm != 'SHA2-256' && algorithm != 'sha-256' && algorithm != 'SHA-256' &&
             algorithm != 'sha2-384' && algorithm != 'SHA2-384' && algorithm != 'sha-384' && algorithm != 'SHA-384' &&
             algorithm != 'sha2-512' && algorithm != 'SHA2-512' && algorithm != 'sha-512' && algorithm != 'SHA-512' &&
             algorithm != 'sha3-256' && algorithm != 'SHA3-256' &&
@@ -28,7 +28,7 @@ export class CryptoUtil
 
     static digestSize(algorithm: string): number {
         switch (algorithm)
-        {   
+        {
             case 'sha1-160':
             case 'SHA1-160':
             case 'sha1':
@@ -153,6 +153,15 @@ export class CryptoUtil
             return {data: null, err: new Error('Invalid AES key size')};
 
         return {data: {length: bitsize}, err: null};
+    }
+
+    static getHMACMetadata(params: HmacKeyGenParams): Result<idlV1.hmac_metadata, Error>
+    {
+        let shaMetadata = CryptoUtil.getShaMetadata(params.hash);
+        if (shaMetadata.err !== null || shaMetadata.data === null)
+            return {data: null, err: new Error('Invalid HMAC hash metadata')};
+
+        return {data: {sha_metadata: shaMetadata.data!}, err: null};
     }
 
     static getKeyFormat(format: string): Result<KeyFormatWrapper, Error>

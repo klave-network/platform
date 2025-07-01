@@ -18,10 +18,13 @@
         },
         "keepClassNames": true,
         "externalHelpers": false,
-        "loose": true
+        "loose": true,
+        "experimental": {
+            "keepImportAttributes": true
+        }
     },
     "module": {
-        "type": "commonjs",
+        "type": "es6",
         "strict": true,
         "lazy": false,
         "noInterop": false

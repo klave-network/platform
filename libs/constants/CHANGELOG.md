@@ -1,4 +1,16 @@
 # Changelog
+## [1.2.0](https://github.com/klave-network/platform/compare/constants@1.1.1...constants@1.2.0) (2025-06-12)
+
+
+### Features
+
+* **constants:** Add `process.env` getter helper ([42d17ef](https://github.com/klave-network/platform/commit/42d17ef84ee6f931b6ce180cc5be0aaec9f6d209))
+
+
+### Bug Fixes
+
+* **constants:** Environment getting from `process.env` ([11c7bdb](https://github.com/klave-network/platform/commit/11c7bdb07fa13e5a34353a5511f250f02f0e4828))
+
 ## [1.1.1](https://github.com/klave-network/platform/compare/constants@1.1.0...constants@1.1.1) (2025-05-09)
 
 ### Dependency Updates
