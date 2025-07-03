@@ -1,4 +1,4 @@
-// import { startPruner } from '@klave/pruner';
+import { startPruner } from '@klave/pruner';
 import { config } from '@klave/constants';
 import { start } from './app';
 import './i18n';
@@ -105,7 +105,7 @@ const serverHandle = dbOps.initialize()
             logger.info(`Listening at ${protocol}://${bhuiHostDomain}:${bhuiHostPort}`);
         });
 
-        // startPruner();
+        startPruner();
 
         return [server, serverDUI];
 
