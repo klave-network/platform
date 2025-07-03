@@ -1,8 +1,7 @@
 use crate::sdk;
 
 pub fn connection_string(host: &str, dbname: &str, user: &str, password: &str) -> String {
-    let conn_str = format!("host={} dbname={} user={} password={}", host, dbname, user, password);
-    conn_str
+    format!("host={host} dbname={dbname} user={user} password={password}")
 }
 
 pub fn connection_open(uri: &str) -> Result<String, Box<dyn std::error::Error>> {
