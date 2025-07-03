@@ -1,7 +1,7 @@
 import { trace } from '@sentry/core';
 import * as Sentry from '@sentry/node';
 import { prisma } from '@klave/db';
-import { probot } from './probot';
+import { probotOps } from './probot';
 import { logger } from './logger';
 
 export const githubOps = {
@@ -9,6 +9,12 @@ export const githubOps = {
 
         if (process.env.NODE_ENV === 'development') {
             logger.info('Skipping GitHub Sync in development mode');
+            return;
+        }
+
+        const probot = probotOps.getProbot();
+        if (!probot) {
+            logger.error('Probot is not initialized, cannot sync GitHub installations');
             return;
         }
 

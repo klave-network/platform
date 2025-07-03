@@ -1,30 +1,32 @@
 import { Express, RequestHandler } from 'express-serve-static-core';
-import { createNodeMiddleware, Probot } from 'probot';
-import { probot, dispatchOps } from '@klave/providers';
+import { createNodeMiddleware } from 'probot';
+import { probotOps, dispatchOps } from '@klave/providers';
 import probotApp from '../probot';
 import { createRequest, createResponse } from 'node-mocks-http';
 import { Writable, Readable } from 'node:stream';
 
 let middlewareReference: RequestHandler | undefined;
+let isCreatingNodeMiddleware = false;
+
 export const probotMiddleware: RequestHandler = (req, res, next) => {
-
-    if (!middlewareReference && !(probot as Probot & { uninitialized?: boolean }).uninitialized) {
-        createNodeMiddleware(probotApp, {
-            probot,
-            webhooksPath: '/'
-        }).then((middleware) => {
+    (async () => {
+        const probot = probotOps.getProbot();
+        if (!middlewareReference && probot && !isCreatingNodeMiddleware) {
+            isCreatingNodeMiddleware = true;
+            const middleware = await createNodeMiddleware(probotApp, {
+                probot,
+                webhooksPath: '/'
+            });
             middlewareReference = middleware as RequestHandler;
+        }
+        if (middlewareReference)
             middlewareReference(req, res, next);
-        }).catch((error) => {
-            console.error('Error creating Probot middleware:', error);
-            next(error);
-        });
-    }
-
-    if (middlewareReference)
-        middlewareReference(req, res, next);
-    else
-        next();
+        else
+            next();
+    })().catch((error) => {
+        console.error('Probot middleware error:', error);
+        next(error);
+    });
 };
 
 type HExpress = Express & {
@@ -36,7 +38,6 @@ export const probotMiddlewareHandlerRegistration = (app: Express) => {
         try {
 
             const { headers, body } = reqInfo;
-
             const dHeaders: Record<string, string> = {
                 host: 'localhost'
             };
@@ -50,6 +51,9 @@ export const probotMiddlewareHandlerRegistration = (app: Express) => {
                     dHeaders[key] = value;
                 });
             }
+
+            if (!dHeaders['x-github-event'])
+                return;
 
             let dBody = Buffer.from(new ArrayBuffer(0));
             if (body) {
@@ -66,6 +70,7 @@ export const probotMiddlewareHandlerRegistration = (app: Express) => {
                 }
             }
 
+            console.log('Probot middleware received:', dHeaders, dBody.length);
             const mReqStream = Readable.from(dBody);
             const mReq = createRequest({
                 url: '/hook',
@@ -79,6 +84,7 @@ export const probotMiddlewareHandlerRegistration = (app: Express) => {
                 writableStream: Writable
             });
 
+            console.log('Probot middleware request:', mReq.url, mReq.method, mReq.headers);
             (app as HExpress).handle(mReq, mRes, (...rest) => {
                 console.log('Handle middleware finished:', rest);
             });
