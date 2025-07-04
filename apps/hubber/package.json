@@ -15,6 +15,7 @@
     },
     "type": "module",
     "dependencies": {
-        "typescript": "^5.8.3"
+        "typescript": "^5.8.3",
+        "zod-openapi": "^4.2.4"
     }
 }
