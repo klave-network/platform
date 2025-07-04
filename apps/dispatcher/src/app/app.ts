@@ -65,9 +65,7 @@ export async function app(fastify: FastifyInstance) {
                 }
             });
             req.raw.on('end', () => {
-                const content = concatUint8Arrays(chunks);
-                if (!content)
-                    return;
+                const content = concatUint8Arrays(chunks) ?? new Uint8Array(0);
                 resolve(content);
             });
             req.raw.on('error', (err) => {
