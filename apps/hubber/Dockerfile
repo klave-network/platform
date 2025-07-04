@@ -25,7 +25,7 @@ WORKDIR /app
 RUN cd hubber && yarn add prisma && yarn autoclean --production && yarn cache clean
 RUN cd hubber && yarn run prisma generate
 
-FROM docker.io/node:24-alpine AS base
+FROM docker.io/node:22-alpine AS base
 
 ENV HUSKY=0
 ENV RUST_VERSION=1.85.0 \
