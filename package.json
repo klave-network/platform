@@ -172,9 +172,11 @@
         "stripe": "18.3.0",
         "styled-components": "6.1.19",
         "superjson": "2.2.2",
+        "swagger-ui-express": "^5.0.1",
         "tailwindcss": "4.1.11",
         "terminal-link": "^4.0.0",
         "toml": "3.0.0",
+        "trpc-to-openapi": "2.3.2",
         "ts-case-convert": "2.1.0",
         "tslib": "^2.8.1",
         "unique-names-generator": "4.7.1",
@@ -185,7 +187,8 @@
         "wabt": "1.0.37",
         "winston": "3.17.0",
         "ws": "8.18.3",
-        "zod": "^3.25.71"
+        "zod": "^3.25.71",
+        "zod-openapi": "^4.2.4"
     },
     "devDependencies": {
         "@babel/core": "^7.28.0",
@@ -238,6 +241,7 @@
         "@types/react-transition-group": "4.4.12",
         "@types/sinon-chrome": "2.2.16",
         "@types/supertest": "6.0.3",
+        "@types/swagger-ui-express": "^4.1.8",
         "@types/uuid": "10.0.0",
         "@types/validate-npm-package-name": "4.0.2",
         "@types/ws": "8.18.1",
