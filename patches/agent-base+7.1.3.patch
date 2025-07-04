@@ -1,0 +1,43 @@
+diff --git a/node_modules/agent-base/dist/index.d.ts b/node_modules/agent-base/dist/index.d.ts
+index c849c34..2c11a81 100644
+--- a/node_modules/agent-base/dist/index.d.ts
++++ b/node_modules/agent-base/dist/index.d.ts
+@@ -8,13 +8,11 @@ import * as http from 'http';
+ import type { Duplex } from 'stream';
+ export * from './helpers';
+ interface HttpConnectOpts extends net.TcpNetConnectOpts {
+-    secureEndpoint: false;
+     protocol?: string;
+ }
+ interface HttpsConnectOpts extends tls.ConnectionOptions {
+-    secureEndpoint: true;
+     protocol?: string;
+-    port: number;
++    port?: number;
+ }
+ export type AgentConnectOpts = HttpConnectOpts | HttpsConnectOpts;
+ declare const INTERNAL: unique symbol;
+@@ -30,7 +28,7 @@ export declare abstract class Agent extends http.Agent {
+     isSecureEndpoint(options?: AgentConnectOpts): boolean;
+     private incrementSockets;
+     private decrementSockets;
+-    getName(options: AgentConnectOpts): string;
++    getName(options?: AgentConnectOpts): string;
+     createSocket(req: http.ClientRequest, options: AgentConnectOpts, cb: (err: Error | null, s?: Duplex) => void): void;
+     createConnection(): Duplex;
+     get defaultPort(): number;
+diff --git a/node_modules/agent-base/dist/index.js b/node_modules/agent-base/dist/index.js
+index c3c4099..195c64b 100644
+--- a/node_modules/agent-base/dist/index.js
++++ b/node_modules/agent-base/dist/index.js
+@@ -111,9 +111,7 @@ class Agent extends http.Agent {
+     // In order to properly update the socket pool, we need to call `getName()` on
+     // the core `https.Agent` if it is a secureEndpoint.
+     getName(options) {
+-        const secureEndpoint = typeof options.secureEndpoint === 'boolean'
+-            ? options.secureEndpoint
+-            : this.isSecureEndpoint(options);
++        const secureEndpoint = this.isSecureEndpoint(options);
+         if (secureEndpoint) {
+             // @ts-expect-error `getName()` isn't defined in `@types/node`
+             return https_1.Agent.prototype.getName.call(this, options);

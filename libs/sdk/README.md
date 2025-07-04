@@ -18,7 +18,7 @@ The Klave SDK is a powerful toolset designed to facilitate the development of ho
 
 Before installing the Klave SDK, ensure that the following software is installed on your system:
 
-- [Node.js](https://nodejs.org/)
+- [Node.js](https://nodejs.org/) >=24
 - [Git](https://git-scm.com/)
 
 You will need a [Klave](https://klave.com) account to deploy your application using this SDK

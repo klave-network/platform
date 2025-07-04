@@ -1,4 +1,4 @@
-// import { startPruner } from '@klave/pruner';
+import { startPruner } from '@klave/pruner';
 import { config } from '@klave/constants';
 import { start } from './app';
 import './i18n';
@@ -54,12 +54,21 @@ const serverHandle = dbOps.initialize()
                     hosts: [host, bhuiHostDomain, `*.${bhuiHostDomain}`]
                 }) as unknown as Plugin);
                 if (vitePlugin && typeof vitePlugin.config === 'function') {
-                    const vitePluginConfig = await vitePlugin.config({
+                    const vitePluginConfig = await vitePlugin.config.apply({
+                        debug: console.log,
+                        error: console.error as () => never,
+                        info: console.info,
+                        warn: console.warn,
+                        meta: {
+                            rollupVersion: '*',
+                            viteVersion: '*'
+                        }
+                    }, [{
                         logLevel: 'silent'
                     }, {
                         mode: 'detached',
                         command: 'serve'
-                    });
+                    }]);
                     if (!vitePluginConfig?.server?.https)
                         return;
                     serverContainer = https.createServer({
@@ -96,7 +105,7 @@ const serverHandle = dbOps.initialize()
             logger.info(`Listening at ${protocol}://${bhuiHostDomain}:${bhuiHostPort}`);
         });
 
-        // startPruner();
+        startPruner();
 
         return [server, serverDUI];
 

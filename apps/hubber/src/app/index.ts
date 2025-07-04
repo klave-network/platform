@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import multer from 'multer';
 import cors from 'cors';
 import passport from 'passport';
+import * as swaggerUi from 'swagger-ui-express';
 import { v4 as uuid } from 'uuid';
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { prisma } from '@klave/db';
@@ -17,6 +18,7 @@ import { stripeMiddlware } from './middleware/stripe';
 import { sentryRequestMiddleware, sentryTracingMiddleware, sentryErrorMiddleware } from './middleware/sentry';
 import { passportLoginCheckMiddleware } from './middleware/passport';
 import { trcpMiddlware } from './middleware/trpc';
+import { openAPIMiddleware, openAPIDocument } from './middleware/openapi';
 // import { i18nextMiddleware } from './middleware/i18n';
 // import { getDriverSubstrate } from '../utils/db';
 import { usersRouter } from './routes';
@@ -174,6 +176,9 @@ export const start = async () => {
 
     app.use(passportLoginCheckMiddleware);
     app.use('/mcp', mcpMiddleware);
+
+    app.use('/docs', swaggerUi.serve, swaggerUi.setup(openAPIDocument));
+    app.use('/o', openAPIMiddleware);
     app.use('/trpc', trcpMiddlware);
     app.use(usersRouter);
     app.use(sentryErrorMiddleware);

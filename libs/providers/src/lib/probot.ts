@@ -4,15 +4,6 @@ import { config } from '@klave/constants';
 
 let probotReference: Probot | undefined;
 
-export const probot = new Proxy<Probot>({} as Probot, {
-    get: (__unusedTarget, prop, receiver) => {
-        if (probotReference)
-            return Reflect.get(probotReference, prop, receiver);
-        if (prop === 'uninitialized')
-            return true;
-    }
-});
-
 export const probotOps = {
     initialize: async () => {
 
@@ -44,5 +35,8 @@ export const probotOps = {
         } catch (e) {
             logger.error(`Connection to GitHub via Probot failed: ${e}`);
         }
+    },
+    getProbot: () => {
+        return probotReference;
     }
 };

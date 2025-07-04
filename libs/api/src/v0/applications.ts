@@ -1,6 +1,6 @@
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import * as Sentry from '@sentry/node';
-import { logger, probot, scp, scpOps } from '@klave/providers';
+import { logger, probotOps, scp, scpOps } from '@klave/providers';
 import type { Application, Limits } from '@klave/db';
 import { z } from 'zod';
 import { deployToSubstrate } from '../deployment/deploymentController';
@@ -696,6 +696,10 @@ export const applicationRouter = createTRPCRouter({
                             // owner: webId ?? emphemeralKlaveTag ?? sessionID lklk
                         }
                     });
+
+                    const probot = probotOps.getProbot();
+                    if (!probot)
+                        throw (new Error('Probot is not initialized'));
 
                     logger.debug(`Registering application ${appSlug} (${newApp.id})`);
 

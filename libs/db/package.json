@@ -13,5 +13,5 @@
         "name": "Florian Guitton",
         "email": "florian@secretarium.com"
     },
-    "type": "commonjs"
+    "type": "module"
 }

@@ -7,6 +7,7 @@
  * The pieces you will need to use are documented accordingly near the end
  */
 import * as Sentry from '@sentry/node';
+import { type OpenApiMeta } from 'trpc-to-openapi';
 import { type Context } from './context';
 import { transformer } from './transformer';
 
@@ -20,6 +21,7 @@ import { initTRPC, TRPCError } from '@trpc/server';
 
 const t = initTRPC
     .context<Awaited<Context>>()
+    .meta<OpenApiMeta>()
     .create({
         transformer,
         errorFormatter({ shape }) {

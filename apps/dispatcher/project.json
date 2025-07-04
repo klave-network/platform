@@ -28,7 +28,8 @@
         "serve": {
             "executor": "@nx/js:node",
             "options": {
-                "buildTarget": "dispatcher:build"
+                "buildTarget": "dispatcher:build",
+                "port": 9228
             },
             "configurations": {
                 "production": {
@@ -56,12 +57,7 @@
         },
         "docker-build": {
             "dependsOn": [
-                {
-                    "projects": [
-                        "db"
-                    ],
-                    "target": "compile"
-                }
+                "^build"
             ],
             "executor": "nx:run-commands",
             "options": {

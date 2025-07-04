@@ -6,7 +6,7 @@ import { objectToCamel } from 'ts-case-convert';
 import { isTruthy } from '../utils/isTruthy';
 import type { DeployableRepo, GitHubToken, PrismaClient } from '@klave/db';
 import { config, getFinalParseConfig } from '@klave/constants';
-import { probot } from '@klave/providers';
+import { probotOps } from '@klave/providers';
 
 export const reposRouter = createTRPCRouter({
     deployables: publicProcedure
@@ -445,6 +445,12 @@ export const reposRouter = createTRPCRouter({
 });
 
 const updateInstalledRepos = async (prisma: PrismaClient, octokit: Octokit) => {
+
+    const probot = probotOps.getProbot();
+
+    if (!probot) {
+        throw new Error('Probot is not initialized');
+    }
 
     const allRepos = [];
     const currentInstallForRepo = await octokit.apps.listInstallationsForAuthenticatedUser({

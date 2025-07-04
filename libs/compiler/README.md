@@ -42,7 +42,7 @@ createCompiler()
 
 ## Prerequisites
 
-- **Node.js**: Ensure that Node.js is installed on your system. You can download it from the [official website](https://nodejs.org/).
+- **Node.js**: Ensure that Node.js >=24 is installed on your system. You can download it from the [official website](https://nodejs.org/).
 - **AssemblyScript**: Familiarity with AssemblyScript is recommended for developing applications on Klave. Learn more about AssemblyScript [here](https://www.assemblyscript.org/).
 
 ## Resources

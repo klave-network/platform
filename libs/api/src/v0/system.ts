@@ -5,16 +5,25 @@ import { config } from '@klave/constants';
 
 export const systemRouter = createTRPCRouter({
     isSystemReady: publicProcedure
+        .meta({ openapi: { method: 'GET', path: '/v0/system/isReady' } })
+        .input(z.undefined())
+        .output(z.boolean())
         .query(async ({ ctx: { prisma, sessionID } }) => {
             const isDBAlive = await prisma.session.findUnique({ where: { id: sessionID } });
             const isSecretariumAlive = scpOps.isConnected();
             return isSecretariumAlive && !!isDBAlive;
         }),
     getSecretariumNode: publicProcedure
+        .meta({ openapi: { method: 'GET', path: '/v0/system/secretariumNode' } })
+        .input(z.undefined())
+        .output(z.string())
         .query(async () => {
             return config.get('KLAVE_SECRETARIUM_NODE');
         }),
     getUIHostingDomain: publicProcedure
+        .meta({ openapi: { method: 'GET', path: '/v0/system/uiHostingDomain' } })
+        .input(z.undefined())
+        .output(z.string())
         .query(async () => {
             return config.get('KLAVE_BHDUI_DOMAIN');
         }),

@@ -1,5 +1,8 @@
 import { readFileSync } from 'fs';
+import * as url from 'url';
 import type { Options } from '@swc/core';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 // Reading the SWC compilation config and remove the "exclude"
 // for the test files to be compiled by SWC
@@ -9,9 +12,7 @@ const { exclude: __unusedExclude, ...swcJestConfig } = JSON.parse(
 
 // disable .swcrc look-up by SWC core because we're passing in swcJestConfig ourselves.
 // If we do not disable this, SWC Core will read .swcrc and won't transform our test files due to "exclude"
-if (swcJestConfig.swcrc === undefined) {
-    swcJestConfig.swcrc = false;
-}
+swcJestConfig.swcrc ??= false;
 
 export default {
     displayName: 'db',
