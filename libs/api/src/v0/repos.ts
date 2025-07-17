@@ -1,4 +1,3 @@
-// import { CipherGCM } from 'node:crypto';
 import { Octokit } from '@octokit/rest';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import { z } from 'zod';
@@ -13,51 +12,27 @@ export const reposRouter = createTRPCRouter({
         .input(z.object({
             refreshing: z.boolean().default(false)
         }))
-        .query(async ({ ctx: { session, sessionStore, sessionID, prisma, web }, input: { refreshing } }) => {
+        .query(async ({ ctx: { session, sessionStore, sessionID, prisma }, input: { refreshing } }) => {
 
             let manifest: DeployableRepo[] = await prisma.deployableRepo.findMany({
                 where: {
-                    OR: [{
-                        webId: web.id
-                    }, {
-                        creatorAuthToken: web.githubToken?.accessToken
-                    }]
+                    creatorAuthToken: session.githubToken?.accessToken
                 }
             });
 
             if (manifest.length && !refreshing)
                 return manifest.filter(repo => repo.config);
 
-            if (!web.githubToken) {
-                await prisma.web.update({
-                    where: {
-                        id: web.id
-                    },
-                    data: {
-                        githubToken: null
-                    }
-                });
-                await new Promise<void>((resolve, reject) => {
-                    session.githubToken = undefined;
-                    sessionStore.set(sessionID, {
-                        ...session,
-                        githubToken: undefined
-                    }, (err) => {
-                        if (err)
-                            return reject(err);
-                        return resolve();
-                    });
-                });
+            if (!session.githubToken)
                 throw new Error('Credentials refresh required');
-            }
 
-            const { accessToken: lookupAccessToken } = web.githubToken;
+            const { accessToken: lookupAccessToken } = session.githubToken;
             manifest = await prisma.deployableRepo.findMany({ where: { creatorAuthToken: lookupAccessToken } });
 
             if (manifest.length && !refreshing)
                 return manifest.filter(repo => repo.config);
 
-            const { refreshToken, expiresIn, createdAt } = web.githubToken;
+            const { refreshToken, expiresIn, createdAt } = session.githubToken;
             if (createdAt.valueOf() + expiresIn * 1000 < new Date().valueOf()) {
                 try {
 
@@ -75,21 +50,12 @@ export const reposRouter = createTRPCRouter({
                         })
                     });
 
-
                     const data = {
                         ...objectToCamel(await result.json() as object),
                         createdAt: Date.now()
                     } as unknown as GitHubToken & { error?: Error; errorDescription?: string; };
 
                     if (data.error) {
-                        await prisma.web.update({
-                            where: {
-                                id: web.id
-                            },
-                            data: {
-                                githubToken: null
-                            }
-                        });
                         await new Promise<void>((resolve, reject) => {
                             session.githubToken = undefined;
                             sessionStore.set(sessionID, {
@@ -123,7 +89,7 @@ export const reposRouter = createTRPCRouter({
                 }
             }
 
-            const { accessToken } = web.githubToken;
+            const { accessToken } = session.githubToken;
             const octokit = new Octokit({ auth: accessToken });
             const reposData = await octokit.paginate(
                 octokit.repos.listForAuthenticatedUser,
@@ -136,7 +102,6 @@ export const reposRouter = createTRPCRouter({
             await updateInstalledRepos(prisma, octokit);
 
             const repos = reposData.map(repo => ({
-                webId: web.id,
                 creatorAuthToken: accessToken,
                 owner: repo.owner.login,
                 fullName: repo.full_name,
@@ -172,8 +137,6 @@ export const reposRouter = createTRPCRouter({
                             creatorAuthToken: {
                                 in: [accessToken, lookupAccessToken]
                             }
-                        }, {
-                            webId: web.id
                         }, {
                             createdAt: {
                                 lte: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString()
@@ -217,11 +180,11 @@ export const reposRouter = createTRPCRouter({
             owner: z.string(),
             name: z.string()
         }))
-        .query(async ({ ctx: { webId, prisma }, input: repoInfo }) => {
+        .query(async ({ ctx: { session, prisma }, input: repoInfo }) => {
 
             const data = await prisma.deployableRepo.findFirst({
                 where: {
-                    webId,
+                    creatorAuthToken: session.githubToken?.accessToken,
                     ...repoInfo
                 }
             });
@@ -246,15 +209,7 @@ export const reposRouter = createTRPCRouter({
             code: z.string()
             // state: z.string()
         }))
-        .query(async ({ ctx: { session, sessionStore, sessionID, prisma, webId }, input: { code } }) => {
-
-            // const secret = '1000060000000000';
-
-            // const cipher = crypto.createCipher('aes-128-ecb', secret);
-
-            // const ciphertext = cipher.update('9', 'utf8', 'base64') + cipher.final('base64');
-
-
+        .query(async ({ ctx: { session, sessionStore, sessionID }, input: { code } }) => {
             const result = await fetch('https://github.com/login/oauth/access_token', {
                 method: 'POST',
                 headers: {
@@ -274,10 +229,6 @@ export const reposRouter = createTRPCRouter({
             } as unknown as GitHubToken & { error?: string; errorDescription?: string; };
 
             if (!data.error) {
-                await prisma.web.update({
-                    where: { id: webId },
-                    data: { githubToken: data }
-                });
                 await new Promise<void>((resolve, reject) => {
                     session.githubToken = data;
                     sessionStore.set(sessionID, {
@@ -297,36 +248,16 @@ export const reposRouter = createTRPCRouter({
             owner: z.string(),
             name: z.string()
         }))
-        .mutation(async ({ ctx: { web, prisma, session, sessionStore, sessionID }, input: { owner, name } }) => {
+        .mutation(async ({ ctx: { prisma, session, sessionStore, sessionID }, input: { owner, name } }) => {
 
             if (!session.user)
                 throw new Error('You must be logged in to do this');
 
-            if (!web.githubToken) {
-                await prisma.web.update({
-                    where: {
-                        id: web.id
-                    },
-                    data: {
-                        githubToken: null
-                    }
-                });
-                await new Promise<void>((resolve, reject) => {
-                    session.githubToken = undefined;
-                    sessionStore.set(sessionID, {
-                        ...session,
-                        githubToken: undefined
-                    }, (err) => {
-                        if (err)
-                            return reject(err);
-                        return resolve();
-                    });
-                });
+            if (!session.githubToken)
                 throw new Error('Credentials refresh required');
-            }
 
             try {
-                const octokit = new Octokit({ auth: web.githubToken?.accessToken });
+                const octokit = new Octokit({ auth: session.githubToken?.accessToken });
                 const result = await octokit.repos.createFork({
                     owner,
                     repo: name
@@ -391,8 +322,7 @@ export const reposRouter = createTRPCRouter({
                 const config = parsedConfig.success ? JSON.stringify(parsedConfig.data) : null;
 
                 const repo = {
-                    webId: web.id,
-                    creatorAuthToken: web.githubToken?.accessToken,
+                    creatorAuthToken: session.githubToken?.accessToken,
                     owner: result.data.owner.login,
                     fullName: result.data.full_name,
                     name: result.data.name,
@@ -406,7 +336,7 @@ export const reposRouter = createTRPCRouter({
                     update: repo,
                     where: {
                         creatorAuthToken_owner_name: {
-                            creatorAuthToken: web.githubToken?.accessToken,
+                            creatorAuthToken: session.githubToken?.accessToken,
                             owner: result.data.owner.login,
                             name: result.data.name
                         }
@@ -415,15 +345,6 @@ export const reposRouter = createTRPCRouter({
 
                 return repo;
             } catch (e) {
-
-                await prisma.web.update({
-                    where: {
-                        id: web.id
-                    },
-                    data: {
-                        githubToken: null
-                    }
-                });
                 await new Promise<void>((resolve, reject) => {
                     session.githubToken = undefined;
                     sessionStore.set(sessionID, {

@@ -7,7 +7,6 @@ import { createTransport } from 'nodemailer';
 import FakeMailGuard from 'fakemail-guard';
 import { AuthenticatorTransportFuture, GenerateRegistrationOptionsOpts, generateAuthenticationOptions, generateRegistrationOptions, verifyAuthenticationResponse, verifyRegistrationResponse } from '@simplewebauthn/server';
 import { type startRegistration, type startAuthentication } from '@simplewebauthn/browser';
-// import * as passport from 'passport';
 import { z } from 'zod';
 import { render } from '@react-email/components';
 import { VerificationCodeEmail, RegistrationFollowUpEmail } from '@klave/ui-kit';
@@ -33,8 +32,7 @@ export const authRouter = createTRPCRouter({
             // session: ctx.session,
             // sessionID: ctx.sessionID,
             me: /*ctx.user ?? */ctx.session.user,
-            webId: ctx.webId,
-            hasGithubToken: !!ctx.web.githubToken
+            hasGithubToken: !!ctx.session.githubToken
         };
     }),
     updateSlug: publicProcedure
@@ -146,7 +144,7 @@ export const authRouter = createTRPCRouter({
         .input(z.object({
             email: z.string().email()
         }))
-        .mutation(async ({ ctx: { prisma, webId }, input: { email } }) => {
+        .mutation(async ({ ctx: { prisma }, input: { email } }) => {
 
             const hint = mailGuard.check(email);
             if (hint.errors.includes('disposable'))
@@ -175,9 +173,6 @@ export const authRouter = createTRPCRouter({
                         data: {
                             slug,
                             emails: [email],
-                            webs: {
-                                connect: { id: webId }
-                            },
                             createdOrganisations: {
                                 create: {
                                     slug,
@@ -264,7 +259,7 @@ export const authRouter = createTRPCRouter({
             code: z.string(),
             authenticate: z.boolean().default(true)
         }))
-        .mutation(async ({ ctx: { prisma, session, sessionStore, webId }, input: { email, code, authenticate } }) => {
+        .mutation(async ({ ctx: { prisma, session, sessionStore }, input: { email, code, authenticate } }) => {
             const user = await prisma.user.findFirst({
                 where: {
                     emails: {
@@ -299,12 +294,7 @@ export const authRouter = createTRPCRouter({
                 },
                 data: {
                     loginCode: null,
-                    loginCodeCreatedAt: null,
-                    webs: {
-                        connect: {
-                            id: webId
-                        }
-                    }
+                    loginCodeCreatedAt: null
                 }
             });
             if (authenticate)

@@ -45,12 +45,22 @@ export const activityRouter = createTRPCRouter({
 
         }),
     getAll: publicProcedure
-        .query(async ({ ctx: { prisma, webId } }) => {
+        .query(async ({ ctx: { prisma, session: { user } } }) => {
 
             const domainList = await prisma.activityLog.findMany({
                 where: {
                     application: {
-                        webId
+                        organisation: {
+                            permissionGrants: {
+                                some: {
+                                    OR: [{
+                                        userId: user?.id
+                                    }, {
+                                        organisationId: user?.personalOrganisationId
+                                    }]
+                                }
+                            }
+                        }
                     }
                 }
             });

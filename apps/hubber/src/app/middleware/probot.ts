@@ -70,7 +70,6 @@ export const probotMiddlewareHandlerRegistration = (app: Express) => {
                 }
             }
 
-            console.log('Probot middleware received:', dHeaders, dBody.length);
             const mReqStream = Readable.from(dBody);
             const mReq = createRequest({
                 url: '/hook',
@@ -84,9 +83,8 @@ export const probotMiddlewareHandlerRegistration = (app: Express) => {
                 writableStream: Writable
             });
 
-            console.log('Probot middleware request:', mReq.url, mReq.method, mReq.headers);
             (app as HExpress).handle(mReq, mRes, (...rest) => {
-                console.log('Handle middleware finished:', rest);
+                console.debug('Handle middleware finished:', rest);
             });
         } catch (error) {
             console.error('Probot middleware error:', error);

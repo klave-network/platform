@@ -22,7 +22,6 @@ import { openAPIMiddleware, openAPIDocument } from './middleware/openapi';
 // import { i18nextMiddleware } from './middleware/i18n';
 // import { getDriverSubstrate } from '../utils/db';
 import { usersRouter } from './routes';
-import { webLinkerMiddlware } from './middleware/webLinker';
 import { config, permissiblePeers } from '@klave/constants';
 import { uiHosterMiddleware } from './middleware/uiHoster';
 import { mcpMiddleware } from './middleware/mcp';
@@ -170,13 +169,8 @@ export const start = async () => {
     app.use('/', express.static(path.join(__dirname, 'public')));
     app.use(passport.initialize());
     app.use(passport.session());
-
-    // Contextualise user session, devices, tags, tokens
-    app.use(webLinkerMiddlware);
-
     app.use(passportLoginCheckMiddleware);
     app.use('/mcp', mcpMiddleware);
-
     app.use('/docs', swaggerUi.serve, swaggerUi.setup(openAPIDocument));
     app.use('/o', openAPIMiddleware);
     app.use('/trpc', trcpMiddlware);

@@ -8,14 +8,29 @@ import { config, getFinalParseConfig, KlaveGetCreditResult } from '@klave/consta
 
 export const applicationRouter = createTRPCRouter({
     getAll: publicProcedure
-        .query(async ({ ctx: { prisma, webId, session: { user } } }) => {
+        .query(async ({ ctx: { prisma, session: { user } } }) => {
 
             if (!user)
                 throw (new Error('You must be logged in to delete an application'));
 
             const manifest = await prisma.application.findMany({
                 where: {
-                    webId,
+                    organisation: {
+                        permissionGrants: {
+                            some: {
+                                userId: user.id,
+                                OR: [{
+                                    read: true
+                                },
+                                {
+                                    write: true
+                                },
+                                {
+                                    admin: true
+                                }]
+                            }
+                        }
+                    },
                     deletedAt: {
                         isSet: false
                     }
@@ -603,7 +618,7 @@ export const applicationRouter = createTRPCRouter({
             applications: z.array(z.string()),
             organisationId: z.string().uuid()
         }))
-        .mutation(async ({ ctx: { prisma, session, sessionStore, sessionID, webId }, input: { deployableRepoId, applications, organisationId } }) => {
+        .mutation(async ({ ctx: { prisma, session, sessionStore, sessionID }, input: { deployableRepoId, applications, organisationId } }) => {
 
             if (!session.user)
                 throw (new Error('You must be logged in to register an application'));
@@ -669,11 +684,6 @@ export const applicationRouter = createTRPCRouter({
                     });
                     const newApp = await prisma.application.create({
                         data: {
-                            web: {
-                                connect: {
-                                    id: webId
-                                }
-                            },
                             slug: appSlug,
                             organisation: {
                                 connect: {

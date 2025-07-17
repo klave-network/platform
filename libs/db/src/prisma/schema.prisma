@@ -17,12 +17,11 @@ model Environment {
 }
 
 model Session {
-    id        String   @id @default(uuid()) @map("_id")
-    sid       String   @unique
-    data      String
-    expiresAt DateTime
-    web       Web?     @relation(fields: [webId], references: [id])
-    webId     String?
+    id          String       @id @default(uuid()) @map("_id")
+    sid         String       @unique
+    data        String
+    expiresAt   DateTime
+    githubToken GitHubToken?
 }
 
 type GitHubToken {
@@ -72,7 +71,6 @@ model User {
     createdAt                 DateTime            @default(now())
     updatedAt                 DateTime            @updatedAt
     globalAdmin               Boolean?            @default(false)
-    webs                      Web[]
     webauthCredentials        WebauthCredential[]
     permissionGrants          PermissionGrant[]
     createdOrganisations      Organisation[]
@@ -124,8 +122,6 @@ model DeployableRepo {
     installationRemoteId String
     config               String?
     createdAt            DateTime @default(now())
-    web                  Web      @relation(fields: [webId], references: [id])
-    webId                String
 
     @@unique([creatorAuthToken, owner, name])
 }
@@ -307,8 +303,6 @@ type Limits {
 
 model Application {
     id                  String            @id @default(uuid()) @map("_id")
-    web                 Web               @relation(fields: [webId], references: [id])
-    webId               String
     slug                String
     domains             Domain[]
     license             String?
@@ -385,22 +379,6 @@ model Repository {
     updatedAt            DateTime   @updatedAt
 
     @@unique([source, remoteId, installationRemoteId])
-}
-
-model Web {
-    id              String           @id @default(uuid()) @map("_id")
-    name            String
-    ancestors       String[]         @default([])
-    ephemerals      String[]         @default([])
-    user            User?            @relation(fields: [userId], references: [id])
-    userId          String?
-    githubToken     GitHubToken?
-    sessions        Session[]
-    deployableRepos DeployableRepo[]
-    applications    Application[]
-    deletedAt       DateTime?
-    createdAt       DateTime         @default(now())
-    updatedAt       DateTime         @updatedAt
 }
 
 enum UsageType {

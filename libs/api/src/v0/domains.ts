@@ -21,12 +21,25 @@ export const domainRouter = createTRPCRouter({
 
         }),
     getAll: publicProcedure
-        .query(async ({ ctx: { prisma, webId } }) => {
+        .query(async ({ ctx: { prisma, session: { user } } }) => {
+
+            if (!user)
+                throw (new Error('You must be logged in to get all domains'));
 
             const domainList = await prisma.domain.findMany({
                 where: {
                     application: {
-                        webId
+                        organisation: {
+                            permissionGrants: {
+                                some: {
+                                    OR: [{
+                                        userId: user.id
+                                    }, {
+                                        organisationId: user.personalOrganisationId
+                                    }]
+                                }
+                            }
+                        }
                     }
                 }
             });
