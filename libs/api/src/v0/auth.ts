@@ -34,14 +34,7 @@ export const authRouter = createTRPCRouter({
             // sessionID: ctx.sessionID,
             me: /*ctx.user ?? */ctx.session.user,
             webId: ctx.webId,
-            hasUnclaimedApplications: false,
             hasGithubToken: !!ctx.web.githubToken
-            // hasUnclaimedApplications: !(ctx.user ?? ctx.session.user) && (await ctx.prisma.application.count({
-            //     where: {
-            //         webId: ctx.webId
-            //     }
-            // })).valueOf() > 0
-            // web: ctx.web
         };
     }),
     updateSlug: publicProcedure

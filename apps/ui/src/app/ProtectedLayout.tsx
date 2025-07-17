@@ -10,7 +10,7 @@ export const ProtectedLayout = () => {
     if (isLoading)
         return <Outlet />;
 
-    if (data?.hasUnclaimedApplications || data?.me)
+    if (data?.me)
         return <Outlet />;
 
     return <Landing />;

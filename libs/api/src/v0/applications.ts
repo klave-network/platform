@@ -601,10 +601,9 @@ export const applicationRouter = createTRPCRouter({
         .input(z.object({
             deployableRepoId: z.string().uuid(),
             applications: z.array(z.string()),
-            emphemeralKlaveTag: z.string().optional(),
             organisationId: z.string().uuid()
         }))
-        .mutation(async ({ ctx: { prisma, session, sessionStore, sessionID, webId }, input: { deployableRepoId, applications, /*emphemeralKlaveTag,*/ organisationId } }) => {
+        .mutation(async ({ ctx: { prisma, session, sessionStore, sessionID, webId }, input: { deployableRepoId, applications, organisationId } }) => {
 
             if (!session.user)
                 throw (new Error('You must be logged in to register an application'));
@@ -692,8 +691,6 @@ export const applicationRouter = createTRPCRouter({
                             },
                             catogories: [],
                             tags: []
-                            // author: webId ?? emphemeralKlaveTag ?? sessionID,
-                            // owner: webId ?? emphemeralKlaveTag ?? sessionID lklk
                         }
                     });
 
