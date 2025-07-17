@@ -8,7 +8,10 @@ export const domainRouter = createTRPCRouter({
         .input(z.object({
             appId: z.string().uuid()
         }))
-        .query(async ({ ctx: { prisma }, input: { appId } }) => {
+        .query(async ({ ctx: { prisma, session: { user } }, input: { appId } }) => {
+
+            if (!user)
+                throw (new Error('You must be logged in to get domains'));
 
             if (!appId)
                 return [];
@@ -48,7 +51,10 @@ export const domainRouter = createTRPCRouter({
         }),
     validate: publicProcedure
         .input(z.object({ domainId: z.string().uuid() }))
-        .mutation(async ({ ctx: { prisma }, input: { domainId } }) => {
+        .mutation(async ({ ctx: { prisma, session: { user } }, input: { domainId } }) => {
+
+            if (!user)
+                throw (new Error('You must be logged in to validate a domain'));
 
             const domain = await prisma.domain.findUnique({
                 where: {
@@ -72,7 +78,10 @@ export const domainRouter = createTRPCRouter({
             applicationId: z.string().uuid(),
             fqdn: z.string().regex(/^[0-9\p{L}][0-9\p{L}\-.]{1,61}[0-9\p{L}]\.[0-9\p{L}][\p{L}-]*[0-9\p{L}]+$/ugm)
         }))
-        .mutation(async ({ ctx: { prisma }, input: { applicationId, fqdn } }) => {
+        .mutation(async ({ ctx: { prisma, session: { user } }, input: { applicationId, fqdn } }) => {
+
+            if (!user)
+                throw (new Error('You must be logged in to add a domain'));
 
             // if (fqdn.trim() === '')
             //     throw new Error('The FQDN was not the right format');
@@ -94,7 +103,10 @@ export const domainRouter = createTRPCRouter({
         .input(z.object({
             domainId: z.string().uuid()
         }))
-        .mutation(async ({ ctx: { prisma }, input: { domainId } }) => {
+        .mutation(async ({ ctx: { prisma, session: { user } }, input: { domainId } }) => {
+
+            if (!user)
+                throw (new Error('You must be logged in to delete a domain'));
 
             await prisma.domain.delete({
                 where: {
