@@ -398,7 +398,7 @@ export const organisationRouter = createTRPCRouter({
         .input(
             z.object({
                 filterUnitialized: z.boolean().nullish(),
-                limit: z.number().min(1).max(100).nullish(),
+                limit: z.number().min(1).max(1000).nullish(),
                 cursor: z.string().nullish() // <-- "cursor" needs to exist, but can be any type
             })
         )
