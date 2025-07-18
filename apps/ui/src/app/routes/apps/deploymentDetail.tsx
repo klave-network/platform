@@ -334,7 +334,7 @@ export const AppDeploymentDetail: FC = () => {
                                 || (stage === 'install' && buildOutputs.build.length > 0);
                             let lineNumber = 0;
                             return <div key={stage} className='mt-5'>
-                                <h3 className='bg-slate-100 p-2 rounded-t border-gray-200 border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-5' />}</h3>
+                                <h3 className='bg-slate-100 dark:bg-gray-800 p-2 rounded-t border-gray-200 dark:border-gray-700 border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-5' />}</h3>
                                 <pre className='overflow-auto w-full max-w-full bg-gray-800'>{outputs.length > 0 ? outputs.map((output, i) => {
                                     if (isSettled) {
                                         if (!output.full)
@@ -405,7 +405,7 @@ export const AppDeploymentDetail: FC = () => {
                                     || (stage === 'install' && buildOutputs.build.length > 0);
                                 let lineNumber = 0;
                                 return <div key={stage} className='mt-5'>
-                                    <h3 className='bg-slate-100 p-2 rounded-t border-gray-200 border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-5' />}</h3>
+                                    <h3 className='bg-slate-100 dark:bg-gray-800  p-2 rounded-t border-gray-200 dark:border-gray-700 border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-5' />}</h3>
                                     <pre className='overflow-auto w-full max-w-full bg-gray-800'>{outputs.length > 0 ? outputs.map((output, i) => {
                                         if (isSettled) {
                                             if (!output.full)
@@ -452,7 +452,7 @@ export const AppDeploymentDetail: FC = () => {
                                     || (stage === 'install' && buildOutputs.build.length > 0);
                                 let lineNumber = 0;
                                 return <div key={stage} className='mt-5'>
-                                    <h3 className='bg-slate-100 p-2 rounded-t border-gray-200 border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-5' />}</h3>
+                                    <h3 className='bg-slate-100 dark:bg-gray-800 p-2 rounded-t border-gray-200 dark:border-gray-700  border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-5' />}</h3>
                                     <pre className='overflow-auto w-full max-w-full bg-gray-800'>{outputs.length > 0 ? outputs.map((output, i) => {
                                         if (isSettled) {
                                             if (!output.full)
@@ -479,7 +479,7 @@ export const AppDeploymentDetail: FC = () => {
                         <div ref={scrollPointRef} />
                         <div className='mt-10'>
                             <h2 className='font-bold mb-3'>List of external dependencies and digests</h2>
-                            <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 p-3'>
+                            <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 dark:bg-gray-800 p-3'>
                                 {JSON.stringify(deployment.dependenciesManifest ?? '', null, 4)}
                             </pre>
                         </div>
@@ -487,7 +487,7 @@ export const AppDeploymentDetail: FC = () => {
                     <Tabs.Content value="configuration">
                         <div className='mt-10'>
                             <h2 className='font-bold mb-3'>Build configuration for this deployment</h2>
-                            <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 p-3'>
+                            <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 dark:bg-gray-800 p-3'>
                                 {JSON.stringify(deployment.configSnapshot ?? '', null, 4)}
                             </pre>
                         </div>

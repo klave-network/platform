@@ -46,32 +46,32 @@ export const AppSidebar: FC = () => {
 
     if (isPeronsalOrgLoading)
         return <>
-            <div className="text-xs text-gray-400 tracking-wider">ORGANISATIONS <UilSpinner className='inline-block animate-spin h-5' /></div>
+            <div className="text-xs text-gray-400 dark:text-gray-500 tracking-wider">ORGANISATIONS <UilSpinner className='inline-block animate-spin h-5' /></div>
             <AccountSelector />
         </>;
 
     if (isAppsLoading || !applicationsList || !lastMatch)
         return <>
-            <div className="text-xs text-gray-400 tracking-wider">ORGANISATIONS</div>
+            <div className="text-xs text-gray-400 dark:text-gray-500 tracking-wider">ORGANISATIONS</div>
             <AccountSelector />
-            <div className="text-xs text-gray-400 tracking-wider">APPLICATIONS <UilSpinner className='inline-block animate-spin h-5' /></div>
+            <div className="text-xs text-gray-400 dark:text-gray-500tracking-wider">APPLICATIONS <UilSpinner className='inline-block animate-spin h-5' /></div>
         </>;
 
     return <>
         <div className="text-xs text-gray-400 tracking-wider">ORGANISATIONS</div>
         <AccountSelector />
         <Link to={`/organisation/${orgSlug}`}>
-            <div className="flex p-2 rounded-md gap-1 text-black items-center justify-start align-middle bg-slate-100 hover:bg-slate-200">
+            <div className="flex p-2 rounded-md gap-1 text-black dark:text-white items-center justify-start align-middle bg-slate-100 hover:bg-slate-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                 <UilBookOpen className='inline-block text-slate-500 h-5' /><span>Organisation Activity</span>
             </div >
         </Link>
         <Link to={`/organisation/${orgSlug}/credits`}>
-            <div className="flex p-2 rounded-md gap-1 text-black items-center justify-start align-middle bg-slate-100 hover:bg-slate-200">
+            <div className="flex p-2 rounded-md gap-1 text-black dark:text-white items-center justify-start align-middle bg-slate-100 hover:bg-slate-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                 <UilCoins className='inline-block text-slate-500 h-5' /><span>Organisation Credits</span>
             </div >
         </Link>
         <Link to={`/organisation/${orgSlug}/settings`}>
-            <div className="flex p-2 rounded-md gap-1 text-black items-center justify-start align-middle bg-slate-100 hover:bg-slate-200">
+            <div className="flex p-2 rounded-md gap-1 text-black dark:text-white items-center justify-start align-middle bg-slate-100 hover:bg-slate-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                 <UilSetting className='inline-block text-slate-500 h-5' /><span>Organisation Settings</span>
             </div >
         </Link>
