@@ -13,6 +13,7 @@ import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { prisma } from '@klave/db';
 import { rateLimiterMiddleware } from './middleware/rateLimiter';
 import { morganLoggerMiddleware } from './middleware/morganLogger';
+import { integrationCredsRenewalMiddleware } from './middleware/integrations';
 import { probotMiddleware, probotMiddlewareHandlerRegistration } from './middleware/probot';
 import { stripeMiddlware } from './middleware/stripe';
 import { sentryRequestMiddleware, sentryTracingMiddleware, sentryErrorMiddleware } from './middleware/sentry';
@@ -40,11 +41,16 @@ export const start = async () => {
     app.use(morganLoggerMiddleware);
     app.use(rateLimiterMiddleware);
     app.use(express.json({
+        limit: '10mb',
         verify: (req, __unusedRed, buf) => {
             (req as unknown as Record<string, object>).rawBody = buf;
         }
     }));
-    app.use(express.urlencoded({ extended: true }));
+    app.use(express.urlencoded({
+        extended: true,
+        limit: '10mb'
+    }));
+
     // app.use(i18nextMiddleware);
     app.use(multer().none());
     app.disable('X-Powered-By');
@@ -169,6 +175,7 @@ export const start = async () => {
     app.use('/', express.static(path.join(__dirname, 'public')));
     app.use(passport.initialize());
     app.use(passport.session());
+    app.use(integrationCredsRenewalMiddleware);
     app.use(passportLoginCheckMiddleware);
     app.use('/mcp', mcpMiddleware);
     app.use('/docs', swaggerUi.serve, swaggerUi.setup(openAPIDocument));

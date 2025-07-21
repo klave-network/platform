@@ -4,11 +4,11 @@ import { createUser, getUsers } from '../controllers/userController';
 
 export const usersRouter = Router();
 
-usersRouter.get('/whoami', ({ user, session }, res) => {
+usersRouter.get('/whoami', ({ user }, res) => {
     if (user)
         res.status(200).json({ me: user });
     else
-        res.status(401).json({ who: 'An unknown unicorn', hasGithubToken: !!session.githubToken });
+        res.status(401).json({ who: 'An unknown unicorn' });
 });
 
 usersRouter.get('/login/print', (req, __unusedRes, next) => {

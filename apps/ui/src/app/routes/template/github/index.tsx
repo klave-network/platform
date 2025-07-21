@@ -37,7 +37,7 @@ export const Index: FC = () => {
 
     useEffect(() => {
         if (forkingData) {
-            navigate(`/deploy/repo/${forkingData.fullName}`);
+            navigate(`/deploy/github/repo/${forkingData.fullName}`);
         }
     }, [forkingData, navigate]);
 

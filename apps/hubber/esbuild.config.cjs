@@ -6,7 +6,7 @@ const klaveSentryURL = process.env.KLAVE_SENTRY_DSN ? new URL(process.env.KLAVE_
 
 /** @type {import('esbuild').BuildOptions} */
 module.exports = {
-    // sourcemap: 'both',
+    sourcemap: 'both',
     // minify: false,
     treeShaking: true,
     // keepNames: true,

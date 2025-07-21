@@ -29,9 +29,9 @@ type GitHubToken {
     expiresIn             Int
     refreshToken          String
     refreshTokenExpiresIn Int
-    tokenType             String   @default("bearer")
+    tokenType             String @default("bearer")
     scope                 String
-    createdAt             DateTime
+    createdAt             String
 }
 
 model Organisation {
@@ -110,20 +110,6 @@ model Hook {
     status    HookProcessingStatus @default(idle)
     payload   Json
     createdAt DateTime             @default(now())
-}
-
-model DeployableRepo {
-    id                   String   @id @default(uuid()) @map("_id")
-    creatorAuthToken     String
-    owner                String
-    name                 String
-    fullName             String
-    defaultBranch        String?
-    installationRemoteId String
-    config               String?
-    createdAt            DateTime @default(now())
-
-    @@unique([creatorAuthToken, owner, name])
 }
 
 model Repo {
@@ -289,7 +275,7 @@ type ActivityLogRecord {
 
 model ActivityLog {
     id            String            @id @default(uuid()) @map("_id")
-    application   Application       @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+    application   Application       @relation(fields: [applicationId], references: [id], onDelete: NoAction)
     applicationId String
     class         ActivityLogClass
     context       ActivityLogRecord

@@ -4,20 +4,25 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { UilSpinner, UilExclamationTriangle } from '@iconscout/react-unicons';
 import * as Select from '@radix-ui/react-select';
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons';
-import qs from 'query-string';
-import api from '../../utils/api';
+// import qs from 'query-string';
+import api, { Router } from '../../utils/api';
+import { inferRouterInputs } from '@trpc/server';
 
 export const RepoAppSelect: FC = () => {
 
     const navigate = useNavigate();
-    const repoInfo = useParams() as { owner: string, name: string };
-    const { data: deployableRepo, isLoading } = api.v0.repos.getDeployableRepo.useQuery(repoInfo, {
-        refetchInterval: (data) => {
-            if (data.state.data?.isAvailableToKlave)
-                return false;
-            return 1000;
-        }
+    const params = useParams<inferRouterInputs<Router>['v0']['integrations']['getRepoConfiguration']>();
+    const { provider, owner, name } = params;
+    const { data: repoConfiguration, isLoading } = api.v0.integrations.getRepoConfiguration.useQuery({
+        provider: provider ?? 'github',
+        owner: owner ?? '',
+        name: name ?? ''
+    }, {
+        enabled: !!provider && !!owner && !!name
     });
+
+    // TODO: Remove. We consider this repo as available to Klave
+    const isAvailableToKlave = true;
 
     const { data: organisations, isLoading: areOrganisationsLoading } = api.v0.organisations.getAllWithWrite.useQuery();
     const personals = useMemo(() => organisations?.filter(Boolean).filter(o => o.personal) ?? [], [organisations]);
@@ -34,9 +39,9 @@ export const RepoAppSelect: FC = () => {
     });
 
     const { register, watch } = useForm<{ applications: string[] }>();
-    const { postInstall } = qs.parse(window.location.search);
-    const [isPostInstall, setIsPostInstall] = useState<boolean>(postInstall === 'true');
-    const [isPostInstallStuck, setIsPostInstallStuck] = useState(false);
+    // const { postInstall } = qs.parse(window.location.search);
+    // const [isPostInstall, setIsPostInstall] = useState<boolean>(postInstall === 'true');
+    // const [isPostInstallStuck, setIsPostInstallStuck] = useState(false);
     const [selectedApplications, setSelectedApplications] = useState<string[]>([]);
     const [selectedOrgId, setSelectedOrgId] = useState('00000000-0000-0000-0000-000000000000');
 
@@ -65,35 +70,47 @@ export const RepoAppSelect: FC = () => {
             .catch(() => { return; });
     }, [selectedOrgId, canRegisterData, refetchCanRegister]);
 
-    useEffect(() => {
-        if (deployableRepo?.isAvailableToKlave) {
-            navigate(window.location.pathname);
-            setIsPostInstall(false);
-        } else if (postInstall === 'true') {
-            setIsPostInstall(true);
-        } else {
-            setIsPostInstall(false);
-        }
-    }, [deployableRepo?.isAvailableToKlave, navigate, postInstall]);
+    // useEffect(() => {
+    //     if (deployableRepo?.isAvailableToKlave) {
+    //         navigate(window.location.pathname);
+    //         setIsPostInstall(false);
+    //     } else if (postInstall === 'true') {
+    //         setIsPostInstall(true);
+    //     } else {
+    //         setIsPostInstall(false);
+    //     }
+    // }, [deployableRepo?.isAvailableToKlave, navigate, postInstall]);
 
-    useEffect(() => {
-        let updateReceptionTimer: NodeJS.Timeout | undefined;
-        if (!deployableRepo?.isAvailableToKlave) {
-            updateReceptionTimer = setTimeout(() => {
-                setIsPostInstallStuck(true);
-            }, 10000);
-        }
-        return () => {
-            if (updateReceptionTimer)
-                clearTimeout(updateReceptionTimer);
-        };
-    }, []);
+    // useEffect(() => {
+    //     let updateReceptionTimer: NodeJS.Timeout | undefined;
+    //     if (!deployableRepo?.isAvailableToKlave) {
+    //         updateReceptionTimer = setTimeout(() => {
+    //             setIsPostInstallStuck(true);
+    //         }, 10000);
+    //     }
+    //     return () => {
+    //         if (updateReceptionTimer)
+    //             clearTimeout(updateReceptionTimer);
+    //     };
+    // }, []);
 
     useEffect(() => {
         setSelectedApplications(appSelectionWatch);
     }, [appSelectionWatch.length]);
 
-    if (isLoading || !deployableRepo)
+    if (!provider || !owner || !name) {
+        return <>
+            <div className='pb-5'>
+                <h1 className='text-xl font-bold'>Missing required parameters</h1>
+            </div>
+            <div className='relative'>
+                We are missing some parameters to display this page.<br />
+                Please go back to the <Link to="/deploy" className='btn btn-md h-8 disabled:text-gray-300'>deploy section</Link> and try again.
+            </div>
+        </>;
+    }
+
+    if (isLoading || !repoConfiguration)
         return <>
             <div className='pb-5' >
                 <h1 className='text-xl font-bold'>{isLoading ? 'Getting to know your repo' : 'We could not find your repo'}</h1>
@@ -116,54 +133,60 @@ export const RepoAppSelect: FC = () => {
     const state = JSON.stringify({
         referer: window.location.origin,
         source: 'github',
-        redirectUri: `/deploy/repo/${repoInfo.owner}/${repoInfo.name}?postInstall=true`,
-        repoFullName: deployableRepo.fullName
+        redirectUri: `/deploy/${provider}/repo/${owner}/${name}?postInstall=true`,
+        repoFullName: `${owner}/${name}`
     });
 
     const githubAppInstall = new URL('https://github.com/apps/klave-network/installations/new');
     githubAppInstall.searchParams.append('state', state);
 
-    if (isPostInstall)
-        return <>
-            <div className='pb-5' >
-                <h1 className='text-xl font-bold'>{isPostInstallStuck ? 'Waiting for your repo' : 'Another moment'}</h1>
-            </div>
-            <div className='relative'>
-                {isPostInstallStuck ? <>
-                    <div className='bg-yellow-200 p-5 mb-10 w-full text-center text-yellow-800'>
-                        <UilExclamationTriangle className='inline-block mb-3 h-8' /><br />
-                        <span>This is taking longer than usual</span><br />
-                        <span>Klave still does&apos;t have access to your repository</span><br />
-                        <br />
-                        <a href={githubAppInstall.toString()} type="submit" className='btn btn-md h-8 mt-5 bg-yellow-800 text-white'>Try installing again</a>
-                    </div>
-                    We are waiting to hear from GitHub.<br />
-                    This shouldn&apos;t be very long...<br />
-                    <UilSpinner className='inline-block animate-spin h-5' />
-                </> : <>
-                    We are waiting to hear from GitHub.<br />
-                    This shouldn&apos;t be very long...<br />
-                    <br />
-                    <UilSpinner className='inline-block animate-spin h-5' />
-                </>}
-            </div>
-        </>;
+    // if (isPostInstall)
+    //     return <>
+    //         <div className='pb-5' >
+    //             <h1 className='text-xl font-bold'>{isPostInstallStuck ? 'Waiting for your repo' : 'Another moment'}</h1>
+    //         </div>
+    //         <div className='relative'>
+    //             {isPostInstallStuck ? <>
+    //                 <div className='bg-yellow-200 p-5 mb-10 w-full text-center text-yellow-800'>
+    //                     <UilExclamationTriangle className='inline-block mb-3 h-8' /><br />
+    //                     <span>This is taking longer than usual</span><br />
+    //                     <span>Klave still does&apos;t have access to your repository</span><br />
+    //                     <br />
+    //                     <a href={githubAppInstall.toString()} type="submit" className='btn btn-md h-8 mt-5 bg-yellow-800 text-white'>Try installing again</a>
+    //                 </div>
+    //                 We are waiting to hear from GitHub.<br />
+    //                 This shouldn&apos;t be very long...<br />
+    //                 <UilSpinner className='inline-block animate-spin h-5' />
+    //             </> : <>
+    //                 We are waiting to hear from GitHub.<br />
+    //                 This shouldn&apos;t be very long...<br />
+    //                 <br />
+    //                 <UilSpinner className='inline-block animate-spin h-5' />
+    //             </>}
+    //         </div>
+    //     </>;
 
     const registerApplications = () => {
         if (!selectedOrgId)
             return;
         mutate({
             applications: selectedApplications,
-            deployableRepoId: deployableRepo.id,
+            provider,
+            owner,
+            name,
             organisationId: selectedOrgId
         });
     };
 
+    // TODO: Remove. We consider there was no error in the repo configuration
+    const config = repoConfiguration.config;
+    const configError = false;
+
     return <>
         <div className='pb-5' >
-            <h1 className='text-xl'>{deployableRepo.owner} / <b>{deployableRepo.name}</b></h1>
+            <h1 className='text-xl'>{owner} / <b>{name}</b></h1>
         </div>
-        {!deployableRepo.isAvailableToKlave
+        {!isAvailableToKlave
             ? <div className='bg-yellow-200 p-5 mb-10 w-full text-center text-yellow-800'>
                 <UilExclamationTriangle className='inline-block mb-3 h-8' /><br />
                 <span>This repository doesn&apos;t have the Klave Github App installed</span><br />
@@ -172,11 +195,11 @@ export const RepoAppSelect: FC = () => {
             : null}
         <div className='relative'>
             <form >
-                <div className={!deployableRepo.isAvailableToKlave ? 'opacity-40' : ''}>
-                    We found {deployableRepo.config?.applications?.length ?? 0} applications to deploy.<br />
+                <div className={!isAvailableToKlave ? 'opacity-40' : ''}>
+                    We found {config?.applications?.length ?? 0} applications to deploy.<br />
                     Make your selection and be ready in minutes<br />
                     <br />
-                    {deployableRepo.configError ? <>
+                    {configError ? <>
                         <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-sm relative mx-auto" role="alert">
                             We noticed some errors in your <code>klave.json</code> file.<br />
                             Checkout our documentation at <a rel="noopener" href="https://klave.com/docs" target='_blank' >https://klave.com/docs</a> to fix them.<br />
@@ -185,10 +208,10 @@ export const RepoAppSelect: FC = () => {
                     </> : null}
                     {/* <pre className='text-left w-1/2 bg-slate-200 m-auto p-5'>{JSON.stringify(repoData.config ?? repoData.configError, null, 4)}</pre> */}
                     <div className='grid gap-3 grid-cols-3'>
-                        {(deployableRepo.config?.applications ?? []).map((app, index) => {
+                        {(config?.applications ?? []).map((app, index) => {
                             return <label key={app.slug} htmlFor={`application-${index}`} className={`w-full ${app.slug && appSelectionWatch.includes(app.slug) ? 'border-sky-400 hover:border-sky-500' : 'border-slate-200 hover:border-slate-400'} hover:cursor-pointer border rounded-lg py-3 px-4 text-left`}>
                                 <span className='flex flex-row items-center'>
-                                    <input disabled={!deployableRepo.isAvailableToKlave} id={`application-${index}`} type="checkbox" value={app.slug} {...register('applications')} className='peer toggle toggle-sm checked:bg-sky-500 checked:border-sky-500 mr-3' />
+                                    <input disabled={!isAvailableToKlave} id={`application-${index}`} type="checkbox" value={app.slug} {...register('applications')} className='peer toggle toggle-sm checked:bg-sky-500 checked:border-sky-500 mr-3' />
                                     {app.slug}</span>
                                 {/* <label htmlFor={`application-${index}`}>{app.name}</label> */}
                             </label>;
@@ -205,7 +228,7 @@ export const RepoAppSelect: FC = () => {
                     </> : null}
                 </div>
                 {/* <Link to="/deploy/select" className='mr-5 disabled:text-gray-300 hover:text-gray-500'>Go back</Link>
-                <button disabled={!appSelectionWatch.length || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave} type="submit" className='btn btn-md h-8 disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Next</button> */}
+                <button disabled={!appSelectionWatch.length || isTriggeringDeploy || hasTriggeredDeploy || !isAvailableToKlave} type="submit" className='btn btn-md h-8 disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Next</button> */}
             </form >
         </div >
         <div className='relative'>
@@ -278,7 +301,7 @@ export const RepoAppSelect: FC = () => {
             </> : null}
             {/* <button type="button" onClick={() => setSelectedApplications([])} className='btn btn-md h-8 mr-5 disabled:text-gray-300 hover:text-gray-500'>Go Back</button> */}
             <Link to="/deploy/select" className='btn btn-md h-8 mr-5 disabled:text-gray-300 hover:text-gray-500'>Go back</Link>
-            <button onClick={registerApplications} disabled={!selectedApplications.length || !selectedOrgId || isTriggeringDeploy || hasTriggeredDeploy || !deployableRepo.isAvailableToKlave || Object.values(canRegisterData ?? {}).includes(false)} className='btn btn-md h-8 disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Deploy</button>
+            <button onClick={registerApplications} disabled={!selectedApplications.length || !selectedOrgId || isTriggeringDeploy || hasTriggeredDeploy || !isAvailableToKlave || Object.values(canRegisterData ?? {}).includes(false)} className='btn btn-md h-8 disabled:text-gray-300 text-white hover:text-blue-500 bg-gray-800'>Deploy</button>
         </div>
     </>;
 

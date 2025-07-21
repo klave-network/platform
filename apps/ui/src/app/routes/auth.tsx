@@ -13,7 +13,6 @@ export const loader: LoaderFunction = async ({ request }): Promise<LoaderResult>
     const { code, state } = qs.parse(search);
     const parsedState = typeof state === 'string' ? JSON.parse(state) as {
         referer: string;
-        source: string;
         redirectUri: string;
     } : null;
 
@@ -48,12 +47,12 @@ export const AuthCodeReception: FC = () => {
     const navigate = useNavigate();
     const [hasRedirected, setHasRedirected] = useState(false);
     const { data, state } = useLoaderData() as LoaderResult ?? {};
-    const { redirectUri } = state ? JSON.parse(state) as { redirectUri: string } : { redirectUri: '/deploy/select' };
+    const { redirectUri } = state ? JSON.parse(state) as { redirectUri: string } : { redirectUri: '/deploy' };
 
     useEffect(() => {
         if (!hasRedirected && redirectUri && !data?.error) {
             setHasRedirected(true);
-            navigate(redirectUri);
+            navigate(redirectUri, { state });
         }
     }, [data?.error, hasRedirected, navigate, redirectUri]);
 

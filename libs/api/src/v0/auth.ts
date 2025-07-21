@@ -17,7 +17,6 @@ const mailGuard = new FakeMailGuard({
     allowFreemail: true
 });
 
-
 let origin: string;
 let rpID: string;
 
@@ -29,9 +28,8 @@ const setWebauthnPrimitives = () => {
 export const authRouter = createTRPCRouter({
     getSession: publicProcedure.query(async ({ ctx }) => {
         return {
-            // session: ctx.session,
-            // sessionID: ctx.sessionID,
-            me: /*ctx.user ?? */ctx.session.user,
+            me: ctx.session.user,
+            // TODO: Ensure we check expiration of token
             hasGithubToken: !!ctx.session.githubToken
         };
     }),

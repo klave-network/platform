@@ -65,11 +65,11 @@ const router = sentryCreateBrowserRouter(
                 >
                     <Route index element={<Deploy />} />
                     <Route
-                        path="select"
+                        path=":provider/select"
                         element={<RepoSelect />}
                     />
                     <Route
-                        path="repo/:owner/:name"
+                        path=":provider/repo/:owner/:name"
                         element={<RepoSheet />}
                     />
                 </Route>
