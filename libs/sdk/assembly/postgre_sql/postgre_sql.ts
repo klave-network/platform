@@ -31,7 +31,7 @@ export function connectionOpen(connection_string: string): Result<string, Error>
     }
     if (result < 0)
         return { data: "", err: new Error(String.UTF8.decode(error.slice(0, -result))) };
-    return { data: "", err: null };
+    return { data: String.UTF8.decode(error.slice(0, result)), err: null };
 }
 export function sqlQuery(connection: string, query: string): Result<string, Error>
 {
@@ -61,5 +61,5 @@ export function sqlExec(connection: string, command: string): Result<string, Err
     }
     if (result < 0)
         return { data: "", err: new Error(String.UTF8.decode(error.slice(0, -result))) };
-    return { data: "", err: null };
+    return { data: String.UTF8.decode(error.slice(0, result)), err: null };
 }
