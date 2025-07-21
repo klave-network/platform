@@ -324,6 +324,14 @@ export const AppDeploymentDetail: FC = () => {
                         <iframe className='w-full h-[70vh] rounded-md border border-slate-400 border-dashed' src={`https://${deployment.id}.${uiHostingDomain}?g=${secretariumNode}&d=${fqdn}`} title={`UI for ${fqdn}`} sandbox="allow-same-origin allow-scripts  allow-modals allow-forms allow-popups allow-presentation" />
                     </div>
                 </Tabs.Content>
+                <Tabs.Content value="configuration">
+                    <div className='mt-10'>
+                        <h2 className='font-bold mb-3'>Build configuration for this deployment</h2>
+                        <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 p-3'>
+                            {JSON.stringify(deployment.configSnapshot ?? '', null, 4)}
+                        </pre>
+                    </div>
+                </Tabs.Content>
                 <Tabs.Content value="build">
                     <div className='mt-10'>
                         <h2 className='font-bold mb-3'>Build stages</h2>
@@ -336,20 +344,22 @@ export const AppDeploymentDetail: FC = () => {
                             return <div key={stage} className='mt-5'>
                                 <h3 className='bg-slate-100 dark:bg-gray-800 p-2 rounded-t border-gray-200 dark:border-gray-700 border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-5' />}</h3>
                                 <pre className='overflow-auto w-full max-w-full bg-gray-800'>{outputs.length > 0 ? outputs.map((output, i) => {
-                                    if (isSettled) {
-                                        if (!output.full)
-                                            return null;
-                                    } else {
-                                        if (output.full)
-                                            return null;
-                                    }
+                                    if (output.full)
+                                        return null;
                                     return output.data.split(/[\n]/).map((line, j) => {
-                                        lineNumber++;
+                                        const emulateEmptyLine = line.replaceAll('\x1B', '').replaceAll(/\[2K/g, '').replaceAll(/\[1G/g, '');
+                                        if (emulateEmptyLine.trim() === '' && line.length !== 0)
+                                            return null;
                                         const subLines = line.split(/[\r]/);
                                         const finalLine = subLines.pop() ?? '';
                                         if (finalLine?.trim() === '')
                                             return null;
-                                        subLines.forEach(() => { lineNumber++; });
+                                        lineNumber++;
+                                        subLines.forEach((subline) => {
+                                            if (subline.trim() === '')
+                                                return;
+                                            lineNumber++;
+                                        });
                                         return <span key={`${i}-${j}`} className={`${output.type === 'stderr' ? 'text-slate-400' : 'text-slate-200'} block p-0`}>
                                             <span title={output.time} className='w-10 h-full px-2 inline-block text-slate-500 bg-slate-900 mr-2'>{lineNumber}</span><Ansi>{finalLine}</Ansi>
                                         </span>;
@@ -405,22 +415,24 @@ export const AppDeploymentDetail: FC = () => {
                                     || (stage === 'install' && buildOutputs.build.length > 0);
                                 let lineNumber = 0;
                                 return <div key={stage} className='mt-5'>
-                                    <h3 className='bg-slate-100 dark:bg-gray-800  p-2 rounded-t border-gray-200 dark:border-gray-700 border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-5' />}</h3>
+                                    <h3 className='bg-slate-100 dark:bg-gray-800 p-2 rounded-t border-gray-200 dark:border-gray-700 border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-5' />}</h3>
                                     <pre className='overflow-auto w-full max-w-full bg-gray-800'>{outputs.length > 0 ? outputs.map((output, i) => {
-                                        if (isSettled) {
-                                            if (!output.full)
-                                                return null;
-                                        } else {
-                                            if (output.full)
-                                                return null;
-                                        }
+                                        if (output.full)
+                                            return null;
                                         return output.data.split(/[\n]/).map((line, j) => {
-                                            lineNumber++;
+                                            const emulateEmptyLine = line.replaceAll('\x1B', '').replaceAll(/\[2K/g, '').replaceAll(/\[1G/g, '');
+                                            if (emulateEmptyLine.trim() === '' && line.length !== 0)
+                                                return null;
                                             const subLines = line.split(/[\r]/);
                                             const finalLine = subLines.pop() ?? '';
                                             if (finalLine?.trim() === '')
                                                 return null;
-                                            subLines.forEach(() => { lineNumber++; });
+                                            lineNumber++;
+                                            subLines.forEach((subline) => {
+                                                if (subline.trim() === '')
+                                                    return;
+                                                lineNumber++;
+                                            });
                                             return <span key={`${i}-${j}`} className={`${output.type === 'stderr' ? 'text-slate-400' : 'text-slate-200'} block p-0`}>
                                                 <span title={output.time} className='w-10 h-full px-2 inline-block text-slate-500 bg-slate-900 mr-2'>{lineNumber}</span><Ansi>{finalLine}</Ansi>
                                             </span>;
@@ -452,22 +464,24 @@ export const AppDeploymentDetail: FC = () => {
                                     || (stage === 'install' && buildOutputs.build.length > 0);
                                 let lineNumber = 0;
                                 return <div key={stage} className='mt-5'>
-                                    <h3 className='bg-slate-100 dark:bg-gray-800 p-2 rounded-t border-gray-200 dark:border-gray-700  border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-5' />}</h3>
+                                    <h3 className='bg-slate-100 dark:bg-gray-800 p-2 rounded-t border-gray-200 dark:border-gray-700 border'>{stage} {hasPassed || isSettled ? null : <UilSpinner className='inline-block animate-spin h-5' />}</h3>
                                     <pre className='overflow-auto w-full max-w-full bg-gray-800'>{outputs.length > 0 ? outputs.map((output, i) => {
-                                        if (isSettled) {
-                                            if (!output.full)
-                                                return null;
-                                        } else {
-                                            if (output.full)
-                                                return null;
-                                        }
+                                        if (output.full)
+                                            return null;
                                         return output.data.split(/[\n]/).map((line, j) => {
-                                            lineNumber++;
+                                            const emulateEmptyLine = line.replaceAll('\x1B', '').replaceAll(/\[2K/g, '').replaceAll(/\[1G/g, '');
+                                            if (emulateEmptyLine.trim() === '' && line.length !== 0)
+                                                return null;
                                             const subLines = line.split(/[\r]/);
                                             const finalLine = subLines.pop() ?? '';
                                             if (finalLine?.trim() === '')
                                                 return null;
-                                            subLines.forEach(() => { lineNumber++; });
+                                            lineNumber++;
+                                            subLines.forEach((subline) => {
+                                                if (subline.trim() === '')
+                                                    return;
+                                                lineNumber++;
+                                            });
                                             return <span key={`${i}-${j}`} className={`${output.type === 'stderr' ? 'text-slate-400' : 'text-slate-200'} block p-0`}>
                                                 <span title={output.time} className='w-10 h-full px-2 inline-block text-slate-500 bg-slate-900 mr-2'>{lineNumber}</span><Ansi>{finalLine}</Ansi>
                                             </span>;
@@ -476,10 +490,9 @@ export const AppDeploymentDetail: FC = () => {
                                 </div>;
                             })}
                         </div>
-                        <div ref={scrollPointRef} />
                         <div className='mt-10'>
                             <h2 className='font-bold mb-3'>List of external dependencies and digests</h2>
-                            <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 dark:bg-gray-800 p-3'>
+                            <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 p-3'>
                                 {JSON.stringify(deployment.dependenciesManifest ?? '', null, 4)}
                             </pre>
                         </div>
