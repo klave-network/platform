@@ -173,6 +173,7 @@ export const AppDeploymentDetail: FC = () => {
             ? <div className="badge badge-sm py-2 text-slate-400 border-slate-500"><UilLockSlash className='h-3 w-3' />{commitVerificationReasons[reason ?? 'unknown']}</div>
             : <div className="badge badge-sm py-2 text-red-400 border-red-400"><UilLockSlash className='h-3 w-3' />{commitVerificationReasons[reason ?? 'unknown']}</div>;
 
+    const isSettled = deployment.status === 'errored' || deployment.status === 'deployed' || deployment.status === 'terminated';
     const buildOutputs = deployment.buildOutputs as StagedOutputGroups ?? {
         clone: [],
         fetch: [],
@@ -336,7 +337,6 @@ export const AppDeploymentDetail: FC = () => {
                     <div className='mt-10'>
                         <h2 className='font-bold mb-3'>Build stages</h2>
                         {Object.entries(buildOutputs).map(([stage, outputs]) => {
-                            const isSettled = deployment.status === 'errored' || deployment.status === 'deployed' || deployment.status === 'terminated';
                             const hasPassed = (stage === 'clone' && buildOutputs.fetch.length > 0)
                                 || (stage === 'fetch' && buildOutputs.install.length > 0)
                                 || (stage === 'install' && buildOutputs.build.length > 0);
@@ -371,7 +371,7 @@ export const AppDeploymentDetail: FC = () => {
                     <div className='mt-10'>
                         <h2 className='font-bold mb-3'>List of external dependencies and digests</h2>
                         <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 p-3'>
-                            {JSON.stringify(deployment.dependenciesManifest ?? '', null, 4)}
+                            {isSettled ? JSON.stringify(deployment.dependenciesManifest ?? '', null, 4) : <UilSpinner className='inline-block animate-spin h-5' />}
                         </pre>
                     </div>
                 </Tabs.Content>
@@ -444,7 +444,7 @@ export const AppDeploymentDetail: FC = () => {
                         <div className='mt-10'>
                             <h2 className='font-bold mb-3'>List of external dependencies and digests</h2>
                             <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 p-3'>
-                                {JSON.stringify(deployment.dependenciesManifest ?? '', null, 4)}
+                                {isSettled ? JSON.stringify(deployment.dependenciesManifest ?? '', null, 4) : <UilSpinner className='inline-block animate-spin h-5' />}
                             </pre>
                         </div>
                     </Tabs.Content>
@@ -493,7 +493,7 @@ export const AppDeploymentDetail: FC = () => {
                         <div className='mt-10'>
                             <h2 className='font-bold mb-3'>List of external dependencies and digests</h2>
                             <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-gray-100 p-3'>
-                                {JSON.stringify(deployment.dependenciesManifest ?? '', null, 4)}
+                                {isSettled ? JSON.stringify(deployment.dependenciesManifest ?? '', null, 4) : <UilSpinner className='inline-block animate-spin h-5' />}
                             </pre>
                         </div>
                     </Tabs.Content>

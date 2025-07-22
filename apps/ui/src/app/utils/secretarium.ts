@@ -29,8 +29,8 @@ setInterval(() => {
 interface State<ResultType, ErrorType> {
     isLoading: boolean;
     indentity?: Key;
-    data?: Array<ResultType>
-    errors?: Array<Error | ErrorType>;
+    data: Array<ResultType>
+    errors: Array<Error | ErrorType>;
     refetch: () => void;
 }
 
@@ -79,8 +79,8 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
     const initialState: State<ResultType, ErrorType> = {
         isLoading: false,
         indentity: undefined,
-        errors: undefined,
-        data: undefined,
+        errors: [],
+        data: [],
         refetch: () => {
             dispatch({ type: 'reset' });
         }
@@ -95,9 +95,9 @@ export function useSecretariumQuery<ResultType = unknown, ErrorType = unknown>(o
             case 'loading':
                 return { ...initialState, isLoading: true, indentity: connectionKey };
             case 'fetched':
-                return { ...initialState, data: action.payload, isLoading: false, indentity: connectionKey };
+                return { ...initialState, data: action.payload, errors: state.errors, isLoading: false, indentity: connectionKey };
             case 'error':
-                return { ...initialState, errors: action.payload.length ? action.payload : undefined, isLoading: false, indentity: connectionKey };
+                return { ...initialState, data: state.data, errors: action.payload.length ? action.payload : [], isLoading: false, indentity: connectionKey };
             default:
                 return state;
         }

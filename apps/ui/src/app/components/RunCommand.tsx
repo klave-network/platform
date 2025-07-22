@@ -192,6 +192,37 @@ export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = 
         })().catch(console.error);
     };
 
+    const finalOutput = (() => {
+        if (isLoading)
+            return '// executing...';
+        let stringOutput = '';
+        if (data.length > 0) {
+            let responseCount = 0;
+            for (const item of data) {
+                if (data.length > 1)
+                    stringOutput += `// response #${responseCount++}:\n`;
+                if (typeof item === 'string') {
+                    stringOutput += item + '\n';
+                } else {
+                    stringOutput += JSON.stringify(item, null, 2) + '\n';
+                }
+            }
+        }
+        if (errors.length > 0) {
+            for (const error of errors) {
+                const errorString = typeof error === 'string' ? error : JSON.stringify(error, null, 2);
+                errorString.split('\n').forEach((line, n) => {
+                    if (n === 0) {
+                        stringOutput += `// error: ${line}\n`;
+                    } else {
+                        stringOutput += `// ${line}\n`;
+                    }
+                });
+            }
+        }
+        return stringOutput;
+    });
+
     return <>
         <h2 className='font-bold mb-3'>Command runner</h2>
         <h3 className='mb-3'>Session identity</h3>
@@ -232,7 +263,7 @@ export const RunCommand: FC<RunCommandProps> = ({ address, cluster, functions = 
         <h3 className='my-3 h-5'>Application response {isLoading ? <UilSpinner className='inline-block animate-spin h-5' /> : ''}</h3>
         <Editor
             key={`result.${address}`}
-            value={isLoading ? '// executing...' : data?.length ? JSON.stringify(data, null, 4) : errors?.length ? `// error${errors.length > 1 ? 's' : ''}: ${JSON.stringify(errors, null, 4).replaceAll('\n', '\n// ')}` : ''}
+            value={finalOutput()}
             options={{
                 minimap: { enabled: false },
                 semanticHighlighting: { enabled: false },
