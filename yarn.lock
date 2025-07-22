@@ -2784,13 +2784,6 @@
   dependencies:
     buffer "^6.0.3"
 
-"@klave/as-json@0.9.21":
-  version "0.9.21"
-  resolved "https://registry.yarnpkg.com/@klave/as-json/-/as-json-0.9.21.tgz#cbcb8dab1e972a9ed235729b2e7e4c5c003e2b95"
-  integrity sha512-bdI6ixZF2u2YaYFCzl+iUJVMbQde9XNtlzl5TiHDPxA+LRNHPstqNtpkhZDg/2/igjmCoRAr/uKnJXMEysGuOA==
-  dependencies:
-    as-virtual "^0.2.0"
-
 "@kwsites/file-exists@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@kwsites/file-exists/-/file-exists-1.1.1.tgz#ad1efcac13e1987d8dbaf235ef3be5b0d96faa99"
@@ -8172,11 +8165,6 @@ as-base64@0.2.0:
   resolved "https://registry.yarnpkg.com/as-base64/-/as-base64-0.2.0.tgz#b4bed937c93bfb6524b932b517e1b8571a0dd518"
   integrity sha512-j6JxprAVN4SXUcZiSChuMBf0JJOCdh5OfrHAepluxmFWuDZZm+YjmfNSk8djUHRPEB+Ui5HGvrz46GLvTJf3ig==
 
-as-virtual@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/as-virtual/-/as-virtual-0.2.0.tgz#f498e22ba5291a61f7ce40cfd940e68c3dc587ab"
-  integrity sha512-zI+8VwD6BPUtXrxs4R7v2N+59OAIBRwiiv9nGIMwcQ/w/lspyaualMqM7yok3jMRglKqLkfOx+dCJimeflEJcA==
-
 asap@^2.0.0:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/asap/-/asap-2.0.6.tgz#e50347611d7e690943208bbdafebcbc2fb866d46"
@@ -8191,10 +8179,10 @@ asn1js@^3.0.5:
     pvutils "^1.1.3"
     tslib "^2.8.1"
 
-assemblyscript@0.28.2:
-  version "0.28.2"
-  resolved "https://registry.yarnpkg.com/assemblyscript/-/assemblyscript-0.28.2.tgz#0789280a1bda52834dc550e03d4b38e42d84b71b"
-  integrity sha512-0j6kQdfKqRgmkY9zIzpFVcsLW8lMZ61pIZmmXJNiJeN2rvaHCCBSzHOoFNBh2jlvQNijY2/uxuufnSQma8HmFQ==
+assemblyscript@^0.28.2:
+  version "0.28.3"
+  resolved "https://registry.yarnpkg.com/assemblyscript/-/assemblyscript-0.28.3.tgz#2b771f022b99595af0b1ca8b687ccc03bc0cdd08"
+  integrity sha512-ue5ONQ0D+9yTTFWaw3u8dVBsKoSFCWI7XDoBPj+Vlmcm7PrnCZ1EjApZ+Y8iAMzdRjQ0aONkO4Xt3aAutG/izQ==
   dependencies:
     binaryen "123.0.0-nightly.20250530"
     long "^5.2.4"
@@ -13336,6 +13324,11 @@ jsesc@~3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-3.0.2.tgz#bb8b09a6597ba426425f2e4a07245c3d00b9343e"
   integrity sha512-xKqzzWXDttJuOcawBt4KnKHHIf5oQ/Cxax+0PWFG+DFDgHNAdi+TXECADI+RYiFUMmx8792xsMbbgXj4CwnP4g==
+
+json-as@1.1.20:
+  version "1.1.20"
+  resolved "https://registry.yarnpkg.com/json-as/-/json-as-1.1.20.tgz#919d0715ff4bc25529b19abb2189e64ddd077663"
+  integrity sha512-fb0TH8z4EyLJGQ6xFwxiuY7D5oOYxRiuW9MhOV2oy4GiWfG1CcYysX4EV5vdgJbf34YI5gZEUwNRtzMeIGAIQg==
 
 json-buffer@3.0.1:
   version "3.0.1"

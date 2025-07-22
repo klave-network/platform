@@ -8,7 +8,7 @@ import { Crypto, Result } from '../index';
 import { CryptoImpl, Key } from './crypto_impl';
 import * as idlV1 from './crypto_subtle_idl_v1';
 import { CryptoKey } from './crypto_subtle';
-import { JSON } from '@klave/as-json/assembly';
+import { JSON } from 'json-as/assembly';
 
 export class KeyAES extends Key {
 
@@ -16,7 +16,7 @@ export class KeyAES extends Key {
 
     encrypt(data: ArrayBuffer): Result<ArrayBuffer, Error> {
         const iv = CryptoImpl.getRandomBytes(12);
-        if(!iv.data)
+        if (!iv.data)
             return { data: null, err: new Error('Failed to generate IV') };
         const ivArray = Utils.convertToU8Array(iv.data as Uint8Array);
         const additionalData = new Array<u8>(0);
@@ -44,7 +44,7 @@ export class CryptoAES {
 
     static getKey(keyName: string): KeyAES | null {
         if (CryptoImpl.keyExists(keyName))
-            return {name: keyName, length: 256} as KeyAES;
+            return { name: keyName, length: 256 } as KeyAES;
         return null;
     }
 
@@ -67,7 +67,7 @@ export class CryptoAES {
 
         const keyInfo = String.UTF8.decode(key.data!, true);
         let cryptoKey = JSON.parse<CryptoKey>(keyInfo);
-        const kAES = {name: cryptoKey.id, length: 256} as KeyAES;
+        const kAES = { name: cryptoKey.id, length: 256 } as KeyAES;
         return { data: kAES, err: null };
     }
 }

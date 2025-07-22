@@ -4,7 +4,7 @@
  */
 
 import { Result } from './index';
-import { JSON } from '@klave/as-json/assembly';
+import { JSON } from 'json-as/assembly';
 
 // @ts-ignore: decorator
 @external("env", "get_quote")
@@ -230,7 +230,7 @@ export function verifyQuote(current_time: i64, binaryQuote: Uint8Array): Result<
 
     let quoteString = String.UTF8.decode(result.slice(0, res), true);
     let quote = JSON.parse<QuoteVerificationResponse>(quoteString);
-    return { data: quote, err: null};
+    return { data: quote, err: null };
 }
 
 export function parseQuote(binaryQuote: Uint8Array): Result<ParsedQuote, Error> {
@@ -246,15 +246,15 @@ export function parseQuote(binaryQuote: Uint8Array): Result<ParsedQuote, Error> 
 
     let quoteString = String.UTF8.decode(result.slice(0, res), true);
 
-    if(binaryQuote[0] === 4) {
+    if (binaryQuote[0] === 4) {
         // Quote4
         let quote = JSON.parse<Quote4>(quoteString);
         return { data: { version: "V4", quote4: quote, quote3: null }, err: null };
-    }else if(binaryQuote[0] === 3) {
+    } else if (binaryQuote[0] === 3) {
         // Quote3
         let quote = JSON.parse<Quote3>(quoteString);
         return { data: { version: "V3", quote4: null, quote3: quote }, err: null };
-    }else {
+    } else {
         // Unknown version
         return { data: null, err: new Error("Unknown quote version: " + binaryQuote[0].toString()) };
     }
