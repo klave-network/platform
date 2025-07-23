@@ -22,6 +22,9 @@ declare function runtime_add_user_transaction(s: ArrayBuffer): void;
 @external("env", "notify")
 declare function runtime_notify(s: ArrayBuffer): void;
 // @ts-ignore: decorator
+@external("env", "notify_error")
+declare function runtime_notify_error(s: ArrayBuffer): void;
+// @ts-ignore: decorator
 @external("env", "read_ledger")
 declare function runtime_read_ledger_raw(table: ArrayBuffer, key: ArrayBuffer, key_size: i32, value: ArrayBuffer, value_size: i32): i32;
 // @ts-ignore: decorator
@@ -188,6 +191,10 @@ export class Notifier {
 
     static notify(message: ArrayBuffer): void {
         runtime_notify(message);
+    }
+
+    static notify_error(message: ArrayBuffer): void {
+        runtime_notify_error(message);
     }
 
     static sendArrayBuffer(message: ArrayBuffer): void {

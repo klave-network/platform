@@ -5,6 +5,10 @@ pub fn send_string(param: &str) {
     sdk::notify(param);
 }
 
+pub fn notify_error(param: &str) {
+    sdk::notify_error(param);
+}
+
 pub fn send_json<T: Serialize>(value: &T) -> Result<(), Box<dyn std::error::Error>> {
     let json = serde_json::to_string(value)?; // Convert struct to JSON string
     sdk::notify(&json);
