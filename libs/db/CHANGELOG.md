@@ -1,4 +1,11 @@
 # Changelog
+## [1.4.2](https://github.com/klave-network/platform/compare/db@1.4.1...db@1.4.2) (2025-07-23)
+
+
+### Bug Fixes
+
+* Jest testing launch ([47b1d14](https://github.com/klave-network/platform/commit/47b1d14da9d61dce3ec38659f1c171f767a3524c))
+
 ## [1.4.1](https://github.com/klave-network/platform/compare/db@1.4.0...db@1.4.1) (2025-05-09)
 
 ## [1.4.0](https://github.com/klave-network/platform/compare/db@1.3.2...db@1.4.0) (2025-05-08)
