@@ -20,6 +20,6 @@
         "create-trustless-app": "./bin/create-trustless-app.js"
     },
     "dependencies": {
-        "@klave/sdk": "0.17.1"
+        "@klave/sdk": "0.17.2"
     }
 }
