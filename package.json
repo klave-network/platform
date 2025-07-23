@@ -60,7 +60,6 @@
         "**/react": "^19",
         "**/react-dom": "^19",
         "**/string-width": "^4",
-        "**/stylus": "0.0.1-security",
         "**/ts-node": "^10.9.2",
         "**/type-fest": "^4",
         "**/typescript": "^5",
