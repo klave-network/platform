@@ -56,12 +56,6 @@
                 "jestConfig": "libs/sdk/jest.config.ts"
             }
         },
-        "sync-deps": {
-            "executor": "nx:run-commands",
-            "options": {
-                "command": "node tools/scripts/syncDepVersion.mjs sdk"
-            }
-        },
         "version": {
             "executor": "@jscutlery/semver:version",
             "options": {
@@ -69,10 +63,7 @@
                 "trackDeps": true,
                 "changelogHeader": "# Changelog",
                 "tagPrefix": "{projectName}@",
-                "commitMessageFormat": "chore({projectName}): Release version ${version}",
-                "postTargets": [
-                    "sdk:sync-deps"
-                ]
+                "commitMessageFormat": "chore({projectName}): Release version ${version}"
             }
         },
         "publish": {

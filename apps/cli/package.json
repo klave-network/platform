@@ -16,8 +16,5 @@
     "type": "commonjs",
     "bin": {
         "klave": "./bin/klave.js"
-    },
-    "dependencies": {
-        "@klave/sdk": "0.17.2"
     }
 }

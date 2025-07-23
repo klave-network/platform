@@ -10,11 +10,6 @@ export const compilerModuleFunction = () => {
             const { serializeError } = await import('serialize-error');
             const assemblyscript = await import('assemblyscript/dist/asc.js');
 
-            /** @type {import('json-as/transform/src/index')} */
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            const { default: JSONTranform } = await import('json-as/transform/lib/index.js');
-
             /** @type {import('assemblyscript/dist/asc.d.ts')} */
             const asc = assemblyscript;
             const pendingResolves: Record<number, (value: string | PromiseLike<string | null> | null) => void> = {};
@@ -36,7 +31,7 @@ export const compilerModuleFunction = () => {
                         '--optimizeLevel', '3',
                         '--shrinkLevel', '2',
                         '--converge',
-                        // '--transform', 'json-as/transform',
+                        '--transform', 'json-as/transform',
                         '--bindings', 'esm',
                         '--outFile', 'out.wasm',
                         '--textFile', 'out.wat'
@@ -49,9 +44,6 @@ export const compilerModuleFunction = () => {
                                 diagnostics
                             });
                         },
-                        transforms: [
-                            new JSONTranform()
-                        ],
                         readFile: async (filename) => {
                             const currentReadIdentifier = pendingReadIdentifier++;
                             return new Promise<string | null>((resolve) => {
