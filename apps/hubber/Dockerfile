@@ -17,7 +17,6 @@ COPY --chown=hubber:hubber --chmod=444 dist/apps/hubber/yarn.lock ./
 COPY --chown=hubber:hubber --chmod=444 tools/fixtures/.yarnclean ./
 COPY --chown=hubber:hubber --chmod=444 libs/db/src/prisma ./prisma
 
-RUN ls -lsaR .
 RUN yarn install --production --no-cache && yarn cache clean
 RUN npx patch-package
 
