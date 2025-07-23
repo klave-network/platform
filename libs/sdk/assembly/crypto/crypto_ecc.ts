@@ -7,7 +7,7 @@ import { CryptoImpl, VerifySignResult, Key } from './crypto_impl';
 import * as idlV1 from './crypto_subtle_idl_v1';
 import { CryptoKey } from './crypto_subtle';
 import { PublicKey } from './crypto_keys';
-import { JSON } from '@klave/as-json/assembly';
+import { JSON } from 'json-as/assembly';
 
 export class KeyECC extends Key {
 

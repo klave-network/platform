@@ -1,4 +1,20 @@
 # Changelog
+## [1.4.0](https://github.com/klave-network/platform/compare/providers@1.3.3...providers@1.4.0) (2025-07-23)
+
+### Dependency Updates
+
+* `constants` updated to version `1.3.3`
+* `db` updated to version `1.3.3`
+
+### Features
+
+* **providers,hubber:** Add early support for MCP ([2fc0739](https://github.com/klave-network/platform/commit/2fc0739ddcb85b348da0323759d28fc4cc8d4839))
+
+
+### Bug Fixes
+
+* **api,providers,hubber:** Ensuring Probot is initialised and hooked correctly ([4319e2a](https://github.com/klave-network/platform/commit/4319e2afb24ce6ec0ee90e65aa8f9c07202a2929))
+
 ## [1.3.3](https://github.com/klave-network/platform/compare/providers@1.3.2...providers@1.3.3) (2025-05-11)
 
 

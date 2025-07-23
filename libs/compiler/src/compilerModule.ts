@@ -10,10 +10,10 @@ export const compilerModuleFunction = () => {
             const { serializeError } = await import('serialize-error');
             const assemblyscript = await import('assemblyscript/dist/asc.js');
 
-            /** @type {import('@klave/as-json/transform/src/index')} */
+            /** @type {import('json-as/transform/src/index')} */
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            const { default: JSONTranform } = await import('@klave/as-json/transform/lib/index.js');
+            const { default: JSONTranform } = await import('json-as/transform/lib/index.js');
 
             /** @type {import('assemblyscript/dist/asc.d.ts')} */
             const asc = assemblyscript;
@@ -36,7 +36,7 @@ export const compilerModuleFunction = () => {
                         '--optimizeLevel', '3',
                         '--shrinkLevel', '2',
                         '--converge',
-                        // '--transform', '@klave/as-json/transform',
+                        // '--transform', 'json-as/transform',
                         '--bindings', 'esm',
                         '--outFile', 'out.wasm',
                         '--textFile', 'out.wat'

@@ -6,43 +6,59 @@ FROM docker.io/node:24-alpine AS builder
 
 ENV HUSKY=0
 
-WORKDIR /app
+WORKDIR /app/hubber
 
 RUN addgroup --system hubber && \
     adduser --system -G hubber hubber
 
-COPY --chown=hubber:hubber --chmod=444 dist/apps/hubber/package.json hubber/
-COPY --chown=hubber:hubber --chmod=444 dist/apps/hubber/yarn.lock hubber/
-COPY --chown=hubber:hubber --chmod=444 tools/fixtures/.yarnclean hubber/
-COPY --chown=hubber:hubber --chmod=444 libs/db/src/prisma hubber/prisma
+COPY --chown=hubber:hubber --chmod=444 dist/apps/hubber/package.json ./
+COPY --chown=hubber:hubber --chmod=444 patches ./patches
+COPY --chown=hubber:hubber --chmod=444 dist/apps/hubber/yarn.lock ./
+COPY --chown=hubber:hubber --chmod=444 tools/fixtures/.yarnclean ./
+COPY --chown=hubber:hubber --chmod=444 libs/db/src/prisma ./prisma
 
-RUN cd hubber && yarn install --production --no-cache && yarn cache clean
+RUN yarn install --production --no-cache && yarn cache clean
+RUN npx patch-package
 
 FROM builder AS db
 
-WORKDIR /app
+WORKDIR /app/hubber
 
-RUN cd hubber && yarn add prisma && yarn autoclean --production && yarn cache clean
-RUN cd hubber && yarn run prisma generate
+RUN yarn add prisma && yarn autoclean --production && yarn cache clean
+RUN yarn run prisma generate
 
 FROM docker.io/node:22-alpine AS base
 
 ENV HUSKY=0
-ENV RUST_VERSION=1.85.0 \
+ENV RUST_VERSION=1.88.0 \
     RUSTUP_INIT_SKIP_PATH_CHECK=yes \
     RUSTUP_INIT_NO_MODIFY_PATH=no \
     RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     PATH=/usr/local/cargo/bin:$PATH
 
-RUN apk add --no-cache alpine-sdk musl-dev openssl-dev openssl-libs-static curl git clang; \
-    rm -rf /var/cache/apk/* /tmp/* /usr/share/git-core/* /usr/share/apk/* /var/tmp /usr/share/doc/* /usr/share/doc/*/copyright /usr/share/man/* /usr/share/groff/* /usr/share/info/* /usr/share/lintian/* /usr/share/linda/* /usr/share/locale/* /usr/share/locale/en*
-RUN curl https://sh.rustup.rs -sSf | sh -s -- --no-modify-path --profile minimal --default-toolchain $RUST_VERSION -y --default-host `apk --print-arch`-unknown-linux-musl; \
-    chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
+RUN apk add --no-cache alpine-sdk clang curl git musl-dev openssl-dev openssl-libs-static; \
+    rm -rf /var/cache/apk/* \
+    rm -rf /tmp/* \
+    rm -rf /usr/share/git-core/* \
+    rm -rf /usr/share/apk/* \
+    rm -rf /var/tmp \
+    rm -rf /usr/share/doc/* \
+    rm -rf /usr/share/doc/*/copyright \
+    rm -rf /usr/share/man/* \
+    rm -rf /usr/share/groff/* \
+    rm -rf /usr/share/info/* \
+    rm -rf /usr/share/lintian/* \
+    rm -rf /usr/share/linda/* \
+    rm -rf /usr/share/locale/* \
+    rm -rf /usr/share/locale/en*
+RUN npm install -g npm && npm cache clean --force
+RUN curl https://sh.rustup.rs -sSf | sh -s -- --no-modify-path --profile minimal --default-toolchain "$RUST_VERSION" -y --default-host `apk --print-arch`-unknown-linux-musl; \
+    chmod -R a+w "$RUSTUP_HOME" "$CARGO_HOME"; \
     rustup --version; \
     cargo --version; \
     rustc --version; \
-    rustup target add wasm32-unknown-unknown --toolchain $RUST_VERSION; \
+    rustup target add wasm32-unknown-unknown --toolchain "$RUST_VERSION"; \
     cargo install cargo-quickinstall; \
     cargo quickinstall cargo-component
 

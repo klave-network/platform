@@ -1,4 +1,25 @@
 # Changelog
+## [1.5.0](https://github.com/klave-network/platform/compare/ui@1.4.5...ui@1.5.0) (2025-07-23)
+
+### Dependency Updates
+
+* `constants` updated to version `1.4.5`
+* `db` updated to version `1.4.5`
+* `api` updated to version `1.4.5`
+
+### Features
+
+* **api,ui:** Add the ability to edit Klave configuration ([185ea3e](https://github.com/klave-network/platform/commit/185ea3e5e3d2395be5121998bb97d7470c0bd348))
+
+
+### Bug Fixes
+
+* **ui:** Add copy-able commands ([c66ad38](https://github.com/klave-network/platform/commit/c66ad386d83fca7d4c07784c365a5916b35dcc00))
+* **ui:** Correct dark-mode theming ([e80f46f](https://github.com/klave-network/platform/commit/e80f46fca22ff915174857f5c659c237b07943d8))
+* **ui:** Display fuller traces and stepped data responses ([83d1da9](https://github.com/klave-network/platform/commit/83d1da9c54f7847285aa11375b77616ca3b5f136))
+* **ui:** Error output would not display correctly ([09dcc92](https://github.com/klave-network/platform/commit/09dcc9202a1d90f51ae3346e62368e573d7e2d7a))
+* **ui:** Issue with the size of warning icon during GitHub app enrollment ([1266e5a](https://github.com/klave-network/platform/commit/1266e5a8988a16272f0005289b23e191234ae22b))
+
 ## [1.4.5](https://github.com/klave-network/platform/compare/ui@1.4.4...ui@1.4.5) (2025-06-17)
 
 ## [1.4.4](https://github.com/klave-network/platform/compare/ui@1.4.3...ui@1.4.4) (2025-06-16)

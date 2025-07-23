@@ -3,7 +3,7 @@
  * @module klave/sdk
  */
 
-import { JSON } from "@klave/as-json/assembly";
+import { JSON } from "json-as/assembly";
 export { JSON }
 import * as Crypto from "./crypto"
 export { Crypto }
@@ -119,8 +119,7 @@ class Table {
         return runtime_remove_from_ledger_raw(this.table, k, k.byteLength, buf, buf.byteLength);
     }
 
-    listKeys(): Array<string> 
-    {
+    listKeys(): Array<string> {
         let value = new ArrayBuffer(64);
         let result = runtime_list_keys_from_ledger(this.table, value, value.byteLength);
         if (abs(result) > value.byteLength) {

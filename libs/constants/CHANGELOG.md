@@ -1,4 +1,14 @@
 # Changelog
+## [1.2.1](https://github.com/klave-network/platform/compare/constants@1.2.0...constants@1.2.1) (2025-07-23)
+
+### Dependency Updates
+
+* `db` updated to version `1.2.0`
+
+### Bug Fixes
+
+* Jest testing launch ([47b1d14](https://github.com/klave-network/platform/commit/47b1d14da9d61dce3ec38659f1c171f767a3524c))
+
 ## [1.2.0](https://github.com/klave-network/platform/compare/constants@1.1.1...constants@1.2.0) (2025-06-12)
 
 

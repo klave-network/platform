@@ -7,7 +7,7 @@ import { Utils } from './index';
 import { CryptoUtil, KeyFormatWrapper } from './crypto_utils';
 import { CryptoImpl, Key, UnitType, VerifySignResult } from './crypto_impl';
 import * as idlV1 from './crypto_subtle_idl_v1';
-import { JSON } from '@klave/as-json/assembly';
+import { JSON } from 'json-as/assembly';
 
 @json
 export class CryptoKey {
@@ -22,8 +22,7 @@ export class CryptoKey {
 }
 
 @json
-class keyPersistParams
-{
+class keyPersistParams {
     @alias("key_id")
     keyId!: string;
     @alias("key_name")
@@ -496,7 +495,7 @@ export class SubtleCrypto {
             if (algorithm.name != 'ECDH')
                 return { data: null, err: new Error('Invalid ECDH parameters: invalid algorithm') };
 
-            const derivationMetadataEcdh = {public_key: algorithm.publicKey} as idlV1.ecdh_derivation_metadata;
+            const derivationMetadataEcdh = { public_key: algorithm.publicKey } as idlV1.ecdh_derivation_metadata;
 
             if (derivedKeyAlgorithm instanceof AesKeyGenParams) {
                 const aesMetadata = CryptoUtil.getAESMetadata(derivedKeyAlgorithm);
@@ -565,11 +564,11 @@ export class SubtleCrypto {
         if (key.type == "secret" || key.family == "aes")
             return { data: null, err: new Error('Invalid key type: AES symmetric key cannot have public key') };
 
-        if(key.type == "public")
+        if (key.type == "public")
             return { data: key, err: null };
 
         let pk = CryptoImpl.getPublicKeyAsCryptoKey(key.id);
-        if(!pk.data)
+        if (!pk.data)
             return { data: null, err: new Error('Failed to get public key') };
 
         const keyInfo = String.UTF8.decode(pk.data!, true);
@@ -582,7 +581,7 @@ export class SubtleCrypto {
             return { data: null, err: new Error('Invalid key') };
         if (!keyPersistedName)
             return { data: null, err: new Error('Invalid key name: key name cannot be null') };
-        if(CryptoImpl.keyExists(keyPersistedName))
+        if (CryptoImpl.keyExists(keyPersistedName))
             return { data: null, err: new Error('Key already exists') };
         let params = { keyId: key.id, keyName: keyPersistedName, keyType: key.type } as keyPersistParams;
         return CryptoImpl.persistKey(String.UTF8.encode(JSON.stringify(params)));

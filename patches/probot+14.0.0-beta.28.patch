@@ -1,0 +1,11 @@
+diff --git a/node_modules/probot/lib/octokit/get-octokit-throttle-options.js b/node_modules/probot/lib/octokit/get-octokit-throttle-options.js
+index edd9d40..25e22f2 100644
+--- a/node_modules/probot/lib/octokit/get-octokit-throttle-options.js
++++ b/node_modules/probot/lib/octokit/get-octokit-throttle-options.js
+@@ -1,6 +1,5 @@
+ import { npxImport } from "npx-import-light";
+ import Bottleneck from "bottleneck";
+-import {} from "ioredis";
+ export async function getOctokitThrottleOptions(options) {
+     const { log, redisConfig } = options;
+     const throttlingOptions = {

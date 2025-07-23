@@ -1,4 +1,13 @@
 # Changelog
+## [0.4.4](https://github.com/klave-network/platform/compare/create@0.4.3...create@0.4.4) (2025-07-23)
+
+### Dependency Updates
+
+* `sdk` updated to version `0.4.3`
+
+### Bug Fixes
+
+* **sdk,compiler,cli,create:** Realign dependencies based on NPM current latests ([b9fa160](https://github.com/klave-network/platform/commit/b9fa1602c99f944652627a47892b19a3abf9fe12))
 
 ## [0.4.3](https://github.com/klave-network/platform/compare/create@0.4.2...create@0.4.3) (2025-01-24)
 

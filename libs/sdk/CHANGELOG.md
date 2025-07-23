@@ -1,4 +1,10 @@
 # Changelog
+## [0.17.2](https://github.com/klave-network/platform/compare/sdk@0.17.1...sdk@0.17.2) (2025-07-23)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.17.1`
+* `constants` updated to version `0.17.1`
 ## [0.17.1](https://github.com/klave-network/platform/compare/sdk@0.17.0...sdk@0.17.1) (2025-06-16)
 
 ### Dependency Updates
