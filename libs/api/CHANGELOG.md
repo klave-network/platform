@@ -1,4 +1,11 @@
 # Changelog
+## [1.5.1](https://github.com/klave-network/platform/compare/api@1.5.0...api@1.5.1) (2025-07-23)
+
+
+### Bug Fixes
+
+* **api:** Sanitize branch names only for FQDN ([b5c181c](https://github.com/klave-network/platform/commit/b5c181c78ed654596b75bcedf366dc1c8b7590ed))
+
 ## [1.5.0](https://github.com/klave-network/platform/compare/api@1.4.4...api@1.5.0) (2025-07-23)
 
 ### Dependency Updates
