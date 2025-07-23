@@ -1,4 +1,6 @@
 # Changelog
+## [0.0.6](https://github.com/klave-network/platform/compare/ui-kit@0.0.5...ui-kit@0.0.6) (2025-07-23)
+
 ## [0.0.5](https://github.com/klave-network/platform/compare/ui-kit@0.0.4...ui-kit@0.0.5) (2025-05-09)
 
 ## [0.0.4](https://github.com/klave-network/platform/compare/ui-kit@0.0.3...ui-kit@0.0.4) (2025-05-09)
