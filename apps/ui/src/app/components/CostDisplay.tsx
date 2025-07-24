@@ -51,7 +51,7 @@ const CostDisplay: FC<CostDisplayProps> = ({ basis, compact, size, justify, clas
     else
         consumptionValue = getIntegerCost(basis as CostConsumption);
 
-    let currencyValue = consumptionValue / 100_000_000_000;
+    let currencyValue = consumptionValue / 100_000_000_000_000;
     const isNonNilTinyAmount = currencyValue <= 0.0001 && currencyValue > 0;
     if (isNonNilTinyAmount)
         currencyValue = 0.0001;
