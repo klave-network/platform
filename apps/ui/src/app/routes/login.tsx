@@ -147,7 +147,7 @@ export const Login: FC = () => {
         return <div id="login">
 
             <div className="flex flex-col sm:flex-row max-w-6xl mx-auto gap-12 px-4 sm:px-6">
-                <iframe ref={iframeRef} loading='eager' sandbox='allow-modals allow-scripts' src={secretariumAuth.toString()} className='w-[40vw] h-[50vh]' />
+                <iframe title='Login with Secretarium' ref={iframeRef} loading='eager' sandbox='allow-modals allow-scripts' src={secretariumAuth.toString()} className='w-[40vw] h-[50vh]' />
             </div>
 
         </div>;

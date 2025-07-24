@@ -187,7 +187,8 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
 
             const launchDeploy = async () => {
 
-                const branchName = context.commit.ref?.includes('/') ? context.commit.ref.split('/').pop() : repo.defaultBranch ?? 'master';
+                const branchName = (context.commit.ref?.includes('/') ? context.commit.ref.split('/').pop() : repo.defaultBranch) ?? 'master';
+                const branchNameHash = await Utils.hashBase64(branchName);
                 const buildId = context.commit.after.substring(0, 8);
                 const domains = await prisma.domain.findMany({
                     where: {
@@ -197,10 +198,11 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                 });
 
                 const deploymentSet = uuid();
+                const sanitizedBranchName = `${branchName}.${branchNameHash.substring(0, 2)}`.replace(/[^a-zA-Z0-9-]/g, '-').toLowerCase();
                 const targets = domains
-                    .map(domain => `${branchName}.${application.id.split('-')[0]}.${application.slug}.${domain.fqdn}`)
+                    .map(domain => `${sanitizedBranchName}.${application.id.split('-')[0]}.${application.slug}.${domain.fqdn}`)
                     .concat(...[
-                        `${branchName}.${application.id.split('-')[0]}.${application.slug}.${application.organisation.slug.replace('~$~', '')}.klave.network`,
+                        `${sanitizedBranchName}.${application.id.split('-')[0]}.${application.slug}.${application.organisation.slug.replace('~$~', '')}.klave.network`,
                         application.deployCommitLedgers ? `${buildId}.${application.id.split('-')[0]}.${application.slug}.${application.organisation.slug.replace('~$~', '')}.klave.network` : undefined
                     ].filter(Boolean));
 
@@ -564,7 +566,10 @@ export const sendToSecretarium = async ({
         const clusterAllocation = await prisma.clusterAllocation.findFirst({
             where: {
                 cluster: {
-                    id: targetCluster
+                    id: targetCluster,
+                    deletedAt: {
+                        isSet: false
+                    }
                 },
                 organisationId: contextOrganisation?.id ?? ''
             },

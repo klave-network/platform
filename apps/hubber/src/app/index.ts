@@ -7,20 +7,22 @@ import helmet from 'helmet';
 import multer from 'multer';
 import cors from 'cors';
 import passport from 'passport';
+import * as swaggerUi from 'swagger-ui-express';
 import { v4 as uuid } from 'uuid';
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { prisma } from '@klave/db';
 import { rateLimiterMiddleware } from './middleware/rateLimiter';
 import { morganLoggerMiddleware } from './middleware/morganLogger';
+import { integrationCredsRenewalMiddleware } from './middleware/integrations';
 import { probotMiddleware, probotMiddlewareHandlerRegistration } from './middleware/probot';
 import { stripeMiddlware } from './middleware/stripe';
 import { sentryRequestMiddleware, sentryTracingMiddleware, sentryErrorMiddleware } from './middleware/sentry';
 import { passportLoginCheckMiddleware } from './middleware/passport';
 import { trcpMiddlware } from './middleware/trpc';
+import { openAPIMiddleware, openAPIDocument } from './middleware/openapi';
 // import { i18nextMiddleware } from './middleware/i18n';
 // import { getDriverSubstrate } from '../utils/db';
 import { usersRouter } from './routes';
-import { webLinkerMiddlware } from './middleware/webLinker';
 import { config, permissiblePeers } from '@klave/constants';
 import { uiHosterMiddleware } from './middleware/uiHoster';
 import { mcpMiddleware } from './middleware/mcp';
@@ -39,11 +41,16 @@ export const start = async () => {
     app.use(morganLoggerMiddleware);
     app.use(rateLimiterMiddleware);
     app.use(express.json({
+        limit: '10mb',
         verify: (req, __unusedRed, buf) => {
             (req as unknown as Record<string, object>).rawBody = buf;
         }
     }));
-    app.use(express.urlencoded({ extended: true }));
+    app.use(express.urlencoded({
+        extended: true,
+        limit: '10mb'
+    }));
+
     // app.use(i18nextMiddleware);
     app.use(multer().none());
     app.disable('X-Powered-By');
@@ -168,12 +175,11 @@ export const start = async () => {
     app.use('/', express.static(path.join(__dirname, 'public')));
     app.use(passport.initialize());
     app.use(passport.session());
-
-    // Contextualise user session, devices, tags, tokens
-    app.use(webLinkerMiddlware);
-
+    app.use(integrationCredsRenewalMiddleware);
     app.use(passportLoginCheckMiddleware);
     app.use('/mcp', mcpMiddleware);
+    app.use('/docs', swaggerUi.serve, swaggerUi.setup(openAPIDocument));
+    app.use('/o', openAPIMiddleware);
     app.use('/trpc', trcpMiddlware);
     app.use(usersRouter);
     app.use(sentryErrorMiddleware);

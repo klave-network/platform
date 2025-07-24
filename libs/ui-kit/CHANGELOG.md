@@ -1,4 +1,13 @@
 # Changelog
+## [0.0.7](https://github.com/klave-network/platform/compare/ui-kit@0.0.6...ui-kit@0.0.7) (2025-07-24)
+
+
+### Bug Fixes
+
+* **ui-kit:** Horizontal padding tweak ([dc77429](https://github.com/klave-network/platform/commit/dc774295aa62869691fb516ac15226b55b72e2eb))
+
+## [0.0.6](https://github.com/klave-network/platform/compare/ui-kit@0.0.5...ui-kit@0.0.6) (2025-07-23)
+
 ## [0.0.5](https://github.com/klave-network/platform/compare/ui-kit@0.0.4...ui-kit@0.0.5) (2025-05-09)
 
 ## [0.0.4](https://github.com/klave-network/platform/compare/ui-kit@0.0.3...ui-kit@0.0.4) (2025-05-09)

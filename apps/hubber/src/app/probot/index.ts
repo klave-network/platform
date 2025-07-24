@@ -122,23 +122,29 @@ const probotApp = (app: Probot) => {
                             }
                     }
                     if (payload.action === 'deleted') {
-                        await prisma.installation.delete({
+                        await prisma.installation.update({
                             where: {
                                 source_remoteId_account: {
                                     source: 'github',
                                     remoteId: `${payload.installation.id}`,
                                     account: accountName(account)
                                 }
+                            },
+                            data: {
+                                deletedAt: new Date()
                             }
                         });
                         if (payload.repositories && payload.repositories.length > 0)
-                            await prisma.repository.deleteMany({
+                            await prisma.repository.updateMany({
                                 where: {
                                     source: 'github',
                                     installationRemoteId: `${payload.installation.id}`,
                                     remoteId: {
                                         in: payload.repositories.map(r => `${r.id}`)
                                     }
+                                },
+                                data: {
+                                    deletedAt: new Date()
                                 }
                             });
                     }
@@ -183,37 +189,20 @@ const probotApp = (app: Probot) => {
                                         installationPayload: repo
                                     }
                                 });
-                                await prisma.deployableRepo.updateMany({
-                                    where: {
-                                        fullName: repo.full_name,
-                                        owner: accountName(account)
-                                    },
-                                    data: {
-                                        installationRemoteId: `${payload.installation.id}`
-                                    }
-                                });
                             }
                     }
                     if (payload.action === 'removed') {
                         if (payload.repositories_removed && payload.repositories_removed.length > 0) {
-                            await prisma.repository.deleteMany({
+                            await prisma.repository.updateMany({
                                 where: {
                                     source: 'github',
                                     installationRemoteId: `${payload.installation.id}`,
                                     remoteId: {
                                         in: payload.repositories_removed.map(r => `${r.id}`)
                                     }
-                                }
-                            });
-                            await prisma.deployableRepo.updateMany({
-                                where: {
-                                    fullName: {
-                                        in: payload.repositories_removed.map(r => r.full_name)
-                                    },
-                                    owner: accountName(account)
                                 },
                                 data: {
-                                    installationRemoteId: ''
+                                    deletedAt: new Date()
                                 }
                             });
                         }
@@ -265,14 +254,6 @@ const probotApp = (app: Probot) => {
                             source: 'github',
                             name: payload.repository.name,
                             owner: payload.repository.owner.login
-                        },
-                        data: {
-                            defaultBranch: payload.repository.default_branch
-                        }
-                    });
-                    await prisma.deployableRepo.updateMany({
-                        where: {
-                            fullName: payload.repository.full_name
                         },
                         data: {
                             defaultBranch: payload.repository.default_branch

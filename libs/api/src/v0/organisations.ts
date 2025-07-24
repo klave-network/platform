@@ -80,6 +80,9 @@ export const organisationRouter = createTRPCRouter({
                     permissionGrants: {
                         some: {
                             userId: user.id,
+                            deletedAt: {
+                                isSet: false
+                            },
                             OR: [{
                                 read: true
                             }, {
@@ -96,6 +99,11 @@ export const organisationRouter = createTRPCRouter({
                     kredits: true,
                     personal: true,
                     permissionGrants: {
+                        where: {
+                            deletedAt: {
+                                isSet: false
+                            }
+                        },
                         include: {
                             user: true,
                             organisation: true
@@ -120,6 +128,9 @@ export const organisationRouter = createTRPCRouter({
                     permissionGrants: {
                         some: {
                             userId: user.id,
+                            deletedAt: {
+                                isSet: false
+                            },
                             OR: [{
                                 read: true
                             }, {
@@ -136,6 +147,11 @@ export const organisationRouter = createTRPCRouter({
                     kredits: true,
                     personal: true,
                     permissionGrants: {
+                        where: {
+                            deletedAt: {
+                                isSet: false
+                            }
+                        },
                         include: {
                             user: true,
                             organisation: true
@@ -268,6 +284,9 @@ export const organisationRouter = createTRPCRouter({
                         permissionGrants: {
                             some: {
                                 userId: user.id,
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 OR: [{
                                     write: true
                                 }, {
@@ -285,6 +304,9 @@ export const organisationRouter = createTRPCRouter({
                         permissionGrants: {
                             some: {
                                 userId: user.id,
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 OR: [{
                                     write: true
                                 }, {
@@ -295,7 +317,6 @@ export const organisationRouter = createTRPCRouter({
                     },
                     data
                 });
-            return;
 
         }),
     delete: publicProcedure
@@ -307,18 +328,23 @@ export const organisationRouter = createTRPCRouter({
             if (!user)
                 throw new Error('Not logged in');
 
-            await prisma.organisation.delete({
+            await prisma.organisation.update({
                 where: {
                     id: organisationId,
                     permissionGrants: {
                         some: {
                             userId: user.id,
+                            deletedAt: {
+                                isSet: false
+                            },
                             admin: true
                         }
                     }
+                },
+                data: {
+                    deletedAt: new Date()
                 }
             });
-            return;
 
         }),
     allocationCredits: publicProcedure
@@ -398,7 +424,7 @@ export const organisationRouter = createTRPCRouter({
         .input(
             z.object({
                 filterUnitialized: z.boolean().nullish(),
-                limit: z.number().min(1).max(100).nullish(),
+                limit: z.number().min(1).max(1000).nullish(),
                 cursor: z.string().nullish() // <-- "cursor" needs to exist, but can be any type
             })
         )
@@ -543,9 +569,12 @@ export const organisationRouter = createTRPCRouter({
             if (!currentPermissionGrant || !currentPermissionGrant.admin)
                 throw new Error('Not enough permissions');
 
-            await prisma.permissionGrant.deleteMany({
+            await prisma.permissionGrant.updateMany({
                 where: {
                     id: permissionGrant.id
+                },
+                data: {
+                    deletedAt: new Date()
                 }
             });
         })

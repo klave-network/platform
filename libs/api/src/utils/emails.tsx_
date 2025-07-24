@@ -20,7 +20,7 @@ const LoginCodeEmail: FC<LoginCodeEmailProps> = ({ code }) => {
         <Tailwind>
             <Body className='bg-white'>
                 <Container className='p-6 mx-auto my-0'>
-                    <Heading className='text-slate-800 text-xl font-bold my-11' style={textFontFamily}>Log in to Klave</Heading>
+                    <Heading className='text-slate-800 text-xl font-bold my-11' style={textFontFamily}>Sign in to Klave</Heading>
                     <Text className='my-6' style={textFontFamily}>
                         Copy and paste your Klave login code:
                     </Text>

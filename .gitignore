@@ -4,6 +4,7 @@
 /dist
 /tmp
 /out-tsc
+bindings.rs
 
 # dependencies
 node_modules

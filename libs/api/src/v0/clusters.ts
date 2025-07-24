@@ -32,6 +32,9 @@ export const activityRouter = createTRPCRouter({
                     organisation: {
                         id: deployment.application.organisationId
                     },
+                    deletedAt: {
+                        isSet: false
+                    },
                     AND: {
                         OR: [{
                             read: true
@@ -63,6 +66,9 @@ export const activityRouter = createTRPCRouter({
                 where: {
                     organisation: {
                         id: organisationId
+                    },
+                    deletedAt: {
+                        isSet: false
                     },
                     AND: {
                         OR: [{
@@ -117,9 +123,12 @@ export const activityRouter = createTRPCRouter({
             if (!allocationId)
                 return false;
 
-            await prisma.clusterAllocation.delete({
+            await prisma.clusterAllocation.update({
                 where: {
                     id: allocationId
+                },
+                data: {
+                    deletedAt: new Date()
                 }
             });
 
@@ -134,9 +143,12 @@ export const activityRouter = createTRPCRouter({
             if (!clusterId)
                 return false;
 
-            await prisma.cluster.delete({
+            await prisma.cluster.update({
                 where: {
                     id: clusterId
+                },
+                data: {
+                    deletedAt: new Date()
                 }
             });
 

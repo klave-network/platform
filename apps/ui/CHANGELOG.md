@@ -1,4 +1,44 @@
 # Changelog
+## [1.5.1](https://github.com/klave-network/platform/compare/ui@1.5.0...ui@1.5.1) (2025-07-24)
+
+### Dependency Updates
+
+* `constants` updated to version `1.5.0`
+* `db` updated to version `1.5.0`
+* `api` updated to version `1.5.0`
+
+### Bug Fixes
+
+* **ui:** Change usage pretty-print order ([b5fef48](https://github.com/klave-network/platform/commit/b5fef487b56648debe3b724761f4a03f0779947a))
+* **ui:** Changing usage calculation basis ([7661590](https://github.com/klave-network/platform/commit/7661590c8f6dc67915655e24cab1c45b8ec6c186))
+* **ui:** Changing usage calculation basis ([812d703](https://github.com/klave-network/platform/commit/812d70323444ec193bb4c4f4a72dce94e3b5a93e))
+* **ui:** Missing value transform for usage `pretty-print` ([3251ad3](https://github.com/klave-network/platform/commit/3251ad35871403f6704aadb47da6b9b9636066bc))
+
+## [1.5.0](https://github.com/klave-network/platform/compare/ui@1.4.5...ui@1.5.0) (2025-07-23)
+
+### Dependency Updates
+
+* `constants` updated to version `1.4.5`
+* `db` updated to version `1.4.5`
+* `api` updated to version `1.4.5`
+
+### Features
+
+* **api,ui:** Add the ability to edit Klave configuration ([185ea3e](https://github.com/klave-network/platform/commit/185ea3e5e3d2395be5121998bb97d7470c0bd348))
+
+
+### Bug Fixes
+
+* **ui:** Add copy-able commands ([c66ad38](https://github.com/klave-network/platform/commit/c66ad386d83fca7d4c07784c365a5916b35dcc00))
+* **ui:** Correct dark-mode theming ([e80f46f](https://github.com/klave-network/platform/commit/e80f46fca22ff915174857f5c659c237b07943d8))
+* **ui:** Display fuller traces and stepped data responses ([83d1da9](https://github.com/klave-network/platform/commit/83d1da9c54f7847285aa11375b77616ca3b5f136))
+* **ui:** Error output would not display correctly ([09dcc92](https://github.com/klave-network/platform/commit/09dcc9202a1d90f51ae3346e62368e573d7e2d7a))
+* **ui:** Issue with the size of warning icon during GitHub app enrollment ([1266e5a](https://github.com/klave-network/platform/commit/1266e5a8988a16272f0005289b23e191234ae22b))
+
+## [1.4.5](https://github.com/klave-network/platform/compare/ui@1.4.4...ui@1.4.5) (2025-06-17)
+
+## [1.4.4](https://github.com/klave-network/platform/compare/ui@1.4.3...ui@1.4.4) (2025-06-16)
+
 ## [1.4.3](https://github.com/klave-network/platform/compare/ui@1.4.2...ui@1.4.3) (2025-05-11)
 
 ### Dependency Updates

@@ -1,9 +1,9 @@
-// import { startPruner } from '@klave/pruner';
+import { startPruner } from '@klave/pruner';
 import { config } from '@klave/constants';
 import { start } from './app';
 import './i18n';
 import { dbOps } from './utils/db';
-import { sentryOps, scpOps, githubOps, envOps, dispatchOps, probotOps, objectStoreOps, logger } from '@klave/providers';
+import { sentryOps, scpOps, envOps, dispatchOps, probotOps, objectStoreOps, logger } from '@klave/providers';
 import http from 'node:http';
 import https from 'node:https';
 import type { Plugin } from 'vite';
@@ -20,8 +20,7 @@ const onlineChain = async () => config.get('KLAVE_OFFLINE_DEV') === 'true'
     ? Promise.resolve()
     : Promise.resolve()
         .then(dispatchOps.initialize)
-        .then(scpOps.initialize)
-        .then(githubOps.initialize);
+        .then(scpOps.initialize);
 
 logger.info(`Klave Hubber API v${process.env.GIT_REPO_VERSION}`);
 logger.info(`Branch ${process.env.GIT_REPO_BRANCH} - ${process.env.GIT_REPO_COMMIT?.substring(0, 8)}${process.env.GIT_REPO_DIRTY ? '*' : ''}`);
@@ -105,7 +104,7 @@ const serverHandle = dbOps.initialize()
             logger.info(`Listening at ${protocol}://${bhuiHostDomain}:${bhuiHostPort}`);
         });
 
-        // startPruner();
+        startPruner();
 
         return [server, serverDUI];
 

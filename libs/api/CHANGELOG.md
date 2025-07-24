@@ -1,4 +1,44 @@
 # Changelog
+## [1.5.2](https://github.com/klave-network/platform/compare/api@1.5.1...api@1.5.2) (2025-07-24)
+
+### Dependency Updates
+
+* `db` updated to version `1.5.1`
+* `providers` updated to version `1.5.1`
+* `constants` updated to version `1.5.1`
+* `ui-kit` updated to version `1.5.1`
+## [1.5.1](https://github.com/klave-network/platform/compare/api@1.5.0...api@1.5.1) (2025-07-23)
+
+
+### Bug Fixes
+
+* **api:** Sanitize branch names only for FQDN ([b5c181c](https://github.com/klave-network/platform/commit/b5c181c78ed654596b75bcedf366dc1c8b7590ed))
+
+## [1.5.0](https://github.com/klave-network/platform/compare/api@1.4.4...api@1.5.0) (2025-07-23)
+
+### Dependency Updates
+
+* `db` updated to version `1.4.4`
+* `providers` updated to version `1.4.4`
+* `constants` updated to version `1.4.4`
+* `ui-kit` updated to version `1.4.4`
+
+### Features
+
+* **api,hubber:** Add support for OpenAPI over tRPC ([882e6e2](https://github.com/klave-network/platform/commit/882e6e29044491def34aad5f606184e680f45a17))
+* **api,ui:** Add the ability to edit Klave configuration ([185ea3e](https://github.com/klave-network/platform/commit/185ea3e5e3d2395be5121998bb97d7470c0bd348))
+
+
+### Bug Fixes
+
+* **api,providers,hubber:** Ensuring Probot is initialised and hooked correctly ([4319e2a](https://github.com/klave-network/platform/commit/4319e2afb24ce6ec0ee90e65aa8f9c07202a2929))
+* **api:** Correct beta domain filtering after env fetching changes ([382127d](https://github.com/klave-network/platform/commit/382127d9c94f8acbfd92e655d407235590aaea8b))
+* **api:** Empty environment variable pollute the execution of cargo ([490de10](https://github.com/klave-network/platform/commit/490de107b901a5a57b883cac3a3c32f7e79eda36))
+* **api:** Sanitize branch names to prevent side effects in the backend ([f8b3ed2](https://github.com/klave-network/platform/commit/f8b3ed24a28164da50df71a536117f1b0d5fee60))
+* Jest testing launch ([47b1d14](https://github.com/klave-network/platform/commit/47b1d14da9d61dce3ec38659f1c171f767a3524c))
+* **ui:** Allow up to 1000 organisation querying at a time ([8f53918](https://github.com/klave-network/platform/commit/8f53918970d31937aa91fee89351f1b98a868a75))
+* **ui:** Enable user login checks for domain API ([7eba490](https://github.com/klave-network/platform/commit/7eba490ea49eff4dcc6673762fdbbdd099aadff4))
+
 ## [1.4.4](https://github.com/klave-network/platform/compare/api@1.4.3...api@1.4.4) (2025-05-11)
 
 ### Dependency Updates

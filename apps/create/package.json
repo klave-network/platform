@@ -1,6 +1,6 @@
 {
     "name": "create-on-klave",
-    "version": "0.4.3",
+    "version": "0.4.6",
     "private": false,
     "description": "Klave Honest Apps templater",
     "repository": {
@@ -13,13 +13,10 @@
         "name": "Florian Guitton",
         "email": "florian@secretarium.com"
     },
-    "type": "commonjs",
+    "type": "module",
     "bin": {
         "create-honest-app": "./bin/create-trustless-app.js",
         "create-on-klave": "./bin/create-on-klave.js",
         "create-trustless-app": "./bin/create-trustless-app.js"
-    },
-    "dependencies": {
-        "@klave/sdk": "0.17.1"
     }
 }

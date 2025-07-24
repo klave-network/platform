@@ -1,4 +1,42 @@
 # Changelog
+## [1.3.2](https://github.com/klave-network/platform/compare/hubber@1.3.1...hubber@1.3.2) (2025-07-24)
+
+### Dependency Updates
+
+* `db` updated to version `1.3.1`
+* `constants` updated to version `1.3.1`
+* `providers` updated to version `1.3.1`
+* `api` updated to version `1.3.1`
+* `pruner` updated to version `1.3.1`
+## [1.3.1](https://github.com/klave-network/platform/compare/hubber@1.3.0...hubber@1.3.1) (2025-07-23)
+
+### Dependency Updates
+
+* `api` updated to version `1.3.0`
+* `pruner` updated to version `1.3.0`
+## [1.3.0](https://github.com/klave-network/platform/compare/hubber@1.2.4...hubber@1.3.0) (2025-07-23)
+
+### Dependency Updates
+
+* `db` updated to version `1.2.4`
+* `constants` updated to version `1.2.4`
+* `providers` updated to version `1.2.4`
+* `api` updated to version `1.2.4`
+* `pruner` updated to version `1.2.4`
+
+### Features
+
+* **api,hubber:** Add support for OpenAPI over tRPC ([882e6e2](https://github.com/klave-network/platform/commit/882e6e29044491def34aad5f606184e680f45a17))
+* **providers,hubber:** Add early support for MCP ([2fc0739](https://github.com/klave-network/platform/commit/2fc0739ddcb85b348da0323759d28fc4cc8d4839))
+
+
+### Bug Fixes
+
+* **api,providers,hubber:** Ensuring Probot is initialised and hooked correctly ([4319e2a](https://github.com/klave-network/platform/commit/4319e2afb24ce6ec0ee90e65aa8f9c07202a2929))
+* **hubber:** Forgotten dependency in the built artifact ([4835be7](https://github.com/klave-network/platform/commit/4835be76dbddc256b55ace06de099153817806e7))
+* **hubber:** Sentry incompatibility with Node 24 ([2dd5c40](https://github.com/klave-network/platform/commit/2dd5c409dc43a093820f5bc8f2716442b3c26cb2))
+* **pruner,hubber:** Migrate Webauthn public key types ([8a3cd6e](https://github.com/klave-network/platform/commit/8a3cd6ef7be1af5c94542049ff32d566a86673bc))
+
 ## [1.2.4](https://github.com/klave-network/platform/compare/hubber@1.2.3...hubber@1.2.4) (2025-05-09)
 
 ### Dependency Updates

@@ -1,21 +1,42 @@
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import * as Sentry from '@sentry/node';
-import { logger, probot, scp, scpOps } from '@klave/providers';
+import { logger, probotOps, scp, scpOps } from '@klave/providers';
 import type { Application, Limits } from '@klave/db';
 import { z } from 'zod';
-import { deployToSubstrate } from '../deployment/deploymentController';
 import { config, getFinalParseConfig, KlaveGetCreditResult } from '@klave/constants';
+import { deployToSubstrate } from '../deployment/deploymentController';
 
 export const applicationRouter = createTRPCRouter({
     getAll: publicProcedure
-        .query(async ({ ctx: { prisma, webId, session: { user } } }) => {
+        .query(async ({ ctx: { prisma, session: { user } } }) => {
 
             if (!user)
                 throw (new Error('You must be logged in to delete an application'));
 
             const manifest = await prisma.application.findMany({
                 where: {
-                    webId,
+                    organisation: {
+                        deletedAt: {
+                            isSet: false
+                        },
+                        permissionGrants: {
+                            some: {
+                                userId: user.id,
+                                deletedAt: {
+                                    isSet: false
+                                },
+                                OR: [{
+                                    read: true
+                                },
+                                {
+                                    write: true
+                                },
+                                {
+                                    admin: true
+                                }]
+                            }
+                        }
+                    },
                     deletedAt: {
                         isSet: false
                     }
@@ -40,7 +61,10 @@ export const applicationRouter = createTRPCRouter({
                     },
                     permissionGrants: {
                         where: {
-                            userId: user?.id
+                            userId: user?.id,
+                            deletedAt: {
+                                isSet: false
+                            }
                         }
                     }
                 }
@@ -69,6 +93,9 @@ export const applicationRouter = createTRPCRouter({
                         isSet: false
                     },
                     organisation: {
+                        deletedAt: {
+                            isSet: false
+                        },
                         OR: [{
                             id: orgId
                         },
@@ -78,10 +105,16 @@ export const applicationRouter = createTRPCRouter({
                     },
                     OR: [{
                         organisation: {
+                            deletedAt: {
+                                isSet: false
+                            },
                             permissionGrants: {
                                 some: {
-                                    userId: user?.id
-                                    , OR: [{
+                                    userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
+                                    OR: [{
                                         read: true
                                     },
                                     {
@@ -97,6 +130,9 @@ export const applicationRouter = createTRPCRouter({
                         permissionGrants: {
                             some: {
                                 userId: user?.id,
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 OR: [{
                                     read: true
                                 },
@@ -130,7 +166,10 @@ export const applicationRouter = createTRPCRouter({
                     },
                     permissionGrants: {
                         where: {
-                            userId: user?.id
+                            userId: user?.id,
+                            deletedAt: {
+                                isSet: false
+                            }
                         }
                     }
                 }
@@ -295,10 +334,16 @@ export const applicationRouter = createTRPCRouter({
                     id: appId,
                     OR: [{
                         organisation: {
+                            deletedAt: {
+                                isSet: false
+                            },
                             permissionGrants: {
                                 some: {
-                                    userId: user?.id
-                                    , OR: [{
+                                    userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
+                                    OR: [{
                                         read: true
                                     },
                                     {
@@ -314,6 +359,9 @@ export const applicationRouter = createTRPCRouter({
                         permissionGrants: {
                             some: {
                                 userId: user?.id,
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 OR: [{
                                     read: true
                                 },
@@ -346,7 +394,10 @@ export const applicationRouter = createTRPCRouter({
                     deletedAt: true,
                     permissionGrants: {
                         where: {
-                            userId: user?.id
+                            userId: user?.id,
+                            deletedAt: {
+                                isSet: false
+                            }
                         },
                         include: {
                             user: true,
@@ -460,8 +511,11 @@ export const applicationRouter = createTRPCRouter({
                         organisation: {
                             permissionGrants: {
                                 some: {
-                                    userId: user?.id
-                                    , OR: [{
+                                    userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
+                                    OR: [{
                                         read: true
                                     },
                                     {
@@ -477,6 +531,9 @@ export const applicationRouter = createTRPCRouter({
                         permissionGrants: {
                             some: {
                                 userId: user?.id,
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 OR: [{
                                     read: true
                                 },
@@ -509,7 +566,10 @@ export const applicationRouter = createTRPCRouter({
                     deletedAt: true,
                     permissionGrants: {
                         where: {
-                            userId: user?.id
+                            userId: user?.id,
+                            deletedAt: {
+                                isSet: false
+                            }
                         },
                         include: {
                             user: true,
@@ -599,159 +659,188 @@ export const applicationRouter = createTRPCRouter({
         }),
     register: publicProcedure
         .input(z.object({
-            deployableRepoId: z.string().uuid(),
+            provider: z.literal('github'),
+            owner: z.string(),
+            name: z.string(),
             applications: z.array(z.string()),
-            emphemeralKlaveTag: z.string().optional(),
             organisationId: z.string().uuid()
         }))
-        .mutation(async ({ ctx: { prisma, session, sessionStore, sessionID, webId }, input: { deployableRepoId, applications, /*emphemeralKlaveTag,*/ organisationId } }) => {
+        .mutation(async ({ ctx: { session, prisma }, input: { provider, owner, name, applications, organisationId } }) => {
 
             if (!session.user)
                 throw (new Error('You must be logged in to register an application'));
 
-            const deployableRepo = await prisma.deployableRepo.findFirst({
-                where: {
-                    id: deployableRepoId
+            provider = provider.trim() as typeof provider;
+            owner = owner.trim();
+            name = name.trim();
+
+            if (provider as string === '' || owner === '' || name === '')
+                throw new Error('Missing parameters');
+
+            if (provider === 'github') {
+
+                const probot = probotOps.getProbot();
+                if (!probot)
+                    throw new Error('GitHub connection is not initialized');
+
+                if (!session.githubToken?.accessToken) {
+                    return {
+                        success: false,
+                        hasGithubToken: false,
+                        message: 'GitHub token is not available'
+                    };
                 }
-            });
 
-            if (!deployableRepo)
-                throw (new Error('There is no such repo'));
+                const probotOctokit = await probot.auth();
+                const installation = await probotOctokit.rest.apps.getRepoInstallation({
+                    owner,
+                    repo: name
+                });
+                const installationOctokit = await probot.auth(installation.data.id);
 
-            const newParsedConfig = getFinalParseConfig(deployableRepo.config);
-            const newConfig = newParsedConfig.success ? newParsedConfig.data : null;
-
-            if (newConfig === null)
-                throw (new Error('There is no configuration in this repo'));
-
-            applications.forEach(appName => {
-                (async () => {
-                    const appSlug = appName.replaceAll(/\W/g, '-').toLocaleLowerCase();
-                    const existingApp = await prisma.application.findFirst({
-                        where: {
-                            deletedAt: {
-                                isSet: false
-                            },
-                            organisationId,
-                            slug: appSlug
+                try {
+                    const targetRepo = await installationOctokit.rest.repos.get({
+                        owner,
+                        repo: name
+                    });
+                    const handle = await installationOctokit.rest.repos.getContent({
+                        owner,
+                        repo: name,
+                        path: 'klave.json',
+                        mediaType: {
+                            format: 'raw+json'
                         }
                     });
 
-                    if (existingApp)
-                        throw (new Error(`There is already an application named ${appSlug}`));
-                })()
-                    .catch((error) => { throw error; });
-            });
+                    const newParsedConfig = getFinalParseConfig(handle.data.toString());
+                    const newConfig = newParsedConfig.success ? newParsedConfig.data : null;
 
-            applications.forEach(appName => {
-                (async () => {
-                    const appSlug = appName.replaceAll(/\W/g, '-').toLocaleLowerCase();
-                    const repo = await prisma.repo.upsert({
-                        where: {
-                            source_owner_name: {
-                                source: 'github',
-                                owner: deployableRepo.owner,
-                                name: deployableRepo.name
-                            }
-                        },
-                        update: {
-                            // TODO: Use zod to validate the config
-                            defaultBranch: deployableRepo.defaultBranch,
-                            config: newConfig
-                        },
-                        create: {
-                            source: 'github',
-                            owner: deployableRepo.owner,
-                            name: deployableRepo.name,
-                            defaultBranch: deployableRepo.defaultBranch,
-                            // TODO: Use zod to validate the config
-                            config: newConfig
-                        }
-                    });
-                    const newApp = await prisma.application.create({
-                        data: {
-                            web: {
-                                connect: {
-                                    id: webId
+                    if (newConfig === null)
+                        throw (new Error('There is no configuration in this repo'));
+
+                    applications.forEach(appName => {
+                        (async () => {
+                            const appSlug = appName.replaceAll(/\W/g, '-').toLocaleLowerCase();
+                            const existingApp = await prisma.application.findFirst({
+                                where: {
+                                    deletedAt: {
+                                        isSet: false
+                                    },
+                                    organisationId,
+                                    slug: appSlug
                                 }
-                            },
-                            slug: appSlug,
-                            organisation: {
-                                connect: {
-                                    id: organisationId
-                                }
-                            },
-                            repo: {
-                                connect: {
-                                    id: repo.id
-                                }
-                            },
-                            limits: {
-                                queryCallSpend: 0,
-                                transactionCallSpend: 0
-                            },
-                            catogories: [],
-                            tags: []
-                            // author: webId ?? emphemeralKlaveTag ?? sessionID,
-                            // owner: webId ?? emphemeralKlaveTag ?? sessionID lklk
-                        }
-                    });
-
-                    logger.debug(`Registering application ${appSlug} (${newApp.id})`);
-
-                    const installationOctokit = await probot.auth(parseInt(deployableRepo.installationRemoteId));
-
-                    const lastCommits = await installationOctokit.rest.repos.listCommits({
-                        owner: deployableRepo.owner,
-                        repo: deployableRepo.name,
-                        per_page: 2
-                    });
-
-                    const [afterCommit] = lastCommits.data;
-
-                    if (afterCommit === undefined)
-                        throw (new Error('There is no commit'));
-
-                    await deployToSubstrate({
-                        octokit: installationOctokit,
-                        class: 'push',
-                        type: 'push',
-                        forceDeploy: true,
-                        repo: {
-                            url: afterCommit.html_url,
-                            owner: deployableRepo.owner,
-                            name: deployableRepo.name
-                        },
-                        commit: {
-                            url: afterCommit.html_url,
-                            ref: afterCommit.sha, // TODO: check if this is the right ref
-                            after: afterCommit.sha
-                        },
-                        headCommit: null,
-                        pusher: {
-                            login: afterCommit.author?.login ?? afterCommit.committer?.login ?? afterCommit.commit.author?.name ?? 'unknown',
-                            avatarUrl: afterCommit.author?.avatar_url ?? 'https://avatars.githubusercontent.com/u/583231?v=4',
-                            htmlUrl: afterCommit.author?.html_url ?? afterCommit.committer?.html_url ?? ''
-                        }
-                    }, {
-                        onlyApp: newApp.id
-                    });
-
-                    if (session.user === undefined)
-                        await new Promise<void>((resolve, reject) => {
-                            sessionStore.set(sessionID, {
-                                ...session
-                            }, (err) => {
-                                if (err)
-                                    return reject(err);
-                                return resolve();
                             });
-                        });
-                })()
-                    .catch(() => { return; });
-            });
 
-            return true;
+                            if (existingApp)
+                                throw (new Error(`There is already an application named ${appSlug}`));
+                        })()
+                            .catch((e) => {
+                                logger.error(`Failed to register: ${e}`);
+                            });
+                    });
+
+                    applications.forEach(appName => {
+                        (async () => {
+                            const appSlug = appName.replaceAll(/\W/g, '-').toLocaleLowerCase();
+                            const repo = await prisma.repo.upsert({
+                                where: {
+                                    source_owner_name: {
+                                        source: provider,
+                                        owner,
+                                        name
+                                    }
+                                },
+                                update: {
+                                    // TODO: Use zod to validate the config
+                                    defaultBranch: targetRepo.data.default_branch,
+                                    config: newConfig
+                                },
+                                create: {
+                                    source: provider,
+                                    owner,
+                                    name,
+                                    defaultBranch: targetRepo.data.default_branch,
+                                    // TODO: Use zod to validate the config
+                                    config: newConfig
+                                }
+                            });
+                            const newApp = await prisma.application.create({
+                                data: {
+                                    slug: appSlug,
+                                    organisation: {
+                                        connect: {
+                                            id: organisationId
+                                        }
+                                    },
+                                    repo: {
+                                        connect: {
+                                            id: repo.id
+                                        }
+                                    },
+                                    limits: {
+                                        queryCallSpend: 0,
+                                        transactionCallSpend: 0
+                                    },
+                                    catogories: [],
+                                    tags: []
+                                }
+                            });
+
+                            logger.debug(`Registering application ${appSlug} (${newApp.id})`);
+
+                            const lastCommits = await installationOctokit.rest.repos.listCommits({
+                                owner,
+                                repo: name,
+                                per_page: 2
+                            });
+
+                            const [afterCommit] = lastCommits.data;
+
+                            if (afterCommit === undefined)
+                                throw (new Error('There is no commit'));
+
+                            await deployToSubstrate({
+                                octokit: installationOctokit,
+                                class: 'push',
+                                type: 'push',
+                                forceDeploy: true,
+                                repo: {
+                                    url: afterCommit.html_url,
+                                    owner,
+                                    name
+                                },
+                                commit: {
+                                    url: afterCommit.html_url,
+                                    ref: afterCommit.sha, // TODO: check if this is the right ref
+                                    after: afterCommit.sha
+                                },
+                                headCommit: null,
+                                pusher: {
+                                    login: afterCommit.author?.login ?? afterCommit.committer?.login ?? afterCommit.commit.author?.name ?? 'unknown',
+                                    avatarUrl: afterCommit.author?.avatar_url ?? 'https://avatars.githubusercontent.com/u/583231?v=4',
+                                    htmlUrl: afterCommit.author?.html_url ?? afterCommit.committer?.html_url ?? ''
+                                }
+                            }, {
+                                onlyApp: newApp.id
+                            });
+                        })()
+                            .catch((e) => {
+                                logger.error(`Failed to deploy application '${appName}': ${e}`);
+                            });
+                    });
+                    return {
+                        success: true
+                    };
+                } catch (error) {
+                    // If klave.json is not found, we can still return the repo without config
+                    return {
+                        success: false,
+                        message: error instanceof Error ? error.message : 'An error occurred while registering the application'
+                    };
+                }
+            } else {
+                throw new Error('Unsupported provider');
+            }
         }),
     update: publicProcedure
         .input(z.object({
@@ -926,9 +1015,15 @@ export const applicationRouter = createTRPCRouter({
                         organisationId: organisationId,
                         OR: [{
                             organisation: {
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 permissionGrants: {
                                     some: {
                                         userId: user?.id,
+                                        deletedAt: {
+                                            isSet: false
+                                        },
                                         OR: [
                                             {
                                                 write: true
@@ -943,6 +1038,9 @@ export const applicationRouter = createTRPCRouter({
                             permissionGrants: {
                                 some: {
                                     userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
                                     OR: [
                                         {
                                             write: true
@@ -962,9 +1060,15 @@ export const applicationRouter = createTRPCRouter({
                         id: applicationId,
                         OR: [{
                             organisation: {
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 permissionGrants: {
                                     some: {
                                         userId: user?.id,
+                                        deletedAt: {
+                                            isSet: false
+                                        },
                                         OR: [
                                             {
                                                 write: true
@@ -979,6 +1083,9 @@ export const applicationRouter = createTRPCRouter({
                             permissionGrants: {
                                 some: {
                                     userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
                                     OR: [
                                         {
                                             write: true
@@ -1066,9 +1173,15 @@ export const applicationRouter = createTRPCRouter({
             const org = await prisma.organisation.findUnique({
                 where: {
                     slug: input.orgSlug,
+                    deletedAt: {
+                        isSet: false
+                    },
                     permissionGrants: {
                         some: {
                             userId: user?.id,
+                            deletedAt: {
+                                isSet: false
+                            },
                             OR: [{
                                 read: true
                             },
@@ -1095,10 +1208,16 @@ export const applicationRouter = createTRPCRouter({
                     slug: input.appSlug,
                     OR: [{
                         organisation: {
+                            deletedAt: {
+                                isSet: false
+                            },
                             permissionGrants: {
                                 some: {
-                                    userId: user?.id
-                                    , OR: [{
+                                    userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
+                                    OR: [{
                                         read: true
                                     },
                                     {
@@ -1114,6 +1233,9 @@ export const applicationRouter = createTRPCRouter({
                         permissionGrants: {
                             some: {
                                 userId: user?.id,
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 OR: [{
                                     read: true
                                 },

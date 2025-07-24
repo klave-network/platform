@@ -1,7 +1,7 @@
 import 'express';
 import 'express-session';
 import 'passport';
-import { type User as UserEntity, GitHubToken, Web } from '@klave/db';
+import { type User as UserEntity, GitHubToken } from '@klave/db';
 
 type FilteredUserEntity = Pick<UserEntity, 'id' | 'slug' | 'globalAdmin'> & { personalOrganisationId?: string };
 
@@ -21,8 +21,6 @@ declare global {
             readonly id: string;
         }
         interface Request {
-            web: Web;
-            webId: string;
             forwardPath?: string;
         }
     }

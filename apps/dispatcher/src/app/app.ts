@@ -3,6 +3,7 @@ import type { WebSocket } from 'ws';
 import { v4 as uuid } from 'uuid';
 import { collection } from '../utils/mongo';
 import { config, getFinalParseUsage } from '@klave/constants';
+import { concatUint8Arrays } from '../utils/uint-concat';
 
 const definitions = config.get('KLAVE_DISPATCH_ENDPOINTS').split(',') ?? [];
 const endpoints = definitions.map(def => def.split('#') as [string, string]).filter(def => def.length === 2);
@@ -55,8 +56,28 @@ export async function app(fastify: FastifyInstance) {
 
         // We assume that the request is not too long
         // We assume that it is not a multipart request either
-        const rawContent = Uint8Array.from(req.raw.read() ?? []);
+        const rawContent = await new Promise<Uint8Array>((resolve) => {
+            const chunks: Uint8Array[] = [];
+            req.raw.on('readable', () => {
+                let chunk: Uint8Array | null;
+                while (null !== (chunk = req.raw.read())) {
+                    chunks.push(chunk);
+                }
+            });
+            req.raw.on('end', () => {
+                const content = concatUint8Arrays(chunks) ?? new Uint8Array(0);
+                resolve(content);
+            });
+            req.raw.on('error', (err) => {
+                fastify.log.error('Error reading hook body:', err);
+            });
+        });
         const responseRegister: Promise<[string, number]>[] = [];
+
+        fastify.log.info(undefined, `Received hook request: ${req.method} ${req.url}`);
+        fastify.log.info(undefined, `Headers: ${JSON.stringify(newHeaders)}`);
+        fastify.log.info(undefined, `Raw content length: ${rawContent.length}`);
+        console.log('Received hook request:', newHeaders['content-length'], rawContent.length);
 
         endpoints.forEach(([name, base]) => {
             responseRegister.push(new Promise(resolve => {

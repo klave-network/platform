@@ -283,22 +283,14 @@ export const LoginSecKey: FC = () => {
         getLoginCode();
     }, [getLoginCode]);
 
-    return <div className="text-center pb-12 md:pb-16">
+    return <div className="text-center pb-12 md:pb-10">
         <br />
-        <div className='pb-5' >
+        <div className='pb-5 flex flex-col w-5/12 m-auto' >
+            <h1 className='text-xl font-bold'>Sign in to Klave</h1>
             {isWebauthAvailable && screen === 'start'
-                ? <>
-                    <h1 className='text-xl font-bold'>Passkey Login</h1>
-                    <span>Connect with your Passkey.</span>
-                </>
-                : <>
-                    <h1 className='text-xl font-bold'>Email Code</h1>
-                    <span>Connect via an email code.</span>
-                </>
+                ? <span className='text-sm mt-3'>Klave uses Passkeys, the most secure way to authenticate. But don't worry, we will fallback to email code verification if needed.</span>
+                : <span className='text-sm mt-3'>Welcome to Klave ! Ready to connect via an email code.</span>
             }
-            <br />
-            <br />
-            <br />
         </div >
         <form className='relative'>
             {screen === 'start' ? <>
@@ -312,11 +304,10 @@ export const LoginSecKey: FC = () => {
                                 ? <span className='block mt-1 text-xs leading-tight overflow-clip'><UilSpinner className='inline-block animate-spin h-5' /><br />&nbsp;</span>
                                 : <span className="block mt-1 text-xs leading-tight">&nbsp;<br />&nbsp;</span>}
                 </div>
-                <button disabled={isLoading || emailHint?.sucess === false} onClick={handleLoginSubmit} onSubmit={handleLoginSubmit} type='submit' className='btn btn-md h-8 bg-blue-600 text-white hover:bg-blue-500 disabled:bg-slate-300 rounded-md'>{isLoading ? <UilSpinner className='inline-block animate-spin h-5' /> : isWebauthAvailable ? 'Log in with a passkey' : 'Log in with email code'}</button><br />
-                <button disabled={isLoading || emailHint?.sucess === false} onClick={handleLoginCodeSubmit} className='btn btn-md h-8 bg-transparent border-0 shadow-none font-normal text-sm text-blue-600 disabled:text-slate-400 hover:text-blue-300 hover:cursor-pointer'>Use email code instead</button>
+                <button disabled={isLoading || emailHint?.sucess === false} onClick={handleLoginSubmit} onSubmit={handleLoginSubmit} type='submit' className='btn btn-md h-8 bg-blue-600 text-white hover:bg-blue-500 disabled:bg-slate-300 rounded-md'>{isLoading ? <UilSpinner className='inline-block animate-spin h-5' /> : 'Sign in'}</button><br />
+                <button disabled={isLoading || emailHint?.sucess === false} onClick={handleLoginCodeSubmit} className='btn btn-md m-2 h-8 bg-transparent border-0 shadow-none font-normal text-sm text-blue-600 disabled:text-slate-400 hover:text-blue-300 hover:cursor-pointer'>Sign in with an email code</button>
             </> : screen === 'code' ? <>
                 <input key='codeField' value={code} onInput={onChangeCode} alt='code' placeholder='Code' type='text' className='input input-bordered text-center rounded-md text-black dark:text-white' />
-                <br />
                 <br />
                 <button disabled={isLoading} onClick={verifyEmailCode} onSubmit={verifyEmailCode} type='submit' className='btn btn-md h-8 mx-1 rounded-md bg-blue-600 text-white hover:bg-blue-500'>{isLoading ? <UilSpinner className='inline-block animate-spin h-5' /> : 'Next'}</button>
                 <button onClick={resetLogin} type='button' className='btn btn-md h-8 mx-1 rounded-md bg-gray-500 text-white hover:bg-gray-400'>Cancel</button>

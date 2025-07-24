@@ -17,12 +17,11 @@ model Environment {
 }
 
 model Session {
-    id        String   @id @default(uuid()) @map("_id")
-    sid       String   @unique
-    data      String
-    expiresAt DateTime
-    web       Web?     @relation(fields: [webId], references: [id])
-    webId     String?
+    id          String       @id @default(uuid()) @map("_id")
+    sid         String       @unique
+    data        String
+    expiresAt   DateTime
+    githubToken GitHubToken?
 }
 
 type GitHubToken {
@@ -30,9 +29,9 @@ type GitHubToken {
     expiresIn             Int
     refreshToken          String
     refreshTokenExpiresIn Int
-    tokenType             String   @default("bearer")
+    tokenType             String @default("bearer")
     scope                 String
-    createdAt             DateTime
+    createdAt             String
 }
 
 model Organisation {
@@ -47,6 +46,7 @@ model Organisation {
     creditPurchases    CreditPurchase[]
     createdAt          DateTime            @default(now())
     updatedAt          DateTime            @updatedAt
+    deletedAt          DateTime?
     clusterAllocations ClusterAllocation[]
 }
 
@@ -72,7 +72,6 @@ model User {
     createdAt                 DateTime            @default(now())
     updatedAt                 DateTime            @updatedAt
     globalAdmin               Boolean?            @default(false)
-    webs                      Web[]
     webauthCredentials        WebauthCredential[]
     permissionGrants          PermissionGrant[]
     createdOrganisations      Organisation[]
@@ -112,22 +111,6 @@ model Hook {
     status    HookProcessingStatus @default(idle)
     payload   Json
     createdAt DateTime             @default(now())
-}
-
-model DeployableRepo {
-    id                   String   @id @default(uuid()) @map("_id")
-    creatorAuthToken     String
-    owner                String
-    name                 String
-    fullName             String
-    defaultBranch        String?
-    installationRemoteId String
-    config               String?
-    createdAt            DateTime @default(now())
-    web                  Web      @relation(fields: [webId], references: [id])
-    webId                String
-
-    @@unique([creatorAuthToken, owner, name])
 }
 
 model Repo {
@@ -208,6 +191,7 @@ model Cluster {
     name               String
     createdAt          DateTime            @default(now())
     updatedAt          DateTime            @updatedAt
+    deletedAt          DateTime?
     clusterAllocations ClusterAllocation[]
 }
 
@@ -222,6 +206,7 @@ model ClusterAllocation {
     admin          Boolean
     createdAt      DateTime      @default(now())
     updatedAt      DateTime      @updatedAt
+    deletedAt      DateTime?
 }
 
 model Deployment {
@@ -273,6 +258,7 @@ model Domain {
     verified      Boolean
     createdAt     DateTime     @default(now())
     updatedAt     DateTime     @updatedAt
+    deletedAt     DateTime?
     application   Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
     applicationId String?
 }
@@ -293,7 +279,7 @@ type ActivityLogRecord {
 
 model ActivityLog {
     id            String            @id @default(uuid()) @map("_id")
-    application   Application       @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+    application   Application       @relation(fields: [applicationId], references: [id], onDelete: NoAction)
     applicationId String
     class         ActivityLogClass
     context       ActivityLogRecord
@@ -307,8 +293,6 @@ type Limits {
 
 model Application {
     id                  String            @id @default(uuid()) @map("_id")
-    web                 Web               @relation(fields: [webId], references: [id])
-    webId               String
     slug                String
     domains             Domain[]
     license             String?
@@ -348,6 +332,7 @@ model PermissionGrant {
     admin          Boolean
     createdAt      DateTime      @default(now())
     updatedAt      DateTime      @updatedAt
+    deletedAt      DateTime?
 }
 
 enum InstallationAccountType {
@@ -366,6 +351,7 @@ model Installation {
     accountType InstallationAccountType
     createdAt   DateTime                @default(now())
     updatedAt   DateTime                @updatedAt
+    deletedAt   DateTime?
 
     @@unique([source, remoteId, account])
 }
@@ -383,24 +369,9 @@ model Repository {
     private              Boolean
     createdAt            DateTime   @default(now())
     updatedAt            DateTime   @updatedAt
+    deletedAt            DateTime?
 
     @@unique([source, remoteId, installationRemoteId])
-}
-
-model Web {
-    id              String           @id @default(uuid()) @map("_id")
-    name            String
-    ancestors       String[]         @default([])
-    ephemerals      String[]         @default([])
-    user            User?            @relation(fields: [userId], references: [id])
-    userId          String?
-    githubToken     GitHubToken?
-    sessions        Session[]
-    deployableRepos DeployableRepo[]
-    applications    Application[]
-    deletedAt       DateTime?
-    createdAt       DateTime         @default(now())
-    updatedAt       DateTime         @updatedAt
 }
 
 enum UsageType {

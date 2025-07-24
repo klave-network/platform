@@ -3,10 +3,14 @@ import { prisma } from '@klave/db';
 import { Context, createCallerFactory, router } from '@klave/api';
 import { logger, scp, scpOps } from '@klave/providers';
 import { config, KlaveGetCreditResult } from '@klave/constants';
+import { migrateDBFields } from './migrate-db';
 
 let intervalTimer: NodeJS.Timeout;
 
-async function errorLongDeployingDeployments() {
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+
+async function __unusedErrorLongDeployingDeployments() {
     return prisma.deployment.updateMany({
         where: {
             deletedAt: {
@@ -31,7 +35,10 @@ async function errorLongDeployingDeployments() {
     });
 }
 
-async function cleanDisconnectedDeployments() {
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+
+async function __unusedCleanDisconnectedDeployments() {
 
     const selectTargets = await prisma.deploymentAddress.groupBy({
         by: ['fqdn'],
@@ -86,7 +93,10 @@ async function cleanDisconnectedDeployments() {
     });
 }
 
-async function terminateExpiredDeployments() {
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+
+async function __unusedTerminateExpiredDeployments() {
     const expiredDeploymentList = await prisma.deployment.findMany({
         where: {
             deletedAt: {
@@ -125,7 +135,10 @@ async function terminateExpiredDeployments() {
     });
 }
 
-async function cancelUpdatingDeployments() {
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+
+async function __unusedCancelUpdatingDeployments() {
 
     const expiredDeploymentList = await prisma.deployment.findMany({
         where: {
@@ -216,10 +229,11 @@ export async function prune() {
         origin: 'manual.klave.pruner.run'
     }, async () => {
         try {
-            await errorLongDeployingDeployments();
-            await terminateExpiredDeployments();
-            await cleanDisconnectedDeployments();
-            await cancelUpdatingDeployments();
+            await migrateDBFields();
+            // await errorLongDeployingDeployments();
+            // await terminateExpiredDeployments();
+            // await cleanDisconnectedDeployments();
+            // await cancelUpdatingDeployments();
             // await reconcileApplicationKredits();
             // await reconcileApplicationLimits();
         } catch (e) {

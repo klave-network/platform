@@ -1,6 +1,6 @@
 import { createTRPCReact } from '@trpc/react-query';
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
-import type { Router } from '@klave/api';
+import type { Router as RouterType } from '@klave/api';
 import superjson from 'superjson';
 import { v4 as uuid } from 'uuid';
 
@@ -29,6 +29,7 @@ export const apiClientOptions = {
     ]
 };
 
+export type Router = RouterType;
 export const hookApi = createTRPCReact<Router>();
 export const httpApi = createTRPCClient<Router>(apiClientOptions);
 export default hookApi;

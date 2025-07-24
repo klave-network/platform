@@ -1,4 +1,20 @@
 # Changelog
+## [0.17.3](https://github.com/klave-network/platform/compare/sdk@0.17.2...sdk@0.17.3) (2025-07-23)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.17.2`
+
+### Bug Fixes
+
+* **sdk,compiler,cli,create:** Correct JSON transform call and remove explicit SDK dependencies ([906b31d](https://github.com/klave-network/platform/commit/906b31d70330854a1460b8a08794392654d478cf))
+
+## [0.17.2](https://github.com/klave-network/platform/compare/sdk@0.17.1...sdk@0.17.2) (2025-07-23)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.17.1`
+* `constants` updated to version `0.17.1`
 ## [0.17.1](https://github.com/klave-network/platform/compare/sdk@0.17.0...sdk@0.17.1) (2025-06-16)
 
 ### Dependency Updates

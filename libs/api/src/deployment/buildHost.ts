@@ -190,24 +190,27 @@ export class BuildHost {
                     const command = commands.join(' && ');
                     this.consolePrint('build', { type: 'stdout', full: true, data: `$> ${command}` });
                     this.consolePrint('build', { type: 'stdout', full: false, data: `$> ${command}` });
-                    const hook = exec(command, {
-                        cwd: workingDirectory,
-                        env: {
-                            ...process.env,
-                            INIT_CWD: workingDirectory,
-                            PATH: config.get('PATH'),
-                            PATHEXT: config.get('PATHEXT'),
-                            HOMEPATH: config.get('HOMEPATH'),
-                            HOME: config.get('HOME'),
-                            RUSTUP_HOME: config.get('RUSTUP_HOME'),
-                            RUSTUP_TOOLCHAIN: config.get('RUSTUP_TOOLCHAIN'),
-                            CARGO_HOME: config.get('CARGO_HOME'),
-                            CARGO_TARGET_DIR: config.get('CARGO_TARGET_DIR'),
-                            RUSTFLAGS: `${config.get('RUSTFLAGS')} \
+                    const env = Object.fromEntries(Object.entries({
+                        ...process.env,
+                        INIT_CWD: workingDirectory,
+                        PATH: config.get('PATH'),
+                        PATHEXT: config.get('PATHEXT'),
+                        HOMEPATH: config.get('HOMEPATH'),
+                        HOME: config.get('HOME'),
+                        RUSTUP_HOME: config.get('RUSTUP_HOME'),
+                        RUSTUP_TOOLCHAIN: config.get('RUSTUP_TOOLCHAIN'),
+                        CARGO_HOME: config.get('CARGO_HOME'),
+                        CARGO_TARGET_DIR: config.get('CARGO_TARGET_DIR'),
+                        RUSTFLAGS: `${config.get('RUSTFLAGS')} \
                             --remap-path-prefix ${workingDirectory}=/klave \
                             --remap-path-prefix ${config.get('CARGO_HOME')}=/klave/.cargo
                             --remap-path-prefix ${config.get('RUSTUP_HOME')}=/klave/.rustup`
-                        }
+                    }).filter(([, value]) =>
+                        value !== undefined && value !== null && value !== ''
+                    ));
+                    const hook = exec(command, {
+                        cwd: workingDirectory,
+                        env
                     }, (error, stdout, stderr) => {
                         if (error) return reject(error);
                         this.consolePrint('build', { type: 'stdout', full: true, data: stdout });

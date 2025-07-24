@@ -24,10 +24,9 @@
                 ],
                 "generatePackageJson": true,
                 "external": [
-                    "@klave/as-json",
                     "assemblyscript",
-                    "typescript",
-                    "visitor-as"
+                    "json-as",
+                    "typescript"
                 ],
                 "esbuildConfig": "apps/hubber/esbuild.config.cjs"
             },

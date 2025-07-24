@@ -57,7 +57,7 @@ export const VerificationCodeEmail = (props: { title: string, code: string }) =>
                             </Text>
                         </Section>
 
-                        <Section className="bg-gray-200 rounded-sm flex items-center justify-center">
+                        <Section className="bg-gray-200 px-4 rounded-sm flex items-center justify-center">
                             <Text className="text-xl font-medium font-mono">
                                 {code}
                             </Text>
@@ -65,7 +65,7 @@ export const VerificationCodeEmail = (props: { title: string, code: string }) =>
 
                         <Section className="text-body-grey">
                             <Text>
-                                Best,
+                                Best wishes,
                                 <br />
                                 The Klave team
                             </Text>

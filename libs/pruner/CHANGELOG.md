@@ -1,4 +1,30 @@
 # Changelog
+## [1.0.9](https://github.com/klave-network/platform/compare/pruner@1.0.8...pruner@1.0.9) (2025-07-24)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.8`
+* `api` updated to version `1.0.8`
+* `providers` updated to version `1.0.8`
+* `constants` updated to version `1.0.8`
+## [1.0.8](https://github.com/klave-network/platform/compare/pruner@1.0.7...pruner@1.0.8) (2025-07-23)
+
+### Dependency Updates
+
+* `api` updated to version `1.0.7`
+## [1.0.7](https://github.com/klave-network/platform/compare/pruner@1.0.6...pruner@1.0.7) (2025-07-23)
+
+### Dependency Updates
+
+* `db` updated to version `1.0.6`
+* `api` updated to version `1.0.6`
+* `providers` updated to version `1.0.6`
+* `constants` updated to version `1.0.6`
+
+### Bug Fixes
+
+* **pruner,hubber:** Migrate Webauthn public key types ([8a3cd6e](https://github.com/klave-network/platform/commit/8a3cd6ef7be1af5c94542049ff32d566a86673bc))
+
 ## [1.0.6](https://github.com/klave-network/platform/compare/pruner@1.0.5...pruner@1.0.6) (2025-04-28)
 
 ### Dependency Updates
