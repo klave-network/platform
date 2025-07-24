@@ -2,10 +2,7 @@
  * Environment definitions for compiling Klave Trustless Applications.
  * @module klave/sdk/postgre_sql
  */
-
-import { JSON } from "@klave/as-json/assembly";
 import { Result } from '../index';
-
 
 @external("env", "connection_open")
 declare function wasm_connection_open(connection_string: ArrayBuffer, result: ArrayBuffer, result_size: i32): i32;
@@ -14,12 +11,7 @@ declare function wasm_sql_query(connection: ArrayBuffer, query: ArrayBuffer, res
 @external("env", "sql_exec")
 declare function wasm_sql_exec(connection: ArrayBuffer, command: ArrayBuffer, result: ArrayBuffer, result_size: i32): i32;
 
-
-export function connectionString(host: string, dbname: string, user: string, password: string): string
-{
-    return `host=${host} dbname=${dbname} user=${user} password=${password}`;
-}
-export function connectionOpen(connection_string: string): Result<string, Error>
+function connectionOpen(connection_string: string): Result<string, Error>
 {
     let s = String.UTF8.encode(connection_string, true);
     let error = new ArrayBuffer(64);
@@ -33,33 +25,88 @@ export function connectionOpen(connection_string: string): Result<string, Error>
         return { data: "", err: new Error(String.UTF8.decode(error.slice(0, -result))) };
     return { data: String.UTF8.decode(error.slice(0, result)), err: null };
 }
-export function sqlQuery(connection: string, query: string): Result<string, Error>
+
+function sqlQuery(connectionHandle: ArrayBuffer, query: string): Result<string, Error>
 {
-    let cnx = String.UTF8.encode(connection, true);
-    let q = String.UTF8.encode(query, true);
+    let sanitizedQuery = sanitizeQuery(query);
+    let q = String.UTF8.encode(sanitizedQuery, true);
     let query_response = new ArrayBuffer(64);
-    let result = wasm_sql_query(cnx, q, query_response, query_response.byteLength);
+    let result = wasm_sql_query(connectionHandle, q, query_response, query_response.byteLength);
     if (abs(result) > query_response.byteLength) {
         // buffer not big enough, retry with a properly sized one
         query_response = new ArrayBuffer(abs(result));
-        result = wasm_sql_query(cnx, q, query_response, query_response.byteLength);
+        result = wasm_sql_query(connectionHandle, q, query_response, query_response.byteLength);
     }
     if (result < 0)
         return { data: "", err: new Error(String.UTF8.decode(query_response.slice(0, -result))) };
     return { data: String.UTF8.decode(query_response.slice(0, result)) , err: null };
 }
-export function sqlExec(connection: string, command: string): Result<string, Error>
+
+function sqlExec(connectionHandle: ArrayBuffer, command: string): Result<string, Error>
 {
-    let cnx = String.UTF8.encode(connection, true);
     let cmd = String.UTF8.encode(command, true);
     let error = new ArrayBuffer(64);
-    let result = wasm_sql_exec(cnx, cmd, error, error.byteLength);
+    let result = wasm_sql_exec(connectionHandle, cmd, error, error.byteLength);
     if (abs(result) > error.byteLength) {
         // buffer not big enough, retry with a properly sized one
         error = new ArrayBuffer(abs(result));
-        result = wasm_sql_exec(cnx, cmd, error, error.byteLength);
+        result = wasm_sql_exec(connectionHandle, cmd, error, error.byteLength);
     }
     if (result < 0)
         return { data: "", err: new Error(String.UTF8.decode(error.slice(0, -result))) };
     return { data: String.UTF8.decode(error.slice(0, result)), err: null };
+}
+
+function sanitizeQuery(query: string): string {
+    // Trim whitespace from both ends
+    let trimmed = query.trim();
+    
+    // Replace newlines and carriage returns with spaces
+    let normalized = trimmed.replaceAll("\n", " ").replaceAll("\r", " ");
+
+    // Split by whitespace, filter out empty strings, and join with single spaces
+    let parts = normalized.split(" ");
+    let filtered: string[] = [];
+    
+    for (let i = 0; i < parts.length; i++) {
+        if (parts[i].length > 0) {
+            filtered.push(parts[i]);
+        }
+    }
+    
+    return filtered.join(" ");
+}
+
+export class PostGreSQLConnection {
+    
+    handle: ArrayBuffer;
+    constructor(handle: string) {
+        this.handle = String.UTF8.encode(handle, true);
+    }
+
+    query(query: string): Result<string, Error> {
+        let sanitizedQuery = sanitizeQuery(query);
+        return sqlQuery(this.handle, sanitizedQuery);
+    }
+
+    execute(command: string): Result<string, Error> {
+        let sanitizedCommand = sanitizeQuery(command);
+        return sqlExec(this.handle, sanitizedCommand);
+    }
+}
+
+export function open(uri: string): Result<PostGreSQLConnection, Error> {
+    let conn = connectionOpen(uri);
+    if(conn.err)
+    {
+        return { data: null, err: new Error(`Failed to open connection: ${conn.err!.message}`) };
+    }else
+    {
+        return { data: new PostGreSQLConnection(conn.data!), err: null };
+    }
+}
+
+export function connectionString(host: string, dbname: string, user: string, password: string): string
+{
+    return `host=${host} dbname=${dbname} user=${user} password=${password}`;
 }
