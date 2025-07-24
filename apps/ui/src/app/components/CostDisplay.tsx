@@ -51,7 +51,7 @@ const CostDisplay: FC<CostDisplayProps> = ({ basis, compact, size, justify, clas
     else
         consumptionValue = getIntegerCost(basis as CostConsumption);
 
-    let currencyValue = consumptionValue / 100_000_000_000_000;
+    let currencyValue = consumptionValue / 100_000_000_000;
     const isNonNilTinyAmount = currencyValue <= 0.0001 && currencyValue > 0;
     if (isNonNilTinyAmount)
         currencyValue = 0.0001;
@@ -72,7 +72,7 @@ const CostDisplay: FC<CostDisplayProps> = ({ basis, compact, size, justify, clas
 
     return <span className={`flex flex-col flex-shrink justify-start items-${justify ?? 'start'} ${className ?? ''}`} >
         <span className={`text-klave-light-blue font-bold ${size === 'small' ? 'text-xl' : size === 'medium' ? 'text-2xl' : 'text-3xl'}`}>{isNonNilTinyAmount ? '~' : ''}£{currencyValue.toFixed(2)}</span>
-        <span className="text-slate-300 text-xs">{(type === 'wasm' || type === 'native') ? `${consumptionValue.toString()} instructions` : prettyBytes(consumptionValue, { maximumFractionDigits: 2 })}</span>
+        <span className="text-slate-300 text-xs">{(type === 'wasm' || type === 'native') ? `${consumptionValue.toString()} instructions` : prettyBytes(consumptionValue / 1_000, { maximumFractionDigits: 2 })}</span>
     </span>;
 };
 
