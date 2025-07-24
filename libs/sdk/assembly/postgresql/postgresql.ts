@@ -28,8 +28,7 @@ function connectionOpen(connection_string: string): Result<string, Error>
 
 function sqlQuery(connectionHandle: ArrayBuffer, query: string): Result<string, Error>
 {
-    let sanitizedQuery = sanitizeQuery(query);
-    let q = String.UTF8.encode(sanitizedQuery, true);
+    let q = String.UTF8.encode(query, true);
     let query_response = new ArrayBuffer(64);
     let result = wasm_sql_query(connectionHandle, q, query_response, query_response.byteLength);
     if (abs(result) > query_response.byteLength) {
@@ -57,7 +56,10 @@ function sqlExec(connectionHandle: ArrayBuffer, command: string): Result<string,
     return { data: String.UTF8.decode(error.slice(0, result)), err: null };
 }
 
-function sanitizeQuery(query: string): string {
+function normaliseQuery(query: string): string {
+    // This function normalizes whitespace in the query string.
+    // Note: This does NOT provide SQL injection protection.
+
     // Trim whitespace from both ends
     let trimmed = query.trim();
     
@@ -85,12 +87,12 @@ export class PostGreSQLConnection {
     }
 
     query(query: string): Result<string, Error> {
-        let sanitizedQuery = sanitizeQuery(query);
+        let sanitizedQuery = normaliseQuery(query);
         return sqlQuery(this.handle, sanitizedQuery);
     }
 
     execute(command: string): Result<string, Error> {
-        let sanitizedCommand = sanitizeQuery(command);
+        let sanitizedCommand = normaliseQuery(command);
         return sqlExec(this.handle, sanitizedCommand);
     }
 }
