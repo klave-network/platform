@@ -1,4 +1,19 @@
 # Changelog
+## [1.5.1](https://github.com/klave-network/platform/compare/ui@1.5.0...ui@1.5.1) (2025-07-24)
+
+### Dependency Updates
+
+* `constants` updated to version `1.5.0`
+* `db` updated to version `1.5.0`
+* `api` updated to version `1.5.0`
+
+### Bug Fixes
+
+* **ui:** Change usage pretty-print order ([b5fef48](https://github.com/klave-network/platform/commit/b5fef487b56648debe3b724761f4a03f0779947a))
+* **ui:** Changing usage calculation basis ([7661590](https://github.com/klave-network/platform/commit/7661590c8f6dc67915655e24cab1c45b8ec6c186))
+* **ui:** Changing usage calculation basis ([812d703](https://github.com/klave-network/platform/commit/812d70323444ec193bb4c4f4a72dce94e3b5a93e))
+* **ui:** Missing value transform for usage `pretty-print` ([3251ad3](https://github.com/klave-network/platform/commit/3251ad35871403f6704aadb47da6b9b9636066bc))
+
 ## [1.5.0](https://github.com/klave-network/platform/compare/ui@1.4.5...ui@1.5.0) (2025-07-23)
 
 ### Dependency Updates
