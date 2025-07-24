@@ -1,6 +1,6 @@
 /**
  * Environment definitions for compiling Klave Trustless Applications.
- * @module klave/sdk/postgre_sql
+ * @module klave/sdk/postgresql
  */
 import { Result } from '../index';
 
