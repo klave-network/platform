@@ -9,6 +9,8 @@ import * as Crypto from "./crypto"
 export { Crypto }
 import * as Attestation from "./attestation"
 export { Attestation }
+import * as PostGreSQL from "./postgresql/postgresql"
+export { PostGreSQL }
 
 // @ts-ignore: decorator
 @external("env", "add_user_query")
