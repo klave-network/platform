@@ -53,6 +53,9 @@ export const activityRouter = createTRPCRouter({
                         organisation: {
                             permissionGrants: {
                                 some: {
+                                    deletedAt: {
+                                        isSet: false
+                                    },
                                     OR: [{
                                         userId: user?.id
                                     }, {

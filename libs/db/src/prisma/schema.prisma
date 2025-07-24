@@ -46,6 +46,7 @@ model Organisation {
     creditPurchases    CreditPurchase[]
     createdAt          DateTime            @default(now())
     updatedAt          DateTime            @updatedAt
+    deletedAt          DateTime?
     clusterAllocations ClusterAllocation[]
 }
 
@@ -190,6 +191,7 @@ model Cluster {
     name               String
     createdAt          DateTime            @default(now())
     updatedAt          DateTime            @updatedAt
+    deletedAt          DateTime?
     clusterAllocations ClusterAllocation[]
 }
 
@@ -204,6 +206,7 @@ model ClusterAllocation {
     admin          Boolean
     createdAt      DateTime      @default(now())
     updatedAt      DateTime      @updatedAt
+    deletedAt      DateTime?
 }
 
 model Deployment {
@@ -255,6 +258,7 @@ model Domain {
     verified      Boolean
     createdAt     DateTime     @default(now())
     updatedAt     DateTime     @updatedAt
+    deletedAt     DateTime?
     application   Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
     applicationId String?
 }
@@ -328,6 +332,7 @@ model PermissionGrant {
     admin          Boolean
     createdAt      DateTime      @default(now())
     updatedAt      DateTime      @updatedAt
+    deletedAt      DateTime?
 }
 
 enum InstallationAccountType {
@@ -346,6 +351,7 @@ model Installation {
     accountType InstallationAccountType
     createdAt   DateTime                @default(now())
     updatedAt   DateTime                @updatedAt
+    deletedAt   DateTime?
 
     @@unique([source, remoteId, account])
 }
@@ -363,6 +369,7 @@ model Repository {
     private              Boolean
     createdAt            DateTime   @default(now())
     updatedAt            DateTime   @updatedAt
+    deletedAt            DateTime?
 
     @@unique([source, remoteId, installationRemoteId])
 }

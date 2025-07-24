@@ -33,8 +33,14 @@ export const domainRouter = createTRPCRouter({
                 where: {
                     application: {
                         organisation: {
+                            deletedAt: {
+                                isSet: false
+                            },
                             permissionGrants: {
                                 some: {
+                                    deletedAt: {
+                                        isSet: false
+                                    },
                                     OR: [{
                                         userId: user.id
                                     }, {
@@ -108,13 +114,14 @@ export const domainRouter = createTRPCRouter({
             if (!user)
                 throw (new Error('You must be logged in to delete a domain'));
 
-            await prisma.domain.delete({
+            await prisma.domain.update({
                 where: {
                     id: domainId
+                },
+                data: {
+                    deletedAt: new Date()
                 }
             });
-            return;
-
         })
 });
 

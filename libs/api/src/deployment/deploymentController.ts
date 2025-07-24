@@ -565,7 +565,10 @@ export const sendToSecretarium = async ({
         const clusterAllocation = await prisma.clusterAllocation.findFirst({
             where: {
                 cluster: {
-                    id: targetCluster
+                    id: targetCluster,
+                    deletedAt: {
+                        isSet: false
+                    }
                 },
                 organisationId: contextOrganisation?.id ?? ''
             },

@@ -26,10 +26,16 @@ export const deploymentRouter = createTRPCRouter({
                         id: appId,
                         OR: [{
                             organisation: {
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 permissionGrants: {
                                     some: {
-                                        userId: user?.id
-                                        , OR: [{
+                                        userId: user?.id,
+                                        deletedAt: {
+                                            isSet: false
+                                        },
+                                        OR: [{
                                             read: true
                                         },
                                         {
@@ -45,6 +51,9 @@ export const deploymentRouter = createTRPCRouter({
                             permissionGrants: {
                                 some: {
                                     userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
                                     OR: [{
                                         read: true
                                     },
@@ -110,10 +119,16 @@ export const deploymentRouter = createTRPCRouter({
                     application: {
                         OR: [{
                             organisation: {
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 permissionGrants: {
                                     some: {
-                                        userId: user?.id
-                                        , OR: [{
+                                        userId: user?.id,
+                                        deletedAt: {
+                                            isSet: false
+                                        },
+                                        OR: [{
                                             read: true
                                         },
                                         {
@@ -129,6 +144,9 @@ export const deploymentRouter = createTRPCRouter({
                             permissionGrants: {
                                 some: {
                                     userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
                                     OR: [{
                                         read: true
                                     },
@@ -196,10 +214,16 @@ export const deploymentRouter = createTRPCRouter({
                     application: {
                         OR: [{
                             organisation: {
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 permissionGrants: {
                                     some: {
-                                        userId: user?.id
-                                        , OR: [{
+                                        userId: user?.id,
+                                        deletedAt: {
+                                            isSet: false
+                                        },
+                                        OR: [{
                                             read: true
                                         },
                                         {
@@ -215,6 +239,9 @@ export const deploymentRouter = createTRPCRouter({
                             permissionGrants: {
                                 some: {
                                     userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
                                     OR: [{
                                         read: true
                                     },
@@ -284,8 +311,11 @@ export const deploymentRouter = createTRPCRouter({
                             organisation: {
                                 permissionGrants: {
                                     some: {
-                                        userId: user?.id
-                                        , OR: [{
+                                        userId: user?.id,
+                                        deletedAt: {
+                                            isSet: false
+                                        },
+                                        OR: [{
                                             read: true
                                         },
                                         {
@@ -301,6 +331,9 @@ export const deploymentRouter = createTRPCRouter({
                             permissionGrants: {
                                 some: {
                                     userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
                                     OR: [{
                                         read: true
                                     },
@@ -337,10 +370,16 @@ export const deploymentRouter = createTRPCRouter({
                     application: override !== '__system_post_deploy' && override !== '__system_pruner_cleaner' ? {
                         OR: [{
                             organisation: {
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 permissionGrants: {
                                     some: {
-                                        userId: user?.id
-                                        , OR: [{
+                                        userId: user?.id,
+                                        deletedAt: {
+                                            isSet: false
+                                        },
+                                        OR: [{
                                             admin: true
                                         }]
                                     }
@@ -350,6 +389,9 @@ export const deploymentRouter = createTRPCRouter({
                             permissionGrants: {
                                 some: {
                                     userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
                                     OR: [{
                                         admin: true
                                     }]
@@ -362,7 +404,6 @@ export const deploymentRouter = createTRPCRouter({
                     deletedAt: new Date()
                 }
             });
-            return;
 
         }),
     terminateDeployment: publicProcedure
@@ -379,10 +420,16 @@ export const deploymentRouter = createTRPCRouter({
                     application: override !== '__system_pruner_terminator' ? {
                         OR: [{
                             organisation: {
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 permissionGrants: {
                                     some: {
-                                        userId: user?.id
-                                        , OR: [{
+                                        userId: user?.id,
+                                        deletedAt: {
+                                            isSet: false
+                                        },
+                                        OR: [{
                                             admin: true
                                         }]
                                     }
@@ -392,6 +439,9 @@ export const deploymentRouter = createTRPCRouter({
                             permissionGrants: {
                                 some: {
                                     userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
                                     OR: [{
                                         admin: true
                                     }]
@@ -449,10 +499,16 @@ export const deploymentRouter = createTRPCRouter({
                     application: {
                         OR: [{
                             organisation: {
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 permissionGrants: {
                                     some: {
-                                        userId: user?.id
-                                        , OR: [{
+                                        userId: user?.id,
+                                        deletedAt: {
+                                            isSet: false
+                                        },
+                                        OR: [{
                                             write: true
                                         },
                                         {
@@ -465,6 +521,9 @@ export const deploymentRouter = createTRPCRouter({
                             permissionGrants: {
                                 some: {
                                     userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
                                     OR: [{
                                         write: true
                                     },

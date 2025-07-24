@@ -16,9 +16,15 @@ export const applicationRouter = createTRPCRouter({
             const manifest = await prisma.application.findMany({
                 where: {
                     organisation: {
+                        deletedAt: {
+                            isSet: false
+                        },
                         permissionGrants: {
                             some: {
                                 userId: user.id,
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 OR: [{
                                     read: true
                                 },
@@ -55,7 +61,10 @@ export const applicationRouter = createTRPCRouter({
                     },
                     permissionGrants: {
                         where: {
-                            userId: user?.id
+                            userId: user?.id,
+                            deletedAt: {
+                                isSet: false
+                            }
                         }
                     }
                 }
@@ -84,6 +93,9 @@ export const applicationRouter = createTRPCRouter({
                         isSet: false
                     },
                     organisation: {
+                        deletedAt: {
+                            isSet: false
+                        },
                         OR: [{
                             id: orgId
                         },
@@ -93,10 +105,16 @@ export const applicationRouter = createTRPCRouter({
                     },
                     OR: [{
                         organisation: {
+                            deletedAt: {
+                                isSet: false
+                            },
                             permissionGrants: {
                                 some: {
-                                    userId: user?.id
-                                    , OR: [{
+                                    userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
+                                    OR: [{
                                         read: true
                                     },
                                     {
@@ -112,6 +130,9 @@ export const applicationRouter = createTRPCRouter({
                         permissionGrants: {
                             some: {
                                 userId: user?.id,
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 OR: [{
                                     read: true
                                 },
@@ -145,7 +166,10 @@ export const applicationRouter = createTRPCRouter({
                     },
                     permissionGrants: {
                         where: {
-                            userId: user?.id
+                            userId: user?.id,
+                            deletedAt: {
+                                isSet: false
+                            }
                         }
                     }
                 }
@@ -310,10 +334,16 @@ export const applicationRouter = createTRPCRouter({
                     id: appId,
                     OR: [{
                         organisation: {
+                            deletedAt: {
+                                isSet: false
+                            },
                             permissionGrants: {
                                 some: {
-                                    userId: user?.id
-                                    , OR: [{
+                                    userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
+                                    OR: [{
                                         read: true
                                     },
                                     {
@@ -329,6 +359,9 @@ export const applicationRouter = createTRPCRouter({
                         permissionGrants: {
                             some: {
                                 userId: user?.id,
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 OR: [{
                                     read: true
                                 },
@@ -361,7 +394,10 @@ export const applicationRouter = createTRPCRouter({
                     deletedAt: true,
                     permissionGrants: {
                         where: {
-                            userId: user?.id
+                            userId: user?.id,
+                            deletedAt: {
+                                isSet: false
+                            }
                         },
                         include: {
                             user: true,
@@ -475,8 +511,11 @@ export const applicationRouter = createTRPCRouter({
                         organisation: {
                             permissionGrants: {
                                 some: {
-                                    userId: user?.id
-                                    , OR: [{
+                                    userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
+                                    OR: [{
                                         read: true
                                     },
                                     {
@@ -492,6 +531,9 @@ export const applicationRouter = createTRPCRouter({
                         permissionGrants: {
                             some: {
                                 userId: user?.id,
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 OR: [{
                                     read: true
                                 },
@@ -524,7 +566,10 @@ export const applicationRouter = createTRPCRouter({
                     deletedAt: true,
                     permissionGrants: {
                         where: {
-                            userId: user?.id
+                            userId: user?.id,
+                            deletedAt: {
+                                isSet: false
+                            }
                         },
                         include: {
                             user: true,
@@ -970,9 +1015,15 @@ export const applicationRouter = createTRPCRouter({
                         organisationId: organisationId,
                         OR: [{
                             organisation: {
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 permissionGrants: {
                                     some: {
                                         userId: user?.id,
+                                        deletedAt: {
+                                            isSet: false
+                                        },
                                         OR: [
                                             {
                                                 write: true
@@ -987,6 +1038,9 @@ export const applicationRouter = createTRPCRouter({
                             permissionGrants: {
                                 some: {
                                     userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
                                     OR: [
                                         {
                                             write: true
@@ -1006,9 +1060,15 @@ export const applicationRouter = createTRPCRouter({
                         id: applicationId,
                         OR: [{
                             organisation: {
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 permissionGrants: {
                                     some: {
                                         userId: user?.id,
+                                        deletedAt: {
+                                            isSet: false
+                                        },
                                         OR: [
                                             {
                                                 write: true
@@ -1023,6 +1083,9 @@ export const applicationRouter = createTRPCRouter({
                             permissionGrants: {
                                 some: {
                                     userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
                                     OR: [
                                         {
                                             write: true
@@ -1110,9 +1173,15 @@ export const applicationRouter = createTRPCRouter({
             const org = await prisma.organisation.findUnique({
                 where: {
                     slug: input.orgSlug,
+                    deletedAt: {
+                        isSet: false
+                    },
                     permissionGrants: {
                         some: {
                             userId: user?.id,
+                            deletedAt: {
+                                isSet: false
+                            },
                             OR: [{
                                 read: true
                             },
@@ -1139,10 +1208,16 @@ export const applicationRouter = createTRPCRouter({
                     slug: input.appSlug,
                     OR: [{
                         organisation: {
+                            deletedAt: {
+                                isSet: false
+                            },
                             permissionGrants: {
                                 some: {
-                                    userId: user?.id
-                                    , OR: [{
+                                    userId: user?.id,
+                                    deletedAt: {
+                                        isSet: false
+                                    },
+                                    OR: [{
                                         read: true
                                     },
                                     {
@@ -1158,6 +1233,9 @@ export const applicationRouter = createTRPCRouter({
                         permissionGrants: {
                             some: {
                                 userId: user?.id,
+                                deletedAt: {
+                                    isSet: false
+                                },
                                 OR: [{
                                     read: true
                                 },
