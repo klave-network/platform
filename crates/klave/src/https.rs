@@ -65,7 +65,7 @@ pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn st
                     name.as_str().to_string(),
                     value
                         .to_str()
-                        .map_err(|e| format!("Invalid header value: {}", e))?
+                        .map_err(|e| format!("Invalid header value: {e}"))?
                         .to_string(),
                 ])
             })
@@ -78,14 +78,14 @@ pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn st
     let response = match sdk::https_query(&http_request_str) {
         Ok(response) => response,
         Err(e) => {            
-            return Err(format!("Failed to send https query:\n{}\n{}\n{:?}", e, http_request, http_request_str).into())
+            return Err(format!("Failed to send https query:\n{e}\n{http_request}\n{http_request_str:?}").into())
         }
     };
 
     let http_response: HttpResponse<String> = match serde_json::from_str(&response) {
         Ok(http_response) => http_response,
         Err(e) => {            
-            return Err(format!("Failed to deserialize http response:\n{}\n{:?}\n{}\n{:?}", e, response, http_request, http_request_str).into())
+            return Err(format!("Failed to deserialize http response:\n{e}\n{response:?}\n{http_request}\n{http_request_str:?}").into())
         }
     };
 
@@ -98,10 +98,10 @@ pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn st
             (Some(name), Some(value)) => {
                 let parsed_name = name
                     .parse::<http::header::HeaderName>()
-                    .map_err(|e| format!("Failed to parse header name '{}': {}", name, e))?;
+                    .map_err(|e| format!("Failed to parse header name '{name}': {e}"))?;
                 let parsed_value = value
                     .parse::<http::header::HeaderValue>()
-                    .map_err(|e| format!("Failed to parse header value '{}': {}", value, e))?;
+                    .map_err(|e| format!("Failed to parse header value '{value}': {e}"))?;
                 Ok((parsed_name, parsed_value))
             }
             _ => Err::<_, String>("Malformed header entry: missing name or value".into()),

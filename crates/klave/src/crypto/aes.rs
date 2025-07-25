@@ -103,7 +103,7 @@ pub fn generate_key(name: &str) -> Result<KeyAES, Box<dyn Error>> {
     match CryptoImpl::key_exists(name) {
         Ok(exists) => {
             if exists {
-                return Err(format!("Invalid key name: key name {} already exists", name).into());
+                return Err(format!("Invalid key name: key name {name} already exists").into());
             }
         }
         Err(e) => return Err(e),

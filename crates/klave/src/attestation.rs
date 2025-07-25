@@ -233,7 +233,7 @@ pub enum Quote {
 
 pub fn get_quote(challenge: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
     let quote_bytes = sdk::get_quote(challenge)
-        .map_err(|e| -> String {format!("Failed to get quote: {}", e).into()})?;
+        .map_err(|e| -> String {format!("Failed to get quote: {e}")})?;
 
     Ok(quote_bytes)
 }
@@ -241,11 +241,11 @@ pub fn get_quote(challenge: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>
 pub fn verify_quote(quote: &[u8], current_time: i64) -> Result<VerifyQuoteResponse, Box<dyn std::error::Error>> {
 
     let response_str = sdk::verify_quote(current_time, quote)
-        .map_err(|e| -> String {format!("Failed to verify quote: {}", e).into()})?;
+        .map_err(|e| -> String {format!("Failed to verify quote: {e}")})?;
 
     //Deserialize the response into a VerifyQuoteResponse
     let response: VerifyQuoteResponse = serde_json::from_str(&response_str)
-        .map_err(|e| -> String {format!("Failed to deserialize response: {}", e).into()})?;
+        .map_err(|e| -> String {format!("Failed to deserialize response: {e}")})?;
 
     Ok(response)
 }
@@ -254,17 +254,17 @@ pub fn parse_quote(quote: &[u8]) -> Result<Quote, Box<dyn std::error::Error>> {
     let version = quote.first().ok_or("Quote is empty")?;
 
     let quote_parsed_string = sdk::parse_quote(quote)
-        .map_err(|e| format!("Failed to parse quote: {}", e))?;
+        .map_err(|e| format!("Failed to parse quote: {e}"))?;
 
     let parsed: Quote = match version {
         3 => {
             let q3 = serde_json::from_str::<Quote3>(&quote_parsed_string)
-                .map_err(|e| format!("Failed to parse Quote3: {}", e))?;
+                .map_err(|e| format!("Failed to parse Quote3: {e}"))?;
             Quote::V3(q3)
         }
         4 => {
             let q4 = serde_json::from_str::<Quote4>(&quote_parsed_string)
-                .map_err(|e| format!("Failed to parse Quote4: {}", e))?;
+                .map_err(|e| format!("Failed to parse Quote4: {e}"))?;
             Quote::V4(q4)
         }
         _ => return Err("Unsupported quote version".into()),

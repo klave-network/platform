@@ -915,8 +915,7 @@ pub fn save_key(
 
     if existing_key {
         return Err(format!(
-            "Invalid key name: key name {} already exists",
-            key_persisted_name
+            "Invalid key name: key name {key_persisted_name} already exists"
         )
         .into());
     }
