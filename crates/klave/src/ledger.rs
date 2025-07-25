@@ -72,7 +72,7 @@ impl Table {
                 }
             }
             Err(err) => {
-                let error_message = format!("Error while listing keys: {}", err);
+                let error_message = format!("Error while listing keys: {err}");
                 Err(error_message.into())
             }
         }
