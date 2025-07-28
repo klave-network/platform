@@ -158,15 +158,25 @@ export const start = async () => {
 
     app.use('/version', (__unusedReq, res) => {
 
-        res.setHeader('X-Klave-API-Status', 'ready');
-        res.status(202).send({
-            version: {
-                name: process.env.NX_TASK_TARGET_PROJECT,
-                commit: process.env.GIT_REPO_COMMIT?.substring(0, 8),
-                branch: process.env.GIT_REPO_BRANCH,
-                version: process.env.GIT_REPO_VERSION
-            },
-            node: __hostname
+        prisma.$runCommandRaw({
+            count: 'session'
+        }).then(() => {
+            res.setHeader('X-Klave-API-Status', 'ready');
+            res.status(202).send({
+                version: {
+                    name: process.env.NX_TASK_TARGET_PROJECT,
+                    commit: process.env.GIT_REPO_COMMIT?.substring(0, 8),
+                    branch: process.env.GIT_REPO_BRANCH,
+                    version: process.env.GIT_REPO_VERSION
+                },
+                node: __hostname
+            });
+        }).catch((e) => {
+            console.error('Database connection failed', e, (e as Error)?.stack);
+            res.status(500).send({
+                error: 'Database connection failed',
+                message: e?.toString()
+            });
         });
     });
 
