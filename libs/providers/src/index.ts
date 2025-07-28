@@ -5,4 +5,5 @@ export * from './lib/objectStore';
 export * from './lib/environmentPopulator';
 export * from './lib/mcpServer';
 export * from './lib/dispatcher';
+export * from './lib/telemetry';
 export * from './lib/sentry';

@@ -31,6 +31,7 @@ const serverHandle = dbOps.initialize()
     .then(sentryOps.initialize)
     .then(probotOps.initialize)
     .then(objectStoreOps.initialize)
+    // .then(telemetryOps.initialize)
     .then(onlineChain)
     .then(async () => {
 
