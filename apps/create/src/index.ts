@@ -160,7 +160,7 @@ async function main() {
         const s = p.spinner();
         s.start(`Installing via ${packageManager}`);
 
-        let args = ['install', '--legacy-peer-deps'];
+        let args = ['install'];
 
         if (packageManager === 'yarn' || packageManager === 'pnpm') {
             args = [];
@@ -175,12 +175,11 @@ async function main() {
     }
 
     const buildCmd = packageManager === 'yarn' ? 'build' : 'run build';
-    const installLegacyDeps = packageManager === 'npm' ? '--legacy-peer-deps' : '';
     const nextSteps = `
 Build your application:
 
     - Enter your project directory using ${KLAVE_LIGHT_BLUE(chalk.bold(`cd ${dir}`))}
-    ${installDeps ? 'EMPTY_LINE' : `- To install dependencies, run ${KLAVE_LIGHT_BLUE(chalk.bold(`${packageManager} install ${installLegacyDeps}`))}`}
+    ${installDeps ? 'EMPTY_LINE' : `- To install dependencies, run ${KLAVE_LIGHT_BLUE(chalk.bold(`${packageManager} install`))}`}
     - To build your application, run ${KLAVE_LIGHT_BLUE(chalk.bold(`${packageManager} ${buildCmd}`))}
     - Log in to ${KLAVE_LIGHT_BLUE(chalk.bold(createTerminalLink('Klave', KLAVE_PLATFORM_URL)))} to deploy your application
 
