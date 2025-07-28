@@ -25,7 +25,7 @@ impl Key {
             Key {
                 name: rand.iter().fold(String::new(), |mut acc, b| {
                     use std::fmt::Write;
-                    write!(acc, "{:02x}", b).unwrap();
+                    write!(acc, "{b:02x}").unwrap();
                     acc
                 }),
             }

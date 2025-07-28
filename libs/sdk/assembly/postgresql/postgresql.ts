@@ -79,7 +79,7 @@ function normaliseQuery(query: string): string {
     return filtered.join(" ");
 }
 
-export class PostGreSQLConnection {
+export class Connection {
     
     handle: ArrayBuffer;
     constructor(handle: string) {
@@ -97,14 +97,14 @@ export class PostGreSQLConnection {
     }
 }
 
-export function open(uri: string): Result<PostGreSQLConnection, Error> {
+export function open(uri: string): Result<Connection, Error> {
     let conn = connectionOpen(uri);
     if(conn.err)
     {
         return { data: null, err: new Error(`Failed to open connection: ${conn.err!.message}`) };
     }else
     {
-        return { data: new PostGreSQLConnection(conn.data!), err: null };
+        return { data: new Connection(conn.data!), err: null };
     }
 }
 

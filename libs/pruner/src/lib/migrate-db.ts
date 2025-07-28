@@ -28,27 +28,31 @@ export const migrateDBFields = async () => {
                 console.warn('Skipping credential migration due to missing fields', credId, credPublicKey);
                 continue;
             }
-            if (typeof credPublicKey === 'string') {
-                const publicKeyIntArray = Utils.fromBase64(credPublicKey);
-                console.log('Migrating credentialPublicKey', credId, credPublicKey, publicKeyIntArray);
-                await prisma.webauthCredential.update({
-                    where: {
-                        id: credId
-                    },
-                    data: {
-                        credentialPublicKey: [...publicKeyIntArray]
-                    }
-                });
-            }
-            if (typeof cred['credentialTransport'] === 'undefined') {
-                await prisma.webauthCredential.update({
-                    where: {
-                        id: credId
-                    },
-                    data: {
-                        credentialTransport: 'internal'
-                    }
-                });
+            try {
+                if (typeof credPublicKey === 'string') {
+                    const publicKeyIntArray = Utils.fromBase64(credPublicKey);
+                    console.log('Migrating credentialPublicKey', credId, credPublicKey, publicKeyIntArray);
+                    await prisma.webauthCredential.update({
+                        where: {
+                            id: credId
+                        },
+                        data: {
+                            credentialPublicKey: [...publicKeyIntArray]
+                        }
+                    });
+                }
+                if (typeof cred['credentialTransport'] === 'undefined') {
+                    await prisma.webauthCredential.update({
+                        where: {
+                            id: credId
+                        },
+                        data: {
+                            credentialTransport: 'internal'
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error('Error migrating credential', credId, e);
             }
         }
     }
