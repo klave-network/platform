@@ -106,13 +106,13 @@ export class CryptoImpl {
             return 2;
         if (input === "verify")
             return 3;
-        if (input === "derive_key")
+        if (input === "derive_key" || input === "deriveKey")
             return 4;
-        if (input === "derive_bits")
+        if (input === "derive_bits" || input === "deriveBits")
             return 5;
-        if (input === "wrap_key")
+        if (input === "wrap_key" || input === "wrapKey")
             return 6;
-        if (input === "unwrap_key")
+        if (input === "unwrap_key" || input === "unwrapKey")
             return 7;
         return -1;
     }

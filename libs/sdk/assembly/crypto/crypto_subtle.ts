@@ -49,17 +49,12 @@ export class EcKeyGenParams {
 @json
 export class EcdhKeyDeriveParams {
     name: string = 'ECDH'; //TODO: Add support for X25519
-    publicKey!: string; // The public key to derive the shared secret from
-}
-
-@json
-export class DerivationMetadataEcdh {
-    publicKey!: string; // The public key to derive the shared secret from
+    publicKey!: CryptoKey; // The public key to derive the shared secret from
 }
 
 @json
 export class HkdfParams {
-    shaMetadata: idlV1.sha_metadata = { algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_256 };
+    hash: string = 'SHA2-256';
     salt: ArrayBuffer = new ArrayBuffer(0);
     info: ArrayBuffer = new ArrayBuffer(0);
 }
@@ -483,49 +478,54 @@ export class SubtleCrypto {
             return { data: null, err: new Error('Failed to unwrap key') };
     }
 
-    static deriveKey<T, E>(algorithm: T, baseKeyName: string, derivedKeyAlgorithm: E, extractable: boolean, usages: string[]): Result<CryptoKey, Error> {
-        if (!baseKeyName || baseKeyName == '')
-            return { data: null, err: new Error('Invalid base key name') };
+    static deriveKey<T, E>(algorithm: T, baseKey: CryptoKey, derivedKeyAlgorithm: E, extractable: boolean, usages: string[]): Result<CryptoKey, Error> {
+        if (!baseKey)
+            return { data: null, err: new Error('Invalid baseKey key') };
 
         let key: Result<ArrayBuffer, Error> = { data: null, err: null };
         if (algorithm instanceof EcdhKeyDeriveParams) {
-            if (!algorithm.publicKey || algorithm.publicKey == '')
+            if (!algorithm.publicKey)
                 return { data: null, err: new Error('Invalid ECDH parameters: invalid public key') };
 
             if (algorithm.name != 'ECDH')
                 return { data: null, err: new Error('Invalid ECDH parameters: invalid algorithm') };
 
-            const derivationMetadataEcdh = { public_key: algorithm.publicKey } as idlV1.ecdh_derivation_metadata;
+            const derivationMetadataEcdh = { public_key: algorithm.publicKey.id } as idlV1.ecdh_derivation_metadata;
 
             if (derivedKeyAlgorithm instanceof AesKeyGenParams) {
                 const aesMetadata = CryptoUtil.getAESMetadata(derivedKeyAlgorithm);
                 if (!aesMetadata.data)
                     return { data: null, err: aesMetadata.err };
 
-                key = CryptoImpl.deriveKey(baseKeyName, 0, JSON.stringify(derivationMetadataEcdh), 0, JSON.stringify(aesMetadata), extractable, usages);
+                key = CryptoImpl.deriveKey(baseKey.id, 0, JSON.stringify(derivationMetadataEcdh), 0, JSON.stringify(aesMetadata), extractable, usages);
             }
             else if (derivedKeyAlgorithm instanceof HmacKeyGenParams) {
                 const hmacMetadata = CryptoUtil.getHMACMetadata(derivedKeyAlgorithm);
                 if (!hmacMetadata.data)
                     return { data: null, err: hmacMetadata.err };
 
-                key = CryptoImpl.deriveKey(baseKeyName, 0, JSON.stringify(derivationMetadataEcdh), 1, JSON.stringify(hmacMetadata), extractable, usages);
+                key = CryptoImpl.deriveKey(baseKey.id, 0, JSON.stringify(derivationMetadataEcdh), 1, JSON.stringify(hmacMetadata), extractable, usages);
             }
         } else if (algorithm instanceof HkdfParams) {
-
+            const shaMetadata = CryptoUtil.getShaMetadata(algorithm.hash);
+            if(shaMetadata.err)
+                return { data: null, err: shaMetadata.err };
+            
+            const hkdfMetdata: idlV1.hkdf_metadata = {sha_metadata: shaMetadata.data!, info: Utils.convertToU8Array(Uint8Array.wrap(algorithm.info)), salt: Utils.convertToU8Array(Uint8Array.wrap(algorithm.salt))};
+            
             if (derivedKeyAlgorithm instanceof AesKeyGenParams) {
                 const aesMetadata = CryptoUtil.getAESMetadata(derivedKeyAlgorithm);
                 if (!aesMetadata.data)
                     return { data: null, err: aesMetadata.err };
 
-                key = CryptoImpl.deriveKey(baseKeyName, 1, JSON.stringify(algorithm), 0, JSON.stringify(aesMetadata), extractable, usages);
+                key = CryptoImpl.deriveKey(baseKey.id, 1, JSON.stringify(hkdfMetdata), 0, JSON.stringify(aesMetadata), extractable, usages);
             }
             else if (derivedKeyAlgorithm instanceof HmacKeyGenParams) {
                 const hmacMetadata = CryptoUtil.getHMACMetadata(derivedKeyAlgorithm);
                 if (!hmacMetadata.data)
                     return { data: null, err: hmacMetadata.err };
 
-                key = CryptoImpl.deriveKey(baseKeyName, 1, JSON.stringify(algorithm), 1, JSON.stringify(hmacMetadata), extractable, usages);
+                key = CryptoImpl.deriveKey(baseKey.id, 1, JSON.stringify(hkdfMetdata), 1, JSON.stringify(hmacMetadata), extractable, usages);
             }
         } else
             return { data: null, err: new Error('Invalid algorithm') };

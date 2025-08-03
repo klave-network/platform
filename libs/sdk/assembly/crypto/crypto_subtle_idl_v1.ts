@@ -209,6 +209,13 @@ export class encryption_info {
 }
 
 @json
+export class hkdf_metadata {
+    sha_metadata!: sha_metadata;
+    salt!: Array<u8>;
+    info!: Array<u8>;
+}
+
+@json
 export class aes_kw_wrapping_metadata {
     with_padding!: boolean;
 }
