@@ -139,12 +139,14 @@ deserialize_copy!(DerivationAlgorithm,
 #[derive(Debug, Clone)]
 pub enum DerivedKeyUsageAlgorithm {
     Aes = 0,
+    Hmac = 1,
 }
 
 serialize_copy!(DerivedKeyUsageAlgorithm);
 deserialize_copy!(DerivedKeyUsageAlgorithm,
     DerivedKeyUsageAlgorithmVisitor,
     0 => Ok(DerivedKeyUsageAlgorithm::Aes),
+    1 => Ok(DerivedKeyUsageAlgorithm::Hmac),
     _ => Err(de::Error::custom("invalid DerivedKeyUsageAlgorithm variant"))
 );
 

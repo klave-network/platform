@@ -21,14 +21,14 @@ use super::util;
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
 pub struct CryptoKey {
-    id: String,
-    alias: Option<String>,
+    pub id: String,
+    pub alias: Option<String>,
     #[serde(rename = "type")]
-    key_type: String,
-    extractable: bool,
-    family: String,
-    usages: Vec<String>,
-    algorithm: String,
+    pub key_type: String,
+    pub extractable: bool,
+    pub family: String,
+    pub usages: Vec<String>,
+    pub algorithm: String,
 }
 
 impl Display for CryptoKey {
@@ -212,7 +212,7 @@ pub enum KeyWrapAlgorithm {
 
 #[derive(Deserialize, Serialize)]
 pub struct EcdhDerivParams {
-    pub public: String,
+    pub public: CryptoKey,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -231,6 +231,7 @@ pub enum KeyDerivationAlgorithm {
 #[derive(Deserialize, Serialize)]
 pub enum DerivedKeyAlgorithm {
     Aes(AesKeyGenParams),
+    Hmac(HmacKeyGenParams),
 }
 
 pub fn generate_key(
@@ -461,9 +462,7 @@ pub fn sign(
         }
         SignAlgorithm::Ecdsa(params) => {
             let sha_metadata = util::get_sha_metadata(&params.hash)?;
-            let metadata = EcdsaSignatureMetadata {
-                sha_metadata,
-            };
+            let metadata = EcdsaSignatureMetadata { sha_metadata };
             let result = CryptoImpl::sign(
                 key_name,
                 SigningAlgorithm::Ecdsa as u32,
@@ -474,9 +473,7 @@ pub fn sign(
         }
         SignAlgorithm::Hmac(params) => {
             let sha_metadata = util::get_sha_metadata(&params.hash)?;
-            let metadata = HmacSignatureMetadata {
-                sha_metadata,
-            };
+            let metadata = HmacSignatureMetadata { sha_metadata };
             let result = CryptoImpl::sign(
                 key_name,
                 SigningAlgorithm::Hmac as u32,
@@ -514,9 +511,7 @@ pub fn verify(
         }
         SignAlgorithm::Ecdsa(params) => {
             let sha_metadata = util::get_sha_metadata(&params.hash)?;
-            let metadata = EcdsaSignatureMetadata {
-                sha_metadata,
-            };
+            let metadata = EcdsaSignatureMetadata { sha_metadata };
             let result = CryptoImpl::verify(
                 key_name,
                 SigningAlgorithm::Ecdsa as u32,
@@ -528,9 +523,7 @@ pub fn verify(
         }
         SignAlgorithm::Hmac(params) => {
             let sha_metadata = util::get_sha_metadata(&params.hash)?;
-            let metadata = HmacSignatureMetadata {
-                sha_metadata,
-            };
+            let metadata = HmacSignatureMetadata { sha_metadata };
             let result = CryptoImpl::verify(
                 key_name,
                 SigningAlgorithm::Hmac as u32,
@@ -885,6 +878,21 @@ pub fn derive_key(
             };
             derived_key_algo_id = DerivedKeyUsageAlgorithm::Aes;
         }
+        DerivedKeyAlgorithm::Hmac(params) => {
+            let hmac_metadata = match util::get_hmac_metadata(params) {
+                Ok(hmac_metadata) => hmac_metadata,
+                Err(e) => {
+                    return Err(e);
+                }
+            };
+            derived_key_algo_metadata = match serde_json::to_string(&hmac_metadata) {
+                Ok(result) => result,
+                Err(e) => {
+                    return Err(e.into());
+                }
+            };
+            derived_key_algo_id = DerivedKeyUsageAlgorithm::Hmac;
+        }
     }
 
     let crypto_key_json = CryptoImpl::derive_key(
@@ -914,10 +922,9 @@ pub fn save_key(
     let existing_key = CryptoImpl::key_exists(key_persisted_name)?;
 
     if existing_key {
-        return Err(format!(
-            "Invalid key name: key name {key_persisted_name} already exists"
-        )
-        .into());
+        return Err(
+            format!("Invalid key name: key name {key_persisted_name} already exists").into(),
+        );
     }
 
     let params = KeyPersistParams {

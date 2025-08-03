@@ -65,9 +65,13 @@ impl CryptoImpl {
             "sign" => 2,
             "verify" => 3,
             "derive_key" => 4,
+            "deriveKey" => 4,
             "derive_bits" => 5,
+            "deriveBits" => 5,
             "wrap_key" => 6,
+            "wrapKey" => 6,
             "unwrap_key" => 7,
+            "unwrapKey" => 7,
             _ => u8::MAX,
         }
     }
