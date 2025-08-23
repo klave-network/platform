@@ -4028,10 +4028,10 @@
   resolved "https://registry.yarnpkg.com/@octokit/webhooks-methods/-/webhooks-methods-6.0.0.tgz#34abf78aec6f826fe561cfe79d2ebb1950d1d25f"
   integrity sha512-MFlzzoDJVw/GcbfzVC1RLR36QqkTLUf79vLVO3D+xn7r0QgxnFoLZgtrzxiQErAjFUOdH6fas2KeQJ1yr/qaXQ==
 
-"@octokit/webhooks@^14.1.1":
-  version "14.1.1"
-  resolved "https://registry.yarnpkg.com/@octokit/webhooks/-/webhooks-14.1.1.tgz#88b873779acdddcc568a20ebb32aa72c1afa4b7c"
-  integrity sha512-4kN/yPhcZEP+X7iMMuBTk+dD4ZGOpU57F7kHKrFlD2SSY/Sxh01t79oVn4npchLdPIXvLKrQw0uBXhmEaiZAdw==
+"@octokit/webhooks@^14.1.2":
+  version "14.1.3"
+  resolved "https://registry.yarnpkg.com/@octokit/webhooks/-/webhooks-14.1.3.tgz#2d0bed71b07745c0b33363d69e0ae0e440469a18"
+  integrity sha512-gcK4FNaROM9NjA0mvyfXl0KPusk7a1BeA8ITlYEZVQCXF5gcETTd4yhAU0Kjzd8mXwYHppzJBWgdBVpIR9wUcQ==
   dependencies:
     "@octokit/openapi-webhooks-types" "12.0.3"
     "@octokit/request-error" "^7.0.0"
@@ -4709,10 +4709,10 @@
   dependencies:
     "@opentelemetry/instrumentation" "^0.52.0 || ^0.53.0 || ^0.54.0 || ^0.55.0 || ^0.56.0 || ^0.57.0"
 
-"@probot/get-private-key@^2.0.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@probot/get-private-key/-/get-private-key-2.1.0.tgz#b91da4d04ab01bd83333d6aac236d3847eb692fe"
-  integrity sha512-9kcqsE2lLyMsWq1LgWRNraZfisEny4rWspx76CbtuFwR/S940p4fy6/Qf/BN//WW8XdZO9xzUW4EfqImjEn4cQ==
+"@probot/get-private-key@^2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@probot/get-private-key/-/get-private-key-2.1.1.tgz#87a6d9015a5fd8bea3516d2ff64f83f316865685"
+  integrity sha512-i20LJE0751wWDCiTQmyS6UM65vNWOZMim/DAxIFQWfoPJSBPdFPgNffG1XbTiMfl4et8JCBZWab9ldxDtzhcWw==
 
 "@probot/octokit-plugin-config@^3.0.2":
   version "3.0.2"
@@ -4721,10 +4721,10 @@
   dependencies:
     js-yaml "^4.1.0"
 
-"@probot/pino@^5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@probot/pino/-/pino-5.0.0.tgz#7e2ba1f7023f6d6ccf07270814b4000946502413"
-  integrity sha512-tI5ZEx3EslwmS9KpiJk2Tm6ArFHn+v0z4hAt3VlzcD2tAi7kR+bgyQ+9cYIhD4xgAasPAM5GhJbiXezqQUZD6w==
+"@probot/pino@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@probot/pino/-/pino-5.0.1.tgz#a00e2cb9f32568248291dd9f40c57ff568d1617c"
+  integrity sha512-ULNKXY9jewO1/BHME3ZmsP3yHYocJBErT5D5fWxaQnoHNS635mTqBI2NszIGZO/56/i/lRFm+J9gp2NOkM6yjQ==
   dependencies:
     npx-import-light "^1.0.0"
     pino-pretty "^13.0.0"
@@ -16712,10 +16712,10 @@ prismjs@^1.30.0:
   resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.30.0.tgz#d9709969d9d4e16403f6f348c63553b19f0975a9"
   integrity sha512-DEvV2ZF2r2/63V+tK8hQvrR2ZGn10srHbXviTlcv7Kpzw8jWiNTqbVgjO3IY8RxrrOUF8VPMQQFysYYYv0YZxw==
 
-probot@14.0.0-beta.29:
-  version "14.0.0-beta.29"
-  resolved "https://registry.yarnpkg.com/probot/-/probot-14.0.0-beta.29.tgz#77c283db517ae5304bec9f6e8c2176fea4c24290"
-  integrity sha512-xc+jPUDFdL0s4OqUtmk1M4AIhIwcIQFRkI4a4CtRxRrlWTXu8Qf/2GvzgserlkGiKK2hO5ydMs7GQMj9N0rcUQ==
+probot@14.0.1:
+  version "14.0.1"
+  resolved "https://registry.yarnpkg.com/probot/-/probot-14.0.1.tgz#f5f8e177877f228b61be3334c495df5811f9a38f"
+  integrity sha512-T3johF5kDZfWRuTx9iNixpF2EtssKm7bpItZlYl3rrOVqSz9zQGO8/WBV8MnZtRLEIbuBNc5xWbPIBwk5kwuXA==
   dependencies:
     "@octokit/core" "^7.0.3"
     "@octokit/plugin-enterprise-compatibility" "^6.0.1"
@@ -16725,10 +16725,10 @@ probot@14.0.0-beta.29:
     "@octokit/plugin-throttling" "^11.0.1"
     "@octokit/request" "^10.0.3"
     "@octokit/types" "^14.1.0"
-    "@octokit/webhooks" "^14.1.1"
-    "@probot/get-private-key" "^2.0.0"
+    "@octokit/webhooks" "^14.1.2"
+    "@probot/get-private-key" "^2.1.1"
     "@probot/octokit-plugin-config" "^3.0.2"
-    "@probot/pino" "^5.0.0"
+    "@probot/pino" "^5.0.1"
     bottleneck "^2.19.5"
     deepmerge "^4.3.1"
     dotenv "^17.0.0"
