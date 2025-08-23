@@ -4622,10 +4622,10 @@
   resolved "https://registry.yarnpkg.com/@primer/primitives/-/primitives-11.0.0.tgz#5c6f9be048be09cb70b7f13351c71ef5d7239466"
   integrity sha512-GREFF8jTAyfs8lMhLQLAtuqmd9LJqodfI1ejmUSL3IEWtoATRSQAy8eqksjV/LcJnJoKNft42hyAeAbawskpaw==
 
-"@primer/react@37.29.1":
-  version "37.29.1"
-  resolved "https://registry.yarnpkg.com/@primer/react/-/react-37.29.1.tgz#7502c85b37731ce9cfe3eead1c2690351ecd31ea"
-  integrity sha512-Bm3AGnA82f+i9C63qZk3Z7YgrGXmmabF/WS5kjriBpyh6Yv2LKeQihlhDv3N/tLrvBP8uP9012zI5Em676SqMQ==
+"@primer/react@37.30.0":
+  version "37.30.0"
+  resolved "https://registry.yarnpkg.com/@primer/react/-/react-37.30.0.tgz#6e9eb5ae4858be3ba691d0b25fb76ec0c6f1d2ac"
+  integrity sha512-Y99SbZ/eYrjPWEjWv+wdQkxvm7jT2kkFqQfAJXsExXYqhnWR+bFrsSScon/v+wPP3L9WWWO6ijvhzTBIQtdS5w==
   dependencies:
     "@github/relative-time-element" "^4.4.5"
     "@github/tab-container-element" "4.8.2"

@@ -85,7 +85,7 @@
         "@monaco-editor/react": "4.7.0",
         "@nivo/geo": "0.99.0",
         "@opentelemetry/sdk-node": "0.203.0",
-        "@primer/react": "37.29.1",
+        "@primer/react": "37.30.0",
         "@prisma/client": "6.12.0",
         "@prisma/instrumentation": "6.12.0",
         "@quixo3/prisma-session-store": "3.1.13",
