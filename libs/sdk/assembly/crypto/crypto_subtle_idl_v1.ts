@@ -94,6 +94,7 @@ export class aes_metadata {
 @json
 export class hmac_metadata {
     sha_metadata!: sha_metadata;
+    length: u16 = 0;
 }
 
 @json
@@ -167,11 +168,6 @@ export class ecdsa_signature_metadata {
 @json
 export class rsa_pss_signature_metadata {
     saltLength!: u64;
-}
-
-@json
-export class hmac_signature_metadata {
-    sha_metadata!: sha_metadata;
 }
 
 @json

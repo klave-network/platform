@@ -161,7 +161,7 @@ export class CryptoUtil
         if (shaMetadata.err !== null || shaMetadata.data === null)
             return {data: null, err: new Error('Invalid HMAC hash metadata')};
 
-        return {data: {sha_metadata: shaMetadata.data!}, err: null};
+        return {data: {sha_metadata: shaMetadata.data!, length: params.length}, err: null};
     }
 
     static getKeyFormat(format: string): Result<KeyFormatWrapper, Error>

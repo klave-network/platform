@@ -67,6 +67,7 @@ export class AesKeyGenParams {
 @json
 export class HmacKeyGenParams {
     hash: string = 'SHA2-256';
+    length: u16 = 0;
 }
 
 export class RsaOaepParams {
@@ -235,8 +236,11 @@ export class SubtleCrypto {
         } else if (algorithm instanceof RsaPssParams) {
             const metadata: idlV1.rsa_pss_signature_metadata = { saltLength: algorithm.saltLength };
             return CryptoImpl.sign(key.id, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata), true), data);
-        } else if (algorithm instanceof HmacKeyGenParams) {
-            return CryptoImpl.sign(key.id, idlV1.signing_algorithm.hmac, String.UTF8.encode("", true), data);
+        } else if (algorithm instanceof NamedAlgorithm) {
+            if (algorithm.name == 'HMAC' || algorithm.name == 'hmac') {
+                return CryptoImpl.sign(key.id, idlV1.signing_algorithm.hmac, String.UTF8.encode("", true), data);
+            } else
+                return { data: null, err: new Error('Invalid algorithm') };
         }
 
         return { data: null, err: new Error('Invalid algorithm') };
@@ -260,12 +264,11 @@ export class SubtleCrypto {
         } else if (algorithm instanceof RsaPssParams) {
             const metadata: idlV1.rsa_pss_signature_metadata = { saltLength: algorithm.saltLength };
             return CryptoImpl.verify(key.id, idlV1.signing_algorithm.rsa_pss, String.UTF8.encode(JSON.stringify(metadata), true), data, signature);
-        } else if (algorithm instanceof HmacKeyGenParams) {
-            const metadata = CryptoUtil.getHMACMetadata(algorithm);
-            if (!metadata.data)
-                return { data: null, err: metadata.err };
-            const hmacMetadata = metadata.data as idlV1.hmac_metadata;
-            return CryptoImpl.verify(key.id, idlV1.signing_algorithm.hmac, String.UTF8.encode(JSON.stringify(hmacMetadata), true), data, signature);
+        } else if (algorithm instanceof NamedAlgorithm) {
+            if (algorithm.name == 'HMAC' || algorithm.name == 'hmac') {
+                return CryptoImpl.verify(key.id, idlV1.signing_algorithm.hmac, String.UTF8.encode("", true), data, signature);
+            } else
+                return { data: null, err: new Error('Invalid algorithm') };
         }
 
         return { data: null, err: new Error('Invalid algorithm') };
