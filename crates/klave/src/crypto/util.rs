@@ -165,9 +165,12 @@ pub fn get_aes_metadata(params: &AesKeyGenParams) -> Result<AesMetadata, Box<dyn
 }
 
 pub fn get_hmac_metadata(params: &HmacKeyGenParams) -> Result<HmacMetadata, Box<dyn Error>> {
-    let hash = params.hash.as_str();
+    let hash: &str = params.hash.as_str();
     match get_sha_metadata(hash) {
-        Ok(sha_metadata) => Ok(HmacMetadata { sha_metadata }),
+        Ok(sha_metadata) => Ok(HmacMetadata {
+            sha_metadata,
+            length: params.length,
+        }),
         Err(_) => Err("Invalid hash algorithm".into()),
     }
 }

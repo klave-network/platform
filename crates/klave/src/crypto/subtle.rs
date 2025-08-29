@@ -8,7 +8,6 @@ use std::fmt::Display;
 
 use super::sdk_wrapper::CryptoImpl;
 use super::sdk_wrapper::VerifySignResult;
-use super::subtle_idl_v1::HmacSignatureMetadata;
 use super::subtle_idl_v1::{
     AesGcmEncryptionMetadata, AesKwWrappingMetadata, EcdsaSignatureMetadata,
     RsaOaepEncryptionMetadata, RsaPssSignatureMetadata,
@@ -119,12 +118,14 @@ impl Default for EcKeyGenParams {
 #[derive(Deserialize, Serialize)]
 pub struct HmacKeyGenParams {
     pub hash: String,
+    pub length: u16,
 }
 
 impl Default for HmacKeyGenParams {
     fn default() -> Self {
         HmacKeyGenParams {
             hash: "SHA2-256".to_string(),
+            length: 64,
         }
     }
 }
@@ -154,19 +155,6 @@ pub struct RsaOaepParams {
 #[derive(Default, Deserialize, Serialize)]
 pub struct RsaPssParams {
     pub salt_length: u32,
-}
-
-#[derive(Deserialize, Serialize)]
-pub struct HmacParams {
-    pub hash: String,
-}
-
-impl Default for HmacParams {
-    fn default() -> Self {
-        HmacParams {
-            hash: "SHA2-256".to_string(),
-        }
-    }
 }
 
 #[derive(Deserialize, Serialize)]
@@ -200,7 +188,7 @@ pub enum EncryptAlgorithm {
 pub enum SignAlgorithm {
     Ecdsa(EcdsaParams),
     RsaPss(RsaPssParams),
-    Hmac(HmacParams),
+    Hmac(),
 }
 
 #[derive(Deserialize, Serialize)]
@@ -471,15 +459,8 @@ pub fn sign(
             )?;
             Ok(result)
         }
-        SignAlgorithm::Hmac(params) => {
-            let sha_metadata = util::get_sha_metadata(&params.hash)?;
-            let metadata = HmacSignatureMetadata { sha_metadata };
-            let result = CryptoImpl::sign(
-                key_name,
-                SigningAlgorithm::Hmac as u32,
-                &serde_json::to_string(&metadata)?,
-                data,
-            )?;
+        SignAlgorithm::Hmac() => {
+            let result = CryptoImpl::sign(key_name, SigningAlgorithm::Hmac as u32, "", data)?;
             Ok(result)
         }
     }
@@ -521,16 +502,9 @@ pub fn verify(
             )?;
             Ok(result)
         }
-        SignAlgorithm::Hmac(params) => {
-            let sha_metadata = util::get_sha_metadata(&params.hash)?;
-            let metadata = HmacSignatureMetadata { sha_metadata };
-            let result = CryptoImpl::verify(
-                key_name,
-                SigningAlgorithm::Hmac as u32,
-                &serde_json::to_string(&metadata)?,
-                data,
-                signature,
-            )?;
+        SignAlgorithm::Hmac() => {
+            let result =
+                CryptoImpl::verify(key_name, SigningAlgorithm::Hmac as u32, "", data, signature)?;
             Ok(result)
         }
     }
