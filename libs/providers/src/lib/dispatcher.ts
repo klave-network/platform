@@ -6,6 +6,7 @@ import { Utils } from '@secretarium/connector';
 let reconnectAttempt = 0;
 let pingInterval: NodeJS.Timeout | undefined = undefined;
 let reconnectionTimeout: NodeJS.Timeout | undefined;
+let shuttingDown = false;
 
 const planReconnection = async () => {
     return new Promise((resolve) => {
@@ -18,10 +19,14 @@ const planReconnection = async () => {
 };
 
 let hookHandler: (reqInfo: Pick<RequestInit, 'headers' | 'body'>) => void | undefined;
+let hookSocket: WebSocket | undefined;
 
 export const dispatchOps = {
     initialize: async () => {
         try {
+            if (shuttingDown)
+                return;
+
             const dispatcherWs = config.get('KLAVE_DISPATCH_WS', 'ws://klave.dispatch.127.0.0.1.nip.io:3334');
             const dispatcherSecret = config.get('KLAVE_DISPATCH_SECRET');
 
@@ -30,12 +35,16 @@ export const dispatchOps = {
                 return;
             }
 
-            const hookSocket = new WebSocket(dispatcherWs);
+            hookSocket = new WebSocket(dispatcherWs);
             hookSocket.addEventListener('open', () => {
+                if (!hookSocket)
+                    return;
                 hookSocket.send(dispatcherSecret);
                 logger.info(`Connected to dispatcher ${dispatcherWs}`);
                 reconnectAttempt = 0;
                 pingInterval = setInterval(() => {
+                    if (!hookSocket)
+                        return;
                     hookSocket.ping();
                 }, 30000);
             });
@@ -82,5 +91,22 @@ export const dispatchOps = {
     },
     registerHookHandler: (handler: typeof hookHandler) => {
         hookHandler = handler;
+    },
+    stop: async () => {
+        logger.info('Stopping dispatcher listener...');
+        shuttingDown = true;
+        if (pingInterval) {
+            clearInterval(pingInterval);
+            pingInterval = undefined;
+        }
+        if (reconnectionTimeout) {
+            clearTimeout(reconnectionTimeout);
+            reconnectionTimeout = undefined;
+        }
+        if (hookSocket) {
+            hookSocket.close();
+            hookSocket = undefined;
+        }
+        logger.info('Dispatcher listener stopped');
     }
 };
