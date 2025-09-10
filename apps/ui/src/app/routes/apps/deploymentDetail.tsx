@@ -302,7 +302,7 @@ export const AppDeploymentDetail: FC = () => {
                         <h2 className='font-bold mb-3'>Code Explorer</h2>
                         <h3 className='mb-3'>Type declarations</h3>
                         <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-slate-100 dark:bg-gray-800 p-3'>
-                            {deployment.buildOutputDTS}
+                            {deployment.buildOutputDTS ?? deployment.buildOutputWIT ?? 'No type declarations were generated for this build.'}
                         </pre>
                         <h3 className='mt-5 mb-3'>WASM</h3>
                         {deployment.sourceType?.includes('rust')

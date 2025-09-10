@@ -230,6 +230,7 @@ model Deployment {
     applicationId        String
     sourceType           String?
     buildOutputs         Json?
+    buildOutputWIT       String?
     buildOutputDTS       String?
     buildOutputWAT       String?
     buildOutputWASM      String?
