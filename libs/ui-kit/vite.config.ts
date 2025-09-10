@@ -1,11 +1,13 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig, PluginOption } from 'vite';
+import react from '@vitejs/plugin-react-swc';
 import dts from 'vite-plugin-dts';
-import git from 'git-rev-sync';
 import * as path from 'path';
 import { version } from './package.json';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
+import { current } from '../../tools/scripts/gitInfo.mjs';
+
+const gitInfo = current();
 
 export default defineConfig({
     root: __dirname,
@@ -18,7 +20,7 @@ export default defineConfig({
             entryRoot: 'src',
             tsconfigPath: path.join(__dirname, 'tsconfig.lib.json')
         })
-    ],
+    ] as PluginOption[],
     // Uncomment this if you are using workers.
     // worker: {
     //  plugins: [ nxViteTsPaths() ],
@@ -48,9 +50,9 @@ export default defineConfig({
     },
     define: {
         'import.meta.vitest': undefined,
-        'import.meta.env.VITE_REPO_COMMIT': JSON.stringify(git.long(__dirname)),
-        'import.meta.env.VITE_REPO_BRANCH': JSON.stringify(git.branch(__dirname)),
-        'import.meta.env.VITE_REPO_DIRTY': git.isDirty(),
+        'import.meta.env.VITE_REPO_COMMIT': JSON.stringify(gitInfo.long),
+        'import.meta.env.VITE_REPO_BRANCH': JSON.stringify(gitInfo.branch),
+        'import.meta.env.VITE_REPO_DIRTY': gitInfo.isDirty,
         'import.meta.env.VITE_REPO_VERSION': JSON.stringify(version)
     },
     test: {

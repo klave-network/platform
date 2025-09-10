@@ -1,12 +1,12 @@
-import { defineConfig as defineViteConfig } from 'vite';
+import { defineConfig as defineViteConfig, PluginOption } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import mkcert from 'vite-plugin-mkcert';
 import tailwindcss from '@tailwindcss/vite';
-import { createRequire } from 'module';
 import { version } from './package.json';
+import { current } from '../../tools/scripts/gitInfo.mjs';
 
-const git = createRequire(import.meta.url)('git-rev-sync');
+const gitInfo = current();
 
 export default defineViteConfig({
     cacheDir: '../../node_modules/.vite/ui',
@@ -29,10 +29,15 @@ export default defineViteConfig({
         host: 'klave.ui.127.0.0.1.nip.io'
     },
 
-    plugins: [mkcert({
-        keyFileName: 'klave-ui-dev-key.pem',
-        certFileName: 'klave-ui-dev-cert.pem'
-    }), tailwindcss(), react(), nxViteTsPaths()],
+    plugins: [
+        mkcert({
+            keyFileName: 'klave-ui-dev-key.pem',
+            certFileName: 'klave-ui-dev-cert.pem'
+        }),
+        tailwindcss(),
+        react(),
+        nxViteTsPaths()
+    ] as PluginOption[],
 
     // Uncomment this if you are using workers.
     // worker: {
@@ -41,9 +46,9 @@ export default defineViteConfig({
 
     define: {
         'import.meta.vitest': undefined,
-        'import.meta.env.VITE_REPO_COMMIT': JSON.stringify(git.long()),
-        'import.meta.env.VITE_REPO_BRANCH': JSON.stringify(git.branch()),
-        'import.meta.env.VITE_REPO_DIRTY': git.isDirty(),
+        'import.meta.env.VITE_REPO_COMMIT': JSON.stringify(gitInfo.long),
+        'import.meta.env.VITE_REPO_BRANCH': JSON.stringify(gitInfo.branch),
+        'import.meta.env.VITE_REPO_DIRTY': gitInfo.isDirty,
         'import.meta.env.VITE_REPO_VERSION': JSON.stringify(version)
     },
 
