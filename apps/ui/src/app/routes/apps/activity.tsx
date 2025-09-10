@@ -96,7 +96,7 @@ export const ActivityRecordListing: FC = () => {
                 No recorded activity
             </div>
             :
-            <div className="w-full text-left">
+            <div className="w-full text-left" data-color-mode="light" data-light-theme="light">
                 <Timeline clipSidebar>
                     {activitiesList.map(activity => <ActivityRecord key={activity.id} activity={activity} />)}
                 </Timeline>
