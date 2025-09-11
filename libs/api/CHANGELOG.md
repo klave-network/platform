@@ -1,4 +1,18 @@
 # Changelog
+## [1.5.4](https://github.com/klave-network/platform/compare/api@1.5.3...api@1.5.4) (2025-09-11)
+
+### Dependency Updates
+
+* `db` updated to version `1.5.3`
+* `providers` updated to version `1.5.3`
+* `constants` updated to version `1.5.3`
+* `ui-kit` updated to version `1.5.3`
+
+### Bug Fixes
+
+* **api:** Conversion of WIT world definition as `string` requires `Buffer.from` ([ce9f423](https://github.com/klave-network/platform/commit/ce9f4232b3bd454adf84bbee4a2f50b540301c6a))
+* **api:** Git versions not brokered correctly ([de4065c](https://github.com/klave-network/platform/commit/de4065cd17a0137ce91d5c8622e0f818872527a2))
+
 ## [1.5.3](https://github.com/klave-network/platform/compare/api@1.5.2...api@1.5.3) (2025-07-28)
 
 ### Dependency Updates
