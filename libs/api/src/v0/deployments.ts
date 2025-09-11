@@ -205,13 +205,13 @@ export const deploymentRouter = createTRPCRouter({
 
             let buildOutputWASMFingerprint: string | undefined = undefined;
             if (deployment.buildOutputWASM)
-                buildOutputWASMFingerprint = Utils.toHex(new Uint8Array(await crypto.subtle.digest('SHA-256', Utils.fromBase64(deployment.buildOutputWASM).slice(0))))
+                buildOutputWASMFingerprint = Utils.toHex(new Uint8Array(await crypto.subtle.digest('SHA-256', Utils.fromBase64(deployment.buildOutputWASM).slice(0))));
 
-            const { buildOutputWASM, ...rest } = deployment;
+            const { buildOutputWASM: __unusedBuildOutputWASM, ...rest } = deployment;
             return {
                 ...rest,
                 buildOutputWASMFingerprint
-            }
+            };
 
         }),
     getAll: publicProcedure
@@ -311,9 +311,9 @@ export const deploymentRouter = createTRPCRouter({
 
                 let buildOutputWASMFingerprint: string | undefined = undefined;
                 if (deployment.buildOutputWASM)
-                    buildOutputWASMFingerprint = Utils.toHex(new Uint8Array(await crypto.subtle.digest('SHA-256', Utils.fromBase64(deployment.buildOutputWASM).slice(0))))
+                    buildOutputWASMFingerprint = Utils.toHex(new Uint8Array(await crypto.subtle.digest('SHA-256', Utils.fromBase64(deployment.buildOutputWASM).slice(0))));
 
-                const { buildOutputWASM, ...rest } = deployment;
+                const { buildOutputWASM: __unusedBuildOutputWASM, ...rest } = deployment;
                 deploymentListWithFingerprints.push({
                     ...rest,
                     buildOutputWASMFingerprint
