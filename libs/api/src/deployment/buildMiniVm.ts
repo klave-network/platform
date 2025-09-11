@@ -409,13 +409,13 @@ export class BuildMiniVM {
                             };
                         } else if (message.type === 'write') {
                             if (message.contents) {
-                                if ((message.filename).endsWith('.wasm'))
+                                if (message.filename.endsWith('.wasm'))
                                     compiledBinary = message.contents ? Uint8Array.from(typeof message.contents === 'string' ? Buffer.from(message.contents) : message.contents) : new Uint8Array(0);
-                                if ((message.filename).endsWith('.wat'))
+                                if (message.filename.endsWith('.wat'))
                                     compiledWAT = typeof message.contents === 'string' ? message.contents : Buffer.from(message.contents).toString() ?? undefined;
-                                if ((message.filename).endsWith('.d.ts'))
+                                if (message.filename.endsWith('.d.ts'))
                                     compiledDTS = typeof message.contents === 'string' ? message.contents : Buffer.from(message.contents).toString() ?? undefined;
-                                if ((message.filename).endsWith('.wit'))
+                                if (message.filename.endsWith('.wit'))
                                     worldWIT = typeof message.contents === 'string' ? message.contents : Buffer.from(message.contents).toString() ?? undefined;
                             }
                         } else if (message.type === 'progress') {

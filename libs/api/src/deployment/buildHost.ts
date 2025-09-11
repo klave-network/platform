@@ -261,18 +261,21 @@ export class BuildHost {
                         const witPath: string = path.resolve(path.join(workingDirectory, appPath, witRelativePath));
                         const witEntries = fs.readdirSync(witPath, { withFileTypes: true });
                         const witWorld: string | undefined = tomlConf.package?.metadata?.component?.['world'];
+
                         let firstWorld: string | undefined;
                         let foundWitWorld = false;
                         for (const entry of witEntries) {
+
                             if (foundWitWorld)
                                 break;
                             if (!entry.isFile() || !entry.name.endsWith('.wit'))
                                 continue;
+
                             const witFilePath = path.join(witPath, entry.name);
                             const witContents = fs.readFileSync(witFilePath, 'utf-8').toString();
-
                             const worldReg = /^\s*?world\s+([\w-]+)\s*{(.*?)}/gsm;
                             const worldMatches = Array.from(witContents.matchAll(worldReg));
+
                             for (const m of worldMatches) {
                                 if (foundWitWorld)
                                     break;
@@ -280,12 +283,12 @@ export class BuildHost {
                                 if (!worldDefinition || !worldName)
                                     return;
                                 if (!firstWorld)
-                                    firstWorld = worldDefinition;
+                                    firstWorld = worldDefinition.trim();
                                 if (worldName.trim() === witWorld) {
                                     foundWitWorld = true;
                                     this.listeners['message']?.forEach(listener => listener({
                                         type: 'write',
-                                        contents: Uint8Array.from(worldDefinition),
+                                        contents: Buffer.from(worldDefinition.trim()),
                                         filename: entry.name
                                     }));
                                 }
@@ -295,7 +298,7 @@ export class BuildHost {
                         if (!foundWitWorld && firstWorld)
                             this.listeners['message']?.forEach(listener => listener({
                                 type: 'write',
-                                contents: Uint8Array.from(firstWorld),
+                                contents: Buffer.from(firstWorld),
                                 filename: 'world.wit'
                             }));
 
