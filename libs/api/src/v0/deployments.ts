@@ -4,6 +4,7 @@ import { createTRPCRouter, publicProcedure } from '../trpc';
 import { logger, scp } from '@klave/providers';
 import { sendToSecretarium } from '../deployment/deploymentController';
 import { config, RepoConfigSchemaLatest } from '@klave/constants';
+import { Utils } from '@secretarium/connector';
 
 export const deploymentRouter = createTRPCRouter({
     getByApplication: publicProcedure
@@ -185,9 +186,9 @@ export const deploymentRouter = createTRPCRouter({
                     buildOutputStdErr: true,
                     buildOutputStdOut: true,
                     buildOutputRoutes: true,
-                    buildOutputWASM: true,
                     buildOutputDTS: true,
                     buildOutputWIT: true,
+                    buildOutputWASM: true,
                     buildOutputHasUI: true,
                     buildOutputs: true,
                     configSnapshot: true,
@@ -199,7 +200,19 @@ export const deploymentRouter = createTRPCRouter({
                 }
             });
 
-            return deployment;
+            if (!deployment)
+                return null;
+
+            let buildOutputWASMFingerprint: string | undefined = undefined;
+            if (deployment.buildOutputWASM)
+                buildOutputWASMFingerprint = Utils.toHex(new Uint8Array(await crypto.subtle.digest('SHA-256', Utils.fromBase64(deployment.buildOutputWASM).slice(0))))
+
+            const { buildOutputWASM, ...rest } = deployment;
+            return {
+                ...rest,
+                buildOutputWASMFingerprint
+            }
+
         }),
     getAll: publicProcedure
         .query(async ({ ctx: { prisma, session: { user } } }) => {
@@ -280,6 +293,7 @@ export const deploymentRouter = createTRPCRouter({
                     buildOutputStdErr: true,
                     buildOutputStdOut: true,
                     buildOutputRoutes: true,
+                    buildOutputWASM: true,
                     deploymentAddress: {
                         select: {
                             fqdn: true
@@ -292,7 +306,20 @@ export const deploymentRouter = createTRPCRouter({
                 take: 20
             });
 
-            return deploymentList;
+            const deploymentListWithFingerprints = [];
+            for (const deployment of deploymentList) {
+
+                let buildOutputWASMFingerprint: string | undefined = undefined;
+                if (deployment.buildOutputWASM)
+                    buildOutputWASMFingerprint = Utils.toHex(new Uint8Array(await crypto.subtle.digest('SHA-256', Utils.fromBase64(deployment.buildOutputWASM).slice(0))))
+
+                const { buildOutputWASM, ...rest } = deployment;
+                deploymentListWithFingerprints.push({
+                    ...rest,
+                    buildOutputWASMFingerprint
+                });
+            }
+            return deploymentListWithFingerprints;
         }),
     getDeploymentOutputs: publicProcedure
         .input(z.object({
