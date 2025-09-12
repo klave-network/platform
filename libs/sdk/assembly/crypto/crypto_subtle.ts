@@ -541,6 +541,43 @@ export class SubtleCrypto {
         return { data: cryptoKey, err: null };
     }
 
+    static deriveBits<T>(algorithm: T, baseKey: CryptoKey | null, length: u32): Result<ArrayBuffer, Error> {
+        if (!baseKey)
+            return { data: null, err: new Error('Invalid baseKey key') };
+
+        if (length == 0)
+            return { data: null, err: new Error('Invalid length') };
+
+        let result: Result<ArrayBuffer, Error> = { data: null, err: null };
+
+        if (algorithm instanceof EcdhKeyDeriveParams) {
+            if (!algorithm.publicKey)
+                return { data: null, err: new Error('Invalid ECDH parameters: invalid public key') };
+
+            if (algorithm.name != 'ECDH')
+                return { data: null, err: new Error('Invalid ECDH parameters: invalid algorithm') };
+
+            const derivationMetadataEcdh = { public_key: algorithm.publicKey.id } as idlV1.ecdh_derivation_metadata;
+
+            result = CryptoImpl.deriveBits(baseKey.id, 0, JSON.stringify(derivationMetadataEcdh), length);
+
+        } else if (algorithm instanceof HkdfParams) {
+            const shaMetadata = CryptoUtil.getShaMetadata(algorithm.hash);
+            if(shaMetadata.err)
+                return { data: null, err: shaMetadata.err };
+            
+            const hkdfMetdata: idlV1.hkdf_metadata = {sha_metadata: shaMetadata.data!, info: Utils.convertToU8Array(Uint8Array.wrap(algorithm.info)), salt: Utils.convertToU8Array(Uint8Array.wrap(algorithm.salt))};
+
+            result = CryptoImpl.deriveBits(baseKey.id, 1, JSON.stringify(hkdfMetdata), length);
+        } else
+            return { data: null, err: new Error('Invalid algorithm') };
+
+        if(result.err)
+            return { data: null, err: result.err };
+
+        return { data: result.data!, err: null };
+    }
+
     static exportKey(format: string, key: CryptoKey | null): Result<ArrayBuffer, Error> {
         if (!key)
             return { data: null, err: new Error('Invalid key') };
