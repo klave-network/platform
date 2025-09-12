@@ -514,7 +514,7 @@ export class SubtleCrypto {
             if(shaMetadata.err)
                 return { data: null, err: shaMetadata.err };
             
-            const hkdfMetdata: idlV1.hkdf_metadata = {sha_metadata: shaMetadata.data!, info: Utils.convertToU8Array(Uint8Array.wrap(algorithm.info)), salt: Utils.convertToU8Array(Uint8Array.wrap(algorithm.salt))};
+            const hkdfMetdata: idlV1.hkdf_metadata = {hash_info: shaMetadata.data!, info: Utils.convertToU8Array(Uint8Array.wrap(algorithm.info)), salt: Utils.convertToU8Array(Uint8Array.wrap(algorithm.salt))};
             
             if (derivedKeyAlgorithm instanceof AesKeyGenParams) {
                 const aesMetadataResult = CryptoUtil.getAESMetadata(derivedKeyAlgorithm);
@@ -566,7 +566,7 @@ export class SubtleCrypto {
             if(shaMetadata.err)
                 return { data: null, err: shaMetadata.err };
             
-            const hkdfMetdata: idlV1.hkdf_metadata = {sha_metadata: shaMetadata.data!, info: Utils.convertToU8Array(Uint8Array.wrap(algorithm.info)), salt: Utils.convertToU8Array(Uint8Array.wrap(algorithm.salt))};
+            const hkdfMetdata: idlV1.hkdf_metadata = {hash_info: shaMetadata.data!, info: Utils.convertToU8Array(Uint8Array.wrap(algorithm.info)), salt: Utils.convertToU8Array(Uint8Array.wrap(algorithm.salt))};
 
             result = CryptoImpl.deriveBits(baseKey.id, 1, JSON.stringify(hkdfMetdata), length);
         } else

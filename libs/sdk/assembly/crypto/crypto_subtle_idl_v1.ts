@@ -206,7 +206,7 @@ export class encryption_info {
 
 @json
 export class hkdf_metadata {
-    sha_metadata!: sha_metadata;
+    hash_info!: sha_metadata;
     salt!: Array<u8>;
     info!: Array<u8>;
 }
