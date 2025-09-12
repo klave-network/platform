@@ -280,6 +280,23 @@ impl CryptoImpl {
         }
     }
 
+    pub fn derive_bits(
+        key_name: &str,
+        derivation_algorithm: u32,
+        derivation_metadata: &str,
+        length: u32,
+    ) -> Result<Vec<u8>, Box<dyn Error>> {
+        match sdk::derive_bits(
+            key_name,
+            derivation_algorithm as i32,
+            derivation_metadata,
+            length as i32,
+        ) {
+            Ok(result) => Ok(result),
+            Err(err) => Err(err.into()),
+        }
+    }
+
     pub fn save_key(key_name: &str) -> Result<(), Box<dyn Error>> {
         match sdk::save_key(key_name) {
             Ok(_) => Ok(()),

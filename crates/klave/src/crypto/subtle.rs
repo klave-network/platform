@@ -883,6 +883,49 @@ pub fn derive_key(
     Ok(crypto_key)
 }
 
+pub fn derive_bits(
+    derivation_algorithm: &KeyDerivationAlgorithm,
+    base_key: &CryptoKey,
+    length: u32,
+) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+    if base_key.id.is_empty() {
+        return Err("Invalid key".into());
+    }
+    if length == 0 {
+        return Err("Invalid Length".into());
+    }
+    let base_key_name = &base_key.id;
+
+    let derivation_algo_metadata: String;
+    let derivation_algo_id: DerivationAlgorithm;
+
+    match derivation_algorithm {
+        KeyDerivationAlgorithm::Ecdh(params) => {
+            derivation_algo_metadata = match util::get_ecdh_metadata(params) {
+                Ok(result) => serde_json::to_string(&result)?,
+                Err(e) => return Err(e),
+            };
+            derivation_algo_id = DerivationAlgorithm::Ecdh;
+        }
+        KeyDerivationAlgorithm::Hkdf(params) => {
+            derivation_algo_metadata = match util::get_hkdf_metadata(params) {
+                Ok(result) => serde_json::to_string(&result)?,
+                Err(e) => return Err(e),
+            };
+            derivation_algo_id = DerivationAlgorithm::Hkdf;
+        }
+    }
+
+    let derived_bits = CryptoImpl::derive_bits(
+        base_key_name,
+        derivation_algo_id as u32,
+        &derivation_algo_metadata,
+        length,
+    )?;
+
+    Ok(derived_bits)
+}
+
 pub fn save_key(
     key: &CryptoKey,
     key_persisted_name: &str,
