@@ -32,7 +32,7 @@ pub struct TaggedShaMetadata {
 #[derive(Deserialize, Serialize)]
 pub struct HmacMetadata {
     pub sha_metadata: ShaMetadata,
-    pub length: u16,
+    pub length: u32,
 }
 
 #[derive(Deserialize, Serialize)]

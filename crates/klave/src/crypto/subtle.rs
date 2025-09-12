@@ -118,14 +118,14 @@ impl Default for EcKeyGenParams {
 #[derive(Deserialize, Serialize)]
 pub struct HmacKeyGenParams {
     pub hash: String,
-    pub length: u16,
+    pub length: u32,
 }
 
 impl Default for HmacKeyGenParams {
     fn default() -> Self {
         HmacKeyGenParams {
             hash: "SHA2-256".to_string(),
-            length: 64,
+            length: 0, // Default = block size of hash algo in bits
         }
     }
 }
