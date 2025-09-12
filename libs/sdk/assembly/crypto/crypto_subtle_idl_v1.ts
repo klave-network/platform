@@ -94,7 +94,7 @@ export class aes_metadata {
 @json
 export class hmac_metadata {
     sha_metadata!: sha_metadata;
-    length: u16 = 0;
+    length: u32 = 0;
 }
 
 @json

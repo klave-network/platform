@@ -67,7 +67,7 @@ export class AesKeyGenParams {
 @json
 export class HmacKeyGenParams {
     hash: string = 'SHA2-256';
-    length: u16 = 0;
+    length: u32 = 0; // default = block size of hash in bits
 }
 
 export class RsaOaepParams {
@@ -481,7 +481,7 @@ export class SubtleCrypto {
             return { data: null, err: new Error('Failed to unwrap key') };
     }
 
-    static deriveKey<T, E>(algorithm: T, baseKey: CryptoKey, derivedKeyAlgorithm: E, extractable: boolean, usages: string[]): Result<CryptoKey, Error> {
+    static deriveKey<T, E>(algorithm: T, baseKey: CryptoKey | null, derivedKeyAlgorithm: E, extractable: boolean, usages: string[]): Result<CryptoKey, Error> {
         if (!baseKey)
             return { data: null, err: new Error('Invalid baseKey key') };
 
