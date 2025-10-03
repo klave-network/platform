@@ -194,8 +194,10 @@ export class SubtleCrypto {
         } else if (algorithm instanceof AesGcmParams) {
             const iv = Utils.convertToU8Array(Uint8Array.wrap(algorithm.iv));
             const additionalData = Utils.convertToU8Array(Uint8Array.wrap(algorithm.additionalData));
-            const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: algorithm.tagLength };
-            return CryptoImpl.encrypt(key.id, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams), true), clear_text);
+            const aesGcmParams = CryptoUtil.getAESGCMMetadata(iv, additionalData, algorithm.tagLength);
+            if (!aesGcmParams.data)
+                return { data: null, err: aesGcmParams.err };
+            return CryptoImpl.encrypt(key.id, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams.data!), true), clear_text);
 
         } else
             return { data: null, err: new Error('Invalid algorithm') };
@@ -214,8 +216,10 @@ export class SubtleCrypto {
         } else if (algorithm instanceof AesGcmParams) {
             const iv = Utils.convertToU8Array(Uint8Array.wrap(algorithm.iv));
             const additionalData = Utils.convertToU8Array(Uint8Array.wrap(algorithm.additionalData));
-            const aesGcmParams: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: algorithm.tagLength };
-            return CryptoImpl.decrypt(key.id, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams), true), cipher_text);
+            const aesGcmParams = CryptoUtil.getAESGCMMetadata(iv, additionalData, algorithm.tagLength);
+            if (!aesGcmParams.data)
+                return { data: null, err: aesGcmParams.err };
+            return CryptoImpl.decrypt(key.id, idlV1.encryption_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(aesGcmParams.data!), true), cipher_text);
         } else
             return { data: null, err: new Error('Invalid algorithm') };
     }
@@ -380,8 +384,10 @@ export class SubtleCrypto {
         } else if (wrapAlgo instanceof AesGcmParams) {
             const iv = Utils.convertToU8Array(Uint8Array.wrap(wrapAlgo.iv));
             const additionalData = Utils.convertToU8Array(Uint8Array.wrap(wrapAlgo.additionalData));
-            const wrappingInfo: idlV1.aes_gcm_encryption_metadata = { iv: iv, additionalData: additionalData, tagLength: wrapAlgo.tagLength };
-            return CryptoImpl.wrapKey(wrappingKey.id, idlV1.wrapping_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(wrappingInfo), true), key.id, formatData.format);
+            const wrappingInfo = CryptoUtil.getAESGCMMetadata(iv, additionalData, wrapAlgo.tagLength);
+            if (!wrappingInfo.data)
+                return { data: null, err: wrappingInfo.err };
+            return CryptoImpl.wrapKey(wrappingKey.id, idlV1.wrapping_algorithm.aes_gcm, String.UTF8.encode(JSON.stringify(wrappingInfo.data!), true), key.id, formatData.format);
         } else if (wrapAlgo instanceof NamedAlgorithm) {
             if (wrapAlgo.name == 'AES-KW' || wrapAlgo.name == 'aes-kw') {
                 const wrappingInfo: idlV1.aes_kw_wrapping_metadata = { with_padding: true };

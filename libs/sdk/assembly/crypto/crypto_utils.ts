@@ -4,7 +4,7 @@
  */
 
 import * as idlV1 from './crypto_subtle_idl_v1';
-import { RsaHashedKeyGenParams, EcKeyGenParams, AesKeyGenParams, HmacKeyGenParams } from './crypto_subtle';
+import { RsaHashedKeyGenParams, EcKeyGenParams, AesKeyGenParams, HmacKeyGenParams, AesGcmParams } from './crypto_subtle';
 import { Result } from '../index';
 
 export class KeyFormatWrapper
@@ -153,6 +153,25 @@ export class CryptoUtil
             return {data: null, err: new Error('Invalid AES key size')};
 
         return {data: {length: bitsize}, err: null};
+    }
+
+    static getAESGCMMetadata(iv: u8[], additionalData: u8[], tagLength: u32): Result<idlV1.aes_gcm_encryption_metadata, Error>
+    {
+        let bitsize = idlV1.aes_tag_length.TAG_128;
+        if (tagLength == 96)
+            bitsize = idlV1.aes_tag_length.TAG_96;
+        else if (tagLength == 104)
+            bitsize = idlV1.aes_tag_length.TAG_104;
+        else if (tagLength == 112)
+            bitsize = idlV1.aes_tag_length.TAG_112;
+        else if (tagLength == 120)
+            bitsize = idlV1.aes_tag_length.TAG_120;
+        else if (tagLength == 128)
+            bitsize = idlV1.aes_tag_length.TAG_128;
+        else
+            return {data: null, err: new Error('Invalid Tag Length. Tag length can be only 96, 104, 112, 120 or 128 bits')};
+
+        return {data: { iv: iv, additionalData: additionalData, tagLength: bitsize }, err: null};
     }
 
     static getHMACMetadata(params: HmacKeyGenParams): Result<idlV1.hmac_metadata, Error>
