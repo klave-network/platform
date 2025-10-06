@@ -69,7 +69,7 @@ export async function app(fastify: FastifyInstance) {
                 resolve(content);
             });
             req.raw.on('error', (err) => {
-                fastify.log.error('Error reading hook body:', err);
+                fastify.log.error('Error reading hook body:' + err);
             });
         });
         const responseRegister: Promise<[string, number]>[] = [];
@@ -88,7 +88,7 @@ export async function app(fastify: FastifyInstance) {
                 fetch(base, {
                     method: req.method,
                     headers: newHeaders as Record<string, string>,
-                    body: rawContent
+                    body: Buffer.from(rawContent)
                 }).then((response) => {
                     fastify.log.debug(undefined, `Receiving response from ${name}`);
                     resolve([name, response.status]);
@@ -159,7 +159,7 @@ export async function app(fastify: FastifyInstance) {
                 return await preRes.status(400).send({ ok: false });
             data = parseResult.data;
         } catch (error) {
-            fastify.log.error('Failed to parse the content', error);
+            fastify.log.error('Failed to parse the content' + error);
             return await preRes.status(400).send({ ok: false });
         }
         if (!collection)

@@ -1,4 +1,17 @@
 # Changelog
+## [1.5.2](https://github.com/klave-network/platform/compare/ui@1.5.1...ui@1.5.2) (2025-09-11)
+
+### Dependency Updates
+
+* `constants` updated to version `1.5.1`
+* `db` updated to version `1.5.1`
+* `api` updated to version `1.5.1`
+
+### Bug Fixes
+
+* **ui:** `Buffer` is not available in the broswer ([dd2b5ff](https://github.com/klave-network/platform/commit/dd2b5fff91ad05870e5bbbb6daf3ca89b9faf54e))
+* **ui:** Remove `@primer/react` interfering base styles ([03f3acf](https://github.com/klave-network/platform/commit/03f3acf6e187e53b0469f52364bfa75a639d324b))
+
 ## [1.5.1](https://github.com/klave-network/platform/compare/ui@1.5.0...ui@1.5.1) (2025-07-24)
 
 ### Dependency Updates

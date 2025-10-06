@@ -16,6 +16,28 @@ process.on('uncaughtException', (error) => {
     console.error('Uncaught Exception:', error);
 });
 
+process.on('SIGTERM', () => {
+    logger.info('SIGTERM received, planning to shut down gracefully...');
+    dispatchOps
+        .stop()
+        .then(() => {
+            setTimeout(() => {
+                dbOps.stop()
+                    .then(() => {
+                        logger.info('Database connection closed.');
+                        process.exit(0);
+                    })
+                    .catch((error) => {
+                        logger.error('Error during shutdown:', error);
+                        process.exit(1);
+                    });
+            }, 250 * 60);
+        })
+        .catch((error) => {
+            logger.error('Error during graceful shutdown:', error);
+        });
+});
+
 const onlineChain = async () => config.get('KLAVE_OFFLINE_DEV') === 'true'
     ? Promise.resolve()
     : Promise.resolve()
