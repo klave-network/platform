@@ -1,4 +1,14 @@
 # Changelog
+## [0.4.7](https://github.com/klave-network/platform/compare/create@0.4.6...create@0.4.7) (2025-10-06)
+
+### Dependency Updates
+
+* `sdk` updated to version `0.4.6`
+
+### Bug Fixes
+
+* **create:** Respect `npm` resolution strategy ([9bf7b78](https://github.com/klave-network/platform/commit/9bf7b788140ea9c2910aea9b4471c4b379dda937))
+
 ## [0.4.6](https://github.com/klave-network/platform/compare/create@0.4.5...create@0.4.6) (2025-07-23)
 
 ### Dependency Updates
