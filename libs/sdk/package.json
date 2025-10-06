@@ -24,7 +24,7 @@
         "stac": "./bin/stac.js"
     },
     "dependencies": {
-        "@klave/compiler": "1.0.8",
+        "@klave/compiler": "1.0.9",
         "as-base64": "0.2.0",
         "chalk": "^4.1.2",
         "fs-extra": "^11.3.2",
