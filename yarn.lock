@@ -17388,10 +17388,10 @@ react-dom@19.2.0, react-dom@^19:
   dependencies:
     scheduler "^0.27.0"
 
-react-email@4.2.12:
-  version "4.2.12"
-  resolved "https://registry.yarnpkg.com/react-email/-/react-email-4.2.12.tgz#16db584d378435e04e5edc40e64b0199d873bec3"
-  integrity sha512-Cp6nYAG9uL4//X/96wDSKxGqVTXsaRMuD1ub0G0iBcfTqLel4VVre3kicq7RraplDuj+ATlqSZu47d7P2ULP5w==
+react-email@4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/react-email/-/react-email-4.3.0.tgz#d7d2f959e2cf71e32f76b743d59f79236f9f4d16"
+  integrity sha512-XFHCSfhdlO7k5q2TYGwC0HsVh5Yn13YaOdahuJEUEOfOJKHEpSP4PKg7R/RiKFoK9cDvzunhY+58pXxz0vE2zA==
   dependencies:
     "@babel/parser" "^7.27.0"
     "@babel/traverse" "^7.27.0"

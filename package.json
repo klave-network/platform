@@ -161,7 +161,7 @@
         "rate-limiter-flexible": "7.4.0",
         "react": "19.2.0",
         "react-dom": "19.2.0",
-        "react-email": "4.2.12",
+        "react-email": "4.3.0",
         "react-highlight-words": "0.21.0",
         "react-hook-form": "7.64.0",
         "react-router-dom": "6.30.1",
