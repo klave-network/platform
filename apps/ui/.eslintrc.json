@@ -22,7 +22,9 @@
                 "@nx/enforce-module-boundaries": [
                     "error",
                     {
-                        "allow": [],
+                        "allow": [
+                            "../../tools/scripts/gitInfo.mjs"
+                        ],
                         "depConstraints": [
                             {
                                 "sourceTag": "*",

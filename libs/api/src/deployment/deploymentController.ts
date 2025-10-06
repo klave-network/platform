@@ -422,7 +422,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                 return;
                             }
 
-                            const { result: { wasm, wat, dts, routes, hasUI } } = buildResult;
+                            const { result: { wasm, wat, dts, wit, routes, hasUI } } = buildResult;
                             const wasmB64 = Utils.toBase64(wasm);
 
                             logger.debug(`Compilation was successful ${deployment.id} (${prettyBytes(wasmB64.length)})`, {
@@ -456,6 +456,7 @@ export const deployToSubstrate = async (deploymentContext: DeploymentContext<Dep
                                     buildOutputs: buildResult.buildOutputs,
                                     buildOutputWASM: wasmB64,
                                     buildOutputWAT: wat,
+                                    buildOutputWIT: wit,
                                     buildOutputDTS: dts,
                                     buildOutputRoutes: routes,
                                     buildOutputHasUI: hasUI

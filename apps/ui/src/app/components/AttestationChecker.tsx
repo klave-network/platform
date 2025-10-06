@@ -1,7 +1,7 @@
 import { FC, useEffect, useMemo, useState } from 'react';
 import { UilDownloadAlt, UilExternalLinkAlt, UilShieldCheck, UilShieldExclamation, UilSpinner } from '@iconscout/react-unicons';
 import { Utils } from '@secretarium/connector';
-import api from '../utils/api';
+import api, { httpApi } from '../utils/api';
 import { useSecretariumQuery } from '../utils/secretarium';
 import { BackendVersion } from '@klave/constants';
 
@@ -119,21 +119,24 @@ export const AttestationChecker: FC<AttestationCheckerProps> = ({ deploymentId, 
     const contractIntegrityHash = Utils.toBase64(new Uint8Array(quoteDataTip?.quote?.report_body?.report_data ?? []));
 
     useEffect(() => {
-        if (quoteDataTip?.quote?.report_body?.report_data && deployment?.buildOutputWASM) {
-            const reportData = new Uint8Array(quoteDataTip?.quote.report_body.report_data);
-            const contractBytes = Utils.fromBase64(deployment.buildOutputWASM);
-            Utils.hash(contractBytes).then(async (contractBytesHash) => {
-                const validation = new Uint8Array(challenge.length + contractBytesHash.length);
-                validation.set(challenge);
-                validation.set(contractBytesHash, challenge.length);
-                return Utils.hash(validation).then((validationHash) => {
-                    const reportHash = reportData.subarray(0, 32);
-                    if (Utils.toHex(reportHash) === Utils.toHex(validationHash))
-                        setIsContractValid(true);
-                    setIsValidating(false);
-                });
+        if (quoteDataTip?.quote?.report_body?.report_data && deployment)
+            httpApi.v0.deployments.getDeploymentOutputs.query({ deploymentId: deployment.id }).then((outputs) => {
+                if (outputs?.buildOutputWASM) {
+                    const reportData = new Uint8Array(quoteDataTip?.quote.report_body.report_data);
+                    const contractBytes = Utils.fromBase64(outputs.buildOutputWASM);
+                    Utils.hash(contractBytes).then(async (contractBytesHash) => {
+                        const validation = new Uint8Array(challenge.length + contractBytesHash.length);
+                        validation.set(challenge);
+                        validation.set(contractBytesHash, challenge.length);
+                        return Utils.hash(validation).then((validationHash) => {
+                            const reportHash = reportData.subarray(0, 32);
+                            if (Utils.toHex(reportHash) === Utils.toHex(validationHash))
+                                setIsContractValid(true);
+                            setIsValidating(false);
+                        });
+                    }).catch(() => { return; });
+                }
             }).catch(() => { return; });
-        }
     }, [quoteData, deployment, challenge]);
 
     return <>

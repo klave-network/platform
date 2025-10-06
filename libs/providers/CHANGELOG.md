@@ -1,4 +1,10 @@
 # Changelog
+## [1.4.3](https://github.com/klave-network/platform/compare/providers@1.4.2...providers@1.4.3) (2025-09-11)
+
+### Dependency Updates
+
+* `constants` updated to version `1.4.2`
+* `db` updated to version `1.4.2`
 ## [1.4.2](https://github.com/klave-network/platform/compare/providers@1.4.1...providers@1.4.2) (2025-07-28)
 
 ### Dependency Updates
