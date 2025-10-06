@@ -257,6 +257,51 @@ export class BuildHost {
                             };
                         });
 
+                        const witRelativePath: string = tomlConf.package?.metadata?.component?.['wit-path'] ?? 'wit';
+                        const witPath: string = path.resolve(path.join(workingDirectory, appPath, witRelativePath));
+                        const witEntries = fs.readdirSync(witPath, { withFileTypes: true });
+                        const witWorld: string | undefined = tomlConf.package?.metadata?.component?.['world'];
+
+                        let firstWorld: string | undefined;
+                        let foundWitWorld = false;
+                        for (const entry of witEntries) {
+
+                            if (foundWitWorld)
+                                break;
+                            if (!entry.isFile() || !entry.name.endsWith('.wit'))
+                                continue;
+
+                            const witFilePath = path.join(witPath, entry.name);
+                            const witContents = fs.readFileSync(witFilePath, 'utf-8').toString();
+                            const worldReg = /^\s*?world\s+([\w-]+)\s*{(.*?)}/gsm;
+                            const worldMatches = Array.from(witContents.matchAll(worldReg));
+
+                            for (const m of worldMatches) {
+                                if (foundWitWorld)
+                                    break;
+                                const [worldDefinition, worldName] = m;
+                                if (!worldDefinition || !worldName)
+                                    return;
+                                if (!firstWorld)
+                                    firstWorld = worldDefinition.trim();
+                                if (worldName.trim() === witWorld) {
+                                    foundWitWorld = true;
+                                    this.listeners['message']?.forEach(listener => listener({
+                                        type: 'write',
+                                        contents: Buffer.from(worldDefinition.trim()),
+                                        filename: entry.name
+                                    }));
+                                }
+                            }
+                        }
+
+                        if (!foundWitWorld && firstWorld)
+                            this.listeners['message']?.forEach(listener => listener({
+                                type: 'write',
+                                contents: Buffer.from(firstWorld),
+                                filename: 'world.wit'
+                            }));
+
                         const appCompiledPath = path.join(workingDirectory, 'target', 'wasm32-unknown-unknown', 'release');
                         fs.readdirSync(appCompiledPath).forEach(file => {
                             const filename = file.split('.').shift();

@@ -55,7 +55,7 @@ export const probotMiddlewareHandlerRegistration = (app: Express) => {
             if (!dHeaders['x-github-event'])
                 return;
 
-            let dBody = Buffer.from(new ArrayBuffer(0));
+            let dBody: Buffer = Buffer.from(new ArrayBuffer(0));
             if (body) {
                 if (typeof body === 'string') {
                     dBody = Buffer.from(body);

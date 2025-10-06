@@ -14,8 +14,7 @@ export const telemetryOps = {
                 traceExporter,
                 instrumentations: [
                     new PrismaInstrumentation({
-                        enabled: true,
-                        middleware: true
+                        enabled: true
                     })
                 ]
             });

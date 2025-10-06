@@ -2,7 +2,7 @@ import { FC, useEffect, useMemo, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import * as Tabs from '@radix-ui/react-tabs';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import { UilExclamationTriangle, UilExternalLinkAlt, UilLock, UilLockSlash, UilSpinner } from '@iconscout/react-unicons';
+import { UilDownloadAlt, UilExclamationTriangle, UilExternalLinkAlt, UilLock, UilLockSlash, UilSpinner } from '@iconscout/react-unicons';
 import { Utils } from '@secretarium/crypto';
 import * as NivoGeo from '@nivo/geo';
 import Ansi from 'ansi-to-react';
@@ -23,7 +23,6 @@ export const AppDeploymentDetail: FC = () => {
     const scrollPointRef = useRef<HTMLDivElement>(null);
     const [shouldAutoScroll] = useState(false);
     const [effectiveClusterFQDN, setEffectiveClusterFQDN] = useState<string>();
-    const [WASMFingerprint, setWASMFingerprint] = useState<string>();
     const { data: secretariumNodeInfo, isLoading: isLoadingSecretariumNodeInfo } = api.v0.system.getSecretariumNode.useQuery();
     const { data: uiHostingInfo } = api.v0.system.getUIHostingDomain.useQuery();
     const { data: deployment, isLoading: isLoadingDeployments } = api.v0.deployments.getById.useQuery({ deploymentId: deploymentId ?? '' }, {
@@ -50,17 +49,6 @@ export const AppDeploymentDetail: FC = () => {
             return url.host;
         return undefined;
     }, [secretariumNodeInfo]);
-
-    useEffect(() => {
-
-        if (!deployment?.buildOutputWASM)
-            return;
-
-        crypto.subtle.digest('SHA-256', Utils.fromBase64(deployment.buildOutputWASM)).then((hash) => {
-            setWASMFingerprint(Utils.toHex(new Uint8Array(hash)));
-        }).catch(() => { return; });
-
-    }, [deployment?.buildOutputWASM]);
 
     useEffect(() => {
         if (!deployment)
@@ -180,6 +168,23 @@ export const AppDeploymentDetail: FC = () => {
         install: [],
         build: []
     };
+
+    const downloadWASM = () => {
+        httpApi.v0.deployments.getDeploymentOutputs.query({ deploymentId: deployment.id }).then((outputs) => {
+            const file = new Blob([Utils.fromBase64(outputs?.buildOutputWASM ?? '').slice(0)], { type: 'application/wasm' });
+            const url = URL.createObjectURL(file);
+            const element = document.createElement('a');
+            element.href = url;
+            element.download = `wasm_${deployment.deploymentAddress?.fqdn ?? 'noop'}_${deployment.id}.wasm`;
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }).catch(() => {
+            console.error('Error downloading WASM file');
+            return;
+        });
+    };
+
     return <div className="flex flex-col w-full mb-7">
         <div className="flex w-full justify-between">
             <div className='mb-10'>
@@ -302,7 +307,7 @@ export const AppDeploymentDetail: FC = () => {
                         <h2 className='font-bold mb-3'>Code Explorer</h2>
                         <h3 className='mb-3'>Type declarations</h3>
                         <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-slate-100 dark:bg-gray-800 p-3'>
-                            {deployment.buildOutputDTS}
+                            {deployment.buildOutputDTS ?? deployment.buildOutputWIT ?? 'No type declarations were generated for this build.'}
                         </pre>
                         <h3 className='mt-5 mb-3'>WASM</h3>
                         {deployment.sourceType?.includes('rust')
@@ -312,11 +317,9 @@ export const AppDeploymentDetail: FC = () => {
                             </pre>
                             : null}
                         <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full bg-slate-100 dark:bg-gray-800 p-3'>
-                            SHA256:{WASMFingerprint}
+                            SHA256:{deployment.buildOutputWASMFingerprint}
                         </pre>
-                        <pre className='overflow-auto whitespace-pre-wrap break-words w-full max-w-full max-h-[50vh] bg-slate-100 dark:bg-gray-800 p-3 mt-2'>
-                            {deployment.buildOutputWASM}
-                        </pre>
+                        <button onClick={downloadWASM} className='mt-2 hover:cursor-pointer text-klave-light-blue hover:underline flex align-middle items-center'>Download WASM <UilDownloadAlt className='inline-block h-4' /></button>
                     </div>
                 </Tabs.Content>
                 <Tabs.Content value="ui">

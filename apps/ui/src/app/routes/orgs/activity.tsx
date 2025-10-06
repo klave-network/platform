@@ -65,7 +65,7 @@ export const OrganisationRecordListing: FC = () => {
                 No recorded activities
             </div>
             :
-            <div className="w-full text-left">
+            <div className="w-full text-left" data-color-mode="light" data-light-theme="light">
                 <Timeline clipSidebar>
                     {sortedApplications.map(application => <ApplicationRecord key={application.id} application={application} />)}
                 </Timeline>

@@ -1,6 +1,6 @@
 import { FC, PropsWithChildren, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider, BaseStyles } from '@primer/react';
+import { ThemeProvider } from '@primer/react';
 import { StyleSheetManager } from 'styled-components';
 import isPropValid from '@emotion/is-prop-valid';
 import { hookApi, apiClientOptions } from './utils/api';
@@ -12,13 +12,11 @@ export const Providers: FC<PropsWithChildren> = ({ children }) => {
 
     return <StyleSheetManager shouldForwardProp={shouldForwardProp}>
         <ThemeProvider>
-            <BaseStyles>
-                <hookApi.Provider client={trpcClient} queryClient={queryClient}>
-                    <QueryClientProvider client={queryClient}>
-                        {children}
-                    </QueryClientProvider>
-                </hookApi.Provider>
-            </BaseStyles>
+            <hookApi.Provider client={trpcClient} queryClient={queryClient}>
+                <QueryClientProvider client={queryClient}>
+                    {children}
+                </QueryClientProvider>
+            </hookApi.Provider>
         </ThemeProvider>
     </StyleSheetManager>;
 };

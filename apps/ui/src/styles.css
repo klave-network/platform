@@ -1,8 +1,13 @@
 @import 'tailwindcss';
+/* @import '@primer/primitives/dist/css/primitives.css'; */
 @import '@primer/primitives/dist/css/functional/themes/light.css';
 
 @plugin '@tailwindcss/typography' {}
-@plugin '@tailwindcss/forms' { strategy: 'class' }
+
+@plugin '@tailwindcss/forms' {
+    strategy: 'class'
+}
+
 @plugin 'daisyui' {}
 
 @theme {
@@ -20,6 +25,10 @@
     .rtl {
         direction: rtl;
     }
+    
+.prc-src-BaseStyles-dl-St a:not([class*='prc-']):not([class*='PRC-']):not([class*='Primer_Brand__']) {
+    color: initial;
+}
 }
 
 /* See Alpine.js: https://github.com/alpinejs/alpine#x-cloak */
