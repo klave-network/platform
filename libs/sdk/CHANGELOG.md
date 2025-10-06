@@ -1,4 +1,28 @@
 # Changelog
+## [0.18.0](https://github.com/klave-network/platform/compare/sdk@0.17.3...sdk@0.18.0) (2025-10-06)
+
+### Dependency Updates
+
+* `compiler` updated to version `0.17.3`
+* `constants` updated to version `0.17.3`
+
+### Features
+
+* **sdk:** Add deriveBits method in cryptoSubtle ([2663317](https://github.com/klave-network/platform/commit/2663317cef11c6472f4782a25cab6a30aefdaa79))
+* **sdk:** KN-323 - Add AS PostGre Management ([#367](https://github.com/klave-network/platform/issues/367)) ([ab4d31f](https://github.com/klave-network/platform/commit/ab4d31fb5b7dddb38e52941e6de4a2e12d385118))
+
+
+### Bug Fixes
+
+* **sdk:** Apply linting ([5073fa1](https://github.com/klave-network/platform/commit/5073fa178a122bd2e31daa9dcf76d1fbed5274b7))
+* **sdk:** Enable any size HMAC key ([51e4e48](https://github.com/klave-network/platform/commit/51e4e48112bd03ebfa200fa24439e0fff8333e8e))
+* **sdk:** Export missing types ([97ea4d9](https://github.com/klave-network/platform/commit/97ea4d932ecdfb0a95dbf87defb295084409fcae))
+* **sdk:** Fix AesGcmParams taglength conversion ([3b7369d](https://github.com/klave-network/platform/commit/3b7369d82a7273cb01517c40e651339931eec043))
+* **sdk:** Fix deriveKey method ([78d0219](https://github.com/klave-network/platform/commit/78d0219fe155c6a6f9a6f7c907720e7c7a6d4f12))
+* **sdk:** Fix HKDF key derivation and update EcdhKeyDeriveParams object ([3b28e95](https://github.com/klave-network/platform/commit/3b28e953f44bb03a92eed013b13388f019c7217e))
+* **sdk:** Fix hkdf_metadata param name ([cd3d741](https://github.com/klave-network/platform/commit/cd3d741c4356ed7dde2480e55960f4bbb1e88f33))
+* **sdk:** Fix HMAC key length back to bits ([6b4e773](https://github.com/klave-network/platform/commit/6b4e773539b90f2e9abf2834daf6a847e05b7c20))
+
 ## [0.17.3](https://github.com/klave-network/platform/compare/sdk@0.17.2...sdk@0.17.3) (2025-07-23)
 
 ### Dependency Updates
