@@ -517,29 +517,29 @@ export class SubtleCrypto {
             }
         } else if (algorithm instanceof HkdfParams) {
             const shaMetadata = CryptoUtil.getShaMetadata(algorithm.hash);
-            if(shaMetadata.err)
+            if (shaMetadata.err)
                 return { data: null, err: shaMetadata.err };
-            
-            const hkdfMetdata: idlV1.hkdf_metadata = {hash_info: shaMetadata.data!, info: Utils.convertToU8Array(Uint8Array.wrap(algorithm.info)), salt: Utils.convertToU8Array(Uint8Array.wrap(algorithm.salt))};
-            
+
+            const hkdfMetadata: idlV1.hkdf_metadata = { hash_info: shaMetadata.data!, info: Utils.convertToU8Array(Uint8Array.wrap(algorithm.info)), salt: Utils.convertToU8Array(Uint8Array.wrap(algorithm.salt)) };
+
             if (derivedKeyAlgorithm instanceof AesKeyGenParams) {
                 const aesMetadataResult = CryptoUtil.getAESMetadata(derivedKeyAlgorithm);
                 if (aesMetadataResult.err)
                     return { data: null, err: aesMetadataResult.err };
 
-                keyResult = CryptoImpl.deriveKey(baseKey.id, 1, JSON.stringify(hkdfMetdata), 0, JSON.stringify(aesMetadataResult.data!), extractable, usages);
+                keyResult = CryptoImpl.deriveKey(baseKey.id, 1, JSON.stringify(hkdfMetadata), 0, JSON.stringify(aesMetadataResult.data!), extractable, usages);
             }
             else if (derivedKeyAlgorithm instanceof HmacKeyGenParams) {
                 const hmacMetadataResult = CryptoUtil.getHMACMetadata(derivedKeyAlgorithm);
                 if (hmacMetadataResult.err)
                     return { data: null, err: hmacMetadataResult.err };
 
-                keyResult = CryptoImpl.deriveKey(baseKey.id, 1, JSON.stringify(hkdfMetdata), 1, JSON.stringify(hmacMetadataResult.data!), extractable, usages);
+                keyResult = CryptoImpl.deriveKey(baseKey.id, 1, JSON.stringify(hkdfMetadata), 1, JSON.stringify(hmacMetadataResult.data!), extractable, usages);
             }
         } else
             return { data: null, err: new Error('Invalid algorithm') };
 
-        if(keyResult.err)
+        if (keyResult.err)
             return { data: null, err: keyResult.err };
 
         const cryptoKeyJson = String.UTF8.decode(keyResult.data!, true);
@@ -569,16 +569,16 @@ export class SubtleCrypto {
 
         } else if (algorithm instanceof HkdfParams) {
             const shaMetadata = CryptoUtil.getShaMetadata(algorithm.hash);
-            if(shaMetadata.err)
+            if (shaMetadata.err)
                 return { data: null, err: shaMetadata.err };
-            
-            const hkdfMetdata: idlV1.hkdf_metadata = {hash_info: shaMetadata.data!, info: Utils.convertToU8Array(Uint8Array.wrap(algorithm.info)), salt: Utils.convertToU8Array(Uint8Array.wrap(algorithm.salt))};
 
-            result = CryptoImpl.deriveBits(baseKey.id, 1, JSON.stringify(hkdfMetdata), length);
+            const hkdfMetadata: idlV1.hkdf_metadata = { hash_info: shaMetadata.data!, info: Utils.convertToU8Array(Uint8Array.wrap(algorithm.info)), salt: Utils.convertToU8Array(Uint8Array.wrap(algorithm.salt)) };
+
+            result = CryptoImpl.deriveBits(baseKey.id, 1, JSON.stringify(hkdfMetadata), length);
         } else
             return { data: null, err: new Error('Invalid algorithm') };
 
-        if(result.err)
+        if (result.err)
             return { data: null, err: result.err };
 
         return { data: result.data!, err: null };

@@ -7,13 +7,11 @@ import * as idlV1 from './crypto_subtle_idl_v1';
 import { RsaHashedKeyGenParams, EcKeyGenParams, AesKeyGenParams, HmacKeyGenParams, AesGcmParams } from './crypto_subtle';
 import { Result } from '../index';
 
-export class KeyFormatWrapper
-{
+export class KeyFormatWrapper {
     format!: idlV1.key_format;
 }
 
-export class CryptoUtil
-{
+export class CryptoUtil {
     static isValidAlgorithm(algorithm: string): boolean {
         if (algorithm != 'sha1-160' && algorithm != 'SHA1-160' && algorithm != 'sha1' && algorithm != 'SHA1' &&
             algorithm != 'sha2-256' && algorithm != 'SHA2-256' && algorithm != 'sha-256' && algorithm != 'SHA-256' &&
@@ -27,8 +25,7 @@ export class CryptoUtil
     }
 
     static digestSize(algorithm: string): number {
-        switch (algorithm)
-        {
+        switch (algorithm) {
             case 'sha1-160':
             case 'SHA1-160':
             case 'sha1':
@@ -61,37 +58,27 @@ export class CryptoUtil
         return 0;
     }
 
-    static getShaMetadata(algorithm: string): Result<idlV1.sha_metadata, Error>
-    {
-        if (algorithm == 'sha1-160' || algorithm == 'SHA1-160' || algorithm == 'sha1' || algorithm == 'SHA1')
-        {
-            return {data: {algo_id: idlV1.sha_algorithm.sha1, length: idlV1.sha_digest_bitsize.SHA_160}, err: null};
-        }else if(algorithm == 'sha2-256' || algorithm == 'SHA2-256' || algorithm == 'sha-256' || algorithm == 'SHA-256')
-        {
-            return  {data: {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_256}, err: null};
-        }else if(algorithm == 'sha2-384' || algorithm == 'SHA2-384' || algorithm == 'sha-384' || algorithm == 'SHA-384')
-        {
-            return {data: {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_384}, err: null};
-        }else if(algorithm == 'sha2-512' || algorithm == 'SHA2-512' || algorithm == 'sha-512' || algorithm == 'SHA-512')
-        {
-            return {data: {algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_512}, err: null};
-        }else if(algorithm == 'sha3-256' || algorithm == 'SHA3-256')
-        {
-            return {data: {algo_id: idlV1.sha_algorithm.sha3, length: idlV1.sha_digest_bitsize.SHA_256}, err: null};
-        }else if(algorithm == 'sha3-384' || algorithm == 'SHA3-384')
-        {
-            return {data: {algo_id: idlV1.sha_algorithm.sha3, length: idlV1.sha_digest_bitsize.SHA_384}, err: null};
-        }else if (algorithm == 'sha3-512' || algorithm == 'SHA3-512')
-        {
-            return {data: {algo_id: idlV1.sha_algorithm.sha3, length: idlV1.sha_digest_bitsize.SHA_512}, err: null};
-        }else
-        {
-            return {data: null, err: new Error(`Unsupported algorithm ${algorithm}`)};
+    static getShaMetadata(algorithm: string): Result<idlV1.sha_metadata, Error> {
+        if (algorithm == 'sha1-160' || algorithm == 'SHA1-160' || algorithm == 'sha1' || algorithm == 'SHA1') {
+            return { data: { algo_id: idlV1.sha_algorithm.sha1, length: idlV1.sha_digest_bitsize.SHA_160 }, err: null };
+        } else if (algorithm == 'sha2-256' || algorithm == 'SHA2-256' || algorithm == 'sha-256' || algorithm == 'SHA-256') {
+            return { data: { algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_256 }, err: null };
+        } else if (algorithm == 'sha2-384' || algorithm == 'SHA2-384' || algorithm == 'sha-384' || algorithm == 'SHA-384') {
+            return { data: { algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_384 }, err: null };
+        } else if (algorithm == 'sha2-512' || algorithm == 'SHA2-512' || algorithm == 'sha-512' || algorithm == 'SHA-512') {
+            return { data: { algo_id: idlV1.sha_algorithm.sha2, length: idlV1.sha_digest_bitsize.SHA_512 }, err: null };
+        } else if (algorithm == 'sha3-256' || algorithm == 'SHA3-256') {
+            return { data: { algo_id: idlV1.sha_algorithm.sha3, length: idlV1.sha_digest_bitsize.SHA_256 }, err: null };
+        } else if (algorithm == 'sha3-384' || algorithm == 'SHA3-384') {
+            return { data: { algo_id: idlV1.sha_algorithm.sha3, length: idlV1.sha_digest_bitsize.SHA_384 }, err: null };
+        } else if (algorithm == 'sha3-512' || algorithm == 'SHA3-512') {
+            return { data: { algo_id: idlV1.sha_algorithm.sha3, length: idlV1.sha_digest_bitsize.SHA_512 }, err: null };
+        } else {
+            return { data: null, err: new Error(`Unsupported algorithm ${algorithm}`) };
         }
     }
 
-    static getRSAMetadata(params: RsaHashedKeyGenParams): Result<idlV1.rsa_metadata, Error>
-    {
+    static getRSAMetadata(params: RsaHashedKeyGenParams): Result<idlV1.rsa_metadata, Error> {
         let bitsize = idlV1.rsa_key_bitsize.RSA_2048;
         if (params.modulusLength == 3072)
             bitsize = idlV1.rsa_key_bitsize.RSA_3072;
@@ -100,22 +87,21 @@ export class CryptoUtil
         else if (params.modulusLength == 2048)
             bitsize = idlV1.rsa_key_bitsize.RSA_2048;
         else
-            return {data: null, err: new Error('Invalid RSA key size')};
+            return { data: null, err: new Error('Invalid RSA key size') };
 
         const shaMetadata = CryptoUtil.getShaMetadata(params.hash);
 
-        if(shaMetadata.data)
-            return {data: {modulus: bitsize, public_exponent:params.publicExponent, sha_metadata: shaMetadata.data as idlV1.sha_metadata}, err: null};
-        else if(shaMetadata.err)
-            return {data: null, err: shaMetadata.err};
+        if (shaMetadata.data)
+            return { data: { modulus: bitsize, public_exponent: params.publicExponent, sha_metadata: shaMetadata.data as idlV1.sha_metadata }, err: null };
+        else if (shaMetadata.err)
+            return { data: null, err: shaMetadata.err };
 
-        return {data: null, err: new Error('getRSAMetadata: Invalid RSA Metadata')};
+        return { data: null, err: new Error('getRSAMetadata: Invalid RSA Metadata') };
     }
 
-    static getSECPR1Metadata(params: EcKeyGenParams): Result<idlV1.secp_r1_metadata, Error>
-    {
-        if(params.namedCurve != 'P-256' && params.namedCurve != 'P-384' && params.namedCurve != 'P-521')
-            return {data: null, err: new Error('Invalid EC curve')};
+    static getSECPR1Metadata(params: EcKeyGenParams): Result<idlV1.secp_r1_metadata, Error> {
+        if (params.namedCurve != 'P-256' && params.namedCurve != 'P-384' && params.namedCurve != 'P-521')
+            return { data: null, err: new Error('Invalid EC curve') };
 
         let bitsize = idlV1.secp_r1_key_bitsize.SECP_R1_256;
         if (params.namedCurve == 'P-256')
@@ -125,23 +111,21 @@ export class CryptoUtil
         else if (params.namedCurve == 'P-521')
             bitsize = idlV1.secp_r1_key_bitsize.SECP_R1_521;
         else
-            return {data: null, err: new Error('Invalid EC curve')};
+            return { data: null, err: new Error('Invalid EC curve') };
 
 
-        return {data: {length: bitsize}, err: null};
+        return { data: { length: bitsize }, err: null };
     }
 
-    static getSECPK1Metadata(params: EcKeyGenParams): Result<idlV1.secp_k1_metadata, Error>
-    {
-        if(params.namedCurve != 'secp256k1' && params.namedCurve != 'SECP256K1')
-            return {data: null, err: new Error('Invalid EC curve')};
+    static getSECPK1Metadata(params: EcKeyGenParams): Result<idlV1.secp_k1_metadata, Error> {
+        if (params.namedCurve != 'secp256k1' && params.namedCurve != 'SECP256K1')
+            return { data: null, err: new Error('Invalid EC curve') };
 
         const bitsize = idlV1.secp_k1_key_bitsize.SECP_K1_256;
-        return {data: {length: bitsize}, err: null};
+        return { data: { length: bitsize }, err: null };
     }
 
-    static getAESMetadata(params: AesKeyGenParams): Result<idlV1.aes_metadata, Error>
-    {
+    static getAESMetadata(params: AesKeyGenParams): Result<idlV1.aes_metadata, Error> {
         let bitsize = idlV1.aes_key_bitsize.AES_128;
         if (params.length == 192)
             bitsize = idlV1.aes_key_bitsize.AES_192;
@@ -150,13 +134,12 @@ export class CryptoUtil
         else if (params.length == 128)
             bitsize = idlV1.aes_key_bitsize.AES_128;
         else
-            return {data: null, err: new Error('Invalid AES key size')};
+            return { data: null, err: new Error('Invalid AES key size') };
 
-        return {data: {length: bitsize}, err: null};
+        return { data: { length: bitsize }, err: null };
     }
 
-    static getAESGCMMetadata(iv: u8[], additionalData: u8[], tagLength: u32): Result<idlV1.aes_gcm_encryption_metadata, Error>
-    {
+    static getAESGCMMetadata(iv: u8[], additionalData: u8[], tagLength: u32): Result<idlV1.aes_gcm_encryption_metadata, Error> {
         let bitsize = idlV1.aes_tag_length.TAG_128;
         if (tagLength == 96)
             bitsize = idlV1.aes_tag_length.TAG_96;
@@ -169,33 +152,31 @@ export class CryptoUtil
         else if (tagLength == 128)
             bitsize = idlV1.aes_tag_length.TAG_128;
         else
-            return {data: null, err: new Error('Invalid Tag Length. Tag length can be only 96, 104, 112, 120 or 128 bits')};
+            return { data: null, err: new Error('Invalid Tag Length. Tag length can be only 96, 104, 112, 120 or 128 bits') };
 
-        return {data: { iv: iv, additionalData: additionalData, tagLength: bitsize }, err: null};
+        return { data: { iv: iv, additionalData: additionalData, tagLength: bitsize }, err: null };
     }
 
-    static getHMACMetadata(params: HmacKeyGenParams): Result<idlV1.hmac_metadata, Error>
-    {
+    static getHMACMetadata(params: HmacKeyGenParams): Result<idlV1.hmac_metadata, Error> {
         let shaMetadata = CryptoUtil.getShaMetadata(params.hash);
         if (shaMetadata.err !== null || shaMetadata.data === null)
-            return {data: null, err: new Error('Invalid HMAC hash metadata')};
+            return { data: null, err: new Error('Invalid HMAC hash metadata') };
 
-        return {data: {sha_metadata: shaMetadata.data!, length: params.length}, err: null};
+        return { data: { sha_metadata: shaMetadata.data!, length: params.length }, err: null };
     }
 
-    static getKeyFormat(format: string): Result<KeyFormatWrapper, Error>
-    {
-        if(format == 'raw' || format == 'RAW')
-            return {data: { format: idlV1.key_format.raw }, err: null};
-        else if(format == 'pkcs8' || format == 'PKCS8')
-            return {data: { format: idlV1.key_format.pkcs8 }, err: null};
-        else if(format == 'spki' || format == 'SPKI')
-            return {data: { format: idlV1.key_format.spki }, err: null};
-        else if(format == 'sec1' || format == 'SEC1')
-            return {data: { format: idlV1.key_format.sec1 }, err: null};
-        else if(format == 'pkcs1' || format == 'PKCS1')
-            return {data: { format: idlV1.key_format.pkcs1 }, err: null};
+    static getKeyFormat(format: string): Result<KeyFormatWrapper, Error> {
+        if (format == 'raw' || format == 'RAW')
+            return { data: { format: idlV1.key_format.raw }, err: null };
+        else if (format == 'pkcs8' || format == 'PKCS8')
+            return { data: { format: idlV1.key_format.pkcs8 }, err: null };
+        else if (format == 'spki' || format == 'SPKI')
+            return { data: { format: idlV1.key_format.spki }, err: null };
+        else if (format == 'sec1' || format == 'SEC1')
+            return { data: { format: idlV1.key_format.sec1 }, err: null };
+        else if (format == 'pkcs1' || format == 'PKCS1')
+            return { data: { format: idlV1.key_format.pkcs1 }, err: null };
         else
-            return {data: null, err: new Error('Invalid or unsupported key format')};
+            return { data: null, err: new Error('Invalid or unsupported key format') };
     }
 }
