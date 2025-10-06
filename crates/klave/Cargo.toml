@@ -1,6 +1,6 @@
 [package]
 name = "klave"
-version = "0.5.0"
+version = "0.4.7"
 authors = [ "Jérémie Labbé <jeremie@secretarium.org>", "Étienne Bossé <etienne@secretarium.org>", "Florian Guitton <florian@secretarium.org>", "Jean-Jacques Lafay <jean-jacques@secretarium.org>" ]
 license = "MIT"
 edition = "2021"
