@@ -75,9 +75,7 @@ impl KeyRSA {
 
     pub fn sign(&self, data: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
         let salt_length = 32;
-        let signature_metadata = RsaPssSignatureMetadata {
-            salt_length,
-        };
+        let signature_metadata = RsaPssSignatureMetadata { salt_length };
         match CryptoImpl::sign(
             &self.key.name(),
             SigningAlgorithm::RsaPss as u32,
@@ -95,9 +93,7 @@ impl KeyRSA {
         signature: &[u8],
     ) -> Result<VerifySignResult, Box<dyn Error>> {
         let salt_length = 32;
-        let signature_metadata = RsaPssSignatureMetadata {
-            salt_length,
-        };
+        let signature_metadata = RsaPssSignatureMetadata { salt_length };
         match CryptoImpl::verify(
             &self.key.name(),
             SigningAlgorithm::RsaPss as u32,

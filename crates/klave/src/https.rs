@@ -77,8 +77,11 @@ pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn st
 
     let response = match sdk::https_query(&http_request_str) {
         Ok(response) => response,
-        Err(e) => {            
-            return Err(format!("Failed to send https query:\n{e}\n{http_request}\n{http_request_str:?}").into())
+        Err(e) => {
+            return Err(format!(
+                "Failed to send https query:\n{e}\n{http_request}\n{http_request_str:?}"
+            )
+            .into())
         }
     };
 

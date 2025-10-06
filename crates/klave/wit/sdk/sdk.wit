@@ -37,6 +37,7 @@ interface sdk {
     get-public-key: func(key-name: string) -> result<list<u8>, string>;
     get-public-key-as-cryptokey: func(key-name: string) -> result<string, string>;
     derive-key: func(base-key-name: string, derivation-algorithm: s32, derivation-metadata: string, derived-key-algorithm: s32, derived-key-metadata: string, extractable: s32, usages: list<u8>) -> result<string, string>;
+    derive-bits: func(base-key-name: string, derivation-algorithm: s32, derivation-metadata: string, length: s32) -> result<list<u8>, string>;
     encrypt: func(key-name: string, encrypt-algo-id: s32, encrypt-metadata: string, plain-txt: list<u8>) -> result<list<u8>, string>;
     decrypt: func(key-name: string, decrypt-algo-id: s32, decrypt-metadata: string, cipher-txt: list<u8>) -> result<list<u8>, string>;
     sign: func(key-name: string, sign-algo-id: s32, sign-metadata: string, txt: list<u8>) -> result<list<u8>, string>;

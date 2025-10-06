@@ -65,9 +65,13 @@ impl CryptoImpl {
             "sign" => 2,
             "verify" => 3,
             "derive_key" => 4,
+            "deriveKey" => 4,
             "derive_bits" => 5,
+            "deriveBits" => 5,
             "wrap_key" => 6,
+            "wrapKey" => 6,
             "unwrap_key" => 7,
+            "unwrapKey" => 7,
             _ => u8::MAX,
         }
     }
@@ -270,6 +274,23 @@ impl CryptoImpl {
             derived_key_metadata,
             extractable as i32,
             &CryptoImpl::process_usages(usages),
+        ) {
+            Ok(result) => Ok(result),
+            Err(err) => Err(err.into()),
+        }
+    }
+
+    pub fn derive_bits(
+        key_name: &str,
+        derivation_algorithm: u32,
+        derivation_metadata: &str,
+        length: u32,
+    ) -> Result<Vec<u8>, Box<dyn Error>> {
+        match sdk::derive_bits(
+            key_name,
+            derivation_algorithm as i32,
+            derivation_metadata,
+            length as i32,
         ) {
             Ok(result) => Ok(result),
             Err(err) => Err(err.into()),
