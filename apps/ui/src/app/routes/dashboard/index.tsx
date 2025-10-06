@@ -24,7 +24,7 @@ export const Dashboard: FC = () => {
                 <div className="w-72 shrink-0 border-r border-gray-200 dark:border-gray-800 h-full min-h-[50vh] overflow-y-auto sm:block hidden p-5">
                     <AppSidebar />
                 </div>
-                <div className="app-content-panel flex-grow flex flex-col bg-white dark:bg-gray-900 overflow-x-auto">
+                <div className="app-content-panel flex-grow flex flex-col bg-white dark:bg-gray-900 overflow-y-auto overflow-x-hidden">
                     {outlet}
                 </div>
             </div>

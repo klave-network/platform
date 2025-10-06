@@ -16,6 +16,8 @@ export {
     AesGcmParams, AesKeyGenParams,
     CryptoKey,
     EcdsaParams, EcKeyGenParams,
+    EcdhKeyDeriveParams,
+    HkdfParams,
     HmacKeyGenParams,
     NamedAlgorithm,
     RsaHashedKeyGenParams, RsaOaepParams, RsaPssParams,

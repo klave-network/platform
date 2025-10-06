@@ -30,7 +30,7 @@ RUN yarn run prisma generate
 FROM docker.io/node:22-alpine AS base
 
 ENV HUSKY=0
-ENV RUST_VERSION=1.88.0 \
+ENV RUST_VERSION=1.89.0 \
     RUSTUP_INIT_SKIP_PATH_CHECK=yes \
     RUSTUP_INIT_NO_MODIFY_PATH=no \
     RUSTUP_HOME=/usr/local/rustup \

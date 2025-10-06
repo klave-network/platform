@@ -89,11 +89,11 @@ export const systemRouter = createTRPCRouter({
     version: publicProcedure
         .query(async () => {
             return {
-                version: config.get('GIT_REPO_VERSION'),
+                version: process.env['GIT_REPO_VERSION'],
                 git: {
-                    commit: config.get('GIT_REPO_COMMIT'),
-                    branch: config.get('GIT_REPO_BRANCH'),
-                    dirty: config.get('GIT_REPO_DIRTY')
+                    commit: process.env['GIT_REPO_COMMIT'],
+                    branch: process.env['GIT_REPO_BRANCH'],
+                    dirty: process.env['GIT_REPO_DIRTY']
                 },
                 secretarium: scpOps.version()
             };

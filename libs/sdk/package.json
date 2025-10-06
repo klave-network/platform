@@ -1,6 +1,6 @@
 {
     "name": "@klave/sdk",
-    "version": "0.17.3",
+    "version": "0.18.0",
     "private": false,
     "description": "Klave Honest Apps helpers and definitions",
     "repository": {
@@ -24,13 +24,13 @@
         "stac": "./bin/stac.js"
     },
     "dependencies": {
-        "@klave/compiler": "1.0.8",
+        "@klave/compiler": "1.0.9",
         "as-base64": "0.2.0",
         "chalk": "^4.1.2",
-        "fs-extra": "^11.3.0",
-        "json-as": "1.1.20",
+        "fs-extra": "^11.3.2",
+        "json-as": "1.1.21",
         "path-complete-extname": "1.0.0",
-        "zod": "^3.25.76"
+        "zod": "^4.1.11"
     },
     "devDependencies": {
         "@types/fs-extra": "^11.0.4"

@@ -36,6 +36,7 @@ type BuildOutput = {
         wasm: Uint8Array;
         wat?: string;
         dts?: string;
+        wit?: string;
         hasUI: boolean;
         routes: string[];
         signature?: sigstore.Bundle;
@@ -385,6 +386,7 @@ export class BuildMiniVM {
             let compiledBinary = new Uint8Array(0);
             let compiledWAT: string | undefined;
             let compiledDTS: string | undefined;
+            let worldWIT: string | undefined;
             let hasUI = false;
             try {
                 const authStruct = await this.options.context.octokit.auth({ type: 'installation' }) as InstallationAccessTokenAuthentication;
@@ -407,13 +409,14 @@ export class BuildMiniVM {
                             };
                         } else if (message.type === 'write') {
                             if (message.contents) {
-                                if ((message.filename).endsWith('.wasm'))
+                                if (message.filename.endsWith('.wasm'))
                                     compiledBinary = message.contents ? Uint8Array.from(typeof message.contents === 'string' ? Buffer.from(message.contents) : message.contents) : new Uint8Array(0);
-                                if ((message.filename).endsWith('.wat')) {
+                                if (message.filename.endsWith('.wat'))
                                     compiledWAT = typeof message.contents === 'string' ? message.contents : Buffer.from(message.contents).toString() ?? undefined;
-                                } if ((message.filename).endsWith('.d.ts')) {
+                                if (message.filename.endsWith('.d.ts'))
                                     compiledDTS = typeof message.contents === 'string' ? message.contents : Buffer.from(message.contents).toString() ?? undefined;
-                                }
+                                if (message.filename.endsWith('.wit'))
+                                    worldWIT = typeof message.contents === 'string' ? message.contents : Buffer.from(message.contents).toString() ?? undefined;
                             }
                         } else if (message.type === 'progress') {
                             outputProgress[message.stage] = outputProgress[message.stage] ?? [];
@@ -472,7 +475,11 @@ export class BuildMiniVM {
                                 .catch(() => { return; })
                                 .finally(() => {
 
-                                    const matches = compiledDTS ? Array.from(compiledDTS.matchAll(/^export declare function (.*)\(/gm)) : [];
+                                    let matches: Array<RegExpExecArray> = [];
+                                    if (compiledDTS)
+                                        matches = Array.from(compiledDTS.matchAll(/^export declare function (.*)\(/gm));
+                                    if (worldWIT)
+                                        matches = Array.from(worldWIT.matchAll(/^\s*?export\s+([\w-]+?):/gm));
                                     const validRoutes = matches
                                         .map(match => match[1])
                                         .filter(Boolean)
@@ -485,6 +492,7 @@ export class BuildMiniVM {
                                             routes: validRoutes,
                                             wat: compiledWAT,
                                             dts: compiledDTS,
+                                            wit: worldWIT,
                                             hasUI,
                                             signature
                                         },

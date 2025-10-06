@@ -1,5 +1,5 @@
 use crate::sdk;
-use serde::{Deserialize, Serialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 
 #[derive(Deserialize)]
 #[serde(untagged)]
@@ -188,7 +188,7 @@ pub struct TargetInfo {
     pub attributes: QuoteAttributes,
     pub reserved1: Vec<u8>,
     #[serde(deserialize_with = "deserialize_nested_u16")]
-    pub config_svn : u16,
+    pub config_svn: u16,
     #[serde(deserialize_with = "deserialize_nested_u32")]
     pub misc_select: u32,
     pub reserved2: Vec<u8>,
@@ -207,8 +207,7 @@ pub struct Report {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct VerifyQuoteResponse
-{
+pub struct VerifyQuoteResponse {
     pub collateral_expiration_status: u32,
     pub quote_verification_result: i32,
     pub qve_report_info: QlQeReportInfo,
@@ -218,8 +217,7 @@ pub struct VerifyQuoteResponse
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TeeSuppDataDescriptor
-{
+pub struct TeeSuppDataDescriptor {
     pub major_version: u16,
     pub data: Vec<u8>,
 }
@@ -232,20 +230,22 @@ pub enum Quote {
 }
 
 pub fn get_quote(challenge: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
-    let quote_bytes = sdk::get_quote(challenge)
-        .map_err(|e| -> String {format!("Failed to get quote: {e}")})?;
+    let quote_bytes =
+        sdk::get_quote(challenge).map_err(|e| -> String { format!("Failed to get quote: {e}") })?;
 
     Ok(quote_bytes)
 }
 
-pub fn verify_quote(quote: &[u8], current_time: i64) -> Result<VerifyQuoteResponse, Box<dyn std::error::Error>> {
-
+pub fn verify_quote(
+    quote: &[u8],
+    current_time: i64,
+) -> Result<VerifyQuoteResponse, Box<dyn std::error::Error>> {
     let response_str = sdk::verify_quote(current_time, quote)
-        .map_err(|e| -> String {format!("Failed to verify quote: {e}")})?;
+        .map_err(|e| -> String { format!("Failed to verify quote: {e}") })?;
 
     //Deserialize the response into a VerifyQuoteResponse
     let response: VerifyQuoteResponse = serde_json::from_str(&response_str)
-        .map_err(|e| -> String {format!("Failed to deserialize response: {e}")})?;
+        .map_err(|e| -> String { format!("Failed to deserialize response: {e}") })?;
 
     Ok(response)
 }
@@ -253,8 +253,8 @@ pub fn verify_quote(quote: &[u8], current_time: i64) -> Result<VerifyQuoteRespon
 pub fn parse_quote(quote: &[u8]) -> Result<Quote, Box<dyn std::error::Error>> {
     let version = quote.first().ok_or("Quote is empty")?;
 
-    let quote_parsed_string = sdk::parse_quote(quote)
-        .map_err(|e| format!("Failed to parse quote: {e}"))?;
+    let quote_parsed_string =
+        sdk::parse_quote(quote).map_err(|e| format!("Failed to parse quote: {e}"))?;
 
     let parsed: Quote = match version {
         3 => {

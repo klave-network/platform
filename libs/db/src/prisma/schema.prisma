@@ -1,6 +1,5 @@
 generator client {
     provider        = "prisma-client-js"
-    previewFeatures = ["metrics"]
 }
 
 datasource db {
@@ -230,6 +229,7 @@ model Deployment {
     applicationId        String
     sourceType           String?
     buildOutputs         Json?
+    buildOutputWIT       String?
     buildOutputDTS       String?
     buildOutputWAT       String?
     buildOutputWASM      String?
