@@ -4,7 +4,7 @@ export default {
     globals: {},
     testEnvironment: 'node',
     transformIgnorePatterns: [
-        'node_modules/(?!(uuid)/)', // 👈 allow esbuild to handle uuid
+        'node_modules/(?!(uuid)/)'
     ],
     transform: {
         '^.+\\.[tj]s$': 'esbuild-jest-transform'
