@@ -27,6 +27,6 @@
         "@react-email/render": "^1.3.2",
         "@react-email/tailwind": "^1.2.2",
         "react": "19.2.0",
-        "react-email": "4.2.12"
+        "react-email": "4.3.0"
     }
 }
