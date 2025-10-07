@@ -22,7 +22,8 @@
             "command": "rimraf target && cargo component build --target wasm32-unknown-unknown -p klave --target-dir crates/klave/target --release",
             "cache": true,
             "outputs": [
-                "{projectRoot}/target"
+                "{projectRoot}/target",
+                "{projectRoot}/src/bindings.rs"
             ]
         },
         "sync-deps": {
