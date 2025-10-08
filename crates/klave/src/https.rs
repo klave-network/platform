@@ -87,7 +87,7 @@ pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn st
 
     let http_response: HttpResponse<String> = match serde_json::from_str(&response) {
         Ok(http_response) => http_response,
-        Err(e) => {            
+        Err(e) => {
             return Err(format!("Failed to deserialize http response:\n{e}\n{response:?}\n{http_request}\n{http_request_str:?}").into())
         }
     };

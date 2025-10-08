@@ -1,4 +1,9 @@
 # Changelog
+## [0.18.1](https://github.com/klave-network/platform/compare/sdk@0.18.0...sdk@0.18.1) (2025-10-06)
+
+### Dependency Updates
+
+* `constants` updated to version `0.18.0`
 ## [0.18.0](https://github.com/klave-network/platform/compare/sdk@0.17.3...sdk@0.18.0) (2025-10-06)
 
 ### Dependency Updates

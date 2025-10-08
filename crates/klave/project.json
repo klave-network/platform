@@ -6,6 +6,7 @@
     ],
     "targets": {
         "deps": {
+            "dependsOn": [],
             "command": "(is-ci && cargo install cargo-component --force) || cargo install cargo-component",
             "cache": true,
             "inputs": [
@@ -21,8 +22,28 @@
             "command": "rimraf target && cargo component build --target wasm32-unknown-unknown -p klave --target-dir crates/klave/target --release",
             "cache": true,
             "outputs": [
-                "{projectRoot}/target"
+                "{projectRoot}/target",
+                "{projectRoot}/src/bindings.rs"
             ]
+        },
+        "sync-deps": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "node tools/scripts/syncDepVersion.mjs crate"
+            }
+        },
+        "version": {
+            "executor": "@jscutlery/semver:version",
+            "options": {
+                "preset": "conventional",
+                "trackDeps": false,
+                "changelogHeader": "# Changelog",
+                "tagPrefix": "{projectName}@",
+                "commitMessageFormat": "chore({projectName}): Release version ${version}",
+                "postTargets": [
+                    "crate:sync-deps"
+                ]
+            }
         },
         "publish": {
             "dependsOn": [

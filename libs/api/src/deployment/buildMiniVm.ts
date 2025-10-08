@@ -483,7 +483,7 @@ export class BuildMiniVM {
                                     const validRoutes = matches
                                         .map(match => match[1])
                                         .filter(Boolean)
-                                        .filter(match => !['__new', '__pin', '__unpin', '__collect', 'register_routes'].includes(match));
+                                        .filter(match => !['__new', '__pin', '__unpin', '__collect', 'register_routes', 'register-routes'].includes(match));
                                     const output: BuildOutput = {
                                         success: true,
                                         result: {
