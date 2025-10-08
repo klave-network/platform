@@ -11,6 +11,8 @@ WORKDIR /app/hubber
 RUN addgroup --system hubber && \
     adduser --system -G hubber hubber
 
+RUN apk add --no-cache python3 make g++ git
+
 COPY --chown=hubber:hubber --chmod=444 dist/apps/hubber/package.json ./
 COPY --chown=hubber:hubber --chmod=444 patches ./patches
 COPY --chown=hubber:hubber --chmod=444 dist/apps/hubber/yarn.lock ./
