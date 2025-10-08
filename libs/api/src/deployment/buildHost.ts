@@ -259,18 +259,19 @@ export class BuildHost {
                         });
                     } else if (packageManager === 'cargo') {
 
+                        // TODO: This should probably be zod-ed
                         const tomlConf: MinimalTOMLConfig = TOML.parse(fs.readFileSync(path.join(workingDirectory, appPath, 'Cargo.toml'), 'utf-8'));
 
-                        Object.entries(tomlConf['dependencies'] ?? {})?.forEach(([name, version]) => {
+                        Object.entries(tomlConf.dependencies ?? {})?.forEach(([name, version]) => {
                             this.usedDependencies[name] = {
                                 version: (typeof version === 'string' ? version : (version as { version: string }).version) ?? 'unknown',
                                 digests: {}
                             };
                         });
-                        const witRelativePath: string = tomlConf?.['package']?.['metadata']?.['component']?.['wit-path'] ?? 'wit';
+                        const witRelativePath: string = tomlConf.package?.metadata?.component?.['wit-path'] ?? 'wit';
                         const witPath: string = path.resolve(path.join(workingDirectory, appPath, witRelativePath));
                         const witEntries = fs.readdirSync(witPath, { withFileTypes: true });
-                        const witWorld: string | undefined = tomlConf?.['package']?.['metadata']?.['component']?.['world'];
+                        const witWorld: string | undefined = tomlConf.package?.metadata?.component?.['world'];
 
                         let firstWorld: string | undefined;
                         let foundWitWorld = false;
@@ -315,7 +316,7 @@ export class BuildHost {
                         const appCompiledPath = path.join(workingDirectory, 'target', 'wasm32-unknown-unknown', 'release');
                         fs.readdirSync(appCompiledPath).forEach(file => {
                             const filename = file.split('.').shift();
-                            if (filename === tomlConf?.['package']?.['name'] || filename === tomlConf?.['package']?.['name']?.replaceAll('-', '_'))
+                            if (filename === tomlConf.package?.name || filename === tomlConf.package?.name?.replaceAll('-', '_'))
                                 this.listeners['message']?.forEach(listener => listener({
                                     type: 'write',
                                     contents: Uint8Array.from(fs.readFileSync(path.join(appCompiledPath, file), null)),
