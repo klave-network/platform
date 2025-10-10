@@ -1,4 +1,11 @@
 # Changelog
+## [1.5.5](https://github.com/klave-network/platform/compare/ui@1.5.4...ui@1.5.5) (2025-10-10)
+
+
+### Bug Fixes
+
+* **ui:** Correct the Sentry Router wrapping ([9fe4ad9](https://github.com/klave-network/platform/commit/9fe4ad994e214ec828e3c950476e3673e9c1a5d7))
+
 ## [1.5.4](https://github.com/klave-network/platform/compare/ui@1.5.3...ui@1.5.4) (2025-10-10)
 
 ### Dependency Updates
