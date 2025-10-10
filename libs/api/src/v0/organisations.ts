@@ -253,7 +253,7 @@ export const organisationRouter = createTRPCRouter({
                     keySelector,
                     privateKey: config.get('KLAVE_DKIM_PRIVATE_KEY')
                 }
-            })
+            });
 
             return org;
 

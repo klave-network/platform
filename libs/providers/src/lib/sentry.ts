@@ -18,7 +18,7 @@ export const sentryOps = {
                     Sentry.httpServerSpansIntegration(),
                     Sentry.expressIntegration(),
                     Sentry.prismaIntegration(),
-                    Sentry.mongoIntegration(),
+                    Sentry.mongoIntegration()
                 ].concat(config.get('NODE_ENV') === 'development' ? [nodeProfilingIntegration()] : []),
                 // Set tracesSampleRate to 1.0 to capture 100%
                 // of transactions for performance monitoring.

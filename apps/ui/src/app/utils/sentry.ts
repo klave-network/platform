@@ -17,7 +17,7 @@ Sentry.init({
         Sentry.httpClientIntegration(),
         Sentry.browserTracingIntegration({
             enableHTTPTimings: true,
-            enableLongTask: true,
+            enableLongTask: true
         }),
         Sentry.reactRouterV6BrowserTracingIntegration({
             useEffect,
