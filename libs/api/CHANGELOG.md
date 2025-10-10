@@ -1,4 +1,10 @@
 # Changelog
+## [1.5.7](https://github.com/klave-network/platform/compare/api@1.5.6...api@1.5.7) (2025-10-10)
+
+### Dependency Updates
+
+* `providers` updated to version `1.5.6`
+* `ui-kit` updated to version `1.5.6`
 ## [1.5.6](https://github.com/klave-network/platform/compare/api@1.5.5...api@1.5.6) (2025-10-10)
 
 ### Dependency Updates
