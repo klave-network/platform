@@ -94,6 +94,7 @@ export class aes_metadata {
 @json
 export class hmac_metadata {
     sha_metadata!: sha_metadata;
+    length: u32 = 0;
 }
 
 @json
@@ -170,11 +171,6 @@ export class rsa_pss_signature_metadata {
 }
 
 @json
-export class hmac_signature_metadata {
-    sha_metadata!: sha_metadata;
-}
-
-@json
 export class ecdh_derivation_metadata {
     public_key!: string;
 }
@@ -206,6 +202,13 @@ export class rsa_pkcs1_v1_5_encryption_metadata {
 export class encryption_info {
     algo_id!: encryption_algorithm;
     algo_metadata!: string;
+}
+
+@json
+export class hkdf_metadata {
+    hash_info!: sha_metadata;
+    salt!: Array<u8>;
+    info!: Array<u8>;
 }
 
 @json

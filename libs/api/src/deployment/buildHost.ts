@@ -3,7 +3,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { v4 as uuid } from 'uuid';
 import mime from 'mime';
-import TOML from 'toml';
+import TOML from 'smol-toml';
 import { logger, objectStore, Upload, PutObjectOutput } from '@klave/providers';
 import { config, getFinalParseConfig, StagedOutputGroups } from '@klave/constants';
 import { BuildDependenciesManifest, BuildMiniVMOptions } from './buildMiniVm';
@@ -63,6 +63,17 @@ type BuildHostMessage = {
     type: 'expand';
     feature: 'ui';
 };
+
+type MinimalTOMLConfig = {
+    dependencies?: Record<string, string>;
+    package?: {
+        name?: string;
+        metadata?: {
+            component?:
+            Record<string, string>
+        }
+    }
+}
 
 export type BuildHostCreatorOptions = BuildMiniVMOptions & {
     token: string;
@@ -248,7 +259,8 @@ export class BuildHost {
                         });
                     } else if (packageManager === 'cargo') {
 
-                        const tomlConf = TOML.parse(fs.readFileSync(path.join(workingDirectory, appPath, 'Cargo.toml'), 'utf-8'));
+                        // TODO: This should probably be zod-ed
+                        const tomlConf: MinimalTOMLConfig = TOML.parse(fs.readFileSync(path.join(workingDirectory, appPath, 'Cargo.toml'), 'utf-8'));
 
                         Object.entries(tomlConf.dependencies ?? {})?.forEach(([name, version]) => {
                             this.usedDependencies[name] = {
@@ -256,7 +268,6 @@ export class BuildHost {
                                 digests: {}
                             };
                         });
-
                         const witRelativePath: string = tomlConf.package?.metadata?.component?.['wit-path'] ?? 'wit';
                         const witPath: string = path.resolve(path.join(workingDirectory, appPath, witRelativePath));
                         const witEntries = fs.readdirSync(witPath, { withFileTypes: true });

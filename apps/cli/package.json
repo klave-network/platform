@@ -1,6 +1,6 @@
 {
     "name": "@klave/cli",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "private": false,
     "description": "The Klave Command Line Interface lets you interact with your Klave apps from the command line",
     "repository": {

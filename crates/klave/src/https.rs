@@ -77,14 +77,17 @@ pub fn request(request: &Request<String>) -> Result<Response<String>, Box<dyn st
 
     let response = match sdk::https_query(&http_request_str) {
         Ok(response) => response,
-        Err(e) => {            
-            return Err(format!("Failed to send https query:\n{e}\n{http_request}\n{http_request_str:?}").into())
+        Err(e) => {
+            return Err(format!(
+                "Failed to send https query:\n{e}\n{http_request}\n{http_request_str:?}"
+            )
+            .into())
         }
     };
 
     let http_response: HttpResponse<String> = match serde_json::from_str(&response) {
         Ok(http_response) => http_response,
-        Err(e) => {            
+        Err(e) => {
             return Err(format!("Failed to deserialize http response:\n{e}\n{response:?}\n{http_request}\n{http_request_str:?}").into())
         }
     };

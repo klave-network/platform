@@ -6,12 +6,10 @@ use serde::{Deserialize, Serialize};
  */
 use std::fmt::Display;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[derive(Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct PublicKey {
     bytes: Vec<u8>,
 }
-
 
 impl Display for PublicKey {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
@@ -43,7 +41,6 @@ impl PublicKey {
 pub struct PrivateKey {
     bytes: Vec<u8>,
 }
-
 
 impl PrivateKey {
     pub fn new(bytes: &[u8]) -> PrivateKey {
