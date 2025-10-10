@@ -1,4 +1,6 @@
 # Changelog
+## [1.4.5](https://github.com/klave-network/platform/compare/providers@1.4.4...providers@1.4.5) (2025-10-10)
+
 ## [1.4.4](https://github.com/klave-network/platform/compare/providers@1.4.3...providers@1.4.4) (2025-10-07)
 
 ### Dependency Updates

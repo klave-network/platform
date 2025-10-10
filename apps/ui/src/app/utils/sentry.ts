@@ -1,6 +1,4 @@
 import * as Sentry from '@sentry/react';
-import { BrowserTracing } from '@sentry/browser';
-import * as SecretariumInstruments from '@secretarium/instrumentation';
 import {
     createBrowserRouter,
     useLocation,
@@ -9,7 +7,6 @@ import {
     matchRoutes
 } from 'react-router-dom';
 import { useEffect } from 'react';
-import { client as scpClient } from './secretarium';
 import { permissiblePeers } from '@klave/constants';
 
 Sentry.init({
@@ -17,22 +14,19 @@ Sentry.init({
     release: `klave@${import.meta.env['VITE_REPO_VERSION']}`,
     environment: ['localhost', '::', '127.0.0.1', '127.0.0.1.nip.io'].includes(window.location.hostname) ? 'development' : window.location.hostname,
     integrations: [
-        new BrowserTracing({
+        Sentry.httpClientIntegration(),
+        Sentry.browserTracingIntegration({
             enableHTTPTimings: true,
-            enableLongTask: true,
-            routingInstrumentation: Sentry.reactRouterV6Instrumentation(
-                useEffect,
-                useLocation,
-                useNavigationType,
-                createRoutesFromChildren,
-                matchRoutes
-            )
+            enableLongTask: true
         }),
-        new SecretariumInstruments.Sentry.ConnectorTracing({
-            connector: scpClient,
-            domains: ['.klave.network']
+        Sentry.reactRouterV6BrowserTracingIntegration({
+            useEffect,
+            useLocation,
+            useNavigationType,
+            createRoutesFromChildren,
+            matchRoutes
         }),
-        new Sentry.Replay()
+        Sentry.replayIntegration()
     ],
 
     // We recommend adjusting this value in production, or using tracesSampler
@@ -43,6 +37,6 @@ Sentry.init({
     tracePropagationTargets: permissiblePeers
 });
 
-export const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouter(
+export const sentryCreateBrowserRouter = Sentry.wrapCreateMemoryRouterV6(
     createBrowserRouter
 );

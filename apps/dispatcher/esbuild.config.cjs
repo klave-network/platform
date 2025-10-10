@@ -7,7 +7,7 @@ const gitInfo = current();
 module.exports = {
     sourcemap: process.env.NODE_ENV === 'development' ? 'inline' : 'external',
     outExtension: {
-        '.js': '.js'
+        '.js': '.cjs'
     },
     define: {
         'process.env.NX_TASK_TARGET_PROJECT': JSON.stringify(process.env.NX_TASK_TARGET_PROJECT),

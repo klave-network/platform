@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/node';
 import { logger } from '@klave/providers';
 import idgen from '@ideafast/idgen';
 import { publicProcedure, createTRPCRouter } from '../trpc';
@@ -79,11 +78,7 @@ export const authRouter = createTRPCRouter({
             if (!keySelector || !domainName)
                 throw new Error('DKIM domain not set');
 
-            await Sentry.startSpan({
-                name: 'Email Transport',
-                op: 'mailer.send',
-                description: 'Email Transport'
-            }, async () => transporter.sendMail({
+            await transporter.sendMail({
                 from: config.get('KLAVE_NOREPLY_ADDRESS'),
                 to: user.emails[0], // unsure if we should send email to all addresses
                 subject: 'Welcome to Klave',
@@ -93,7 +88,7 @@ export const authRouter = createTRPCRouter({
                     keySelector,
                     privateKey: config.get('KLAVE_DKIM_PRIVATE_KEY')
                 }
-            }));
+            });
 
             await new Promise<void>((resolve, reject) => {
                 session.save(() => {
@@ -225,11 +220,7 @@ export const authRouter = createTRPCRouter({
                     code: temporaryCode.substring(0, 3) + '-' + temporaryCode.substring(3, 6) + '-' + temporaryCode.substring(6, 9),
                     title: 'Your login code for Klave'
                 }));
-                await Sentry.startSpan({
-                    name: 'Email Transport',
-                    op: 'mailer.send',
-                    description: 'Email Transport'
-                }, async () => transporter.sendMail({
+                await transporter.sendMail({
                     from: config.get('KLAVE_NOREPLY_ADDRESS'),
                     to: email,
                     subject: 'Klave login code',
@@ -239,7 +230,7 @@ export const authRouter = createTRPCRouter({
                         keySelector,
                         privateKey: config.get('KLAVE_DKIM_PRIVATE_KEY')
                     }
-                }));
+                });
                 return {
                     ok: true
                 };

@@ -1,4 +1,17 @@
 # Changelog
+## [1.3.6](https://github.com/klave-network/platform/compare/hubber@1.3.5...hubber@1.3.6) (2025-10-10)
+
+### Dependency Updates
+
+* `providers` updated to version `1.3.5`
+* `api` updated to version `1.3.5`
+* `pruner` updated to version `1.3.5`
+
+### Bug Fixes
+
+* **hubber:** Add building missing dependencies in Dockerfile ([8321936](https://github.com/klave-network/platform/commit/8321936b86206c3f78753147d66315fceebd0237))
+* **hubber:** Exclude problem CommonJS dependencies ([7762fcb](https://github.com/klave-network/platform/commit/7762fcb399baf1f834c834bac4b1ddfd3fa4e21d))
+
 ## [1.3.5](https://github.com/klave-network/platform/compare/hubber@1.3.4...hubber@1.3.5) (2025-10-07)
 
 ### Dependency Updates
