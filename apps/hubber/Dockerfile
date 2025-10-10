@@ -29,7 +29,7 @@ WORKDIR /app/hubber
 RUN yarn add prisma && yarn autoclean --production && yarn cache clean
 RUN yarn run prisma generate
 
-FROM docker.io/node:22-alpine AS base
+FROM docker.io/node:24-alpine AS base
 
 ENV HUSKY=0
 ENV RUST_VERSION=1.89.0 \
@@ -86,4 +86,4 @@ EXPOSE 3333
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:3333/ || exit 1
 
-CMD [ "node", "main.js" ]
+CMD [ "node", "main.mjs" ]
