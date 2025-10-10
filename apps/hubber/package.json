@@ -1,6 +1,6 @@
 {
     "name": "@klave/hubber",
-    "version": "1.3.4",
+    "version": "1.3.6",
     "private": false,
     "description": "Klave Platform server hub",
     "repository": {
@@ -15,7 +15,7 @@
     },
     "type": "module",
     "dependencies": {
-        "typescript": "^5.9.2",
-        "zod-openapi": "^5.4.1"
+        "typescript": "^5.9.3",
+        "zod-openapi": "^5.4.3"
     }
 }

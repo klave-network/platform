@@ -16,7 +16,6 @@ import { morganLoggerMiddleware } from './middleware/morganLogger';
 import { integrationCredsRenewalMiddleware } from './middleware/integrations';
 import { probotMiddleware, probotMiddlewareHandlerRegistration } from './middleware/probot';
 import { stripeMiddlware } from './middleware/stripe';
-import { sentryRequestMiddleware, sentryTracingMiddleware, sentryErrorMiddleware } from './middleware/sentry';
 import { passportLoginCheckMiddleware } from './middleware/passport';
 import { trcpMiddlware } from './middleware/trpc';
 import { openAPIMiddleware, openAPIDocument } from './middleware/openapi';
@@ -36,8 +35,8 @@ export const start = async () => {
 
     const __hostname = config.get('HOSTNAME', 'unknown');
 
-    app.use(sentryRequestMiddleware);
-    app.use(sentryTracingMiddleware);
+    // app.use(sentryRequestMiddleware);
+    // app.use(sentryTracingMiddleware);
     app.use(morganLoggerMiddleware);
     app.use(rateLimiterMiddleware);
     app.use(express.json({
@@ -192,7 +191,7 @@ export const start = async () => {
     app.use('/o', openAPIMiddleware);
     app.use('/trpc', trcpMiddlware);
     app.use(usersRouter);
-    app.use(sentryErrorMiddleware);
+    // app.use(sentryErrorMiddleware);
     app.all('*', (req, res) => {
         res.json({
             path: req.path,

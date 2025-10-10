@@ -11,6 +11,8 @@ WORKDIR /app/hubber
 RUN addgroup --system hubber && \
     adduser --system -G hubber hubber
 
+RUN apk add --no-cache python3 make g++ git
+
 COPY --chown=hubber:hubber --chmod=444 dist/apps/hubber/package.json ./
 COPY --chown=hubber:hubber --chmod=444 patches ./patches
 COPY --chown=hubber:hubber --chmod=444 dist/apps/hubber/yarn.lock ./
@@ -27,7 +29,7 @@ WORKDIR /app/hubber
 RUN yarn add prisma && yarn autoclean --production && yarn cache clean
 RUN yarn run prisma generate
 
-FROM docker.io/node:22-alpine AS base
+FROM docker.io/node:24-alpine AS base
 
 ENV HUSKY=0
 ENV RUST_VERSION=1.89.0 \
@@ -84,4 +86,4 @@ EXPOSE 3333
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:3333/ || exit 1
 
-CMD [ "node", "main.js" ]
+CMD [ "node", "main.mjs" ]

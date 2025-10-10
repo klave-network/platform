@@ -49,6 +49,9 @@ declare function wasm_wrap_key(key_name_to_export: ArrayBuffer, key_format: i32,
 // @ts-ignore: decorator
 @external("env", "derive_key")
 declare function wasm_derive_key(base_key_name: ArrayBuffer, derivation_algo_id: i32, derivation_metadata: ArrayBuffer, derived_key_algo_id: i32, derived_key_metadata: ArrayBuffer, extractable: i32, usages: ArrayBuffer, usages_size: i32, error: ArrayBuffer, error_size: i32): i32;
+// @ts-ignore: decorator
+@external("env", "derive_bits")
+declare function wasm_derive_bits(base_key_name: ArrayBuffer, derivation_algo_id: i32, derivation_metadata: ArrayBuffer, length: i32, error: ArrayBuffer, error_size: i32): i32;
 
 // @ts-ignore: decorator
 @external("env", "save_key")
@@ -106,13 +109,13 @@ export class CryptoImpl {
             return 2;
         if (input === "verify")
             return 3;
-        if (input === "derive_key")
+        if (input === "derive_key" || input === "deriveKey")
             return 4;
-        if (input === "derive_bits")
+        if (input === "derive_bits" || input === "deriveBits")
             return 5;
-        if (input === "wrap_key")
+        if (input === "wrap_key" || input === "wrapKey")
             return 6;
-        if (input === "unwrap_key")
+        if (input === "unwrap_key" || input === "unwrapKey")
             return 7;
         return -1;
     }
@@ -309,6 +312,20 @@ export class CryptoImpl {
         }
         if (result < 0)
             return { data: null, err: new Error("Failed to derive key : " + String.UTF8.decode(buf.slice(0, -result))) };
+
+        return { data: buf.slice(0, result), err: null };
+    }
+
+    static deriveBits(baseKeyName: string, derivationAlgorithm: u32, derivationMetadata: string, length: u32): Result<ArrayBuffer, Error> {
+        let buf = new ArrayBuffer(200);
+        let result = wasm_derive_bits(String.UTF8.encode(baseKeyName, true), derivationAlgorithm, String.UTF8.encode(derivationMetadata, true), length, buf, buf.byteLength);
+        if (abs(result) > buf.byteLength) {
+            // buffer not big enough, retry with a properly sized one
+            buf = new ArrayBuffer(abs(result));
+            result = wasm_derive_bits(String.UTF8.encode(baseKeyName, true), derivationAlgorithm, String.UTF8.encode(derivationMetadata, true), length, buf, buf.byteLength);
+        }
+        if (result < 0)
+            return { data: null, err: new Error("Failed to derive bits : " + String.UTF8.decode(buf.slice(0, -result))) };
 
         return { data: buf.slice(0, result), err: null };
     }

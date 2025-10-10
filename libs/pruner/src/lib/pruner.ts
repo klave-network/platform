@@ -1,4 +1,3 @@
-import { trace } from '@sentry/core';
 import { prisma } from '@klave/db';
 import { Context, createCallerFactory, router } from '@klave/api';
 import { logger, scp, scpOps } from '@klave/providers';
@@ -222,26 +221,17 @@ async function __unusedReconcileApplicationKredits() {
 }
 
 export async function prune() {
-    return trace({
-        name: 'CRON Pruner',
-        op: 'pruner.cron',
-        description: 'Cron Pruner',
-        origin: 'manual.klave.pruner.run'
-    }, async () => {
-        try {
-            await migrateDBFields();
-            // await errorLongDeployingDeployments();
-            // await terminateExpiredDeployments();
-            // await cleanDisconnectedDeployments();
-            // await cancelUpdatingDeployments();
-            // await reconcileApplicationKredits();
-            // await reconcileApplicationLimits();
-        } catch (e) {
-            logger.error('Error while pruning', e);
-        }
-    }, () => {
-        logger.error('Error while pruning');
-    });
+    try {
+        await migrateDBFields();
+        // await errorLongDeployingDeployments();
+        // await terminateExpiredDeployments();
+        // await cleanDisconnectedDeployments();
+        // await cancelUpdatingDeployments();
+        // await reconcileApplicationKredits();
+        // await reconcileApplicationLimits();
+    } catch (e) {
+        logger.error('Error while pruning', e);
+    }
 }
 
 type PrunerOptions = {

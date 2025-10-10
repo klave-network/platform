@@ -1,6 +1,6 @@
 {
     "name": "@klave/providers",
-    "version": "1.4.3",
+    "version": "1.4.5",
     "private": true,
     "description": "Klave backend external systems providers",
     "repository": {

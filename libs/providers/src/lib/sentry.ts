@@ -1,8 +1,6 @@
 import * as Sentry from '@sentry/node';
-import { ProfilingIntegration } from '@sentry/profiling-node';
-import * as SecretariumInstruments from '@secretarium/instrumentation';
-import { prisma } from '@klave/db';
-import { logger, scp as scpClient, scpOps } from '..';
+import { nodeProfilingIntegration } from '@sentry/profiling-node';
+import { logger, scpOps } from '..';
 import { config, permissiblePeers } from '@klave/constants';
 
 export const sentryOps = {
@@ -15,27 +13,20 @@ export const sentryOps = {
                 environment: config.get('KLAVE_SENTRY_ENV', process.env['NODE_ENV'] ?? 'development'),
                 integrations: [
                     // enable HTTP calls tracing
-                    new Sentry.Integrations.Http({ tracing: true }),
-                    // enable Express.js middleware tracing
-                    // see Express middlware instantiation
-                    // new Sentry.Integrations.Express({
-                    //     app
-                    // }),
-                    new Sentry.Integrations.Prisma({
-                        client: prisma
-                    }),
-                    new Sentry.Integrations.Mongo(),
-                    new SecretariumInstruments.Sentry.ConnectorTracing({
-                        connector: scpClient,
-                        domains: ['.klave.network']
-                    })
-                ].concat(config.get('NODE_ENV') === 'development' ? [new ProfilingIntegration()] : []),
+                    Sentry.httpIntegration(),
+                    Sentry.httpServerIntegration(),
+                    Sentry.httpServerSpansIntegration(),
+                    Sentry.expressIntegration(),
+                    Sentry.prismaIntegration(),
+                    Sentry.mongoIntegration()
+                ].concat(config.get('NODE_ENV') === 'development' ? [nodeProfilingIntegration()] : []),
                 // Set tracesSampleRate to 1.0 to capture 100%
                 // of transactions for performance monitoring.
                 // We recommend adjusting this value in production
                 tracesSampleRate: 1.0,
                 tracePropagationTargets: permissiblePeers,
                 profilesSampleRate: 1.0,
+                profileLifecycle: 'trace',
                 beforeSend: (event) => {
                     const secretariumVersion = scpOps.version();
                     if (!event.tags)

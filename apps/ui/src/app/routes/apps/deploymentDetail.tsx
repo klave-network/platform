@@ -179,8 +179,11 @@ export const AppDeploymentDetail: FC = () => {
             document.body.appendChild(element);
             element.click();
             document.body.removeChild(element);
+        }).catch(() => {
+            console.error('Error downloading WASM file');
+            return;
         });
-    }
+    };
 
     return <div className="flex flex-col w-full mb-7">
         <div className="flex w-full justify-between">
