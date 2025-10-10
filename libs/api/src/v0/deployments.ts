@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import * as Sentry from '@sentry/node';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import { logger, scp } from '@klave/providers';
 import { sendToSecretarium } from '../deployment/deploymentController';
@@ -486,32 +485,24 @@ export const deploymentRouter = createTRPCRouter({
                     deploymentAddress: true
                 }
             });
-            await Sentry.startSpan({
-                name: 'SCP Subtask',
-                op: 'scp.task',
-                description: 'Secretarium Task'
-            }, async () => {
-                return await scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'deactivate_instance', `klave-termination-${deploymentId}`, {
-                    app_id: dep.applicationId,
-                    fqdn: dep.deploymentAddress?.fqdn
-                }).onExecuted(() => {
-                    (async () => {
-                        await prisma.deployment.update({
-                            where: {
-                                id: deploymentId
-                            },
-                            data: {
-                                status: 'terminated'
-                            }
-                        });
-                    })().catch(() => { return; });
-                }).onError((error) => {
-                    console.error('Secretarium failed', error);
-                    // Timeout will eventually error this
-                }).send();
-            }).catch(() => {
-                // Swallow this error
-            });
+            await scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'deactivate_instance', `klave-termination-${deploymentId}`, {
+                app_id: dep.applicationId,
+                fqdn: dep.deploymentAddress?.fqdn
+            }).onExecuted(() => {
+                (async () => {
+                    await prisma.deployment.update({
+                        where: {
+                            id: deploymentId
+                        },
+                        data: {
+                            status: 'terminated'
+                        }
+                    });
+                })().catch(() => { return; });
+            }).onError((error) => {
+                console.error('Secretarium failed', error);
+                // Timeout will eventually error this
+            }).send();
         }),
     release: publicProcedure
         .input(z.object({

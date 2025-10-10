@@ -1,5 +1,4 @@
 import { createTRPCRouter, publicProcedure } from '../trpc';
-import * as Sentry from '@sentry/node';
 import { logger, probotOps, scp, scpOps } from '@klave/providers';
 import type { Application, Limits } from '@klave/db';
 import { z } from 'zod';
@@ -261,72 +260,66 @@ export const applicationRouter = createTRPCRouter({
 
             if (scpOps.isConnected()) {
 
-                await Sentry.startSpan({
-                    name: 'SCP Subtask',
-                    op: 'scp.task',
-                    description: 'Secretarium Task'
-                }, async () => {
-                    try {
-                        // await scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_kredit', `klave-app-get-kredit-${appId}`, {
-                        //     app_id: appId
-                        // }).send()
-                        //     .then(async (result) => {
-                        //         if (result.kredit === undefined)
-                        //             throw (new Error('No credits returned'));
-                        //         return prisma.application.update({
-                        //             where: {
-                        //                 id: appId
-                        //             },
-                        //             data: {
-                        //                 kredits: result.kredit
-                        //             }
-                        //         });
-                        //     }).catch(() => {
-                        //         // Swallow this error
-                        //     });
-                        await scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_allowed_kredit_per_query', `klave-app-get-query-limit-${appId}`, {
-                            app_id: appId
-                        }).send()
-                            .then(async (result) => {
-                                if (result.kredit === undefined)
-                                    throw (new Error('No credits returned'));
-                                return await prisma.application.update({
-                                    where: {
-                                        id: appId
-                                    },
-                                    data: {
-                                        limits: {
-                                            queryCallSpend: result.kredit ?? 0
-                                        }
+                try {
+                    // await scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_kredit', `klave-app-get-kredit-${appId}`, {
+                    //     app_id: appId
+                    // }).send()
+                    //     .then(async (result) => {
+                    //         if (result.kredit === undefined)
+                    //             throw (new Error('No credits returned'));
+                    //         return prisma.application.update({
+                    //             where: {
+                    //                 id: appId
+                    //             },
+                    //             data: {
+                    //                 kredits: result.kredit
+                    //             }
+                    //         });
+                    //     }).catch(() => {
+                    //         // Swallow this error
+                    //     });
+                    await scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_allowed_kredit_per_query', `klave-app-get-query-limit-${appId}`, {
+                        app_id: appId
+                    }).send()
+                        .then(async (result) => {
+                            if (result.kredit === undefined)
+                                throw (new Error('No credits returned'));
+                            return await prisma.application.update({
+                                where: {
+                                    id: appId
+                                },
+                                data: {
+                                    limits: {
+                                        queryCallSpend: result.kredit ?? 0
                                     }
-                                });
-                            }).catch(() => {
-                                // Swallow this error
+                                }
                             });
-                        await scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_allowed_kredit_per_transaction', `klave-app-get-transaction-limit-${appId}`, {
-                            app_id: appId
-                        }).send()
-                            .then(async (result) => {
-                                if (result.kredit === undefined)
-                                    throw (new Error('No credits returned'));
-                                return await prisma.application.update({
-                                    where: {
-                                        id: appId
-                                    },
-                                    data: {
-                                        limits: {
-                                            transactionCallSpend: result.kredit ?? 0
-                                        }
+                        }).catch(() => {
+                            // Swallow this error
+                        });
+                    await scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_allowed_kredit_per_transaction', `klave-app-get-transaction-limit-${appId}`, {
+                        app_id: appId
+                    }).send()
+                        .then(async (result) => {
+                            if (result.kredit === undefined)
+                                throw (new Error('No credits returned'));
+                            return await prisma.application.update({
+                                where: {
+                                    id: appId
+                                },
+                                data: {
+                                    limits: {
+                                        transactionCallSpend: result.kredit ?? 0
                                     }
-                                });
-                            }).catch(() => {
-                                // Swallow this error
+                                }
                             });
-                    } catch (e) {
-                        console.error(e?.toString());
-                        ///
-                    }
-                });
+                        }).catch(() => {
+                            // Swallow this error
+                        });
+                } catch (e) {
+                    console.error(e?.toString());
+                    ///
+                }
             }
 
             return await prisma.application.findUnique({
@@ -441,63 +434,56 @@ export const applicationRouter = createTRPCRouter({
 
             if (scpOps.isConnected()) {
 
-                await Sentry.startSpan({
-                    name: 'SCP Subtask',
-                    op: 'scp.task',
-                    description: 'Secretarium Task'
-                }, async () => {
-
-                    const newLimits = { ...(app.limits ?? {}) };
-                    try {
-                        // await scp.newTx<KlaveGetCreditResult>(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_kredit', `klave-app-get-kredit-${app.id}`, {
-                        //     app_id: app.id
-                        // }).send().then(async (result) => {
-                        //     if (result.kredit === undefined)
-                        //         throw (new Error('No credits returned'));
-                        //     return prisma.application.update({
-                        //         where: {
-                        //             id: app.id
-                        //         },
-                        //         data: {
-                        //             kredits: result.kredit
-                        //         }
-                        //     });
-                        // }).catch(() => {
-                        //     // Swallow this error
-                        // });
-                        await scp.newTx<KlaveGetCreditResult>(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_allowed_kredit_per_query', `klave-app-get-query-limit-${app.id}`, {
-                            app_id: app.id
-                        }).send()
-                            .then(async (result) => {
-                                if (result.kredit === undefined)
-                                    throw (new Error('No credits returned'));
-                                newLimits.queryCallSpend = result.kredit ?? 0;
-                            }).catch(() => {
-                                // Swallow this error
-                            });
-                        await scp.newTx<KlaveGetCreditResult>(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_allowed_kredit_per_transaction', `klave-app-get-transaction-limit-${app.id}`, {
-                            app_id: app.id
-                        }).send()
-                            .then(async (result) => {
-                                if (result.kredit === undefined)
-                                    throw (new Error('No credits returned'));
-                                newLimits.transactionCallSpend = result.kredit ?? 0;
-                            }).catch(() => {
-                                // Swallow this error
-                            });
-                        await prisma.application.update({
-                            where: {
-                                id: app.id
-                            },
-                            data: {
-                                limits: newLimits
-                            }
+                const newLimits = { ...(app.limits ?? {}) };
+                try {
+                    // await scp.newTx<KlaveGetCreditResult>(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_kredit', `klave-app-get-kredit-${app.id}`, {
+                    //     app_id: app.id
+                    // }).send().then(async (result) => {
+                    //     if (result.kredit === undefined)
+                    //         throw (new Error('No credits returned'));
+                    //     return prisma.application.update({
+                    //         where: {
+                    //             id: app.id
+                    //         },
+                    //         data: {
+                    //             kredits: result.kredit
+                    //         }
+                    //     });
+                    // }).catch(() => {
+                    //     // Swallow this error
+                    // });
+                    await scp.newTx<KlaveGetCreditResult>(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_allowed_kredit_per_query', `klave-app-get-query-limit-${app.id}`, {
+                        app_id: app.id
+                    }).send()
+                        .then(async (result) => {
+                            if (result.kredit === undefined)
+                                throw (new Error('No credits returned'));
+                            newLimits.queryCallSpend = result.kredit ?? 0;
+                        }).catch(() => {
+                            // Swallow this error
                         });
-                    } catch (e) {
-                        console.error(e?.toString());
-                        ///
-                    }
-                });
+                    await scp.newTx<KlaveGetCreditResult>(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'get_allowed_kredit_per_transaction', `klave-app-get-transaction-limit-${app.id}`, {
+                        app_id: app.id
+                    }).send()
+                        .then(async (result) => {
+                            if (result.kredit === undefined)
+                                throw (new Error('No credits returned'));
+                            newLimits.transactionCallSpend = result.kredit ?? 0;
+                        }).catch(() => {
+                            // Swallow this error
+                        });
+                    await prisma.application.update({
+                        where: {
+                            id: app.id
+                        },
+                        data: {
+                            limits: newLimits
+                        }
+                    });
+                } catch (e) {
+                    console.error(e?.toString());
+                    ///
+                }
 
             }
 
@@ -1118,42 +1104,30 @@ export const applicationRouter = createTRPCRouter({
                 }
             });
 
-            await Sentry.startSpan({
-                name: 'SCP Subtask',
-                op: 'scp.task.kredit.transaction.allow',
-                description: 'Secretarium Task Transaction Kredit Allocation'
-            }, async () => {
-                return await new Promise((resolve, reject) => {
+            await new Promise((resolve, reject) => {
 
-                    scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'set_allowed_kredit_per_transaction', `klave-app-set-transaction-limit-${app.id}`, {
-                        app_id: app.id,
-                        kredit: Number(combinedLimits.transactionCallSpend)
-                    }).onExecuted(result => {
-                        resolve(result);
-                    }).onError(error => {
-                        reject(error);
-                    }).send()
-                        .catch(reject);
-                });
+                scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'set_allowed_kredit_per_transaction', `klave-app-set-transaction-limit-${app.id}`, {
+                    app_id: app.id,
+                    kredit: Number(combinedLimits.transactionCallSpend)
+                }).onExecuted(result => {
+                    resolve(result);
+                }).onError(error => {
+                    reject(error);
+                }).send()
+                    .catch(reject);
             });
 
-            await Sentry.startSpan({
-                name: 'SCP Subtask',
-                op: 'scp.task.kredit.query.allow',
-                description: 'Secretarium Task Query Kredit Allocation'
-            }, async () => {
-                return await new Promise((resolve, reject) => {
+            await new Promise((resolve, reject) => {
 
-                    scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'set_allowed_kredit_per_query', `klave-app-set-query-limit-${app.id}`, {
-                        app_id: app.id,
-                        kredit: Number(combinedLimits.queryCallSpend)
-                    }).onExecuted(result => {
-                        resolve(result);
-                    }).onError(error => {
-                        reject(error);
-                    }).send()
-                        .catch(reject);
-                });
+                scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'set_allowed_kredit_per_query', `klave-app-set-query-limit-${app.id}`, {
+                    app_id: app.id,
+                    kredit: Number(combinedLimits.queryCallSpend)
+                }).onExecuted(result => {
+                    resolve(result);
+                }).onError(error => {
+                    reject(error);
+                }).send()
+                    .catch(reject);
             });
         }),
     infiniteUsage: publicProcedure

@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import * as Sentry from '@sentry/node';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import { Organisation } from '@klave/db';
 import { scp } from '@klave/providers';
@@ -244,11 +243,7 @@ export const organisationRouter = createTRPCRouter({
             if (!keySelector || !domainName)
                 throw new Error('DKIM domain not set');
 
-            await Sentry.startSpan({
-                name: 'Email Transport',
-                op: 'mailer.send',
-                description: 'Email Transport'
-            }, async () => transporter.sendMail({
+            await transporter.sendMail({
                 from: config.get('KLAVE_NOREPLY_ADDRESS'),
                 to: fetchedUser.emails[0], // unsure if we should send email to all addresses
                 subject: 'Your organisation is now live on Klave',
@@ -258,7 +253,7 @@ export const organisationRouter = createTRPCRouter({
                     keySelector,
                     privateKey: config.get('KLAVE_DKIM_PRIVATE_KEY')
                 }
-            }));
+            })
 
             return org;
 
@@ -400,24 +395,18 @@ export const organisationRouter = createTRPCRouter({
                     }
                 })
             ]);
-            await Sentry.startSpan({
-                name: 'SCP Subtask',
-                op: 'scp.task',
-                description: 'Secretarium Task'
-            }, async () => {
-                return await new Promise((resolve, reject) => {
-                    scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'add_kredit', `klave-app-set-kredit-${application.id}`, {
-                        app_id: application.id,
-                        kredit: amount
-                    }).onResult(result => {
-                        resolve(result);
-                    }).onExecuted(result => {
-                        resolve(result);
-                    }).onError(error => {
-                        reject(error);
-                    }).send()
-                        .catch(reject);
-                });
+            await new Promise((resolve, reject) => {
+                scp.newTx(config.get('KLAVE_DEPLOYMENT_MANDLER'), 'add_kredit', `klave-app-set-kredit-${application.id}`, {
+                    app_id: application.id,
+                    kredit: amount
+                }).onResult(result => {
+                    resolve(result);
+                }).onExecuted(result => {
+                    resolve(result);
+                }).onError(error => {
+                    reject(error);
+                }).send()
+                    .catch(reject);
             });
         }),
     infiniteOrganisations: publicProcedure
