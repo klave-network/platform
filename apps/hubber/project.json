@@ -24,6 +24,9 @@
                 ],
                 "generatePackageJson": true,
                 "external": [
+                    "@aws-sdk/client-s3",
+                    "@aws-sdk/lib-storage",
+                    "@modelcontextprotocol/sdk",
                     "assemblyscript",
                     "json-as",
                     "typescript"

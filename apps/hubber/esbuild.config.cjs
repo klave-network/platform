@@ -28,7 +28,7 @@ module.exports = {
         '.node': 'copy'
     },
     outExtension: {
-        '.js': '.js'
+        '.js': '.mjs'
     },
     define: {
         'process.env.NX_TASK_TARGET_PROJECT': JSON.stringify(process.env.NX_TASK_TARGET_PROJECT),
