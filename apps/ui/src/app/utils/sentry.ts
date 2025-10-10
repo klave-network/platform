@@ -37,6 +37,6 @@ Sentry.init({
     tracePropagationTargets: permissiblePeers
 });
 
-export const sentryCreateBrowserRouter = Sentry.wrapCreateMemoryRouterV6(
+export const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouterV6(
     createBrowserRouter
 );
