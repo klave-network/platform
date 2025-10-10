@@ -1,4 +1,9 @@
 # Changelog
+## [1.5.4](https://github.com/klave-network/platform/compare/ui@1.5.3...ui@1.5.4) (2025-10-10)
+
+### Dependency Updates
+
+* `api` updated to version `1.5.3`
 ## [1.5.3](https://github.com/klave-network/platform/compare/ui@1.5.2...ui@1.5.3) (2025-10-07)
 
 ### Dependency Updates
