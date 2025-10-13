@@ -157,7 +157,7 @@
         "probot": "14.0.6",
         "prompts": "2.4.2",
         "query-string": "9.3.1",
-        "rate-limiter-flexible": "8.0.1",
+        "rate-limiter-flexible": "8.1.0",
         "react": "19.2.0",
         "react-dom": "19.2.0",
         "react-email": "4.3.0",
