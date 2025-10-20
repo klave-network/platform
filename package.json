@@ -203,7 +203,7 @@
         "@nx/devkit": "19.8.14",
         "@nx/esbuild": "19.8.14",
         "@nx/eslint": "19.8.14",
-        "@nx/eslint-plugin": "19.8.14",
+        "@nx/eslint-plugin": "21.6.5",
         "@nx/express": "19.8.14",
         "@nx/jest": "19.8.14",
         "@nx/js": "19.8.14",
