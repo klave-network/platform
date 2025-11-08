@@ -128,7 +128,7 @@
         "core-js": "^3.46.0",
         "cors": "2.8.5",
         "cross-spawn": "7.0.6",
-        "daisyui": "5.1.31",
+        "daisyui": "5.3.7",
         "date-fns": "^4.1.0",
         "expect-ct": "1.0.0",
         "express": "4.21.2",
