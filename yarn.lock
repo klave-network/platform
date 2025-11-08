@@ -10709,10 +10709,10 @@ d3-time-format@^3.0.0:
   dependencies:
     d3-array "2 - 3"
 
-daisyui@5.1.31:
-  version "5.1.31"
-  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-5.1.31.tgz#f98189d9fc8dd95663afa6b15b7c5be9c5c68d87"
-  integrity sha512-p1zRMQ/eEfx1gpExFlyI62NksJ+UxyNC3kH4gYSK0JuL3qFXeo9R5lgkrIvos0V4ukaN+vMKMxGz7Gy6xg1hNg==
+daisyui@5.3.7:
+  version "5.3.7"
+  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-5.3.7.tgz#9dd8c8fc773e5cac60deb6ebeffd51ef75702a0f"
+  integrity sha512-0+8PaSGift0HlIQABCeZzWOBV5Nx/vsI2TihB9hbaEyZENPlZZz+se2JnAH5rz9gBYTyDLB7NJup8hkREr6WBw==
 
 damerau-levenshtein@^1.0.8:
   version "1.0.8"
