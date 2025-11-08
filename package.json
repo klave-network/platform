@@ -154,7 +154,7 @@
         "passport": "0.7.0",
         "path-complete-extname": "1.0.0",
         "pretty-bytes": "7.1.0",
-        "probot": "14.0.6",
+        "probot": "14.2.1",
         "prompts": "2.4.2",
         "query-string": "9.3.1",
         "rate-limiter-flexible": "8.0.1",

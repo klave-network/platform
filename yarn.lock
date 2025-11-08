@@ -17301,10 +17301,10 @@ prismjs@^1.30.0:
   resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.30.0.tgz#d9709969d9d4e16403f6f348c63553b19f0975a9"
   integrity sha512-DEvV2ZF2r2/63V+tK8hQvrR2ZGn10srHbXviTlcv7Kpzw8jWiNTqbVgjO3IY8RxrrOUF8VPMQQFysYYYv0YZxw==
 
-probot@14.0.6:
-  version "14.0.6"
-  resolved "https://registry.yarnpkg.com/probot/-/probot-14.0.6.tgz#7588720156f1b98e532450f40c8fbd712653c814"
-  integrity sha512-/BBM+1NdniXojvdTEKCxE+nS21DoBRRyhuDV2MZpG0ZocRuKKI1vrzySqO+nz6/XyWuWQw5E70DU8jAkVgACQg==
+probot@14.2.1:
+  version "14.2.1"
+  resolved "https://registry.yarnpkg.com/probot/-/probot-14.2.1.tgz#df4d6582c96a41e521ac3987e9f5a881c013b000"
+  integrity sha512-McW8rn1X7UA6lR6GfruHrrwFbkwBwnPeYfmX7F1fuaEPhE0oFdg+cwIxp4Z7ez31kz/ABAeWdDBigOCr3b+zXw==
   dependencies:
     "@octokit/core" "^7.0.3"
     "@octokit/plugin-enterprise-compatibility" "^6.0.1"
@@ -17322,13 +17322,13 @@ probot@14.0.6:
     deepmerge "^4.3.1"
     dotenv "^17.0.0"
     import-meta-resolve "^4.1.0"
-    js-yaml "^4.1.0"
     npx-import-light "^1.0.0"
     octokit-auth-probot "^4.0.1"
     package-config "^5.0.0"
     pino "^10.0.0"
     pino-http "^11.0.0"
     toad-cache "^3.7.0"
+    yaml "^2.8.1"
 
 proc-log@^3.0.0:
   version "3.0.0"
