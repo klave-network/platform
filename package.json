@@ -99,7 +99,7 @@
         "@react-email/tailwind": "^1.2.2",
         "@secretarium/connector": "0.20.0-dev.1",
         "@sentry/browser": "10.19.0",
-        "@sentry/esbuild-plugin": "4.4.0",
+        "@sentry/esbuild-plugin": "4.6.1",
         "@sentry/node": "10.19.0",
         "@sentry/profiling-node": "10.19.0",
         "@sentry/react": "10.19.0",
