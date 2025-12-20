@@ -7439,10 +7439,10 @@
   resolved "https://registry.yarnpkg.com/@trpc/react-query/-/react-query-11.6.0.tgz#9300a7dbdaf5d87a4ce714928aea5de0687384b7"
   integrity sha512-xljUCzROa23cC89SEd5fwbKiWrGus2NDwtg8zszPlsFvaByWW50Jx6y5sLPXhp/g1FBsEtCInNNhEEL0UCHwGw==
 
-"@trpc/server@11.6.0":
-  version "11.6.0"
-  resolved "https://registry.yarnpkg.com/@trpc/server/-/server-11.6.0.tgz#beafa9d366031cfcb2e338120c8276141df5135a"
-  integrity sha512-skTso0AWbOZck40jwNeYv++AMZXNWLUWdyk+pB5iVaYmEKTuEeMoPrEudR12VafbEU6tZa8HK3QhBfTYYHDCdg==
+"@trpc/server@11.8.0":
+  version "11.8.0"
+  resolved "https://registry.yarnpkg.com/@trpc/server/-/server-11.8.0.tgz#2f6b37e79a6774628be0a050c8ef8b4e55385222"
+  integrity sha512-DphyQnLuyX2nwJCQGWQ9zYz4hZGvRhSBqDhQ0SH3tDhQ3PU4u68xofA0pJ741Ir4InEAFD+TtJVLAQy+wVOkiQ==
 
 "@trysound/sax@0.2.0":
   version "0.2.0"

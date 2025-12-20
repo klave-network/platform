@@ -117,7 +117,7 @@
         "@total-typescript/ts-reset": "^0.6.1",
         "@trpc/client": "11.6.0",
         "@trpc/react-query": "11.6.0",
-        "@trpc/server": "11.6.0",
+        "@trpc/server": "11.8.0",
         "ansi-to-react": "6.1.6",
         "as-base64": "0.2.0",
         "assemblyscript": "^0.28.8",
